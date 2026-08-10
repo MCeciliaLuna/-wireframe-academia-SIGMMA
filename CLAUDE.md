@@ -111,12 +111,15 @@ Un bloque se marca con `data-escena="E2"`, o con varias separadas por coma. `ui.
 corresponden con **`data-escena-off`** — un atributo propio, **no `hidden`**: las solapas y el
 conmutador de vista usan `hidden` y se pisarían. Así componen.
 
-**Dos reglas que no se negocian:**
+**Tres reglas que no se negocian:**
 
 1. **Los datos de una escena nunca se mezclan con los de otra.** Por eso se alternan bloques enteros
    de HTML y no celdas sueltas.
 2. **Si se pide una escena que la pantalla no maqueta, avisa.** Nunca muestra los datos de otro
    momento con el rótulo cambiado.
+3. **Monotonía temporal: entre escenas sucesivas, el estado de un video solo puede avanzar.** Las
+   únicas excepciones son `a regrabar` y `obsoleto`, posteriores a `publicado`. Vale igual para todo
+   contador derivado: el banco de la Ruta Esencial no baja, y un módulo ya activado sigue activo.
 
 **Los estados vacíos son escenas**, no un parámetro aparte: el estado vacío de una pantalla *es* esa
 pantalla en E1 o E2. No hay `?state=empty`.
@@ -184,6 +187,10 @@ Salieron de tres rondas de revisión del wireframe. **Romperlas es un error, no 
 
 Los 7 estados de producción, en orden: `backlog` → `guionado` → `grabado` → `editado` → `publicado`
 → `a regrabar` → `obsoleto`.
+
+`data-estado` lleva **el nombre exacto**, sin abreviar ni slugificar — incluido
+`data-estado="a regrabar"`, con espacio. Ese vocabulario se copia a desarrollo. Los pasos del
+importador son otro vocabulario y usan `data-paso-estado`, para no pisar el atributo.
 
 ## La regla numérica que une todo
 
@@ -263,7 +270,10 @@ reales de cada columna, el listado de módulos coincidiendo con el tablero módu
 - `E3`: `2 + 6 + 4 + 43 = 55`, y los 2 publicados son C01, los 6 editados C02 y los 4 guionados C03
 - `E4`: publicados por módulo `2+3+3+3+1 = 12`, banco 60, Ruta 12/12 apta, y **ningún módulo de
   biblioteca completo** — que es el argumento de la Ruta Esencial
+- `E5`: `14 + 4 + 2 + 2 + 29 + 3 + 1 = 55`, los 12 de P1 **siguen publicados**, y la Ruta pasó de
+  apta a **activa** con 12/12 videos y banco 60/60
 - **Los mismos 55 IDs en las cuatro:** ninguno aparece ni desaparece, solo cambia el estado
+- **Monotonía: cero retrocesos.** Video por video, `E2 ≤ E3 ≤ E4 ≤ E5` según el orden de avance
 
 ```bash
 # R10 — el Home no inventa métricas de uso

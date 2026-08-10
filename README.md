@@ -31,6 +31,22 @@ Se recorre con **`?escena=E1..E4`**. Sin parámetro, todas las pantallas abren e
 Si se pide una escena que una pantalla no maqueta, **avisa** en vez de mostrar los datos de otro
 momento con el rótulo cambiado.
 
+### Monotonía temporal
+
+Las cinco escenas son una **línea de tiempo**, no cinco variantes sueltas. De ahí sale la regla que
+las mantiene consistentes:
+
+> **Entre escenas sucesivas, el estado de un video solo puede avanzar.** Las únicas excepciones son
+> `a regrabar` y `obsoleto`, que son estados posteriores a `publicado`.
+
+Orden de avance: `backlog` → `guionado` → `grabado` → `editado` → `publicado` → `a regrabar` /
+`obsoleto`.
+
+Vale igual para todo contador **derivado**: el banco de la Ruta Esencial hereda de sus 12 videos y no
+puede bajar entre dos momentos sucesivos sin que alguien haya borrado preguntas; un módulo que ya se
+activó sigue activo en la escena siguiente. Sin esta regla, E5 deja de ser posterior a E4 y el flujo
+**F8 · camino al lanzamiento** pierde continuidad justo en el tramo que le da sentido.
+
 ---
 
 ## Cómo verlo
@@ -137,6 +153,10 @@ sidebar.
 - **Planes:** «plan A» y «plan B», **placeholder deliberado** — el diccionario real es una decisión abierta.
 - **IDs de video:** `BAK-M30.050`, de 10 en 10, para poder intercalar sin renumerar.
 - **Los 7 estados:** `backlog` → `guionado` → `grabado` → `editado` → `publicado` → `a regrabar` → `obsoleto`.
+  El atributo `data-estado` lleva **el nombre exacto**, sin abreviar ni slugificar — incluido
+  `data-estado="a regrabar"`, con espacio. Ese vocabulario se copia a desarrollo: un estado no puede
+  llamarse de una manera en la interfaz y de otra en el atributo. Los pasos del importador, que son
+  otro vocabulario, usan `data-paso-estado` para no pisarlo.
 
 ---
 
@@ -192,14 +212,26 @@ tablero y la columna «publicados / total» del listado. Eso destapó contradicc
 | Qué | Decía | Queda |
 |---|---|---|
 | `BAK-M10` publicados | 6 / 6 | **5 / 6** — `BAK-M10.050` está `obsoleto` |
-| `BAK-M40` publicados | 5 / 5 | **4 / 5** — `BAK-M40.010` está `guionado` |
 | Columnas del kanban | sumaban 58 con 55 videos | **suman 55** |
+| Los 12 de P1 en régimen | E4 los publicaba y E5 devolvía 3 a `editado`, `grabado` y `guionado` | **los 12 publicados también en E5** — `BAK-M20.030`, `BAK-M20.040` y `BAK-M40.010` |
+| Banco de la Ruta Esencial | 60 / 60 en E4 y 18 / 60 en E5 | **60 / 60 en las dos**, y la Ruta queda **activa** en E5 |
 
-### B-1 · Los cohortes se alinearon al Maestro
+Las dos últimas filas salen de la **monotonía temporal**: son retrocesos entre escenas sucesivas, y
+un video —o un banco derivado— no retrocede solo.
+
+### B-1 · Manda el Maestro de Producción
 
 **8 de 9 cohortes de la primera tanda contradecían al plan de rodaje real.** Era tolerable cuando el
-cohorte era una columna; dejó de serlo cuando pasó a ser una pantalla. Se alinearon los 55 videos —y
-sus prioridades— al Maestro de Producción. **Cierra la decisión abierta D-7.**
+cohorte era una columna; dejó de serlo cuando pasó a ser una pantalla de trabajo con receta y
+encadenamiento: si contradice el plan real, no sirve para grabar. Y el Maestro es el que tiene el
+escenario de datos compartido de cada cohorte — el wireframe de baja fidelidad nunca los tuvo
+especificados, se generaron por aproximación.
+
+Los 55 videos —y sus prioridades— **quedaron alineados al Maestro**: `BAK-M30.030` va en C07, no en
+C03. Los 12 de P1 conservan C01, C02 y C03 según `Majo_3_Cohorte_P1_guiones`, porque de eso dependen
+las tres secciones de la Ruta Esencial y el modo sesión de la hoja de cohorte.
+
+**D-7 queda cerrada**, y así figura en la tabla de decisiones de `design-system.html`.
 
 ### B-2 · El documento de guiones escribe «SIGMA»
 
@@ -240,11 +272,16 @@ A las 9 reglas no negociables de la primera tanda se suman dos:
 
 - **Compila** con `@tailwindcss/cli` 4.3.3, sin errores.
 - **Las 4 escenas cierran:** E2 los 55 en backlog · E3 `2+6+4+43 = 55` · E4 publicados por módulo
-  `2+3+3+3+1 = 12` y banco 60 · y en E4 **ningún módulo de biblioteca queda completo**, que es el
-  argumento de la Ruta Esencial.
+  `2+3+3+3+1 = 12` y banco 60 · E5 `14+4+2+2+29+3+1 = 55` · y en E4 **ningún módulo de biblioteca
+  queda completo**, que es el argumento de la Ruta Esencial.
 - **Los mismos 55 IDs en las 4 escenas:** ninguno aparece ni desaparece, solo cambia el estado.
+- **Monotonía temporal: cero retrocesos.** Los 55 videos, video por video, cumplen
+  E2 ≤ E3 ≤ E4 ≤ E5 según el orden de avance. Los 12 de P1 están publicados en E4 **y** en E5, y la
+  Ruta Esencial va de apta (E4) a activa (E5) con 12 / 12 videos y banco 60 / 60 en las dos.
 - **Los 7 contadores del kanban suman 55 en cada escena**, y coinciden con las tarjetas reales y con
   las filas de la tabla, estado por estado.
+- **Los 7 valores de `data-estado`** son exactamente los 7 nombres del vocabulario. Los pasos del
+  importador usan `data-paso-estado`, así que no hay colisión.
 - **Las 5 cadenas de `BAK-M30`** siguen cerrando en régimen: 28 / 20 / 15 / 35 / 10.
 - **R10:** `home.html` no contiene métricas de uso. **R11:** ninguna pantalla de alta tiene campo de
   link de YouTube.

@@ -2313,23 +2313,23 @@
     font-weight: 700;
     color: var(--color-gray-700);
   }
-  .wizard-step[data-estado="hecho"] {
+  .wizard-step[data-paso-estado="hecho"] {
     background: var(--color-surface);
   }
-  .wizard-step[data-estado="hecho"] .wizard-num {
+  .wizard-step[data-paso-estado="hecho"] .wizard-num {
     background: var(--color-success-bg);
     border-color: var(--color-success-line);
     color: var(--color-success-dark);
   }
-  .wizard-step[data-estado="actual"] b {
+  .wizard-step[data-paso-estado="actual"] b {
     color: var(--color-ink);
   }
-  .wizard-step[data-estado="actual"] .wizard-num {
+  .wizard-step[data-paso-estado="actual"] .wizard-num {
     background: var(--color-primary);
     border-color: var(--color-primary);
     color: var(--color-white);
   }
-  .wizard-step[data-estado="pendiente"] {
+  .wizard-step[data-paso-estado="pendiente"] {
     color: var(--color-gray-600);
   }
 
@@ -2564,7 +2564,7 @@
   .funnel > span[data-estado="publicado"] {
     background: var(--color-success-dark);
   }
-  .funnel > span[data-estado="regrabar"] {
+  .funnel > span[data-estado="a regrabar"] {
     background: var(--color-error);
   }
   .funnel > span[data-estado="obsoleto"] {

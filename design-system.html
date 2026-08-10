@@ -114,6 +114,38 @@
           </span>
         </p>
 
+        <h3 class="text-h5 mt-8">Monotonía temporal</h3>
+        <p class="mt-2 max-w-[72ch] text-gray-700">
+          Las cinco escenas son una <strong>línea de tiempo</strong>, no cinco variantes sueltas. De
+          ahí sale la regla que las mantiene consistentes:
+        </p>
+        <p class="alert alert-warning mt-3">
+          <span class="icon" data-icon="alert-triangle"></span>
+          <span>
+            <strong>Entre escenas sucesivas, el estado de un video solo puede avanzar.</strong> Las
+            únicas excepciones son <code class="font-mono text-xs">a regrabar</code> y
+            <code class="font-mono text-xs">obsoleto</code>, que son estados posteriores a
+            <code class="font-mono text-xs">publicado</code>.
+          </span>
+        </p>
+        <p class="mt-3 max-w-[72ch] text-gray-700">
+          Orden de avance:
+          <code class="font-mono text-xs">backlog</code> →
+          <code class="font-mono text-xs">guionado</code> →
+          <code class="font-mono text-xs">grabado</code> →
+          <code class="font-mono text-xs">editado</code> →
+          <code class="font-mono text-xs">publicado</code> →
+          <code class="font-mono text-xs">a regrabar</code> /
+          <code class="font-mono text-xs">obsoleto</code>.
+        </p>
+        <p class="mt-3 max-w-[72ch] text-sm text-ink-soft">
+          Lo mismo vale para todo contador derivado: el banco de la Ruta Esencial, que hereda de sus
+          12 videos, no puede bajar entre dos momentos sucesivos sin que alguien haya borrado
+          preguntas. Y un módulo que ya se activó sigue activo en la escena siguiente. Sin esta
+          regla, E5 dejaría de ser posterior a E4 y el flujo <strong>F8 · camino al lanzamiento</strong>
+          perdería continuidad justo en el tramo que le da sentido.
+        </p>
+
         <h3 class="text-h5 mt-8">Cómo funciona</h3>
         <p class="mt-2 max-w-[72ch] text-gray-700">
           Es un parámetro de URL, <code class="font-mono text-sm">?escena=</code>, y sin él se muestra
@@ -382,10 +414,10 @@
 
         <h3 class="text-h5 mt-8">Asistente por pasos</h3>
         <ol class="wizard mt-3">
-          <li class="wizard-step" data-estado="hecho"><span class="wizard-num">1</span><span><b>Origen</b>El archivo del tablero</span></li>
-          <li class="wizard-step" data-estado="actual"><span class="wizard-num">2</span><span><b>Mapeo</b>Columna → campo</span></li>
-          <li class="wizard-step" data-estado="pendiente"><span class="wizard-num">3</span><span><b>Validación</b>Qué entra y qué no</span></li>
-          <li class="wizard-step" data-estado="pendiente"><span class="wizard-num">4</span><span><b>Confirmación</b>Qué se va a crear</span></li>
+          <li class="wizard-step" data-paso-estado="hecho"><span class="wizard-num">1</span><span><b>Origen</b>El archivo del tablero</span></li>
+          <li class="wizard-step" data-paso-estado="actual"><span class="wizard-num">2</span><span><b>Mapeo</b>Columna → campo</span></li>
+          <li class="wizard-step" data-paso-estado="pendiente"><span class="wizard-num">3</span><span><b>Validación</b>Qué entra y qué no</span></li>
+          <li class="wizard-step" data-paso-estado="pendiente"><span class="wizard-num">4</span><span><b>Confirmación</b>Qué se va a crear</span></li>
         </ol>
         <p class="mt-2 text-sm text-ink-soft">
           El rótulo importa: «mapeo» y «validación» no son intercambiables, así que
@@ -409,11 +441,11 @@
         <h3 class="text-h5 mt-8">Embudo de producción</h3>
         <div class="funnel mt-3">
           <span data-estado="backlog" style="width: 25.45%">14</span>
-          <span data-estado="guionado" style="width: 9.09%">5</span>
-          <span data-estado="grabado" style="width: 5.45%">3</span>
-          <span data-estado="editado" style="width: 5.45%">3</span>
-          <span data-estado="publicado" style="width: 47.27%">26 publicados</span>
-          <span data-estado="regrabar" style="width: 5.45%">3</span>
+          <span data-estado="guionado" style="width: 7.27%">4</span>
+          <span data-estado="grabado" style="width: 3.64%">2</span>
+          <span data-estado="editado" style="width: 3.64%">2</span>
+          <span data-estado="publicado" style="width: 52.73%">29 publicados</span>
+          <span data-estado="a regrabar" style="width: 5.45%">3</span>
           <span data-estado="obsoleto" style="width: 1.82%">1</span>
         </div>
         <p class="mt-2 text-sm text-ink-soft">
@@ -479,7 +511,9 @@
         <h2 class="text-h3">Decisiones abiertas</h2>
         <p class="mt-2 max-w-[72ch] text-gray-700">
           Lo que el prototipo resuelve de una manera pero <strong>todavía no está decidido</strong>.
-          Cada fila es una pregunta para el proyecto, no un pendiente de maquetación.
+          Cada fila es una pregunta para el proyecto, no un pendiente de maquetación. Las que ya se
+          resolvieron quedan en la tabla marcadas <span class="chip chip-publicado">cerrada</span>,
+          con la resolución y su motivo, para no perder el rastro de por qué se decidió así.
         </p>
 
         <div class="table-wrap mt-6">
@@ -510,12 +544,12 @@
               <tr>
                 <td class="font-mono text-xs">D-4</td>
                 <td><strong>¿Un módulo activo puede tener videos sin publicar?</strong></td>
-                <td>Sí. La «aptitud para activar» es una compuerta al momento de activar, no una condición permanente: <code class="font-mono text-xs">BAK-M40</code> está activo con 4 de 5 videos publicados porque el quinto entró en producción después.</td>
+                <td>Sí. La «aptitud para activar» es una compuerta al momento de activar, no una condición permanente: <code class="font-mono text-xs">BAK-M10</code> está activo con 5 de 6 videos publicados porque <code class="font-mono text-xs">BAK-M10.050</code> quedó obsoleto <em>después</em> de la activación.</td>
               </tr>
               <tr>
                 <td class="font-mono text-xs">D-5</td>
                 <td><strong>Cómo hereda el banco de la Ruta Esencial</strong></td>
-                <td>Se muestra etiquetado como <span class="chip chip-meta">derivado</span> con 18 heredadas de 60 mínimas. La regla exacta de herencia —qué pasa si el video de origen cambia de estado— no está definida.</td>
+                <td>Se muestra etiquetado como <span class="chip chip-meta">derivado</span>: en E4 hereda 60 de 60 mínimas (5 preguntas × 12 videos publicados) y en E5 sigue en 60, porque ninguno de sus 12 videos cambió de estado. La regla exacta de herencia —qué pasa si el video de origen pasa a <code class="font-mono text-xs">a regrabar</code> u <code class="font-mono text-xs">obsoleto</code>— no está definida.</td>
               </tr>
               <tr>
                 <td class="font-mono text-xs">D-6</td>
@@ -524,8 +558,8 @@
               </tr>
               <tr>
                 <td class="font-mono text-xs">D-7</td>
-                <td><strong>Cohortes: el wireframe contradice al Maestro de Producción</strong></td>
-                <td>Manda el wireframe en los videos que nombra. Ejemplo: pone <code class="font-mono text-xs">BAK-M30.030</code> en C03 y el Maestro en C07.</td>
+                <td><strong>Cohortes: el wireframe contradice al Maestro de Producción</strong> <span class="chip chip-publicado">cerrada</span></td>
+                <td><strong>Manda el Maestro de Producción.</strong> Es el plan de rodaje real, con el escenario de datos compartido de cada cohorte; el wireframe de baja fidelidad nunca los tuvo especificados, se generaron por aproximación. Y el cohorte dejó de ser una columna: ahora es una pantalla de trabajo (<a href="cohorte.html?c=C03&amp;escena=E3">hoja de cohorte</a>) con receta y encadenamiento, y si contradice el plan real no se puede usar para grabar. Los 55 videos están alineados al Maestro: <code class="font-mono text-xs">BAK-M30.030</code> queda en C07.</td>
               </tr>
               <tr>
                 <td class="font-mono text-xs">D-8</td>
@@ -606,14 +640,19 @@
                 <td><strong>5 / 6</strong> — <code class="font-mono text-xs">BAK-M10.050</code> está obsoleto, y un video no puede estar en dos columnas</td>
               </tr>
               <tr>
-                <td><code class="font-mono text-xs">BAK-M40</code> videos publicados</td>
-                <td>5 / 5</td>
-                <td><strong>4 / 5</strong> — <code class="font-mono text-xs">BAK-M40.010</code> está guionado</td>
-              </tr>
-              <tr>
                 <td>Cohortes de la primera tanda</td>
                 <td>8 de 9 contradecían al Maestro</td>
                 <td><strong>alineados al Maestro de Producción</strong> — el plan de rodaje real. Cierra la decisión D-7</td>
+              </tr>
+              <tr>
+                <td>Los 12 videos de P1 en régimen</td>
+                <td>E4 los publica y E5 devolvía 3 a <code class="font-mono text-xs">editado</code>, <code class="font-mono text-xs">grabado</code> y <code class="font-mono text-xs">guionado</code></td>
+                <td><strong>los 12 publicados también en E5</strong> — <code class="font-mono text-xs">BAK-M20.030</code>, <code class="font-mono text-xs">BAK-M20.040</code> y <code class="font-mono text-xs">BAK-M40.010</code>. Un video no retrocede entre escenas sucesivas</td>
+              </tr>
+              <tr>
+                <td>Banco de la Ruta Esencial en régimen</td>
+                <td>60 de 60 en E4 y 18 de 60 en E5</td>
+                <td><strong>60 de 60 en las dos</strong> — un banco derivado no baja solo. La Ruta queda <span class="chip chip-publicado">activa</span> en E5: ya pasó su compuerta</td>
               </tr>
               <tr>
                 <td><code class="font-mono text-xs">BAK-M30.050</code> en la Ruta</td>

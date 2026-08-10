@@ -468,7 +468,7 @@ BAK-M00.010,BAK,M00,P+B,C01,P1,backlog,,,,"></textarea>
 
         document.querySelectorAll(".wizard-step").forEach(function (s, i) {
           const estado = paso === "resultado" ? "hecho" : i < idx ? "hecho" : i === idx ? "actual" : "pendiente";
-          s.dataset.estado = estado;
+          s.dataset.pasoEstado = estado;
           if (estado === "actual") s.setAttribute("aria-current", "step");
         });
       })();
