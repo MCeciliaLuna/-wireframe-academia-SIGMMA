@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap" rel="stylesheet"><style>
+body{margin:0;background:#f0eee9;font-family:system-ui,sans-serif}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 13px/1.2 system-ui,sans-serif;color:#1a1a1a}
+.dv-opts{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 system-ui,sans-serif;color:rgba(0,0,0,.55)}
+.dv-card{max-width:100%;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);overflow:hidden}
+.dv-opt:target .dv-oid{background:#2a78d6;color:#fff}
+.dv-next{margin:22px 0 0;font:12px/1.5 system-ui,sans-serif;color:rgba(0,0,0,.5)}
+a{color:#2a78d6}a:hover{color:#1b5ea8}
+.sh{width:1440px;height:880px;display:grid;grid-template-columns:200px 1fr;background:#fff;color:#333;font:12px/1.45 system-ui,sans-serif}
+.sd{border-right:1px dashed #a8a8a8;padding:12px 10px;display:flex;flex-direction:column;gap:16px;background:#fafafa}
+.sf{border:1px solid #999;border-radius:3px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;font-size:11px;background:#fff}
+.ng{display:flex;flex-direction:column;gap:3px}
+.nt{font:600 9px/1 ui-monospace,Menlo,monospace;letter-spacing:.09em;color:#9a9a9a;text-transform:uppercase;margin-bottom:3px}
+.ni{padding:5px 8px;border-radius:3px;color:#555;font-size:11.5px}
+.ni.on{background:#e4e4e4;color:#111;font-weight:600}
+.mn{display:flex;flex-direction:column;min-width:0}
+.hd{border-bottom:1px solid #ddd;padding:12px 20px;display:flex;justify-content:space-between;align-items:flex-end;gap:20px}
+.bc{font:10.5px/1 ui-monospace,Menlo,monospace;color:#9a9a9a;margin-bottom:7px}
+.h1{font-size:18px;font-weight:600;color:#111;display:flex;align-items:center;gap:10px}
+.bd{padding:16px 20px;display:flex;flex-direction:column;gap:14px;min-height:0;overflow:hidden}
+.row{display:flex;gap:12px;align-items:center}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;border:1px dashed #bbb;border-radius:4px;padding:8px 10px;background:#fcfcfc}
+.fl{border:1px solid #bbb;border-radius:3px;padding:4px 9px;font-size:11px;color:#555;background:#fff;display:flex;gap:6px;align-items:center}
+.btn{border:1px solid #888;border-radius:3px;padding:6px 11px;font-size:11.5px;color:#333;background:#fff}
+.btn.p{background:#333;color:#fff;border-color:#333}
+.chip{display:inline-block;border:1px solid #999;border-radius:10px;padding:1px 8px;font-size:10px;color:#555;white-space:nowrap}
+.chip.f{background:#e9e9e9;border-color:#c4c4c4}
+.chip.o{border-style:dashed;color:#8a8a8a}
+.tb{width:100%;border-collapse:collapse;font-size:11.5px;table-layout:fixed}
+.tb th{text-align:left;font:600 9.5px/1.2 ui-monospace,Menlo,monospace;letter-spacing:.05em;text-transform:uppercase;color:#8d8d8d;border-bottom:1px solid #c9c9c9;padding:7px 8px}
+.tb td{border-bottom:1px solid #eee;padding:7px 8px;color:#454545;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mono{font-family:ui-monospace,Menlo,monospace}
+.mut{color:#9a9a9a}
+.box{border:1px dashed #b0b0b0;border-radius:4px;padding:12px}
+.cd{border:1px solid #e0e0e0;border-radius:4px;padding:12px;background:#fff}
+.lb{font:600 9px/1 ui-monospace,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;color:#9a9a9a}
+.inp{border:1px solid #c4c4c4;border-radius:3px;padding:6px 8px;font-size:11.5px;color:#444;background:#fff}
+.inp.dis{background:#f0f0f0;color:#8a8a8a;border-style:dashed}
+.note{font-family:Caveat,cursive;font-size:15px;line-height:1.15;color:#b1553a}
+.tabs{display:flex;border-bottom:1px solid #ddd;gap:2px}
+.tab{padding:8px 15px;font-size:12px;color:#7d7d7d;border-bottom:2px solid transparent}
+.tab.on{color:#111;font-weight:600;border-bottom:2px solid #333}
+.sw{width:30px;height:16px;border:1px solid #999;border-radius:9px;position:relative;background:#fff}
+.sw i{position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:#bbb}
+.sw.on{background:#444;border-color:#444}.sw.on i{left:16px;background:#fff}
+.ph{background:#ececec;border-radius:2px;display:block}
+.kcol{flex:1;min-width:0;border:1px dashed #c0c0c0;border-radius:4px;background:#fbfbfb;padding:7px;display:flex;flex-direction:column;gap:6px}
+.kc{border:1px solid #ddd;border-radius:3px;background:#fff;padding:7px}
+.big{font:600 30px/1 ui-monospace,Menlo,monospace;color:#222}
+</style></helmet>
+
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Tanda 1 — las 6 pantallas del corazón, a 1440 px</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="1a"><div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>S00 · Layout maestro (shell)</div>
+<div class="dv-card"><div class="sh">
+<div class="sd">
+<div><div class="lb" style="margin-bottom:5px">Superficie</div><div class="sf"><span><b>BAK</b> · Backoffice</span><span class="mut">▾</span></div></div>
+<div class="ng"><div class="nt">Contenido</div><div class="ni on">Módulos</div><div class="ni">Biblioteca de videos</div><div class="ni">Tablero de producción</div><div class="ni">Cola de regrabación</div></div>
+<div class="ng"><div class="nt">Evaluación</div><div class="ni">Bancos de preguntas</div><div class="ni">Configuración</div></div>
+<div class="ng"><div class="nt">Currícula</div><div class="ni">Ruta Esencial</div><div class="ni">Matriz perfil × módulo</div></div>
+<div class="ng"><div class="nt">Pipeline</div><div class="ni">Impactos en Academia</div></div>
+<div class="ng"><div class="nt">Seguimiento</div><div class="ni">Panel macro</div><div class="ni">Detalle por agencia</div></div>
+<div class="ng"><div class="nt">Administración</div><div class="ni">Superficies y planes</div><div class="ni">Usuarios y roles</div><div class="ni">Auditoría</div></div>
+<div style="margin-top:auto;display:flex;justify-content:space-between;align-items:center;border-top:1px dashed #ccc;padding-top:9px"><span class="mut" style="font-size:11px">Majo · Contenido</span><span class="mut">‹‹</span></div>
+</div>
+<div class="mn">
+<div class="hd"><div><div class="bc">Contenido / Módulos</div><div class="h1">Título de la pantalla <span class="chip f">chip de estado</span> <span class="chip o">chip</span></div></div>
+<div class="row"><span class="btn">Acción secundaria</span><span class="btn p">Acción primaria</span></div></div>
+<div class="bd" style="flex:1">
+<div class="box" style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px"><span class="mut mono" style="font-size:12px">ÁREA DE CONTENIDO · 1240 × alto completo</span><span class="note">sin footer: la tabla usa todo el alto y scrollea sola</span></div>
+</div></div></div></div></div>
+
+<div class="dv-opt" id="1b"><div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>S02 · Listado de módulos</div>
+<div class="dv-card"><div class="sh">
+<div class="sd">
+<div><div class="lb" style="margin-bottom:5px">Superficie</div><div class="sf"><span><b>BAK</b> · Backoffice</span><span class="mut">▾</span></div></div>
+<div class="ng"><div class="nt">Contenido</div><div class="ni on">Módulos</div><div class="ni">Biblioteca de videos</div><div class="ni">Tablero de producción</div><div class="ni">Cola de regrabación</div></div>
+<div class="ng"><div class="nt">Evaluación</div><div class="ni">Bancos de preguntas</div><div class="ni">Configuración</div></div>
+<div class="ng"><div class="nt">Currícula</div><div class="ni">Ruta Esencial</div><div class="ni">Matriz perfil × módulo</div></div>
+<div class="ng"><div class="nt">Pipeline</div><div class="ni">Impactos en Academia</div></div>
+<div class="ng"><div class="nt">Seguimiento</div><div class="ni">Panel macro</div><div class="ni">Detalle por agencia</div></div>
+<div class="ng"><div class="nt">Administración</div><div class="ni">Superficies y planes</div><div class="ni">Usuarios y roles</div></div>
+</div>
+<div class="mn">
+<div class="hd"><div><div class="bc">Contenido / Módulos</div><div class="h1">Módulos <span class="chip">13 en BAK</span></div></div><div class="row"><span class="btn">Exportar</span><span class="btn p">Nuevo módulo</span></div></div>
+<div class="bd">
+<div class="bar"><span class="fl">Tipo: todos <span class="mut">▾</span></span><span class="fl">Estado: todos <span class="mut">▾</span></span><span class="fl">Prioridad Pareto: todas <span class="mut">▾</span></span><span class="fl">Plan: todos <span class="mut">▾</span></span><span class="fl mut" style="border-style:dashed">🔎 buscar por ID o nombre</span><span class="mut" style="margin-left:auto;font-size:11px">13 resultados</span></div>
+<table class="tb" style="table-layout:auto">
+<tr><th>Orden</th><th>ID</th><th>Nombre</th><th>Tipo</th><th>Videos publ. / total</th><th>Banco / mínimo</th><th>Planes</th><th>Estado</th><th>Últ. actividad</th></tr>
+<tr><td class="mono">R</td><td class="mono">BAK-R01</td><td>Ruta Esencial P1</td><td><b>ruta</b></td><td>12 / 12</td><td><span class="chip">derivado</span> <b>18</b> heredadas / 60 mín. <span class="chip o">faltan 42</span></td><td>plan A · plan B</td><td><span class="chip">borrador</span></td><td class="mut">hace 3 días</td></tr>
+<tr><td class="mono">1</td><td class="mono">BAK-M00</td><td>Fundamentos</td><td>biblioteca</td><td>4 / 4</td><td><b>25</b> / 25 <span class="chip f">apto</span></td><td>plan A · plan B</td><td><span class="chip f">activo</span></td><td class="mut">hace 2 días</td></tr>
+<tr><td class="mono">2</td><td class="mono">BAK-M10</td><td>File</td><td>biblioteca</td><td>6 / 6</td><td><b>35</b> / 35 <span class="chip f">apto</span></td><td>plan A · plan B</td><td><span class="chip f">activo</span></td><td class="mut">hace 4 días</td></tr>
+<tr><td class="mono">3</td><td class="mono">BAK-M20</td><td>Entidades (clientes, pasajeros, proveedores)</td><td>biblioteca</td><td>4 / 6</td><td><b>22</b> / 40 <span class="chip o">faltan 18</span></td><td>plan A</td><td><span class="chip">borrador</span></td><td class="mut">ayer</td></tr>
+<tr style="background:#fafafa"><td class="mono">4</td><td class="mono"><b>BAK-M30</b></td><td>Voucher / Servicios</td><td>biblioteca</td><td>4 / 7</td><td><b>20</b> / 35 <span class="chip o">faltan 15</span></td><td>plan A · plan B</td><td><span class="chip">borrador</span></td><td class="mut">hoy 11:04</td></tr>
+<tr><td class="mono mut">—</td><td class="mono">BAK-M35</td><td class="mut">reservado (Tráfico)</td><td class="mut">—</td><td class="mut">—</td><td class="mut">—</td><td class="mut">—</td><td><span class="chip o">reservado</span></td><td class="mut">—</td></tr>
+<tr><td class="mono">5</td><td class="mono">BAK-M40</td><td>Cobranzas / Recibos</td><td>biblioteca</td><td>5 / 5</td><td><b>30</b> / 25 <span class="chip f">apto</span></td><td>plan A</td><td><span class="chip f">activo</span></td><td class="mut">hace 5 días</td></tr>
+<tr><td class="mono">6</td><td class="mono">BAK-M50</td><td>Facturación</td><td>biblioteca</td><td>0 / 6</td><td><b>0</b> / 30 <span class="chip o">sin banco</span></td><td>plan A</td><td><span class="chip">borrador</span></td><td class="mut">hace 2 sem.</td></tr>
+<tr><td class="mono">7</td><td class="mono">BAK-M60</td><td>Pagos a proveedores</td><td>biblioteca</td><td>3 / 4</td><td><b>12</b> / 20 <span class="chip o">faltan 8</span></td><td>plan B</td><td><span class="chip">borrador</span></td><td class="mut">hace 8 días</td></tr>
+<tr><td class="mono">8</td><td class="mono">BAK-M70</td><td>Caja y bancos</td><td>biblioteca</td><td>2 / 4</td><td><b>9</b> / 30 <span class="chip o">faltan 21</span></td><td>plan A</td><td><span class="chip">borrador</span></td><td class="mut">hace 12 días</td></tr>
+<tr><td class="mono">9</td><td class="mono">BAK-M80</td><td>Informes</td><td>biblioteca</td><td>0 / 4</td><td><b>0</b> / 15 <span class="chip o">sin banco</span></td><td>plan B</td><td><span class="chip">borrador</span></td><td class="mut">hace 1 mes</td></tr>
+<tr><td class="mono">10</td><td class="mono">BAK-M90</td><td>Contable</td><td>biblioteca</td><td>0 / 5</td><td><b>0</b> / 20 <span class="chip o">sin banco</span></td><td>plan A</td><td><span class="chip">borrador</span></td><td class="mut">hace 1 mes</td></tr>
+<tr><td class="mono">11</td><td class="mono">BAK-M95</td><td>Receptivo operador</td><td>biblioteca</td><td>0 / 4</td><td><b>0</b> / 15 <span class="chip o">sin banco</span></td><td>plan B</td><td><span class="chip">borrador</span></td><td class="mut">hace 3 sem.</td></tr>
+</table>
+<div class="mut" style="font-size:11px;margin-top:-4px">Orden curricular = secuencia de desbloqueo. La Ruta Esencial (R) va antes de la biblioteca y su banco es <b>derivado</b>: hereda las preguntas de los videos que referencia.</div>
+<div class="row" style="align-items:flex-start;gap:16px">
+<div class="box" style="flex:1;text-align:center;color:#9a9a9a;padding:22px"><b>Estado vacío (FRT / CRM)</b><br><span style="font-size:11px">esta superficie todavía no tiene módulos mapeados</span><br><br><span class="btn">Crear el primer módulo</span></div>
+<div class="note" style="flex:1;padding-top:18px">la columna “banco” no es un número suelto:<br>dice si el módulo se puede activar o no</div>
+</div>
+</div></div></div></div></div>
+
+<div class="dv-opt" id="1c"><div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>S03 · Detalle de módulo</div>
+<div class="dv-card"><div class="sh">
+<div class="sd">
+<div><div class="lb" style="margin-bottom:5px">Superficie</div><div class="sf"><span><b>BAK</b> · Backoffice</span><span class="mut">▾</span></div></div>
+<div class="ng"><div class="nt">Contenido</div><div class="ni on">Módulos</div><div class="ni">Biblioteca de videos</div><div class="ni">Tablero de producción</div><div class="ni">Cola de regrabación</div></div>
+<div class="ng"><div class="nt">Evaluación</div><div class="ni">Bancos de preguntas</div><div class="ni">Configuración</div></div>
+<div class="ng"><div class="nt">Currícula</div><div class="ni">Ruta Esencial</div><div class="ni">Matriz perfil × módulo</div></div>
+<div class="ng"><div class="nt">Pipeline</div><div class="ni">Impactos en Academia</div></div>
+<div class="ng"><div class="nt">Seguimiento</div><div class="ni">Panel macro</div></div>
+</div>
+<div class="mn">
+<div class="hd"><div><div class="bc">Contenido / Módulos / BAK-M30</div><div class="h1"><span class="mono" style="font-size:14px;color:#8d8d8d">BAK-M30</span> Voucher / Servicios <span class="chip">borrador</span> <span class="chip f">biblioteca</span> <span class="chip">plan A · plan B</span></div></div>
+<div class="row"><span class="btn">Agregar sección</span><span class="btn">Agregar video</span><span class="btn p" style="opacity:.45">Activar módulo</span></div></div>
+<div class="bd" style="display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start">
+<div style="display:flex;flex-direction:column;gap:10px">
+<div class="lb">Árbol de secciones · arrastrar para reordenar</div>
+
+<div class="cd" style="padding:0">
+<div style="display:flex;align-items:center;gap:8px;padding:9px 11px;border-bottom:1px solid #eee;background:#fafafa"><span class="mut mono">⠿</span><b>1 · Concepto</b><span class="chip">1 video</span><span class="chip o">6 preguntas</span><span style="margin-left:auto" class="mut">▾</span></div>
+<div style="display:flex;align-items:center;gap:10px;padding:8px 11px 8px 32px"><span class="mut mono">⠿</span><span class="mono">BAK-M30.010</span><span style="flex:1">Qué es el voucher</span><span class="chip f">publicado</span><span class="chip">6 preg.</span></div>
+</div>
+
+<div class="cd" style="padding:0">
+<div style="display:flex;align-items:center;gap:8px;padding:9px 11px;border-bottom:1px solid #eee;background:#fafafa"><span class="mut mono">⠿</span><b>2 · Carga y proceso</b><span class="chip">2 videos</span><span class="chip o">8 preguntas</span><span style="margin-left:auto" class="mut">▾</span></div>
+<div style="display:flex;align-items:center;gap:10px;padding:8px 11px 8px 32px;border-bottom:1px solid #f2f2f2"><span class="mut mono">⠿</span><span class="mono">BAK-M30.020</span><span style="flex:1">Cargar voucher</span><span class="chip f">publicado</span><span class="chip">8 preg.</span></div>
+<div style="display:flex;align-items:center;gap:10px;padding:8px 11px 8px 32px;background:#f6f6f6"><span class="mut mono">⠿</span><span class="mono"><b>BAK-M30.050</b></span><span style="flex:1">Procesar el voucher</span><span class="chip f">publicado</span><span class="chip o">0 preg.</span></div>
+</div>
+
+<div class="cd" style="padding:0">
+<div style="display:flex;align-items:center;gap:8px;padding:9px 11px;border-bottom:1px solid #eee;background:#fafafa"><span class="mut mono">⠿</span><b>3 · Plata: margen e impuestos</b><span class="chip">2 videos</span><span class="chip o">7 preguntas</span><span style="margin-left:auto" class="mut">▾</span></div>
+<div style="display:flex;align-items:center;gap:10px;padding:8px 11px 8px 32px;border-bottom:1px solid #f2f2f2"><span class="mut mono">⠿</span><span class="mono">BAK-M30.030</span><span style="flex:1">Margen comisión vs utilidad</span><span class="chip">editado</span><span class="chip o">0 preg.</span></div>
+<div style="display:flex;align-items:center;gap:10px;padding:8px 11px 8px 32px"><span class="mut mono">⠿</span><span class="mono">BAK-M30.040</span><span style="flex:1">Conceptos impositivos e IVA</span><span class="chip f">publicado</span><span class="chip">7 preg.</span></div>
+</div>
+
+<div class="cd" style="padding:0">
+<div style="display:flex;align-items:center;gap:8px;padding:9px 11px;border-bottom:1px solid #eee;background:#fafafa"><span class="mut mono">⠿</span><b>4 · Estados y plantillas</b><span class="chip">2 videos</span><span class="chip o">7 preguntas · todas a revisar</span><span style="margin-left:auto" class="mut">▾</span></div>
+<div style="display:flex;align-items:center;gap:10px;padding:8px 11px 8px 32px;border-bottom:1px solid #f2f2f2"><span class="mut mono">⠿</span><span class="mono">BAK-M30.060</span><span style="flex:1">Estados del voucher</span><span class="chip">a regrabar</span><span class="chip">7 preg. a revisar</span></div>
+<div style="display:flex;align-items:center;gap:10px;padding:8px 11px 8px 32px"><span class="mut mono">⠿</span><span class="mono">BAK-M30.070</span><span style="flex:1">Modelos de venta</span><span class="chip">en backlog</span><span class="chip o">0 preg.</span></div>
+</div>
+<div class="box" style="text-align:center;color:#9a9a9a;padding:9px;font-size:11px">+ agregar sección</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:12px;position:sticky;top:0">
+<div class="cd" style="border:1px solid #c9c9c9">
+<div class="lb" style="margin-bottom:10px">Aptitud para activar</div>
+<div style="display:flex;flex-direction:column;gap:9px;font-size:11.5px">
+<div style="display:flex;justify-content:space-between;gap:8px"><span>Videos publicados</span><b>4 / 7 ✕</b></div>
+<div style="height:5px;background:#ececec;border-radius:3px"><div style="width:57%;height:5px;background:#8a8a8a;border-radius:3px"></div></div>
+<div style="display:flex;justify-content:space-between;gap:8px"><span>Banco de preguntas vigentes</span><b>20 / 35 ✕</b></div>
+<div style="height:5px;background:#ececec;border-radius:3px"><div style="width:57%;height:5px;background:#8a8a8a;border-radius:3px"></div></div>
+<div style="display:flex;justify-content:space-between;gap:8px"><span>Config. de evaluación</span><b>cargada ✓</b></div>
+<div style="display:flex;justify-content:space-between;gap:8px"><span>Preguntas “a revisar”</span><b>7 ✕</b></div>
+</div>
+<div style="border-top:1px dashed #ccc;margin-top:11px;padding-top:10px;font-size:11px;color:#777">Faltan 3 videos publicados y 15 preguntas vigentes. Las 7 preguntas de BAK-M30.060 pasaron a “a revisar” al marcarlo para regrabar.</div>
+<div class="btn p" style="opacity:.45;text-align:center;margin-top:10px">Activar módulo</div>
+</div>
+<div class="cd"><div class="lb" style="margin-bottom:8px">Atajos</div><div style="display:flex;flex-direction:column;gap:6px;font-size:11.5px"><a href="#1h">Ir al banco de preguntas ›</a><a href="#1f">Ver en el tablero de producción ›</a><span class="mut">Configuración de evaluación ›</span></div></div>
+<div class="note">esta tarjeta contesta “¿por qué no puedo activar el módulo?” sin que Majo tenga que buscar</div>
+</div>
+</div></div></div></div></div>
+
+<div class="dv-opt" id="1d"><div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>S04 · Detalle de video — solapa Ficha</div>
+<div class="dv-card"><div class="sh">
+<div class="sd">
+<div><div class="lb" style="margin-bottom:5px">Superficie</div><div class="sf"><span><b>BAK</b> · Backoffice</span><span class="mut">▾</span></div></div>
+<div class="ng"><div class="nt">Contenido</div><div class="ni">Módulos</div><div class="ni on">Biblioteca de videos</div><div class="ni">Tablero de producción</div><div class="ni">Cola de regrabación</div></div>
+<div class="ng"><div class="nt">Evaluación</div><div class="ni">Bancos de preguntas</div><div class="ni">Configuración</div></div>
+<div class="ng"><div class="nt">Currícula</div><div class="ni">Ruta Esencial</div><div class="ni">Matriz perfil × módulo</div></div>
+<div class="ng"><div class="nt">Pipeline</div><div class="ni">Impactos en Academia</div></div>
+</div>
+<div class="mn">
+<div class="hd"><div><div class="bc">Contenido / Módulos / BAK-M30 / BAK-M30.050</div><div class="h1"><span class="mono" style="font-size:14px;color:#8d8d8d">BAK-M30.050</span> Procesar el voucher <span class="chip f">publicado</span> <span class="chip">v2</span> <span class="chip o">cohorte C03</span></div></div>
+<div class="row"><div style="display:flex;align-items:center;gap:7px;border:1px dashed #bbb;border-radius:3px;padding:5px 9px"><span style="font-size:11px">Visible en el Front</span><span class="sw on"><i></i></span></div><span class="btn">Cambiar estado ▾</span><span class="btn p">Guardar</span></div></div>
+<div class="bd" style="gap:0">
+<div class="tabs"><span class="tab on">Ficha</span><span class="tab">Versiones <span class="mut">2</span></span><span class="tab">Guión y receta</span><span class="tab">Preguntas <span class="mut">0</span></span><!-- 0 preguntas: coherente con el banco --><span class="tab">Ubicaciones <span class="mut">2</span></span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr 330px;gap:18px;padding-top:16px">
+
+<div style="display:flex;flex-direction:column;gap:14px">
+<div class="box" style="background:#fafafa">
+<div class="lb" style="margin-bottom:10px">Identidad · no editable</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+<div><div class="lb" style="font-weight:400;margin-bottom:4px">ID permanente</div><div class="inp dis mono">BAK-M30.050 🔒</div></div>
+<div><div class="lb" style="font-weight:400;margin-bottom:4px">Superficie</div><div class="inp dis">BAK 🔒</div></div>
+<div><div class="lb" style="font-weight:400;margin-bottom:4px">Módulo</div><div class="inp dis">M30 · Voucher / Servicios 🔒</div></div>
+<div><div class="lb" style="font-weight:400;margin-bottom:4px">Secuencia</div><div class="inp dis">050 🔒</div></div>
+</div>
+<div class="note" style="margin-top:9px">el ID sobrevive al regrabado: nunca cambia</div>
+</div>
+<div class="cd">
+<div class="lb" style="margin-bottom:10px">Datos editables</div>
+<div style="display:flex;flex-direction:column;gap:9px">
+<div><div class="lb" style="font-weight:400;margin-bottom:4px">Título</div><div class="inp">Procesar el voucher</div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+<div><div class="lb" style="font-weight:400;margin-bottom:4px">Tag de plan</div><div class="inp">plan A · plan B <span class="mut" style="float:right">▾</span></div></div>
+<div><div class="lb" style="font-weight:400;margin-bottom:4px">Cohorte</div><div class="inp">C03 <span class="mut" style="float:right">▾</span></div></div>
+<div><div class="lb" style="font-weight:400;margin-bottom:4px">Prioridad Pareto</div><div class="inp">P1 <span class="mut" style="float:right">▾</span></div></div>
+<div><div class="lb" style="font-weight:400;margin-bottom:4px">Duración objetivo</div><div class="inp">3:30</div></div>
+</div>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:14px">
+<div class="cd">
+<div class="lb" style="margin-bottom:10px">Versión vigente · v2</div>
+<div style="display:flex;gap:7px;margin-bottom:9px"><div class="inp mono" style="flex:1">https://youtu.be/xxxxxxxxxxx</div><span class="btn">Traer datos</span></div>
+<div class="ph" style="height:190px;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;color:#9a9a9a;font-size:11px">▶ preview embebido de YouTube</div>
+<div style="display:flex;gap:14px;margin-top:9px;font-size:11px" class="mut"><span>Título API: <span style="color:#555">Procesar el voucher</span></span><span>Duración: <span style="color:#555">3:41</span></span><span>Embebido: <span style="color:#555">permitido ✓</span></span></div>
+<div class="note" style="margin-top:8px">no hay carga de archivos: se pega el link y la API completa lo demás</div>
+</div>
+<div class="cd">
+<div class="lb" style="margin-bottom:9px">Estado de producción</div>
+<div style="display:flex;gap:5px;flex-wrap:wrap"><span class="chip o">backlog</span><span class="chip o">guionado</span><span class="chip o">grabado</span><span class="chip o">editado</span><span class="chip f" style="border-color:#666;color:#111">publicado</span><span class="chip o">a regrabar</span><span class="chip o">obsoleto</span></div>
+<div style="border-top:1px dashed #ddd;margin-top:10px;padding-top:9px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:11.5px">Visible en el Front <span class="mut">(solo si está publicado)</span></span><span class="sw on"><i></i></span></div>
+</div>
+</div>
+
+<div class="cd" style="align-self:start">
+<div class="lb" style="margin-bottom:10px">Checklist de publicación</div>
+<div style="display:flex;flex-direction:column;gap:8px;font-size:11.5px">
+<div style="display:flex;gap:8px"><span>☑</span><span>Link cargado y validado</span></div>
+<div style="display:flex;gap:8px"><span>☑</span><span>Embebido permitido en el dominio</span></div>
+<div style="display:flex;gap:8px"><span>☑</span><span>Guión versionado</span></div>
+<div style="display:flex;gap:8px"><span>☑</span><span>Duración dentro del objetivo</span></div>
+<div style="display:flex;gap:8px;color:#b1553a"><span>☐</span><span>Tiene al menos 1 pregunta asociada</span></div>
+<div style="display:flex;gap:8px"><span>☑</span><span>Ubicación canónica definida</span></div>
+</div>
+<div class="box" style="margin-top:11px;font-size:11px;color:#777;padding:9px">4 de 5 obligatorios. Advierte, no bloquea: se puede publicar y queda listado en “publicados sin pregunta”.</div>
+<div class="note" style="margin-top:10px">¿la checklist bloquea o advierte?<br>decisión a validar</div>
+<div style="border-top:1px dashed #ddd;margin-top:12px;padding-top:10px"><div class="lb" style="margin-bottom:8px">Afectado por</div><div style="display:flex;flex-direction:column;gap:5px;font-size:11.5px"><span class="chip">sgm2026.03 · voucher</span><span class="mut">Este video no tiene preguntas: 0 pasarían a “a revisar”</span></div></div>
+</div>
+</div></div></div></div></div></div>
+
+<div class="dv-opt" id="1e"><div class="dv-olabel"><a class="dv-oid" href="#1e">1e</a>S04 · Las otras cuatro solapas</div>
+<div class="dv-card"><div style="width:1440px;background:#fff;font:12px/1.45 system-ui,sans-serif;color:#333;padding:18px 20px;display:flex;flex-direction:column;gap:16px">
+<div class="tabs"><span class="tab">Ficha</span><span class="tab on">Versiones</span><span class="tab on">Guión y receta</span><span class="tab on">Preguntas</span><span class="tab on">Ubicaciones</span><span class="note" style="margin-left:14px;align-self:center">las 4 solapas restantes, apiladas para verlas juntas</span></div>
+
+<div><div class="row" style="justify-content:space-between;margin-bottom:8px"><span class="lb">2 · Versiones</span><span class="btn">Cargar nueva versión</span></div>
+<table class="tb"><tr><th style="width:70px">Versión</th><th style="width:280px">Link</th><th style="width:150px">Versión de producto</th><th style="width:110px">Fecha</th><th>Motivo de regrabado</th><th style="width:90px">Vigente</th></tr>
+<tr><td class="mono">v2</td><td class="mono">youtu.be/xxxxxxxxxxx</td><td class="mono">sgm2026.02</td><td>12/06/2026</td><td>Cambió la pantalla de proceso del voucher</td><td><span class="chip f">vigente</span></td></tr>
+<tr><td class="mono">v1</td><td class="mono">youtu.be/yyyyyyyyyyy</td><td class="mono">sgm2026.01</td><td>02/02/2026</td><td class="mut">—</td><td class="mut">archivada</td></tr>
+</table></div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+<div><div class="lb" style="margin-bottom:8px">3 · Guión y receta</div>
+<div class="cd" style="display:flex;flex-direction:column;gap:10px">
+<div class="box" style="background:#fafafa;padding:10px"><div class="lb" style="margin-bottom:6px">Receta</div><span class="ph" style="height:8px;width:100%"></span><span class="ph" style="height:8px;width:88%;margin-top:5px"></span></div>
+<div><div class="lb" style="margin-bottom:5px">Intro</div><div class="cd" style="padding:9px"><span class="ph" style="height:8px;width:96%"></span><span class="ph" style="height:8px;width:70%;margin-top:5px"></span></div></div>
+<div><div class="lb" style="margin-bottom:5px">Cuerpo</div><div class="cd" style="padding:9px"><span class="ph" style="height:8px;width:100%"></span><span class="ph" style="height:8px;width:100%;margin-top:5px"></span><span class="ph" style="height:8px;width:100%;margin-top:5px"></span><span class="ph" style="height:8px;width:54%;margin-top:5px"></span></div></div>
+<div><div class="lb" style="margin-bottom:5px">Cierre</div><div class="cd" style="padding:9px"><span class="ph" style="height:8px;width:82%"></span></div></div>
+</div></div>
+
+<div style="display:flex;flex-direction:column;gap:16px">
+<div><div class="lb" style="margin-bottom:8px">4 · Preguntas con este video de origen <span class="mut">(0)</span></div>
+<div class="cd" style="padding:0">
+<div class="box" style="margin:11px;text-align:center;color:#9a9a9a;padding:16px">Este video publicado todavía no tiene ninguna pregunta.<br><span style="font-size:11px">Figura en “publicados sin pregunta” del banco de BAK-M30.</span></div>
+<div style="padding:0 11px 11px;text-align:center"><span class="btn">Escribir pregunta</span></div>
+</div></div>
+<div><div class="lb" style="margin-bottom:8px">5 · Ubicaciones</div>
+<table class="tb"><tr><th>Módulo / sección</th><th style="width:120px">Orden</th><th style="width:110px">Canónica</th></tr>
+<tr><td>BAK-M30 · Carga y proceso</td><td>2 de 2</td><td><span class="chip f">canónica</span></td></tr>
+<tr><td>BAK-R01 · Ruta Esencial · Voucher y cobro</td><td>9 de 12</td><td class="mut">referencia</td></tr>
+</table>
+<div class="row" style="margin-top:9px"><span class="btn">Agregar a la Ruta Esencial</span><span class="note">referencia, no copia</span></div></div>
+</div>
+</div>
+</div></div></div>
+
+<div class="dv-opt" id="1f"><div class="dv-olabel"><a class="dv-oid" href="#1f">1f</a>S06 · Tablero de producción — vista tabla (default)</div>
+<div class="dv-card"><div class="sh">
+<div class="sd">
+<div><div class="lb" style="margin-bottom:5px">Superficie</div><div class="sf"><span><b>BAK</b> · Backoffice</span><span class="mut">▾</span></div></div>
+<div class="ng"><div class="nt">Contenido</div><div class="ni">Módulos</div><div class="ni">Biblioteca de videos</div><div class="ni on">Tablero de producción</div><div class="ni">Cola de regrabación</div></div>
+<div class="ng"><div class="nt">Evaluación</div><div class="ni">Bancos de preguntas</div><div class="ni">Configuración</div></div>
+<div class="ng"><div class="nt">Currícula</div><div class="ni">Ruta Esencial</div><div class="ni">Matriz perfil × módulo</div></div>
+<div class="ng"><div class="nt">Pipeline</div><div class="ni">Impactos en Academia</div></div>
+</div>
+<div class="mn">
+<div class="hd"><div><div class="bc">Contenido / Tablero de producción</div><div class="h1">Tablero de producción <span class="chip">55 videos</span></div></div>
+<div class="row"><div style="display:flex;border:1px solid #888;border-radius:3px;overflow:hidden;font-size:11.5px"><span style="padding:6px 12px;background:#333;color:#fff">Tabla</span><span style="padding:6px 12px;color:#555">Kanban</span></div><span class="btn">Exportar</span><span class="btn p">Nuevo video</span></div></div>
+<div class="bd">
+<div class="row" style="gap:12px">
+<div class="cd" style="flex:1"><div class="lb">Pendientes de grabar</div><div class="big" style="margin-top:6px">14</div></div>
+<div class="cd" style="flex:1"><div class="lb">En cola de regrabación</div><div class="big" style="margin-top:6px">6</div></div>
+<div class="cd" style="flex:1"><div class="lb">Publicados sin pregunta</div><div class="big" style="margin-top:6px">9</div></div>
+<div class="cd" style="flex:1"><div class="lb">Publicados este mes</div><div class="big" style="margin-top:6px">11</div></div>
+</div>
+<div class="bar"><span class="fl">Cohorte: <b>C03</b> ✕</span><span class="fl">Prioridad: todas <span class="mut">▾</span></span><span class="fl">Estado: todos <span class="mut">▾</span></span><span class="fl">Superficie: BAK <span class="mut">▾</span></span><span class="fl">Módulo: todos <span class="mut">▾</span></span><span class="mut" style="margin-left:auto;font-size:11px">18 de 55</span></div>
+<div class="row" style="background:#f2f2f2;border:1px solid #ddd;border-radius:3px;padding:7px 10px;font-size:11.5px"><b>3 seleccionados</b><span class="btn" style="padding:4px 9px">Cambiar estado</span><span class="btn" style="padding:4px 9px">Asignar cohorte</span><span class="btn" style="padding:4px 9px">Agregar a la cola</span><span class="mut" style="margin-left:auto">limpiar selección</span></div>
+<table class="tb">
+<tr><th style="width:34px">☐</th><th style="width:130px">ID</th><th>Título</th><th style="width:80px">Cohorte</th><th style="width:90px">Prioridad</th><th style="width:120px">Estado</th><th style="width:70px">Versión</th><th style="width:80px">Fecha</th><th style="width:120px">Afectado por</th></tr>
+<tr style="background:#f6f6f6"><td>☑</td><td class="mono">BAK-M30.050</td><td>Procesar el voucher</td><td>C03</td><td>P1</td><td><span class="chip f">publicado</span></td><td class="mono">v2</td><td class="mut">12/06</td><td class="mut mono">sgm2026.03</td></tr>
+<tr style="background:#f6f6f6"><td>☑</td><td class="mono">BAK-M30.060</td><td>Estados del voucher</td><td>C03</td><td>P1</td><td><span class="chip">a regrabar</span></td><td class="mono">v1</td><td class="mut">02/02</td><td class="mut mono">sgm2026.03</td></tr>
+<tr style="background:#f6f6f6"><td>☑</td><td class="mono">BAK-M30.070</td><td>Modelos de venta</td><td>C03</td><td>P2</td><td><span class="chip">en backlog</span></td><td class="mut">—</td><td class="mut">—</td><td class="mut">—</td></tr>
+<tr><td>☐</td><td class="mono">BAK-M30.030</td><td>Margen comisión vs utilidad</td><td>C03</td><td>P1</td><td><span class="chip">editado</span></td><td class="mono">v1</td><td class="mut">28/07</td><td class="mut">—</td></tr>
+<tr><td>☐</td><td class="mono">BAK-M20.040</td><td>Cargar pasajero</td><td>C03</td><td>P1</td><td><span class="chip">grabado</span></td><td class="mono">v1</td><td class="mut">30/07</td><td class="mut">—</td></tr>
+<tr><td>☐</td><td class="mono">BAK-M20.030</td><td>Pasajeros</td><td>C03</td><td>P2</td><td><span class="chip">editado</span></td><td class="mono">v1</td><td class="mut">28/07</td><td class="mut">—</td></tr>
+<tr><td>☐</td><td class="mono">BAK-M40.010</td><td>Recibos de cobranza</td><td>C02</td><td>P2</td><td><span class="chip">guionado</span></td><td class="mut">—</td><td class="mut">21/07</td><td class="mut">—</td></tr>
+<tr><td>☐</td><td class="mono">BAK-M50.020</td><td>Emitir factura</td><td>C02</td><td>P3</td><td><span class="chip">en backlog</span></td><td class="mut">—</td><td class="mut">—</td><td class="mut">—</td></tr>
+<tr><td>☐</td><td class="mono">BAK-M10.050</td><td>Estados del file</td><td>C01</td><td>P3</td><td><span class="chip o">obsoleto</span></td><td class="mono">v1</td><td class="mut">14/03</td><td class="mut mono">sgm2026.01</td></tr>
+<tr><td>☐</td><td class="mono">BAK-M70.010</td><td>Caja: única vs por vendedor</td><td>C04</td><td>P4</td><td><span class="chip">en backlog</span></td><td class="mut">—</td><td class="mut">—</td><td class="mut">—</td></tr>
+<tr><td>☐</td><td class="mono">BAK-M80.020</td><td>Informe de ventas</td><td>C04</td><td>P3</td><td><span class="chip">guionado</span></td><td class="mut">—</td><td class="mut">05/08</td><td class="mut">—</td></tr>
+</table>
+<div class="note">edición en línea: estado, cohorte y prioridad se cambian desde la celda, sin abrir el detalle</div>
+</div></div></div></div></div>
+
+<div class="dv-opt" id="1g"><div class="dv-olabel"><a class="dv-oid" href="#1g">1g</a>S06 · Tablero de producción — vista kanban (conmutable)</div>
+<div class="dv-card"><div class="sh" style="height:700px">
+<div class="sd">
+<div><div class="lb" style="margin-bottom:5px">Superficie</div><div class="sf"><span><b>BAK</b> · Backoffice</span><span class="mut">▾</span></div></div>
+<div class="ng"><div class="nt">Contenido</div><div class="ni">Módulos</div><div class="ni">Biblioteca de videos</div><div class="ni on">Tablero de producción</div><div class="ni">Cola de regrabación</div></div>
+<div class="ng"><div class="nt">Evaluación</div><div class="ni">Bancos de preguntas</div><div class="ni">Configuración</div></div>
+</div>
+<div class="mn">
+<div class="hd"><div><div class="bc">Contenido / Tablero de producción</div><div class="h1">Tablero de producción <span class="chip">vista kanban</span></div></div>
+<div class="row"><div style="display:flex;border:1px solid #888;border-radius:3px;overflow:hidden;font-size:11.5px"><span style="padding:6px 12px;color:#555">Tabla</span><span style="padding:6px 12px;background:#333;color:#fff">Kanban</span></div><span class="btn p">Nuevo video</span></div></div>
+<div class="bd">
+<div class="bar"><span class="fl">Cohorte: <b>C03</b> ✕</span><span class="fl">Prioridad: todas <span class="mut">▾</span></span><span class="fl">Módulo: todos <span class="mut">▾</span></span><span class="mut" style="margin-left:auto;font-size:11px">arrastrar una tarjeta cambia su estado</span></div>
+<div style="display:flex;gap:8px;align-items:stretch;flex:1">
+<div class="kcol"><div style="display:flex;justify-content:space-between"><b style="font-size:11px">En backlog</b><span class="mut mono" style="font-size:10px">14</span></div>
+<div class="kc"><div class="mono" style="font-size:10.5px;color:#8d8d8d">BAK-M30.070</div><div>Modelos de venta</div><div class="row" style="margin-top:6px;gap:5px"><span class="chip">C03</span><span class="chip o">P2</span></div></div>
+<div class="kc"><div class="mono" style="font-size:10.5px;color:#8d8d8d">BAK-M70.010</div><div>Caja: única vs por vendedor</div><div class="row" style="margin-top:6px;gap:5px"><span class="chip">C04</span><span class="chip o">P4</span></div></div>
+<div class="kc"><div class="mono" style="font-size:10.5px;color:#8d8d8d">BAK-M50.020</div><div>Emitir factura</div></div>
+</div>
+<div class="kcol"><div style="display:flex;justify-content:space-between"><b style="font-size:11px">Guionado</b><span class="mut mono" style="font-size:10px">7</span></div>
+<div class="kc"><div class="mono" style="font-size:10.5px;color:#8d8d8d">BAK-M40.010</div><div>Recibos de cobranza</div><div class="row" style="margin-top:6px;gap:5px"><span class="chip">C02</span></div></div>
+<div class="kc"><div class="mono" style="font-size:10.5px;color:#8d8d8d">BAK-M80.020</div><div>Informe de ventas</div></div>
+</div>
+<div class="kcol"><div style="display:flex;justify-content:space-between"><b style="font-size:11px">Grabado</b><span class="mut mono" style="font-size:10px">5</span></div>
+<div class="kc"><div class="mono" style="font-size:10.5px;color:#8d8d8d">BAK-M20.040</div><div>Cargar pasajero</div><div class="row" style="margin-top:6px;gap:5px"><span class="chip">C03</span><span class="chip o">P1</span></div></div>
+</div>
+<div class="kcol"><div style="display:flex;justify-content:space-between"><b style="font-size:11px">Editado</b><span class="mut mono" style="font-size:10px">4</span></div>
+<div class="kc"><div class="mono" style="font-size:10.5px;color:#8d8d8d">BAK-M20.030</div><div>Pasajeros</div><div class="row" style="margin-top:6px;gap:5px"><span class="chip">C03</span><span class="chip o">P2</span></div></div>
+<div class="kc"><div class="mono" style="font-size:10.5px;color:#8d8d8d">BAK-M30.030</div><div>Margen comisión vs utilidad</div><div class="row" style="margin-top:6px;gap:5px"><span class="chip">C03</span><span class="chip o">P1</span></div></div>
+</div>
+<div class="kcol" style="border-style:solid;border-color:#999"><div style="display:flex;justify-content:space-between"><b style="font-size:11px">Publicado</b><span class="mut mono" style="font-size:10px">19</span></div>
+<div class="kc"><div class="mono" style="font-size:10.5px;color:#8d8d8d">BAK-M30.050</div><div>Procesar el voucher</div><div class="row" style="margin-top:6px;gap:5px"><span class="chip f">front: on</span><span class="chip o">0 preg.</span></div></div>
+<div class="kc"><div class="mono" style="font-size:10.5px;color:#8d8d8d">BAK-M30.040</div><div>Conceptos impositivos e IVA</div><div class="row" style="margin-top:6px;gap:5px"><span class="chip f">front: on</span></div></div>
+<div class="kc"><div class="mono" style="font-size:10.5px;color:#8d8d8d">BAK-M00.010</div><div>Qué es SIGMMA: el sistema operativo de la agencia</div></div>
+</div>
+<div class="kcol"><div style="display:flex;justify-content:space-between"><b style="font-size:11px">A regrabar</b><span class="mut mono" style="font-size:10px">6</span></div>
+<div class="kc"><div class="mono" style="font-size:10.5px;color:#8d8d8d">BAK-M30.060</div><div>Estados del voucher</div><div class="row" style="margin-top:6px;gap:5px"><span class="chip mono">sgm2026.03</span></div><div style="margin-top:5px;font-size:10.5px;color:#b1553a">sus 7 preguntas pasaron a “a revisar”</div></div>
+</div>
+<div class="kcol"><div style="display:flex;justify-content:space-between"><b style="font-size:11px">Obsoleto</b><span class="mut mono" style="font-size:10px">3</span></div>
+<div class="kc" style="opacity:.6"><div class="mono" style="font-size:10.5px;color:#8d8d8d">BAK-M10.050</div><div>Estados del file</div></div>
+</div>
+</div>
+<div class="note">7 columnas = los 7 estados de producción. La visibilidad en el Front nunca es una columna: viaja como chip dentro de la tarjeta.</div>
+</div></div></div></div></div>
+
+<div class="dv-opt" id="1h"><div class="dv-olabel"><a class="dv-oid" href="#1h">1h</a>S08 · Banco de preguntas del módulo</div>
+<div class="dv-card"><div class="sh" style="height:960px">
+<div class="sd">
+<div><div class="lb" style="margin-bottom:5px">Superficie</div><div class="sf"><span><b>BAK</b> · Backoffice</span><span class="mut">▾</span></div></div>
+<div class="ng"><div class="nt">Contenido</div><div class="ni">Módulos</div><div class="ni">Biblioteca de videos</div><div class="ni">Tablero de producción</div><div class="ni">Cola de regrabación</div></div>
+<div class="ng"><div class="nt">Evaluación</div><div class="ni on">Bancos de preguntas</div><div class="ni">Configuración</div></div>
+<div class="ng"><div class="nt">Currícula</div><div class="ni">Ruta Esencial</div><div class="ni">Matriz perfil × módulo</div></div>
+<div class="ng"><div class="nt">Pipeline</div><div class="ni">Impactos en Academia</div></div>
+</div>
+<div class="mn">
+<div class="hd"><div><div class="bc">Evaluación / Bancos / BAK-M30</div><div class="h1">Banco de preguntas · Voucher / Servicios <span class="chip">borrador</span></div></div>
+<div class="row"><span class="btn">Vista previa del sorteo</span><span class="btn">Configurar evaluación</span><span class="btn p">Escribir pregunta</span></div></div>
+<div class="bd" style="display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start">
+<div style="display:flex;flex-direction:column;gap:14px">
+<div class="cd" style="display:flex;align-items:center;gap:26px;border:1px solid #c9c9c9">
+<div><div class="lb">Banco vigente / mínimo exigido</div><div style="display:flex;align-items:baseline;gap:8px;margin-top:5px"><span class="big" style="font-size:42px">20</span><span class="mut mono" style="font-size:20px">/ 35</span></div></div>
+<div style="flex:1"><div style="height:9px;background:#ececec;border-radius:5px"><div style="width:57%;height:9px;background:#7d7d7d;border-radius:5px"></div></div><div class="mut" style="font-size:11px;margin-top:6px">Faltan 15 preguntas vigentes para poder activar el módulo · 28 preguntas en total<br>Banco mínimo por sección: 8 + 10 + 9 + 8 = 35 · mínimos por sorteo: 2 + 3 + 3 + 2 = 10</div></div>
+<div style="border-left:1px dashed #ccc;padding-left:20px;display:flex;gap:20px"><div><div class="lb">A revisar</div><div class="big" style="font-size:24px;color:#b1553a">7</div></div><div><div class="lb">Borradores</div><div class="big" style="font-size:24px">1</div></div></div>
+</div>
+
+<div class="box" style="border-color:#b1553a;background:#fdf7f4;display:flex;align-items:center;gap:12px;padding:10px 12px"><b style="color:#b1553a">⚠ 7 preguntas quedaron “a revisar”</b><span class="mut" style="font-size:11.5px">las 7 preguntas de BAK-M30.060, que pasó a “a regrabar” por la versión sgm2026.03</span><span class="btn" style="margin-left:auto;padding:4px 9px">Revisarlas</span></div>
+
+<div class="bar"><span class="fl">Estado: todos <span class="mut">▾</span></span><span class="fl">Sección: todas <span class="mut">▾</span></span><span class="fl">Video de origen: todos <span class="mut">▾</span></span><span class="fl mut" style="border-style:dashed">🔎 buscar</span></div>
+
+<div class="cd" style="padding:0">
+<div style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:#fafafa;border-bottom:1px solid #eee"><b>Sección 1 · Concepto</b><span class="chip">5 vigentes de 6</span><span class="mut" style="font-size:11px">banco mínimo 8 <span style="color:#b1553a">· faltan 3</span> · mínimo por sorteo 2</span><span style="margin-left:auto" class="mut">▾</span></div>
+<div style="display:flex;gap:10px;padding:8px 11px;border-bottom:1px solid #f2f2f2;align-items:center"><span class="mono mut" style="width:60px">P-1002</span><span style="flex:1">¿Qué documenta un voucher?</span><span class="mono mut" style="width:110px">BAK-M30.010</span><span class="chip f">vigente</span></div>
+<div style="display:flex;gap:10px;padding:8px 11px;border-bottom:1px solid #f2f2f2;align-items:center"><span class="mono mut" style="width:60px">P-1003</span><span style="flex:1">El voucher se emite a nombre de…</span><span class="mono mut" style="width:110px">BAK-M30.010</span><span class="chip">borrador</span></div>
+<div style="padding:7px 11px;font-size:11px" class="mut">+ 4 preguntas más</div>
+
+<div style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:#fafafa;border-top:1px solid #eee;border-bottom:1px solid #eee"><b>Sección 2 · Carga y proceso</b><span class="chip">8 vigentes de 8</span><span class="mut" style="font-size:11px">banco mínimo 10 <span style="color:#b1553a">· faltan 2</span> · mínimo por sorteo 3</span><span style="margin-left:auto" class="mut">▾</span></div>
+<div style="display:flex;gap:10px;padding:8px 11px;border-bottom:1px solid #f2f2f2;align-items:center"><span class="mono mut" style="width:60px">P-1021</span><span style="flex:1">Los servicios se cargan al voucher desde…</span><span class="mono mut" style="width:110px">BAK-M30.020</span><span class="chip f">vigente</span></div>
+<div style="display:flex;gap:10px;padding:8px 11px;border-bottom:1px solid #f2f2f2;align-items:center"><span class="mono mut" style="width:60px">P-1022</span><span style="flex:1">¿Qué dato es obligatorio para cargar el voucher?</span><span class="mono mut" style="width:110px">BAK-M30.020</span><span class="chip f">vigente</span></div>
+<div style="padding:7px 11px;font-size:11px" class="mut">+ 6 preguntas más · BAK-M30.050 todavía no tiene preguntas</div>
+
+<div style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:#fafafa;border-top:1px solid #eee;border-bottom:1px solid #eee"><b>Sección 3 · Plata: margen e impuestos</b><span class="chip">7 vigentes de 7</span><span class="mut" style="font-size:11px">banco mínimo 9 <span style="color:#b1553a">· faltan 2</span> · mínimo por sorteo 3</span><span style="margin-left:auto" class="mut">▾</span></div>
+<div style="display:flex;gap:10px;padding:8px 11px;border-bottom:1px solid #f2f2f2;align-items:center"><span class="mono mut" style="width:60px">P-1035</span><span style="flex:1">¿Sobre qué base se calcula el IVA del servicio?</span><span class="mono mut" style="width:110px">BAK-M30.040</span><span class="chip f">vigente</span></div>
+<div style="display:flex;gap:10px;padding:8px 11px;border-bottom:1px solid #f2f2f2;align-items:center"><span class="mono mut" style="width:60px">P-1036</span><span style="flex:1">El impuesto país se imputa como…</span><span class="mono mut" style="width:110px">BAK-M30.040</span><span class="chip f">vigente</span></div>
+<div style="padding:7px 11px;font-size:11px" class="mut">+ 5 preguntas más · BAK-M30.030 todavía no tiene preguntas</div>
+
+<div style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:#fafafa;border-top:1px solid #eee;border-bottom:1px solid #eee"><b>Sección 4 · Estados y plantillas</b><span class="chip o">0 vigentes de 7</span><span style="font-size:11px;color:#b1553a">banco mínimo 8 · faltan 8 (las 7 están “a revisar”) · mínimo por sorteo 2</span><span style="margin-left:auto" class="mut">▾</span></div>
+<div style="display:flex;gap:10px;padding:8px 11px;border-bottom:1px solid #f2f2f2;align-items:center;background:#fdf7f4"><span class="mono mut" style="width:60px">P-1061</span><span style="flex:1">¿Qué estado impide modificar el voucher?</span><span class="mono mut" style="width:110px">BAK-M30.060</span><span class="chip" style="border-color:#b1553a;color:#b1553a">a revisar</span></div>
+<div style="display:flex;gap:10px;padding:8px 11px;border-bottom:1px solid #f2f2f2;align-items:center;background:#fdf7f4"><span class="mono mut" style="width:60px">P-1063</span><span style="flex:1">Anular un voucher procesado implica…</span><span class="mono mut" style="width:110px">BAK-M30.060</span><span class="chip" style="border-color:#b1553a;color:#b1553a">a revisar</span></div>
+<div style="display:flex;gap:10px;padding:8px 11px;align-items:center;background:#fdf7f4"><span class="mono mut" style="width:60px">P-1064</span><span style="flex:1">¿Desde qué estado se puede reimprimir el voucher?</span><span class="mono mut" style="width:110px">BAK-M30.060</span><span class="chip" style="border-color:#b1553a;color:#b1553a">a revisar</span></div>
+<div style="padding:7px 11px;font-size:11px" class="mut">+ 4 preguntas más, todas de BAK-M30.060 y todas “a revisar”</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:12px">
+<div class="cd">
+<div class="lb" style="margin-bottom:9px">Deuda de evaluación</div>
+<div style="font-size:11.5px;margin-bottom:9px">Videos publicados sin ninguna pregunta: <b>1 de 4</b></div>
+<div style="display:flex;flex-direction:column;gap:7px;font-size:11.5px">
+<div style="display:flex;gap:8px;align-items:center"><span class="mono mut">BAK-M30.050</span><span style="flex:1">Procesar el voucher</span><a href="#1d">escribir ›</a></div>
+</div>
+<div class="mut" style="font-size:11px;border-top:1px dashed #ddd;margin-top:9px;padding-top:8px">BAK-M30.030 (editado) y BAK-M30.070 (en backlog) tampoco tienen preguntas, pero todavía no están publicados.</div>
+</div>
+<div class="cd">
+<div class="lb" style="margin-bottom:9px">Vista previa · sorteo de 10</div>
+<div class="mut" style="font-size:10.5px;margin-bottom:7px">sale / mínimo por sorteo · los mínimos suman 10</div>
+<div style="display:flex;flex-direction:column;gap:7px;font-size:11.5px">
+<div style="display:flex;justify-content:space-between"><span>1 · Concepto</span><b>2 / 2</b></div>
+<div style="height:5px;background:#ececec"><div style="width:20%;height:5px;background:#8a8a8a"></div></div>
+<div style="display:flex;justify-content:space-between"><span>2 · Carga y proceso</span><b>3 / 3</b></div>
+<div style="height:5px;background:#ececec"><div style="width:30%;height:5px;background:#8a8a8a"></div></div>
+<div style="display:flex;justify-content:space-between"><span>3 · Plata: margen e impuestos</span><b>3 / 3</b></div>
+<div style="height:5px;background:#ececec"><div style="width:30%;height:5px;background:#8a8a8a"></div></div>
+<div style="display:flex;justify-content:space-between;color:#b1553a"><span>4 · Estados y plantillas</span><b>0 / 2</b></div>
+<div style="height:5px;background:#ececec"><div style="width:0%;height:5px;background:#8a8a8a"></div></div>
+</div>
+<div style="font-size:11px;margin-top:9px;border-top:1px dashed #ddd;padding-top:8px;color:#b1553a">Salen 8 de 10: la sección 4 no cubre su mínimo por sorteo (2) porque no tiene preguntas vigentes.</div>
+<div class="btn" style="text-align:center;margin-top:9px">Volver a simular</div>
+</div>
+<div class="note">el contador vive arriba durante toda la carga: nunca aparece como error al final</div>
+</div>
+</div></div></div></div></div>
+
+</div>
+<p class="dv-next">Probá: “dibujá la tanda 2 empezando por el editor de pregunta <a class="dv-oid" href="#1d">1d</a> con el guión al lado” · “en <a class="dv-oid" href="#1f">1f</a> quiero ver el panel lateral en vez de pantalla propia” · “hacé la checklist de <a class="dv-oid" href="#1d">1d</a> bloqueante”</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}"></script>
+</body>
+</html>
