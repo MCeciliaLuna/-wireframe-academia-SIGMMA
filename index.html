@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Backoffice Academia SIGMMA · prototipo</title>
+    <meta name="description" content="Índice del prototipo de alta fidelidad del backoffice de la Academia de Autocapacitación SIGMMA." />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="stylesheet" href="assets/css/academia.css" />
+  </head>
+  <body class="bg-surface">
+    <div class="mx-auto max-w-[1000px] px-8 py-12">
+      <header class="mb-10">
+        <div class="mb-6 flex items-center gap-3">
+          <img src="assets/img/logo.svg" alt="SIGMMA" width="124" height="20" class="w-[124px]" />
+          <span class="h-6 w-px bg-line" aria-hidden="true"></span>
+          <span class="text-h6 font-bold text-primary">Academia · Backoffice</span>
+        </div>
+        <h1 class="text-h2">Prototipo de alta fidelidad</h1>
+        <p class="mt-3 max-w-[70ch] text-lg text-gray-700">
+          Backoffice de gestión interna de la Academia de Autocapacitación SIGMMA: donde el staff
+          carga los videos, gestiona el ciclo de vida del contenido y administra los bancos de
+          preguntas.
+        </p>
+        <p class="alert alert-info mt-6">
+          <span class="icon" data-icon="info"></span>
+          <span>
+            <strong>Es solo maquetación.</strong> No hay backend, ni API, ni videos reales, ni
+            persistencia. Los datos están escritos en el HTML. Diseñado a <strong>1440 px</strong>:
+            no hay responsive en este alcance.
+          </span>
+        </p>
+      </header>
+
+      <h2 class="text-h4 mb-1">Las 8 vistas</h2>
+      <p class="mb-5 text-sm text-ink-soft">
+        Las 6 pantallas del wireframe aprobado, en 8 vistas. Los estados y las solapas no tienen
+        archivo propio: se abren sobre su pantalla con un parámetro en la URL.
+      </p>
+
+      <div class="table-wrap">
+        <table class="table-app">
+          <thead>
+            <tr>
+              <th scope="col" class="w-[56px]">#</th>
+              <th scope="col">Pantalla</th>
+              <th scope="col">URL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-mono text-xs">S00</td>
+              <td>Layout maestro (shell)</td>
+              <td><a href="design-system.html#shell" class="font-mono text-xs">design-system.html#shell</a></td>
+            </tr>
+            <tr>
+              <td class="font-mono text-xs">S02</td>
+              <td>Listado de módulos</td>
+              <td><a href="modulos.html" class="font-mono text-xs">modulos.html</a></td>
+            </tr>
+            <tr>
+              <td class="font-mono text-xs">S03</td>
+              <td>Detalle de módulo</td>
+              <td><a href="modulo.html?m=30" class="font-mono text-xs">modulo.html?m=30</a></td>
+            </tr>
+            <tr>
+              <td class="font-mono text-xs">S04</td>
+              <td>Detalle de video — solapa Ficha</td>
+              <td><a href="video.html?v=BAK-M30.050" class="font-mono text-xs">video.html?v=BAK-M30.050</a></td>
+            </tr>
+            <tr>
+              <td class="font-mono text-xs">S04</td>
+              <td>Detalle de video — las otras cuatro solapas</td>
+              <td class="text-xs">
+                <a href="video.html?v=BAK-M30.050&amp;tab=versiones" class="font-mono">…&amp;tab=versiones</a> ·
+                <a href="video.html?v=BAK-M30.050&amp;tab=guion" class="font-mono">guion</a> ·
+                <a href="video.html?v=BAK-M30.050&amp;tab=preguntas" class="font-mono">preguntas</a> ·
+                <a href="video.html?v=BAK-M30.050&amp;tab=ubicaciones" class="font-mono">ubicaciones</a>
+              </td>
+            </tr>
+            <tr>
+              <td class="font-mono text-xs">S06</td>
+              <td>Tablero de producción — vista tabla <span class="chip chip-meta">default</span></td>
+              <td><a href="tablero.html" class="font-mono text-xs">tablero.html</a></td>
+            </tr>
+            <tr>
+              <td class="font-mono text-xs">S06</td>
+              <td>Tablero de producción — vista kanban</td>
+              <td><a href="tablero.html?vista=kanban" class="font-mono text-xs">tablero.html?vista=kanban</a></td>
+            </tr>
+            <tr>
+              <td class="font-mono text-xs">S08</td>
+              <td>Banco de preguntas del módulo</td>
+              <td><a href="banco.html?m=30" class="font-mono text-xs">banco.html?m=30</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="text-h4 mb-1 mt-10">Estados y variantes</h2>
+      <p class="mb-5 text-sm text-ink-soft">
+        Lo que se abre por URL sobre una pantalla que ya existe.
+      </p>
+
+      <div class="table-wrap">
+        <table class="table-app">
+          <thead>
+            <tr>
+              <th scope="col">Qué muestra</th>
+              <th scope="col">URL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Superficie sin módulos mapeados (FRT)</td>
+              <td><a href="modulos.html?sup=FRT" class="font-mono text-xs">modulos.html?sup=FRT</a></td>
+            </tr>
+            <tr>
+              <td>Superficie sin módulos mapeados (CRM)</td>
+              <td><a href="modulos.html?sup=CRM" class="font-mono text-xs">modulos.html?sup=CRM</a></td>
+            </tr>
+            <tr>
+              <td>Módulo cuyo detalle no maqueta esta tanda</td>
+              <td><a href="modulo.html?m=50" class="font-mono text-xs">modulo.html?m=50</a></td>
+            </tr>
+            <tr>
+              <td>Video cuya ficha no maqueta esta tanda</td>
+              <td><a href="video.html?v=BAK-M10.050" class="font-mono text-xs">video.html?v=BAK-M10.050</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="text-h4 mb-1 mt-10">Referencia</h2>
+      <ul class="flex flex-col gap-2 text-base">
+        <li>
+          <a href="design-system.html">Sistema de diseño</a> — el catálogo de componentes, el layout
+          maestro y la tabla de decisiones abiertas.
+        </li>
+        <li>
+          <a href="DESIGN-SYSTEM-EXTENSIONS.md">DESIGN-SYSTEM-EXTENSIONS.md</a> — qué se extendió del
+          design system de la vista agencia y por qué.
+        </li>
+        <li>
+          <a href="README.md">README.md</a> — estructura del proyecto, cómo correrlo y qué queda
+          fuera de alcance.
+        </li>
+      </ul>
+
+      <p class="mt-12 border-t border-line pt-6 text-xs text-ink-soft">
+        Repo hermano: <strong>wireframe-academia-AGENCIA</strong>, la vista que usan las agencias.
+        Mismo design system, mismas convenciones.
+      </p>
+    </div>
+
+    <script src="assets/js/icons.js"></script>
+  </body>
+</html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Panel de obra · Backoffice Academia SIGMMA</title>
+    <meta name="description" content="Panel de avance de construcción de la Academia SIGMMA: progreso del contenido, próximo hito y trabajo inmediato." />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="stylesheet" href="assets/css/academia.css" />
+  </head>
+  <body>
+    <a href="#contenido" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[1001] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-white">Saltar al contenido</a>
+
+    <div class="app-shell">
+      <!--SHELL-->
+
+      <div class="main-col">
+        <header class="page-head">
+          <div>
+            <div class="breadcrumb">Inicio</div>
+            <h1 class="page-title">
+              Panel de obra
+              <span class="escena-badge" data-escena-label></span>
+            </h1>
+          </div>
+          <div class="page-actions">
+            <div class="relative" data-dropdown>
+              <button type="button" class="btn btn-bordered btn-sm" data-dropdown-trigger aria-expanded="false" aria-haspopup="true">
+                Ver otro momento <span class="icon" data-icon="chevron-down"></span>
+              </button>
+              <div class="menu" role="menu" data-dropdown-menu hidden>
+                <a href="home.html?escena=E1" class="menu-item" role="menuitem">E1 · Día 0 — sistema vacío</a>
+                <a href="home.html?escena=E2" class="menu-item" role="menuitem">E2 · Semana 1 — mapa cargado</a>
+                <a href="home.html?escena=E3" class="menu-item" role="menuitem">E3 · Mes 1 — P1 en producción</a>
+                <a href="home.html?escena=E4" class="menu-item" role="menuitem">E4 · Mes 2 — hito de lanzamiento</a>
+                <a href="home.html" class="menu-item" role="menuitem">E5 · Régimen</a>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main id="contenido" class="page-body">
+          <!-- ══════════════════ E1 · DÍA 0 · SISTEMA VACÍO ══════════════════
+               Un solo camino posible y un solo CTA. Sin menú de opciones
+               equivalentes: si el día 1 ofrece cinco caminos, no ofrece ninguno. -->
+          <div data-escena="E1" class="contents">
+            <div class="placeholder-box !py-16">
+              <span class="placeholder-icon" data-icon="layers"></span>
+              <h2 class="text-h4">La Academia no tiene contenido cargado</h2>
+              <p class="mt-3 max-w-[56ch] text-base text-gray-700">
+                No hay módulos, ni videos, ni preguntas. El mapa de contenido vive hoy en el tablero
+                de Google Sheets: son <strong>11 módulos, 55 videos y 20 cohortes</strong>, y se
+                cargan de una vez desde ahí.
+              </p>
+              <a href="importador.html" class="btn btn-primary btn-lg mt-8">
+                <span class="icon" data-icon="layers"></span>Importar el mapa de contenido
+              </a>
+              <p class="mt-4 text-xs text-ink-soft">
+                También se puede
+                <a href="alta-modulo.html">crear un módulo a mano</a>, pero son unos 100 registros:
+                el importador existe para eso.
+              </p>
+            </div>
+          </div>
+
+          <!-- ══════════════════ E2 · SEMANA 1 · MAPA CARGADO ══════════════════ -->
+          <div data-escena="E2" class="contents">
+            <section class="hito-card" aria-labelledby="hito-e2">
+              <p class="side-title !mb-2">Próximo hito</p>
+              <h2 class="hito-titulo" id="hito-e2">
+                Ruta Esencial: faltan 12 videos publicados y 60 preguntas para poder activarla
+              </h2>
+              <p class="mt-2 max-w-[74ch] text-sm text-primary-dark">
+                Es el único objetivo que importa ahora. Los 11 módulos de biblioteca están en 0, pero
+                eso no es una alerta: es el punto de partida. <strong>La Academia se lanza con la
+                Ruta Esencial</strong>, no con la biblioteca completa.
+              </p>
+              <a href="cohorte.html?c=C01&amp;escena=E2" class="btn btn-primary btn-sm mt-4">
+                Empezar por el cohorte C01
+              </a>
+            </section>
+
+            <section aria-labelledby="prog-e2">
+              <h2 class="side-title" id="prog-e2">Progreso del contenido · 55 videos</h2>
+              <div class="funnel">
+                <span data-estado="backlog" style="width: 100%">55 en backlog</span>
+              </div>
+              <p class="mt-2 text-xs text-ink-soft">
+                Los 55 IDs están reservados y ninguno se grabó todavía. Es exactamente lo que se
+                espera de la semana 1: el mapa mira hacia adelante.
+              </p>
+            </section>
+
+            <div class="grid grid-cols-3 gap-4">
+              <section class="side-card" aria-labelledby="trab-e2">
+                <h2 class="side-title" id="trab-e2">Trabajo inmediato</h2>
+                <dl class="flex flex-col gap-3 text-xs">
+                  <div class="meter-row">
+                    <dt>Cohorte activo</dt>
+                    <dd class="meter-value"><a href="cohorte.html?c=C01&amp;escena=E2">C01 Arranque</a></dd>
+                  </div>
+                  <div class="meter-row"><dt>Guionados del cohorte</dt><dd class="meter-value" data-ok="false">0 / 2</dd></div>
+                  <div class="meter-row"><dt>Videos a guionar</dt><dd class="meter-value">55</dd></div>
+                  <div class="meter-row"><dt>Publicados sin pregunta</dt><dd class="meter-value">0</dd></div>
+                </dl>
+              </section>
+
+              <section class="side-card" aria-labelledby="acad-e2">
+                <h2 class="side-title" id="acad-e2">Estado de la Academia</h2>
+                <dl class="flex flex-col gap-3 text-xs">
+                  <div class="meter-row"><dt>Módulos mapeados</dt><dd class="meter-value">13</dd></div>
+                  <div class="meter-row"><dt>Videos reservados</dt><dd class="meter-value">55</dd></div>
+                  <div class="meter-row"><dt>Preguntas escritas</dt><dd class="meter-value">0</dd></div>
+                  <div class="meter-row"><dt>Módulos activos</dt><dd class="meter-value" data-ok="false">0</dd></div>
+                  <div class="meter-row"><dt>Agencias con acceso</dt><dd class="meter-value">0</dd></div>
+                </dl>
+              </section>
+
+              <section class="side-card" aria-labelledby="sig-e2">
+                <h2 class="side-title" id="sig-e2">Lo que sigue</h2>
+                <ul class="flex flex-col gap-2 text-xs">
+                  <li><a href="cohorte.html?c=C01&amp;escena=E2">Planificar el cohorte C01 ›</a></li>
+                  <li><a href="tablero.html?escena=E2">Ver los 55 en el tablero ›</a></li>
+                  <li><a href="modulos.html?escena=E2">Revisar el mapa de módulos ›</a></li>
+                  <li><a href="alta-videos.html">Reservar más IDs ›</a></li>
+                </ul>
+              </section>
+            </div>
+          </div>
+
+          <!-- ══════════════════ E3 · MES 1 · P1 EN PRODUCCIÓN ══════════════════ -->
+          <div data-escena="E3" class="contents">
+            <section class="hito-card" aria-labelledby="hito-e3">
+              <p class="side-title !mb-2">Próximo hito</p>
+              <h2 class="hito-titulo" id="hito-e3">
+                Ruta Esencial: faltan 10 videos publicados y 50 preguntas para poder activarla
+              </h2>
+              <p class="mt-2 max-w-[74ch] text-sm text-primary-dark">
+                C01 está publicado. C02 quedó editado y espera link; C03 está guionado y espera
+                grabación. <strong>Un solo objetivo, no once módulos en alerta.</strong>
+              </p>
+              <a href="cohorte.html?c=C02&amp;escena=E3&amp;modo=sesion" class="btn btn-primary btn-sm mt-4">
+                Seguir con el cohorte C02
+              </a>
+            </section>
+
+            <section aria-labelledby="prog-e3">
+              <h2 class="side-title" id="prog-e3">Progreso del contenido · 55 videos</h2>
+              <div class="funnel">
+                <span data-estado="backlog" style="width: 78.18%">43</span>
+                <span data-estado="guionado" style="width: 7.27%">4</span>
+                <span data-estado="editado" style="width: 10.91%">6</span>
+                <span data-estado="publicado" style="width: 3.64%">2</span>
+              </div>
+              <p class="funnel-legend">
+                <span><i style="background: var(--color-gray-500)"></i>43 en backlog</span>
+                <span><i style="background: var(--color-gray-600)"></i>4 guionados · C03</span>
+                <span><i style="background: var(--color-warning-dark)"></i>6 editados · C02</span>
+                <span><i style="background: var(--color-success-dark)"></i>2 publicados · C01</span>
+              </p>
+            </section>
+
+            <div class="grid grid-cols-3 gap-4">
+              <section class="side-card" aria-labelledby="trab-e3">
+                <h2 class="side-title" id="trab-e3">Trabajo inmediato</h2>
+                <dl class="flex flex-col gap-3 text-xs">
+                  <div class="meter-row">
+                    <dt>Cohorte activo</dt>
+                    <dd class="meter-value"><a href="cohorte.html?c=C02&amp;escena=E3">C02 Alta de file</a></dd>
+                  </div>
+                  <div class="meter-row"><dt>Editados, esperando link</dt><dd class="meter-value" data-ok="false">6 / 6</dd></div>
+                  <div class="meter-row"><dt>Videos a guionar</dt><dd class="meter-value">43</dd></div>
+                  <div class="meter-row"><dt>Publicados sin pregunta</dt><dd class="meter-value" data-ok="true">0</dd></div>
+                </dl>
+              </section>
+
+              <section class="side-card" aria-labelledby="acad-e3">
+                <h2 class="side-title" id="acad-e3">Estado de la Academia</h2>
+                <dl class="flex flex-col gap-3 text-xs">
+                  <div class="meter-row"><dt>Módulos mapeados</dt><dd class="meter-value">13</dd></div>
+                  <div class="meter-row"><dt>Videos publicados</dt><dd class="meter-value">2 / 55</dd></div>
+                  <div class="meter-row"><dt>Preguntas escritas</dt><dd class="meter-value">10</dd></div>
+                  <div class="meter-row"><dt>Módulos activos</dt><dd class="meter-value" data-ok="false">0</dd></div>
+                  <div class="meter-row"><dt>Agencias con acceso</dt><dd class="meter-value">0</dd></div>
+                </dl>
+              </section>
+
+              <section class="side-card" aria-labelledby="ruta-e3">
+                <h2 class="side-title" id="ruta-e3">Ruta Esencial</h2>
+                <div class="meter-row"><span>Videos publicados</span><b class="meter-value" data-ok="false">2 / 12</b></div>
+                <div class="progress progress-sm my-2"><span style="width: 17%"></span></div>
+                <div class="meter-row"><span>Banco heredado</span><b class="meter-value" data-ok="false">10 / 60</b></div>
+                <div class="progress progress-sm my-2"><span style="width: 17%"></span></div>
+                <p class="foot-note">
+                  Su banco es <strong>derivado</strong>: hereda las preguntas de los videos que
+                  referencia. Por eso sube solo cuando se publica un video de P1.
+                </p>
+              </section>
+            </div>
+          </div>
+
+          <!-- ══════════════════ E4 · MES 2 · HITO DE LANZAMIENTO ══════════════════ -->
+          <div data-escena="E4" class="contents">
+            <section class="hito-card" data-cumplido="true" aria-labelledby="hito-e4">
+              <p class="side-title !mb-2">Hito alcanzado</p>
+              <h2 class="hito-titulo" id="hito-e4">
+                La Ruta Esencial está lista para activar: 12 de 12 videos y 60 de 60 preguntas
+              </h2>
+              <p class="mt-2 max-w-[74ch] text-sm text-success-dark">
+                Con el Pareto grabado, <strong>ningún módulo de biblioteca quedó completo</strong> — y
+                aun así la Academia se puede lanzar. Eso es exactamente para lo que existe la Ruta
+                Esencial.
+              </p>
+              <a href="modulo.html?m=R01&amp;escena=E4" class="btn btn-primary btn-sm mt-4">
+                Activar la Ruta Esencial
+              </a>
+            </section>
+
+            <section aria-labelledby="prog-e4">
+              <h2 class="side-title" id="prog-e4">Progreso del contenido · 55 videos</h2>
+              <div class="funnel">
+                <span data-estado="backlog" style="width: 78.18%">43 en backlog</span>
+                <span data-estado="publicado" style="width: 21.82%">12</span>
+              </div>
+              <p class="mt-2 text-xs text-ink-soft">
+                Los 12 de P1 publicados. Los 43 restantes siguen en backlog y eso está bien: son P2,
+                P3 y P4, y se graban después del lanzamiento.
+              </p>
+            </section>
+
+            <div class="grid grid-cols-[1fr_1fr] gap-4">
+              <section class="side-card side-card-strong" aria-labelledby="bib-e4">
+                <h2 class="side-title" id="bib-e4">Ningún módulo de biblioteca está completo</h2>
+                <table class="table-dense">
+                  <caption class="sr-only">
+                    Videos publicados sobre el total de cada módulo de biblioteca en el hito de
+                    lanzamiento. Ninguno llega a completarse.
+                  </caption>
+                  <thead>
+                    <tr><th scope="col">Módulo</th><th scope="col">Publicados / total</th><th scope="col">Estado</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td class="cell-mono">BAK-M00</td><td class="cell-num">2 / 4</td><td><span class="chip chip-outline">incompleto</span></td></tr>
+                    <tr><td class="cell-mono">BAK-M10</td><td class="cell-num">3 / 6</td><td><span class="chip chip-outline">incompleto</span></td></tr>
+                    <tr><td class="cell-mono">BAK-M20</td><td class="cell-num">3 / 6</td><td><span class="chip chip-outline">incompleto</span></td></tr>
+                    <tr><td class="cell-mono">BAK-M30</td><td class="cell-num">3 / 7</td><td><span class="chip chip-outline">incompleto</span></td></tr>
+                    <tr><td class="cell-mono">BAK-M40</td><td class="cell-num">1 / 5</td><td><span class="chip chip-outline">incompleto</span></td></tr>
+                    <tr data-reservado="true"><td class="cell-mono">M50 a M95</td><td class="cell-num">0 / 32</td><td><span class="chip chip-outline">sin empezar</span></td></tr>
+                  </tbody>
+                </table>
+                <p class="foot-note">
+                  Suma de publicados: <strong>2+3+3+3+1 = 12</strong>. Sin la Ruta Esencial, la
+                  Academia no se podría lanzar hasta terminar un módulo entero.
+                </p>
+              </section>
+
+              <div class="flex flex-col gap-4">
+                <section class="side-card" aria-labelledby="ruta-e4">
+                  <h2 class="side-title" id="ruta-e4">Ruta Esencial</h2>
+                  <div class="meter-row"><span>Videos publicados</span><b class="meter-value" data-ok="true">12 / 12</b></div>
+                  <div class="progress progress-sm my-2 progress-complete"><span style="width: 100%"></span></div>
+                  <div class="meter-row"><span>Banco heredado</span><b class="meter-value" data-ok="true">60 / 60</b></div>
+                  <div class="progress progress-sm my-2 progress-complete"><span style="width: 100%"></span></div>
+                  <p class="foot-note">Cumple los dos criterios. La acción de activar está habilitada.</p>
+                </section>
+
+                <section class="side-card" aria-labelledby="acad-e4">
+                  <h2 class="side-title" id="acad-e4">Estado de la Academia</h2>
+                  <dl class="flex flex-col gap-3 text-xs">
+                    <div class="meter-row"><dt>Videos publicados</dt><dd class="meter-value">12 / 55</dd></div>
+                    <div class="meter-row"><dt>Preguntas escritas</dt><dd class="meter-value">60</dd></div>
+                    <div class="meter-row"><dt>Módulos activos</dt><dd class="meter-value" data-ok="false">0</dd></div>
+                    <div class="meter-row"><dt>Agencias con acceso</dt><dd class="meter-value">0</dd></div>
+                  </dl>
+                  <p class="foot-note">
+                    Sigue en 0 hasta que se active la Ruta. Ese es el clic que lanza la Academia.
+                  </p>
+                </section>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══════════════════ E5 · RÉGIMEN ══════════════════
+               El panel sigue midiendo construcción: todavía quedan 14 videos por
+               grabar y el banco de la Ruta está incompleto. -->
+          <div data-escena="E5" class="contents">
+            <section class="hito-card" aria-labelledby="hito-e5">
+              <p class="side-title !mb-2">Próximo hito</p>
+              <h2 class="hito-titulo" id="hito-e5">
+                Ruta Esencial: faltan 42 preguntas para poder activarla
+              </h2>
+              <p class="mt-2 max-w-[74ch] text-sm text-primary-dark">
+                Los 12 videos ya están publicados. Lo que falta es banco: hereda 18 de las 60 que
+                necesita.
+              </p>
+              <a href="banco.html?m=30" class="btn btn-primary btn-sm mt-4">Ir a los bancos de preguntas</a>
+            </section>
+
+            <section aria-labelledby="prog-e5">
+              <h2 class="side-title" id="prog-e5">Progreso del contenido · 55 videos</h2>
+              <div class="funnel">
+                <span data-estado="backlog" style="width: 25.45%">14</span>
+                <span data-estado="guionado" style="width: 9.09%">5</span>
+                <span data-estado="grabado" style="width: 5.45%">3</span>
+                <span data-estado="editado" style="width: 5.45%">3</span>
+                <span data-estado="publicado" style="width: 47.27%">26 publicados</span>
+                <span data-estado="regrabar" style="width: 5.45%">3</span>
+                <span data-estado="obsoleto" style="width: 1.82%">1</span>
+              </div>
+              <p class="funnel-legend">
+                <span><i style="background: var(--color-gray-500)"></i>14 en backlog</span>
+                <span><i style="background: var(--color-gray-600)"></i>5 guionados</span>
+                <span><i style="background: var(--color-primary-light)"></i>3 grabados</span>
+                <span><i style="background: var(--color-warning-dark)"></i>3 editados</span>
+                <span><i style="background: var(--color-success-dark)"></i>26 publicados</span>
+                <span><i style="background: var(--color-error)"></i>3 a regrabar</span>
+                <span><i style="background: var(--color-gray-700)"></i>1 obsoleto</span>
+              </p>
+            </section>
+
+            <div class="grid grid-cols-3 gap-4">
+              <section class="side-card" aria-labelledby="trab-e5">
+                <h2 class="side-title" id="trab-e5">Trabajo inmediato</h2>
+                <dl class="flex flex-col gap-3 text-xs">
+                  <div class="meter-row">
+                    <dt>Cohorte activo</dt>
+                    <dd class="meter-value"><a href="cohorte.html?c=C02">C02 Alta de file</a></dd>
+                  </div>
+                  <div class="meter-row"><dt>Publicados del cohorte</dt><dd class="meter-value" data-ok="false">4 / 6</dd></div>
+                  <div class="meter-row"><dt>Videos a guionar</dt><dd class="meter-value">14</dd></div>
+                  <div class="meter-row"><dt>Publicados sin pregunta</dt><dd class="meter-value" data-ok="false">9</dd></div>
+                  <div class="meter-row"><dt>En cola de regrabación</dt><dd class="meter-value" data-ok="false">3</dd></div>
+                </dl>
+              </section>
+
+              <section class="side-card" aria-labelledby="acad-e5">
+                <h2 class="side-title" id="acad-e5">Estado de la Academia</h2>
+                <dl class="flex flex-col gap-3 text-xs">
+                  <div class="meter-row"><dt>Módulos mapeados</dt><dd class="meter-value">13</dd></div>
+                  <div class="meter-row"><dt>Videos publicados</dt><dd class="meter-value">26 / 55</dd></div>
+                  <div class="meter-row"><dt>Módulos activos</dt><dd class="meter-value">3</dd></div>
+                  <div class="meter-row"><dt>Agencias con acceso</dt><dd class="meter-value">0</dd></div>
+                </dl>
+              </section>
+
+              <section class="side-card" aria-labelledby="sig-e5">
+                <h2 class="side-title" id="sig-e5">Lo que sigue</h2>
+                <ul class="flex flex-col gap-2 text-xs">
+                  <li><a href="tablero.html">Ver el tablero de producción ›</a></li>
+                  <li><a href="modulos.html">Revisar los módulos ›</a></li>
+                  <li><a href="banco.html?m=30">Banco de BAK-M30 ›</a></li>
+                </ul>
+              </section>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="assets/js/icons.js"></script>
+    <script src="assets/js/ui.js"></script>
+  </body>
+</html>

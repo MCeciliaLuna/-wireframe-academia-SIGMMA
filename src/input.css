@@ -1,0 +1,2580 @@
+/* ============================================================================
+   Academia SIGMMA — BACKOFFICE — hoja de estilos fuente
+   ----------------------------------------------------------------------------
+   Lenguaje visual heredado de sigmma.net (repo web-2026). Los tokens se nombran
+   por ROL, no por número: la guía marca `color-2-normal` como deuda a no repetir.
+   Ver ESTILOS-ACADEMIA.md para el origen de cada valor.
+
+   El bloque @theme y las secciones 1 a 4 están HEREDADAS TAL CUAL del repo
+   hermano `wireframe-academia-AGENCIA`. No se cambió un solo valor: la
+   consistencia entre los dos repos vale más que una mejora aislada.
+
+   Lo propio del backoffice vive en la sección 6, al final. Es una herramienta
+   interna de alta densidad de datos y necesita componentes que un producto de
+   cara al cliente no tiene: sidebar, tablas densas, kanban, chips de estado de
+   producción, solapas. Todos derivan de los tokens de arriba — ni un hex nuevo,
+   ni una fuente nueva, ni una escala nueva.
+   Cada extensión está documentada en DESIGN-SYSTEM-EXTENSIONS.md.
+
+   Compilar:  npm run build     → assets/css/academia.css (minificado)
+              npm run dev       → watch
+   ========================================================================== */
+
+@import "tailwindcss";
+
+@source "../*.html";
+@source "../assets/js/*.js";
+@source "../src/partials/*.html";
+
+/* ---------------------------------------------------------------------------
+   1 · Fuentes — archivos locales copiados de web-2026/public/fonts
+   Solo existen los pesos 400 y 700. No usar 500/600: el browser los sintetiza.
+   Los fallbacks con métricas ajustadas eliminan el salto de layout (CLS) y
+   están calculados sobre los woff2 reales con base Arial.
+   ------------------------------------------------------------------------- */
+@font-face {
+  font-family: "Sofia Sans";
+  src: url("../fonts/sofia-sans/SofiaSans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Sofia Sans";
+  src: url("../fonts/sofia-sans/SofiaSans-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Roboto";
+  src: url("../fonts/roboto/Roboto-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Roboto";
+  src: url("../fonts/roboto/Roboto-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Sofia Sans Fallback";
+  src: local("Arial");
+  font-weight: 400 700;
+  size-adjust: 121.88%;
+  ascent-override: 73.84%;
+  descent-override: 24.61%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Roboto Fallback";
+  src: local("Arial");
+  font-weight: 400 700;
+  size-adjust: 127.88%;
+  ascent-override: 72.55%;
+  descent-override: 19.09%;
+  line-gap-override: 0%;
+}
+
+/* ---------------------------------------------------------------------------
+   2 · Tokens
+   ------------------------------------------------------------------------- */
+@theme {
+  /* -- Tipografía ------------------------------------------------------- */
+  --font-sans:
+    "Sofia Sans", "Sofia Sans Fallback", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --font-body: "Roboto", "Roboto Fallback", -apple-system, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Solo 400 y 700 existen como archivo. Al borrar el resto, `font-medium`
+     y `font-semibold` directamente no compilan: la deuda no puede colarse. */
+  --font-weight-*: initial;
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+
+  /* Escala fluida 375 → 1440 px. La escala del sitio comercial (H1 72) es
+     de landing; una app necesita el tramo bajo. */
+  --text-*: initial;
+  --text-h1: clamp(2.5rem, 2.324rem + 0.751vw, 3rem); /* 40 → 48 */
+  --text-h1--line-height: 1.15;
+  --text-h2: clamp(1.75rem, 1.574rem + 0.751vw, 2.25rem); /* 28 → 36 */
+  --text-h2--line-height: 1.2;
+  --text-h3: clamp(1.375rem, 1.243rem + 0.563vw, 1.75rem); /* 22 → 28 */
+  --text-h3--line-height: 1.2;
+  --text-h4: clamp(1.125rem, 1.037rem + 0.376vw, 1.375rem); /* 18 → 22 */
+  --text-h4--line-height: 1.25;
+  --text-h5: clamp(1rem, 0.956rem + 0.188vw, 1.125rem); /* 16 → 18 */
+  --text-h5--line-height: 1.3;
+  --text-h6: clamp(0.9375rem, 0.915rem + 0.094vw, 1rem); /* 15 → 16 */
+  --text-h6--line-height: 1.35;
+
+  --text-lg: 1.125rem; /* 18 */
+  --text-lg--line-height: 1.5;
+  --text-base: 1rem; /* 16 — base */
+  --text-base--line-height: 1.5;
+  --text-sm: 0.875rem; /* 14 — secundario */
+  --text-sm--line-height: 1.5;
+  --text-xs: 0.8125rem; /* 13 — metadatos */
+  --text-xs--line-height: 1.45;
+  --text-2xs: 0.75rem; /* 12 — mínimo absoluto */
+  --text-2xs--line-height: 1.4;
+
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+
+  /* -- Color -------------------------------------------------------------
+     Se borra la paleta por defecto de Tailwind: si un color no está acá,
+     no existe en el producto. */
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-inherit: inherit;
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  /* Marca */
+  --color-primary-dark: #003f7f;
+  --color-primary: #004f9f; /* botones sólidos, foco, barra activa */
+  --color-primary-light: #006fe0; /* links, hover, borde de card activa */
+
+  --color-accent-dark: #008dc0;
+  --color-accent: #00a6e2;
+  --color-accent-light: #3dc4f4; /* casi nunca plano: gradientes y washes 10% */
+
+  --color-indigo-dark: #212556; /* logo, fondos profundos */
+  --color-indigo: #2f346c; /* títulos de card */
+  --color-indigo-light: #454c9a;
+
+  /* CTA naranja — reservado. Una sola aparición: descargar el certificado.
+     El naranja de marca no llega a AA con texto blanco (2.84:1), así que el
+     botón lleva texto oscuro. Se conserva el hex exacto de la marca. */
+  --color-cta: #ff6b35;
+  --color-cta-dark: #e6531f;
+  --color-cta-ink: #111827;
+
+  /* Grises */
+  --color-gray-100: #f9fafb;
+  --color-gray-200: #f1f3f5;
+  --color-gray-300: #e5e7eb;
+  --color-gray-400: #d1d5db;
+  --color-gray-500: #9ca3af;
+  --color-gray-600: #6b7280;
+  --color-gray-700: #4b5563;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+
+  /* Alias semánticos de superficie y texto */
+  --color-surface: #f9fafb;
+  --color-surface-sunken: #f1f3f5;
+  --color-line: #e5e7eb;
+  --color-line-strong: #d1d5db;
+  --color-ink: #111827;
+  --color-ink-soft: #6b7280;
+  --color-ink-muted: #9ca3af;
+
+  /* Estado — la guía marca este set como inexistente y a crear (§2.4).
+     `success` e `info` se anclan en la marca; `error` y `warning` son nuevos.
+     El ámbar de warning se eligió lejos del naranja de CTA a propósito. */
+  /* El verde oscuro de la marca (#219667) da 3.46:1 sobre el fondo verde
+     claro: no alcanza para texto. Se bajó un paso para que el badge y la
+     alerta de éxito pasen AA (6.17:1). El verde medio de marca se mantiene. */
+  --color-success-dark: #17694a;
+  --color-success: #2dbe83;
+  --color-success-light: #70dcaf;
+  --color-success-bg: #eafaf3;
+  --color-success-line: #b7ecd4;
+
+  --color-error-dark: #b42318;
+  --color-error: #d92d20;
+  --color-error-light: #fda29b;
+  --color-error-bg: #fef3f2;
+  --color-error-line: #fecdca;
+
+  --color-warning-dark: #b54708;
+  --color-warning: #f79009;
+  --color-warning-light: #fec84b;
+  --color-warning-bg: #fffaeb;
+  --color-warning-line: #fedf89;
+
+  --color-info-dark: #003f7f;
+  --color-info: #006fe0;
+  --color-info-bg: #e5f1fd;
+  --color-info-line: #b9d9f8;
+
+  /* -- Forma -------------------------------------------------------------- */
+  --radius-*: initial;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px; /* botones, modales, paneles — el radio característico */
+  --radius-xl: 16px; /* cards */
+
+  /* -- Profundidad --------------------------------------------------------
+     El sistema es plano: la jerarquía la dan borde 1px + fondo gris.
+     Solo hay sombra donde algo flota de verdad. */
+  --shadow-*: initial;
+  --shadow-dropdown: 0 6px 18px rgba(0, 0, 0, 0.12);
+  --shadow-modal: 0 12px 48px rgba(0, 0, 0, 0.25);
+  --shadow-glow: 0 0 12px rgba(76, 153, 220, 0.25);
+
+  /* -- Movimiento ---------------------------------------------------------- */
+  --ease-brand: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+  /* -- Breakpoints — tres, y cerrados (deuda §6.8) ------------------------- */
+  --breakpoint-*: initial;
+  --breakpoint-md: 48rem; /* 768 */
+  --breakpoint-lg: 64rem; /* 1024 */
+
+  /* -- Layout -------------------------------------------------------------- */
+  --container-*: initial;
+  --container-app: 80rem; /* 1280 */
+  --container-narrow: 44rem; /* 704 — quiz, formularios de una columna */
+}
+
+/* Variables no-Tailwind usadas por los componentes de abajo */
+@theme static {
+  /* -- Backoffice ---------------------------------------------------------
+     El wireframe fija el lienzo en 1440 px y el sidebar en 200 px (R7: no hay
+     responsive en este alcance). El alto de la barra superior de pantalla es
+     menor que el header de 72 px de la vista agencia: acá no hay identidad de
+     marca compitiendo con el contenido, y R6 pide densidad. */
+  --shell-width: 1440px;
+  --sidebar-width: 200px;
+  --pagehead-height: 64px;
+  --z-sidebar: 1001;
+
+  --header-height: 72px;
+  --z-dropdown: 100;
+  --z-overlay: 999;
+  --z-header: 1000;
+  --z-modal: 1002;
+  --z-tooltip: 1003;
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-slow: 350ms;
+  --dur-hover: 300ms;
+  --brand-edge: linear-gradient(
+    180deg,
+    var(--color-accent-light) 20%,
+    var(--color-primary-light) 50%
+  );
+}
+
+/* ---------------------------------------------------------------------------
+   3 · Base
+   ------------------------------------------------------------------------- */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+    color: var(--color-ink);
+    background-color: var(--color-white);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 700;
+    line-height: var(--leading-tight);
+    color: var(--color-ink);
+    text-wrap: balance;
+  }
+  h1 {
+    font-size: var(--text-h1);
+  }
+  h2 {
+    font-size: var(--text-h2);
+  }
+  h3 {
+    font-size: var(--text-h3);
+  }
+  h4 {
+    font-size: var(--text-h4);
+  }
+  h5 {
+    font-size: var(--text-h5);
+  }
+  h6 {
+    font-size: var(--text-h6);
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  a {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color var(--dur-fast) ease-in-out;
+  }
+  a:hover {
+    color: var(--color-primary-light);
+  }
+
+  img,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  /* Foco visible — 3 px con 3 px de separación. Es explícito y generoso a
+     propósito. No quitarlo nunca. */
+  :focus {
+    outline: none;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+  }
+  a:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  [role="menuitem"]:focus-visible {
+    box-shadow: 0 0 0 4px rgba(0, 111, 224, 0.1);
+  }
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline-width: 2px;
+    outline-offset: 1px;
+    border-color: var(--color-primary-light);
+  }
+
+  ::selection {
+    background: var(--color-info-bg);
+    color: var(--color-primary-dark);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-gray-100);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-gray-400);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-gray-500);
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   4 · Componentes
+   ------------------------------------------------------------------------- */
+@layer components {
+  /* -- Iconos --------------------------------------------------------------
+     Los hidrata assets/js/icons.js. Trazo de 2 px sobre grilla de 24. */
+  .icon {
+    display: inline-block;
+    flex: none;
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+  }
+  .icon-sm {
+    width: 14px;
+    height: 14px;
+  }
+  .icon-lg {
+    width: 24px;
+    height: 24px;
+  }
+  .icon-xl {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* -- Layout -------------------------------------------------------------- */
+  .container-app {
+    width: 100%;
+    max-width: var(--container-app);
+    margin-inline: auto;
+    padding-inline: 16px;
+  }
+  @media (min-width: 48rem) {
+    .container-app {
+      padding-inline: 32px;
+    }
+  }
+  @media (min-width: 64rem) {
+    .container-app {
+      padding-inline: 48px;
+    }
+  }
+
+  .page {
+    padding-block: 32px 64px;
+  }
+
+  /* -- Gesto de marca: borde de 1 px pintado con gradiente ------------------
+     Definido UNA sola vez (en web-2026 está triplicado). Se aplica a botones
+     secundarios, a la card del módulo en curso y a paneles destacados. */
+  .brand-edge {
+    border: 1px solid transparent;
+    background-image: linear-gradient(var(--color-white), var(--color-white)),
+      var(--brand-edge);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+  }
+  .brand-edge-soft {
+    border: 1px solid transparent;
+    background-image: linear-gradient(
+        var(--color-surface),
+        var(--color-surface)
+      ),
+      var(--brand-edge);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+  }
+
+  /* -- Chrome de la app ---------------------------------------------------- */
+  .app-header {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header);
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    background: var(--color-white);
+    border-bottom: 1px solid var(--color-surface-sunken);
+  }
+
+  .nav-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+    padding-inline: 13px;
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    color: var(--color-gray-700);
+    white-space: nowrap;
+    transition: color var(--dur-hover) ease-in-out,
+      background-color var(--dur-hover) ease-in-out;
+  }
+  .nav-link:hover {
+    color: var(--color-primary-light);
+    background-color: color-mix(
+      in srgb,
+      var(--color-primary-light) 8%,
+      transparent
+    );
+  }
+  .nav-link[aria-current="page"] {
+    color: var(--color-primary);
+    font-weight: 700;
+    background-color: color-mix(
+      in srgb,
+      var(--color-primary-light) 10%,
+      transparent
+    );
+  }
+
+  /* -- Botones -------------------------------------------------------------
+     Tres variantes × tres tamaños. La guía solo tenía sólido y borde-gradiente
+     en un único tamaño de 48/223 px, inviable para acciones dentro de cards. */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 44px;
+    padding-inline: 20px;
+    border-radius: var(--radius-lg);
+    border: 1px solid transparent;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color var(--dur-hover) ease-in-out,
+      color var(--dur-hover) ease-in-out,
+      border-color var(--dur-hover) ease-in-out,
+      box-shadow var(--dur-hover) ease-in-out;
+  }
+  .btn:hover {
+    color: inherit;
+  }
+  .btn .icon {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    transition: transform var(--dur-hover) ease-in-out;
+  }
+
+  .btn-sm {
+    height: 36px;
+    padding-inline: 14px;
+    font-size: var(--text-xs);
+    gap: 6px;
+  }
+  .btn-sm .icon {
+    width: 16px;
+    height: 16px;
+  }
+  .btn-lg {
+    height: 48px;
+    padding-inline: 24px;
+    font-size: var(--text-base);
+  }
+  .btn-block {
+    width: 100%;
+  }
+  .btn-wide {
+    min-width: 223px;
+  }
+
+  .btn-primary {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-white);
+  }
+  .btn-primary:hover {
+    background-color: var(--color-primary-light);
+    border-color: var(--color-primary-light);
+    color: var(--color-white);
+  }
+  .btn-primary:active {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  .btn-bordered {
+    color: var(--color-gray-800);
+    background-color: var(--color-white);
+    background-image: linear-gradient(var(--color-white), var(--color-white)),
+      var(--brand-edge);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+  }
+  .btn-bordered:hover {
+    background-image: linear-gradient(
+        color-mix(in srgb, var(--color-primary-light) 10%, var(--color-white)),
+        color-mix(in srgb, var(--color-primary-light) 10%, var(--color-white))
+      ),
+      var(--brand-edge);
+    color: var(--color-primary-light);
+    box-shadow: var(--shadow-glow);
+  }
+  .btn-bordered:hover .icon {
+    transform: translateY(-2px);
+  }
+  .btn-bordered:active {
+    background-image: linear-gradient(var(--color-white), var(--color-white)),
+      linear-gradient(var(--color-primary), var(--color-primary));
+    color: var(--color-primary-light);
+  }
+
+  .btn-ghost {
+    background-color: transparent;
+    color: var(--color-gray-700);
+  }
+  .btn-ghost:hover {
+    background-color: color-mix(
+      in srgb,
+      var(--color-primary-light) 8%,
+      transparent
+    );
+    color: var(--color-primary-light);
+  }
+
+  /* Único uso del naranja en todo el producto. Texto oscuro, no blanco: el
+     naranja de marca no da contraste suficiente con blanco. */
+  .btn-cta {
+    background-color: var(--color-cta);
+    border-color: var(--color-cta);
+    color: var(--color-cta-ink);
+  }
+  .btn-cta:hover {
+    background-color: var(--color-cta-dark);
+    border-color: var(--color-cta-dark);
+    color: var(--color-cta-ink);
+  }
+
+  .btn:disabled,
+  .btn[aria-disabled="true"] {
+    cursor: not-allowed;
+    background-image: none;
+    background-color: var(--color-surface-sunken);
+    border-color: var(--color-line);
+    color: var(--color-ink-muted);
+    box-shadow: none;
+  }
+  .btn:disabled:hover .icon,
+  .btn[aria-disabled="true"]:hover .icon {
+    transform: none;
+  }
+
+  .btn.is-loading {
+    pointer-events: none;
+    position: relative;
+    color: transparent;
+  }
+  .btn.is-loading::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-block-start-color: transparent;
+    border-radius: 9999px;
+    animation: spin 700ms linear infinite;
+    color: var(--color-white);
+  }
+  .btn-bordered.is-loading::after,
+  .btn-ghost.is-loading::after {
+    color: var(--color-primary);
+  }
+
+  /* Enlace de texto dentro de una barra de acciones */
+  .link-quiet {
+    font-size: var(--text-sm);
+    color: var(--color-gray-700);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    border-radius: var(--radius-sm);
+  }
+  .link-quiet:hover {
+    color: var(--color-primary-light);
+  }
+
+  /* -- Cards ---------------------------------------------------------------
+     Hereda de la card canónica el radio, borde, superficie y el hover firma.
+     No hereda min-height 382 ni bloque de media: un módulo no tiene imagen. */
+  .card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+  }
+
+  .card-interactive {
+    transition: border-color var(--dur-hover) ease-in-out,
+      background-color var(--dur-hover) ease-in-out;
+  }
+  .card-interactive:hover,
+  .card-interactive:focus-within {
+    border-color: var(--color-primary-light);
+    background-color: color-mix(
+      in srgb,
+      var(--color-accent-light) 10%,
+      var(--color-white)
+    );
+  }
+  .card-interactive:hover .card-title,
+  .card-interactive:focus-within .card-title {
+    color: var(--color-primary-light);
+  }
+
+  .card-title {
+    font-size: var(--text-h5);
+    font-weight: 700;
+    line-height: var(--leading-tight);
+    color: var(--color-indigo);
+    transition: color var(--dur-hover) ease-in-out;
+  }
+
+  /* Card del módulo en curso: lleva el gesto de marca. Solo hay una a la vez;
+     el gradiente dice "acá estás", no decora. */
+  .card-active {
+    background-color: var(--color-white);
+    border: 1px solid transparent;
+    background-image: linear-gradient(var(--color-white), var(--color-white)),
+      var(--brand-edge);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    box-shadow: var(--shadow-glow);
+  }
+
+  .card-locked {
+    background-color: var(--color-white);
+    border-style: dashed;
+    border-color: var(--color-line-strong);
+  }
+  /* El módulo bloqueado se lee igual: lo que comunica el bloqueo es el borde
+     punteado y el badge, no un texto ilegible. */
+  .card-locked .card-title {
+    color: var(--color-gray-600);
+  }
+
+  /* -- Etiquetas de estado -------------------------------------------------- */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 24px;
+    padding-inline: 10px;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .badge .icon {
+    width: 13px;
+    height: 13px;
+    flex: none;
+  }
+  .badge-success {
+    background: var(--color-success-bg);
+    border-color: var(--color-success-line);
+    color: var(--color-success-dark);
+  }
+  .badge-info {
+    background: var(--color-info-bg);
+    border-color: var(--color-info-line);
+    color: var(--color-primary);
+  }
+  .badge-warning {
+    background: var(--color-warning-bg);
+    border-color: var(--color-warning-line);
+    color: var(--color-warning-dark);
+  }
+  .badge-error {
+    background: var(--color-error-bg);
+    border-color: var(--color-error-line);
+    color: var(--color-error-dark);
+  }
+  .badge-neutral {
+    background: var(--color-white);
+    border-color: var(--color-line-strong);
+    color: var(--color-gray-700);
+  }
+  .badge-muted {
+    background: var(--color-surface-sunken);
+    border-color: var(--color-line);
+    color: var(--color-gray-700);
+  }
+
+  /* Eyebrow numérico. Acá el número SÍ informa: el recorrido es secuencial y
+     el orden es la regla de desbloqueo. */
+  .eyebrow {
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-soft);
+  }
+
+  /* -- Barra de progreso ---------------------------------------------------- */
+  .progress {
+    height: 8px;
+    border-radius: 9999px;
+    background-color: var(--color-gray-300);
+    overflow: hidden;
+  }
+  .progress-sm {
+    height: 6px;
+  }
+  .progress-lg {
+    height: 10px;
+  }
+  /* El relleno usa el gradiente azul institucional, no el celeste: el celeste
+     sobre la pista gris queda en 1.63:1 y una barra de progreso tiene que
+     leerse sin depender del número que la acompaña. */
+  .progress > span {
+    display: block;
+    height: 100%;
+    border-radius: 9999px;
+    background-image: linear-gradient(
+      90deg,
+      var(--color-primary-light) 0%,
+      var(--color-primary-dark) 100%
+    );
+    transition: width var(--dur-slow) ease-in-out;
+  }
+  .progress-complete > span {
+    background-image: linear-gradient(
+      90deg,
+      var(--color-success-dark) 0%,
+      var(--color-success-dark) 100%
+    );
+  }
+
+  /* Indicador por pasos del quiz */
+  .steps {
+    display: flex;
+    gap: 5px;
+  }
+  .steps > span {
+    flex: 1;
+    height: 4px;
+    border-radius: 9999px;
+    background: var(--color-gray-300);
+    transition: background-color var(--dur-base) ease-in-out;
+  }
+  .steps > span[data-state="done"] {
+    background: var(--color-accent-dark);
+  }
+  .steps > span[data-state="current"] {
+    background: var(--color-primary);
+  }
+
+  /* -- Formularios ---------------------------------------------------------
+     Set completo, diseñado desde cero: el sitio actual no tiene formularios
+     propios (usa embebidos de un proveedor externo), así que no hay estándar
+     que heredar. Es el mayor aporte de Academia al sistema. */
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .label {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-gray-800);
+  }
+  .label-optional {
+    font-weight: 400;
+    color: var(--color-ink-soft);
+  }
+  .hint {
+    font-size: var(--text-xs);
+    color: var(--color-ink-soft);
+  }
+
+  .input,
+  .textarea,
+  .select {
+    width: 100%;
+    background: var(--color-white);
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-md);
+    padding: 0 14px;
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    color: var(--color-ink);
+    transition: border-color var(--dur-hover) ease-in-out,
+      background-color var(--dur-hover) ease-in-out;
+  }
+  .input,
+  .select {
+    height: 44px;
+  }
+  .textarea {
+    padding: 12px 14px;
+    min-height: 120px;
+    line-height: var(--leading-normal);
+    resize: vertical;
+  }
+  .input::placeholder,
+  .textarea::placeholder {
+    color: var(--color-ink-soft);
+  }
+  .input:hover,
+  .textarea:hover,
+  .select:hover {
+    border-color: var(--color-gray-500);
+  }
+  .input[aria-invalid="true"],
+  .textarea[aria-invalid="true"] {
+    border-color: var(--color-error);
+    background-color: var(--color-error-bg);
+  }
+  .input:disabled,
+  .textarea:disabled,
+  .select:disabled {
+    background: var(--color-surface-sunken);
+    color: var(--color-ink-muted);
+    cursor: not-allowed;
+  }
+  .input[readonly] {
+    background: var(--color-surface);
+    color: var(--color-gray-700);
+  }
+
+  .select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+  }
+
+  .error-text {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-error-dark);
+  }
+
+  .choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--color-white);
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: border-color var(--dur-hover) ease-in-out,
+      background-color var(--dur-hover) ease-in-out;
+  }
+  .choice:hover {
+    border-color: var(--color-primary-light);
+    background-color: color-mix(
+      in srgb,
+      var(--color-accent-light) 6%,
+      var(--color-white)
+    );
+  }
+  .choice:has(input:checked) {
+    border-color: var(--color-primary);
+    background-color: var(--color-info-bg);
+  }
+  .choice:has(input:focus-visible) {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 3px;
+  }
+  .choice input {
+    appearance: none;
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    border: 2px solid var(--color-gray-500);
+    background: var(--color-white);
+    transition: border-color var(--dur-fast) ease-in-out,
+      background-color var(--dur-fast) ease-in-out;
+  }
+  .choice input[type="radio"] {
+    border-radius: 9999px;
+  }
+  .choice input[type="checkbox"] {
+    border-radius: var(--radius-sm);
+  }
+  .choice input:checked {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary);
+    box-shadow: inset 0 0 0 3px var(--color-white);
+  }
+  .choice input[type="checkbox"]:checked {
+    box-shadow: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+    background-size: 12px;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .choice-text {
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+    color: var(--color-gray-800);
+  }
+  .choice:has(input:checked) .choice-text {
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+  .choice-wrong {
+    border-color: var(--color-error-line);
+    background: var(--color-error-bg);
+    cursor: default;
+  }
+  .choice-wrong:hover {
+    border-color: var(--color-error-line);
+    background: var(--color-error-bg);
+  }
+
+  /* -- Avisos --------------------------------------------------------------- */
+  .alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid;
+    border-left-width: 4px;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+  }
+  .alert .icon {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin-top: 1px;
+  }
+  .alert-error {
+    background: var(--color-error-bg);
+    border-color: var(--color-error-line);
+    border-left-color: var(--color-error);
+    color: var(--color-error-dark);
+  }
+  .alert-success {
+    background: var(--color-success-bg);
+    border-color: var(--color-success-line);
+    border-left-color: var(--color-success);
+    color: var(--color-success-dark);
+  }
+  .alert-info {
+    background: var(--color-info-bg);
+    border-color: var(--color-info-line);
+    border-left-color: var(--color-primary-light);
+    color: var(--color-primary-dark);
+  }
+  .alert-warning {
+    background: var(--color-warning-bg);
+    border-color: var(--color-warning-line);
+    border-left-color: var(--color-warning);
+    color: var(--color-warning-dark);
+  }
+
+  /* -- Modal — uno solo para todo el producto (la web tiene dos, es deuda) --- */
+  .modal {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    animation: fade-in 200ms ease-in-out;
+  }
+  .modal-panel {
+    position: relative;
+    width: 100%;
+    max-width: 540px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-modal);
+    padding: 32px;
+    animation: slide-up var(--dur-base) var(--ease-brand);
+  }
+  .modal-panel-wide {
+    max-width: 850px;
+  }
+  .modal-panel-dismissible {
+    padding-top: 48px;
+  }
+  .modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    color: var(--color-ink-soft);
+    transition: background-color var(--dur-hover) ease-in-out,
+      color var(--dur-hover) ease-in-out;
+  }
+  .modal-close:hover {
+    background: var(--color-surface-sunken);
+    color: var(--color-ink);
+  }
+
+  /* -- Menú desplegable ------------------------------------------------------ */
+  .menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: var(--z-dropdown);
+    min-width: 214px;
+    padding: 6px;
+    background: var(--color-white);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-dropdown);
+    animation: slide-up var(--dur-fast) ease-out;
+  }
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 11px 12px;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-gray-800);
+    text-align: left;
+    cursor: pointer;
+    transition: background-color var(--dur-fast) ease-in-out,
+      color var(--dur-fast) ease-in-out;
+  }
+  .menu-item:hover,
+  .menu-item:focus-visible {
+    background: var(--color-info-bg);
+    color: var(--color-primary);
+  }
+
+  /* -- Tooltip --------------------------------------------------------------- */
+  .tooltip {
+    position: absolute;
+    z-index: var(--z-tooltip);
+    left: 50%;
+    bottom: -10px;
+    transform: translate(-50%, 100%);
+    padding: 8px 12px;
+    background: var(--color-indigo-dark);
+    color: var(--color-white);
+    border-radius: var(--radius-md);
+    font-size: var(--text-xs);
+    line-height: 1.35;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--dur-fast) ease-in-out,
+      visibility var(--dur-fast) ease-in-out;
+  }
+  .has-tooltip:hover > .tooltip,
+  .has-tooltip:focus-within > .tooltip {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* -- Tabla ----------------------------------------------------------------- */
+  .table-wrap {
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .table-scroll {
+    overflow-x: auto;
+  }
+  .table-app {
+    width: 100%;
+    min-width: 640px;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+  .table-app thead th {
+    padding: 12px 18px;
+    background: var(--color-surface-sunken);
+    border-bottom: 1px solid var(--color-line);
+    font-size: var(--text-2xs);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    /* Un paso más oscuro que el gris secundario: sobre el fondo gris del
+       encabezado, #6b7280 se queda en 4.35:1. */
+    color: var(--color-gray-700);
+    text-align: left;
+    white-space: nowrap;
+  }
+  .table-app tbody td {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--color-line);
+    color: var(--color-gray-800);
+    vertical-align: middle;
+  }
+  .table-app tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  .table-app tbody tr {
+    transition: background-color var(--dur-fast) ease-in-out;
+  }
+  .table-app tbody tr:hover {
+    background: color-mix(in srgb, var(--color-accent-light) 6%, transparent);
+  }
+  .table-app tbody tr[data-muted="true"] td {
+    color: var(--color-ink-soft);
+  }
+
+  /* -- Vista de ranking ------------------------------------------------------
+     Las columnas de puesto y estado se renderizan siempre y se muestran con la
+     clase en la tabla: alternar la vista no reconstruye el tbody, así que no se
+     pelea con los filtros, que operan sobre `tr.hidden`. */
+  .table-app .col-ranking {
+    display: none;
+  }
+  .table-app.is-ranking .col-ranking {
+    display: table-cell;
+  }
+  /* Contrapartida: el badge de certificado se muda a la columna Estado cuando
+     hay ranking, en vez de aparecer dos veces en la misma fila. */
+  .table-app.is-ranking .col-plain {
+    display: none;
+  }
+  /* Puesto (56) + estado (150) ensanchan la tabla. Solo acá: la de
+     certificaciones.html no tiene por qué crecer. */
+  .table-app.is-ranking {
+    min-width: 880px;
+  }
+  /* Tu fila. Es el único fondo de color de la tabla — el resto del estado lo
+     comunican los badges, que llevan texto e ícono y no dependen del color. */
+  .table-app.is-ranking tbody tr[data-vos="true"] {
+    background: var(--color-info-bg);
+  }
+  .table-app.is-ranking tbody tr[data-vos="true"]:hover {
+    background: color-mix(in srgb, var(--color-info) 10%, var(--color-info-bg));
+  }
+  .th-sort {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+  }
+  .th-sort:hover {
+    color: var(--color-primary);
+  }
+  .th-sort .icon {
+    width: 12px;
+    height: 12px;
+    opacity: 0.35;
+  }
+  .th-sort[aria-sort="ascending"] .icon,
+  .th-sort[aria-sort="descending"] .icon {
+    opacity: 1;
+  }
+  .th-sort[aria-sort="descending"] .icon {
+    transform: rotate(180deg);
+  }
+
+  /* -- Fila de video --------------------------------------------------------- */
+  .video-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--color-white);
+    border-bottom: 1px solid var(--color-line);
+    text-align: left;
+    transition: background-color var(--dur-hover) ease-in-out;
+  }
+  .video-row:last-child {
+    border-bottom: 0;
+  }
+  .video-row:hover {
+    background: color-mix(in srgb, var(--color-accent-light) 8%, transparent);
+  }
+  .video-row[aria-current="true"] {
+    background: var(--color-info-bg);
+  }
+  /* Video que el plan de la agencia no habilita: se lista para que el módulo se
+     entienda completo, pero no es un link. Sin hover, porque no hay nada que
+     abrir. */
+  .video-row[aria-disabled="true"],
+  .video-row[aria-disabled="true"]:hover {
+    background: var(--color-surface);
+  }
+  .video-row[aria-disabled="true"] .video-thumb {
+    background: var(--color-line-strong);
+  }
+  .video-thumb {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 38px;
+    border-radius: var(--radius-sm);
+    background: var(--color-indigo-dark);
+    color: var(--color-white);
+  }
+
+  /* -- Estados vacíos, error y carga ----------------------------------------- */
+  .placeholder-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-align: center;
+    padding: 48px 24px;
+    border: 1px dashed var(--color-line-strong);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+  }
+  .placeholder-icon {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 9999px;
+    background: var(--color-info-bg);
+    color: var(--color-primary);
+  }
+
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--color-gray-200) 0%,
+      var(--color-gray-100) 50%,
+      var(--color-gray-200) 100%
+    );
+    background-size: 200% 100%;
+    border-radius: var(--radius-sm);
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
+
+  /* -- Utilidades de contenido ------------------------------------------------ */
+  .clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .meta {
+    font-size: var(--text-xs);
+    color: var(--color-ink-soft);
+  }
+  .divider {
+    height: 1px;
+    background: var(--color-line);
+  }
+
+  /* =========================================================================
+     6 · BACKOFFICE — extensiones
+     -------------------------------------------------------------------------
+     Todo lo de acá abajo es propio de la herramienta interna y NO existe en el
+     repo de la vista agencia. Cada pieza deriva de los tokens de arriba: ni un
+     hex nuevo, ni una fuente nueva, ni una escala nueva.
+     Documentadas una por una en DESIGN-SYSTEM-EXTENSIONS.md.
+     ====================================================================== */
+
+  /* -- Shell: sidebar fijo + columna de contenido ---------------------------
+     R7: lienzo de 1440 px, sin responsive. El sidebar de 200 px sale del
+     wireframe. La vista agencia usa un header horizontal de 72 px; acá la
+     navegación es de 16 destinos agrupados en 6 funciones y no entra en una
+     barra. */
+  .app-shell {
+    display: grid;
+    grid-template-columns: var(--sidebar-width) 1fr;
+    width: var(--shell-width);
+    /* Alto fijo, no mínimo: la nota del wireframe en el layout maestro dice
+       «sin footer: la tabla usa todo el alto y scrollea sola». Para que un
+       contenedor interno pueda scrollear, el de afuera tiene que tener alto
+       definido. */
+    height: 100vh;
+    margin-inline: auto;
+    background: var(--color-white);
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 14px 12px;
+    overflow-y: auto;
+    border-right: 1px solid var(--color-line);
+    background: var(--color-surface);
+  }
+
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-inline: 4px;
+  }
+
+  .sidebar-foot {
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid var(--color-line);
+  }
+
+  /* -- Selector global de superficie (BAK / FRT / CRM) ----------------------
+     Es el conmutador de contexto de todo el backoffice, así que lleva el gesto
+     de marca: es el único elemento del sidebar que lo tiene. */
+  .surface-picker {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    padding: 7px 10px;
+    border-radius: var(--radius-md);
+    background: var(--color-white);
+    font-size: var(--text-xs);
+    color: var(--color-ink);
+    text-align: left;
+    transition: background var(--dur-hover) ease-in-out;
+  }
+  .surface-picker:hover {
+    background: var(--color-info-bg);
+  }
+  .surface-picker strong {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
+  /* -- Navegación agrupada por función -------------------------------------- */
+  .nav-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .nav-group-title {
+    margin-bottom: 4px;
+    padding-inline: 8px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    /* gray-600, no ink-muted: a 10 px el rótulo del grupo es texto que hay que
+       poder leer (4.63:1 sobre el sidebar). */
+    color: var(--color-gray-600);
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    color: var(--color-gray-700);
+    transition: background var(--dur-hover) ease-in-out;
+  }
+  .nav-item:hover {
+    background: var(--color-info-bg);
+    color: var(--color-primary-light);
+  }
+  .nav-item .icon {
+    width: 15px;
+    height: 15px;
+    flex: none;
+    color: var(--color-gray-600);
+  }
+  .nav-item[aria-current="page"] {
+    background: var(--color-surface-sunken);
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+  .nav-item[aria-current="page"] .icon {
+    color: var(--color-primary);
+  }
+  /* Destino de la arquitectura de navegación que esta tanda no maqueta. Se
+     lista igual —el wireframe dibuja el menú completo— pero no es un link y no
+     finge serlo: sin hover, sin cursor de mano, fuera del orden de tabulación.
+     Mantiene el mismo gris legible que los demás: atenuarlo lo dejaba en
+     2.43:1 y "todavía no está" no es motivo para volverlo ilegible. */
+  .nav-item[aria-disabled="true"] {
+    cursor: default;
+  }
+  .nav-item[aria-disabled="true"]:hover {
+    background: transparent;
+    color: var(--color-gray-700);
+  }
+
+  /* -- Columna principal y encabezado de pantalla --------------------------- */
+  .main-col {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .page-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--color-line);
+    background: var(--color-white);
+  }
+  .breadcrumb {
+    margin-bottom: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    /* gray-600, no ink-muted: es la ruta de navegación, tiene que leerse. */
+    color: var(--color-gray-600);
+  }
+  .breadcrumb a {
+    color: var(--color-ink-soft);
+  }
+  .breadcrumb a:hover {
+    color: var(--color-primary-light);
+  }
+  /* El título de pantalla no usa la escala de heading: en una herramienta
+     densa un h1 de 40 px se come el alto útil. R6. */
+  .page-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: var(--text-h4);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--color-ink);
+  }
+  .page-title .id-mono {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 400;
+    color: var(--color-ink-soft);
+  }
+  .page-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: none;
+  }
+
+  /* Las pantallas de listado (módulos, tablero) llenan el alto y el scroll vive
+     adentro. Las de detalle (módulo, video, banco) son más largas que la
+     ventana y scrollean acá. */
+  .page-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px 20px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* -- Chips de estado ------------------------------------------------------
+     Los 7 estados de producción, mapeados a los tokens de estado que ya
+     existen. La progresión se lee sola: gris → gris → azul → ámbar → verde,
+     con rojo para el desvío y apagado para el final de la vida.
+     Ninguno inventa color: todos salen de --color-*-bg / -line / -dark. */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 20px;
+    padding-inline: 8px;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .chip .icon {
+    width: 12px;
+    height: 12px;
+    flex: none;
+  }
+
+  .chip-backlog {
+    background: var(--color-surface-sunken);
+    border-color: var(--color-line);
+    color: var(--color-gray-700);
+  }
+  .chip-guionado {
+    background: var(--color-white);
+    border-color: var(--color-line-strong);
+    color: var(--color-gray-700);
+  }
+  .chip-grabado {
+    background: var(--color-info-bg);
+    border-color: var(--color-info-line);
+    color: var(--color-primary);
+  }
+  .chip-editado {
+    background: var(--color-warning-bg);
+    border-color: var(--color-warning-line);
+    color: var(--color-warning-dark);
+  }
+  .chip-publicado {
+    background: var(--color-success-bg);
+    border-color: var(--color-success-line);
+    color: var(--color-success-dark);
+  }
+  .chip-regrabar {
+    background: var(--color-error-bg);
+    border-color: var(--color-error-line);
+    color: var(--color-error-dark);
+  }
+  /* El texto NO usa `--color-ink-muted` aunque el estado sea "apagado": sobre
+     el fondo hundido daba 2.28:1. Lo que comunica el fin de la vida útil es el
+     tachado y el borde punteado, no un gris ilegible. 6.79:1. */
+  .chip-obsoleto {
+    background: var(--color-surface-sunken);
+    border-color: var(--color-line-strong);
+    border-style: dashed;
+    color: var(--color-gray-700);
+    text-decoration: line-through;
+  }
+
+  /* Chip de dato ausente o pendiente. El punteado es el mismo recurso que usa
+     `.card-locked` en la vista agencia: comunica "todavía no", no "error". */
+  .chip-outline {
+    background: transparent;
+    border-style: dashed;
+    border-color: var(--color-line-strong);
+    color: var(--color-ink-soft);
+    font-weight: 400;
+  }
+  /* Chip neutro para metadatos (plan, cohorte, versión). */
+  .chip-meta {
+    background: var(--color-white);
+    border-color: var(--color-line);
+    color: var(--color-gray-700);
+    font-weight: 400;
+  }
+  .chip-meta.is-mono {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+  }
+  /* Alerta dentro de un chip: preguntas a revisar, faltantes. */
+  .chip-alerta {
+    background: var(--color-error-bg);
+    border-color: var(--color-error-line);
+    color: var(--color-error-dark);
+    font-weight: 400;
+  }
+
+  /* Bloque que no pertenece a la escena activa. Atributo propio, no `hidden`:
+     las solapas y el conmutador de vista usan `hidden` y se pisarían. */
+  [data-escena-off] {
+    display: none !important;
+  }
+
+  /* -- Rótulo de escena -----------------------------------------------------
+     Declara en qué momento de la construcción de la Academia está el sistema.
+     NO es un dato del producto: es una anotación del prototipo, y por eso usa
+     el índigo —que en el design system es color de titular, nunca de estado— y
+     queda fuera de la familia de los 7 chips de producción.
+     Es un `<button>` con el menú de escenas de esa pantalla: se cablea con el
+     `data-dropdown` que ya existe, sin JS nuevo. */
+  .escena-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 24px;
+    padding-inline: 10px;
+    border: 1px dashed var(--color-indigo);
+    border-radius: 9999px;
+    background: var(--color-white);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--color-indigo);
+    white-space: nowrap;
+    transition: background var(--dur-hover) ease-in-out;
+  }
+  .escena-badge:hover,
+  .escena-badge[aria-expanded="true"] {
+    background: var(--color-surface-sunken);
+  }
+  .escena-badge .icon {
+    width: 12px;
+    height: 12px;
+    flex: none;
+  }
+  /* En régimen el rótulo se atenúa: es el estado por defecto y no compite con
+     el título de la pantalla. Los momentos de construcción sí llaman.
+     La escena activa la marca `ui.js` en el <html>, así que el selector cuelga
+     de la raíz y no del propio botón (que además contiene un <span>). */
+  :root[data-escena-actual="E5"] .escena-badge {
+    border-style: solid;
+    border-color: var(--color-line-strong);
+    color: var(--color-gray-700);
+  }
+
+  /* -- Barra de filtros ----------------------------------------------------- */
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 8px 10px;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+  .filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding-inline: 10px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-sm);
+    background: var(--color-white);
+    font-size: var(--text-xs);
+    color: var(--color-gray-700);
+    transition: border-color var(--dur-hover) ease-in-out;
+  }
+  .filter-pill:hover {
+    border-color: var(--color-primary-light);
+    color: var(--color-primary-light);
+  }
+  .filter-pill .icon {
+    width: 13px;
+    height: 13px;
+    flex: none;
+    color: var(--color-gray-600);
+  }
+  /* Filtro con valor puesto: se distingue del que está en "todos" y se puede
+     sacar. */
+  .filter-pill[data-active="true"] {
+    border-color: var(--color-primary);
+    background: var(--color-info-bg);
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+  .filter-search {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    min-width: 220px;
+    padding-inline: 10px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-sm);
+    background: var(--color-white);
+    font-size: var(--text-xs);
+  }
+  .filter-search input {
+    flex: 1;
+    border: 0;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    color: var(--color-ink);
+  }
+  .filter-search input::placeholder {
+    color: var(--color-gray-600);
+  }
+  .filter-count {
+    margin-left: auto;
+    font-size: var(--text-xs);
+    color: var(--color-ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* -- Tabla densa ----------------------------------------------------------
+     Variante de `.table-app`. R6: la herramienta se usa todos los días y los
+     usuarios vienen de Google Sheets. Menos padding, tipografía menor, filas
+     de 30 px, y encabezado pegado arriba porque las tablas son largas. */
+  .table-dense {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-xs);
+  }
+  .table-dense thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 7px 8px;
+    border-bottom: 1px solid var(--color-line-strong);
+    background: var(--color-white);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-align: left;
+    color: var(--color-gray-700);
+    white-space: nowrap;
+  }
+  .table-dense tbody td {
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--color-line);
+    color: var(--color-gray-800);
+    vertical-align: middle;
+  }
+  .table-dense tbody tr:hover {
+    background: var(--color-surface);
+  }
+  .table-dense tbody tr[data-selected="true"] {
+    background: var(--color-info-bg);
+  }
+  .table-dense tbody tr[data-selected="true"]:hover {
+    background: var(--color-info-bg);
+  }
+  /* Fila de ID reservado: existe en el mapa pero no tiene contenido. Se atenúa
+     un paso respecto de gray-800, no dos: con ink-muted quedaba en 2.54:1. */
+  .table-dense tbody tr[data-reservado="true"] td {
+    color: var(--color-gray-600);
+  }
+  .table-dense .cell-mono {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .table-dense .cell-num {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  /* Contenedor con scroll propio: la tabla usa todo el alto y scrollea sola,
+     sin footer. Es la nota del wireframe en el layout maestro. */
+  .table-scroll-y {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+  }
+
+  /* -- Barra de acciones en lote -------------------------------------------- */
+  .bulk-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border: 1px solid var(--color-info-line);
+    border-radius: var(--radius-md);
+    background: var(--color-info-bg);
+    font-size: var(--text-xs);
+    color: var(--color-primary-dark);
+  }
+
+  /* -- Tile de métrica ------------------------------------------------------ */
+  .metric-tile {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+  .metric-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-soft);
+  }
+  .metric-value {
+    margin-top: 4px;
+    font-family: var(--font-mono);
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-ink);
+  }
+  .metric-value[data-tone="alerta"] {
+    color: var(--color-error-dark);
+  }
+
+  /* -- Conmutador segmentado (Tabla / Kanban) ------------------------------- */
+  .segmented {
+    display: inline-flex;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  .segmented-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-size: var(--text-xs);
+    color: var(--color-gray-700);
+    background: var(--color-white);
+    /* El color viaja junto con el fondo: al aplicar ?vista= el botón cambia de
+       estado y, transicionando solo el fondo, quedaba un instante de texto
+       blanco sobre fondo claro. */
+    transition:
+      background var(--dur-fast) ease-in-out,
+      color var(--dur-fast) ease-in-out;
+  }
+  .segmented-option:hover {
+    background: var(--color-surface);
+  }
+  .segmented-option[aria-pressed="true"] {
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-weight: 700;
+  }
+  .segmented-option .icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* -- Kanban ---------------------------------------------------------------
+     7 columnas = los 7 estados de producción. R3: la visibilidad en el Front
+     NUNCA es una columna; viaja como chip dentro de la tarjeta. */
+  .kanban {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    /* `minmax(0, 1fr)` y no `auto`: con la fila implícita en `auto` el grid
+       crece hasta el alto de la columna más larga (26 tarjetas en Publicado) y
+       el scroll interno de las columnas nunca se activa. */
+    grid-template-rows: minmax(0, 1fr);
+    gap: 8px;
+    flex: 1;
+    min-height: 0;
+  }
+  .kanban-col {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+  .kanban-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 8px 9px;
+    border-bottom: 1px solid var(--color-line);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+  .kanban-count {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-ink-soft);
+  }
+  .kanban-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 7px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+  }
+  .kanban-card {
+    padding: 7px 8px;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-sm);
+    background: var(--color-white);
+    font-size: 11.5px;
+    line-height: 1.3;
+    color: var(--color-ink);
+  }
+  .kanban-card:hover {
+    border-color: var(--color-primary-light);
+  }
+  .kanban-card .card-id {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--color-ink-soft);
+  }
+  .kanban-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 6px;
+  }
+  .kanban-card[data-obsoleto="true"] {
+    opacity: 0.6;
+  }
+
+  /* -- Solapas -------------------------------------------------------------- */
+  .tabs {
+    display: flex;
+    gap: 2px;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 15px;
+    border-bottom: 2px solid transparent;
+    font-size: var(--text-sm);
+    color: var(--color-ink-soft);
+    transition: color var(--dur-hover) ease-in-out;
+  }
+  .tab:hover {
+    color: var(--color-primary-light);
+  }
+  .tab[aria-selected="true"] {
+    font-weight: 700;
+    color: var(--color-ink);
+    border-bottom-color: var(--color-primary);
+  }
+  .tab-count {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--color-gray-600);
+  }
+
+  /* -- Interruptor ----------------------------------------------------------
+     R3: estado de producción y visibilidad en el Front son dos ejes
+     independientes. Este control solo se habilita si el estado es `publicado`;
+     deshabilitado se lee como "todavía no corresponde", no como "roto". */
+  .switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--text-xs);
+    color: var(--color-ink);
+    cursor: pointer;
+  }
+  .switch input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .switch-track {
+    position: relative;
+    width: 34px;
+    height: 18px;
+    flex: none;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 9999px;
+    background: var(--color-white);
+    transition:
+      background var(--dur-hover) ease-in-out,
+      border-color var(--dur-hover) ease-in-out;
+  }
+  .switch-track::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    background: var(--color-gray-400);
+    transition:
+      transform var(--dur-hover) ease-in-out,
+      background var(--dur-hover) ease-in-out;
+  }
+  .switch input:checked + .switch-track {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+  .switch input:checked + .switch-track::after {
+    transform: translateX(16px);
+    background: var(--color-white);
+  }
+  .switch input:focus-visible + .switch-track {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 3px;
+  }
+  .switch input:disabled + .switch-track {
+    background: var(--color-surface-sunken);
+    border-color: var(--color-line);
+  }
+  /* Deshabilitado. WCAG exime del contraste a los componentes inactivos, pero
+     acá el rótulo sigue diciendo algo que hay que poder leer ("Visible en el
+     Front · solo si está publicado"), así que se atenúa un paso, no dos. */
+  .switch:has(input:disabled) {
+    color: var(--color-gray-600);
+    cursor: not-allowed;
+  }
+
+  /* -- Zona de identidad bloqueada ------------------------------------------
+     R2: el ID, la superficie, el módulo y la secuencia no se editan después
+     del alta — el ID sobrevive al regrabado. La interfaz enseña la regla:
+     fondo hundido, borde punteado y candado en cada campo. */
+  .locked-zone {
+    padding: 12px;
+    border: 1px dashed var(--color-line-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+  .input-locked {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 7px 9px;
+    border: 1px dashed var(--color-line-strong);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-sunken);
+    font-size: var(--text-xs);
+    color: var(--color-gray-700);
+  }
+  .input-locked .icon {
+    width: 13px;
+    height: 13px;
+    flex: none;
+    color: var(--color-gray-600);
+  }
+  .input-locked.is-mono {
+    font-family: var(--font-mono);
+  }
+
+  /* -- Árbol de secciones con videos anidados ------------------------------- */
+  .tree-section {
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .tree-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 11px;
+    border-bottom: 1px solid var(--color-line);
+    background: var(--color-surface);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+  .tree-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 11px 7px 32px;
+    border-bottom: 1px solid var(--color-line);
+    font-size: var(--text-xs);
+    color: var(--color-gray-800);
+  }
+  .tree-row:last-child {
+    border-bottom: 0;
+  }
+  .tree-row:hover {
+    background: var(--color-surface);
+  }
+  .tree-row[aria-current="true"] {
+    background: var(--color-info-bg);
+  }
+  .tree-row .row-id {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-ink-soft);
+    white-space: nowrap;
+  }
+  .tree-row .row-title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* Asa de arrastre. El reordenamiento no está implementado (es maquetación):
+     el asa comunica la afordancia sin prometer el gesto. */
+  .grip {
+    font-family: var(--font-mono);
+    color: var(--color-gray-600);
+    cursor: grab;
+    user-select: none;
+  }
+
+  /* -- Panel lateral de apoyo ----------------------------------------------- */
+  .side-card {
+    padding: 12px;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    background: var(--color-white);
+  }
+  .side-card-strong {
+    border-color: var(--color-line-strong);
+  }
+  .side-title {
+    margin-bottom: 10px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-soft);
+  }
+
+  /* -- Fila de medidor: etiqueta + valor + barra ----------------------------
+     R4: los contadores del banco se ven SIEMPRE, durante toda la carga. Nunca
+     aparecen como error al final. */
+  .meter-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: var(--text-xs);
+    color: var(--color-gray-800);
+  }
+  .meter-value {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .meter-value[data-ok="false"] {
+    color: var(--color-error-dark);
+  }
+  .meter-value[data-ok="true"] {
+    color: var(--color-success-dark);
+  }
+
+  /* Contador grande del banco de preguntas. */
+  .counter-big {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .counter-big b {
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+  .counter-big span {
+    font-size: 20px;
+    color: var(--color-ink-soft);
+  }
+
+  /* -- Checklist de publicación ---------------------------------------------
+     Advierte, no bloquea. El ítem incumplido se marca, pero el botón de
+     publicar sigue habilitado: la decisión de que sea bloqueante está abierta. */
+  .checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: var(--text-xs);
+  }
+  .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    color: var(--color-gray-800);
+  }
+  .checklist-item .icon {
+    width: 14px;
+    height: 14px;
+    flex: none;
+    margin-top: 1px;
+    color: var(--color-success-dark);
+  }
+  .checklist-item[data-done="false"] {
+    color: var(--color-error-dark);
+  }
+  .checklist-item[data-done="false"] .icon {
+    color: var(--color-error);
+  }
+
+  /* -- Asistente por pasos --------------------------------------------------
+     El importador tiene 4 pasos y el usuario tiene que saber en cuál está y
+     cuántos faltan. `.steps` heredado es solo una fila de puntos sin rótulo:
+     acá el rótulo importa, porque «mapeo» y «validación» no son intercambiables. */
+  .wizard {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--color-white);
+  }
+  .wizard-step {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 14px;
+    border-right: 1px solid var(--color-line);
+    font-size: var(--text-xs);
+    color: var(--color-gray-600);
+    min-width: 0;
+  }
+  .wizard-step:last-child {
+    border-right: 0;
+  }
+  .wizard-step b {
+    display: block;
+    color: var(--color-gray-700);
+    font-weight: 700;
+  }
+  .wizard-num {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    flex: none;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 9999px;
+    background: var(--color-white);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-gray-700);
+  }
+  .wizard-step[data-estado="hecho"] {
+    background: var(--color-surface);
+  }
+  .wizard-step[data-estado="hecho"] .wizard-num {
+    background: var(--color-success-bg);
+    border-color: var(--color-success-line);
+    color: var(--color-success-dark);
+  }
+  .wizard-step[data-estado="actual"] b {
+    color: var(--color-ink);
+  }
+  .wizard-step[data-estado="actual"] .wizard-num {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-white);
+  }
+  .wizard-step[data-estado="pendiente"] {
+    color: var(--color-gray-600);
+  }
+
+  /* -- Zona de carga de archivo ---------------------------------------------
+     OJO: R1 prohíbe el dropzone DE VIDEO. Este es para el CSV del tablero de
+     Sheets y tiene que leerse inequívocamente como importación de datos: por
+     eso el ícono es una tabla y el copy nombra el archivo esperado. */
+  .dropzone-csv {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 32px 24px;
+    border: 2px dashed var(--color-line-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    text-align: center;
+    transition: border-color var(--dur-hover) ease-in-out;
+  }
+  .dropzone-csv:hover {
+    border-color: var(--color-primary-light);
+  }
+  .dropzone-csv .icon {
+    width: 32px;
+    height: 32px;
+    color: var(--color-gray-600);
+  }
+
+  /* -- Grupo de validación --------------------------------------------------
+     Las tres canastas del paso 3 del importador: listas, con error, a saltear.
+     Cada error tiene que decir su motivo y su número de fila — es lo que hace
+     que el importador sirva. */
+  .validation-group {
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .validation-head {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--color-line);
+    font-size: var(--text-xs);
+    font-weight: 700;
+  }
+  .validation-group[data-tono="ok"] .validation-head {
+    background: var(--color-success-bg);
+    color: var(--color-success-dark);
+  }
+  .validation-group[data-tono="error"] .validation-head {
+    background: var(--color-error-bg);
+    color: var(--color-error-dark);
+  }
+  .validation-group[data-tono="neutro"] .validation-head {
+    background: var(--color-surface);
+    color: var(--color-gray-700);
+  }
+  .validation-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--color-line);
+    font-size: var(--text-xs);
+  }
+  .validation-row:last-child {
+    border-bottom: 0;
+  }
+  .validation-fila {
+    flex: none;
+    width: 62px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-gray-600);
+  }
+  .validation-motivo {
+    margin-left: auto;
+    color: var(--color-error-dark);
+    text-align: right;
+  }
+
+  /* -- Embudo de producción -------------------------------------------------
+     Los 55 videos repartidos en los 7 estados, en una sola barra. Es el bloque
+     que hace que el Home mida CONSTRUCCIÓN y no operación (R10). */
+  .funnel {
+    display: flex;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface-sunken);
+  }
+  .funnel > span {
+    display: grid;
+    place-items: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-white);
+    min-width: 0;
+    overflow: hidden;
+  }
+  /* Los tonos siguen la misma progresión que los chips de estado, un paso más
+     saturados para que se lean sobre blanco a 28 px de alto.
+     `backlog` es el único con texto oscuro: sobre gray-500 el blanco da 2.54:1
+     y el oscuro 6.99:1. Y es el segmento más grande del arranque —los 55 videos
+     en E2— así que es justo el que no puede quedar ilegible. */
+  .funnel > span[data-estado="backlog"] {
+    background: var(--color-gray-500);
+    color: var(--color-ink);
+  }
+  .funnel > span[data-estado="guionado"] {
+    background: var(--color-gray-600);
+  }
+  .funnel > span[data-estado="grabado"] {
+    background: var(--color-primary-light);
+  }
+  .funnel > span[data-estado="editado"] {
+    background: var(--color-warning-dark);
+  }
+  .funnel > span[data-estado="publicado"] {
+    background: var(--color-success-dark);
+  }
+  .funnel > span[data-estado="regrabar"] {
+    background: var(--color-error);
+  }
+  .funnel > span[data-estado="obsoleto"] {
+    background: var(--color-gray-700);
+  }
+  .funnel-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 9px;
+    font-size: 11px;
+    color: var(--color-gray-700);
+  }
+  .funnel-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .funnel-legend i {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex: none;
+  }
+
+  /* -- Tarjeta de hito ------------------------------------------------------
+     UN solo próximo hito, no once módulos en alerta. Es lo que convierte un
+     tablero rojo en un objetivo. */
+  .hito-card {
+    padding: 16px 18px;
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-md);
+    background: var(--color-info-bg);
+  }
+  .hito-card[data-cumplido="true"] {
+    border-color: var(--color-success-dark);
+    background: var(--color-success-bg);
+  }
+  .hito-titulo {
+    font-size: var(--text-h5);
+    font-weight: 700;
+    color: var(--color-primary-dark);
+  }
+  .hito-card[data-cumplido="true"] .hito-titulo {
+    color: var(--color-success-dark);
+  }
+
+  /* -- Nota al pie de un bloque --------------------------------------------- */
+  .foot-note {
+    padding-top: 9px;
+    margin-top: 10px;
+    border-top: 1px dashed var(--color-line-strong);
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--color-ink-soft);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   5 · Animación
+   ------------------------------------------------------------------------- */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes slide-up {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.animate-enter {
+  animation: slide-up var(--dur-slow) var(--ease-brand) both;
+}
+
+/* La guía marca `prefers-reduced-motion` como casi ausente en el sitio actual.
+   Acá es parte del sistema, no un agregado. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+  .btn-bordered:hover .icon,
+  .modal-panel,
+  .animate-enter,
+  .menu {
+    transform: none !important;
+  }
+  .skeleton {
+    animation: none;
+    background: var(--color-gray-200);
+  }
+  .btn.is-loading::after {
+    animation-duration: 700ms !important;
+    animation-iteration-count: infinite !important;
+  }
+}

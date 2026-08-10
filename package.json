@@ -1,0 +1,16 @@
+{
+  "name": "academia-sigmma-backoffice",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Prototipo de alta fidelidad del backoffice de la Academia de Autocapacitación SIGMMA — gestión interna de contenido. 8 vistas en HTML + Tailwind sobre el design system de la vista agencia.",
+  "scripts": {
+    "dev": "tailwindcss -i ./src/input.css -o ./assets/css/academia.css --watch",
+    "build": "tailwindcss -i ./src/input.css -o ./assets/css/academia.css --minify",
+    "build:dev": "tailwindcss -i ./src/input.css -o ./assets/css/academia.css",
+    "serve": "npx --yes serve@14 -l 4321 ."
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.0",
+    "tailwindcss": "^4.1.0"
+  }
+}

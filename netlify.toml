@@ -1,0 +1,20 @@
+# ============================================================================
+# Deploy — sitio estático, sin build
+# ----------------------------------------------------------------------------
+# `assets/css/academia.css` está compilado y versionado en git (misma decisión
+# que el repo de la vista agencia: permite abrir cualquier .html con doble
+# click sobre file:// sin instalar nada). Netlify no necesita correr Tailwind.
+#
+# Nota: el repo hermano `wireframe-academia-AGENCIA` NO tiene configuración de
+# deploy. Este archivo es nuevo, no una réplica. Conviene sumarle el suyo para
+# que los dos queden simétricos.
+# ============================================================================
+
+[build]
+  publish = "."
+  command = ""
+
+[[headers]]
+  for = "/assets/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

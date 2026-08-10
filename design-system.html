@@ -3,1242 +3,456 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Sistema de diseño · Academia SIGMMA</title>
-    <meta
-      name="description"
-      content="Tokens, componentes y mapa de pantallas de la Academia de Autocapacitación SIGMMA."
-    />
+    <title>Sistema de diseño · Backoffice Academia SIGMMA</title>
+    <meta name="description" content="Catálogo de los componentes del backoffice de la Academia SIGMMA: qué se hereda del design system de la vista agencia y qué se extendió." />
     <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
     <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
     <link rel="stylesheet" href="assets/css/academia.css" />
   </head>
   <body>
-    <header class="border-b border-line bg-surface">
-      <div class="container-app flex flex-wrap items-center gap-4 py-6">
-        <a href="modulos.html" class="flex shrink-0 items-center gap-3" aria-label="Academia SIGMMA">
+    <div class="mx-auto max-w-[1100px] px-8 py-12">
+      <header class="mb-12">
+        <div class="mb-6 flex items-center gap-3">
           <img src="assets/img/logo.svg" alt="SIGMMA" width="124" height="20" class="w-[124px]" />
           <span class="h-6 w-px bg-line" aria-hidden="true"></span>
-          <span class="text-h6 font-bold text-primary">Academia</span>
-        </a>
-        <span class="badge badge-info ml-auto">Sistema de diseño</span>
-      </div>
-    </header>
-
-    <div class="container-app flex flex-col gap-12 py-12 lg:flex-row lg:gap-16">
-      <!-- Índice -->
-      <nav class="lg:sticky lg:top-8 lg:h-fit lg:w-56 lg:shrink-0" aria-label="Índice">
-        <p class="eyebrow mb-3">En esta página</p>
-        <ul class="flex flex-col gap-1 text-sm">
-          <li><a class="nav-link w-full justify-start" href="#pantallas">Mapa de pantallas</a></li>
-          <li><a class="nav-link w-full justify-start" href="#personas">Personas de prueba</a></li>
-          <li><a class="nav-link w-full justify-start" href="#color">Color</a></li>
-          <li><a class="nav-link w-full justify-start" href="#tipografia">Tipografía</a></li>
-          <li><a class="nav-link w-full justify-start" href="#espacio">Espacio y forma</a></li>
-          <li><a class="nav-link w-full justify-start" href="#iconos">Íconos</a></li>
-          <li><a class="nav-link w-full justify-start" href="#gesto">Gesto de marca</a></li>
-          <li><a class="nav-link w-full justify-start" href="#botones">Botones</a></li>
-          <li><a class="nav-link w-full justify-start" href="#cards">Cards de módulo</a></li>
-          <li><a class="nav-link w-full justify-start" href="#estado">Etiquetas de estado</a></li>
-          <li><a class="nav-link w-full justify-start" href="#progreso">Progreso</a></li>
-          <li><a class="nav-link w-full justify-start" href="#formularios">Formularios</a></li>
-          <li><a class="nav-link w-full justify-start" href="#avisos">Avisos</a></li>
-          <li><a class="nav-link w-full justify-start" href="#chrome">Chrome y menú</a></li>
-          <li><a class="nav-link w-full justify-start" href="#datos">Tablas y filas</a></li>
-          <li><a class="nav-link w-full justify-start" href="#vacios">Vacío, error, carga</a></li>
-          <li><a class="nav-link w-full justify-start" href="#movimiento">Movimiento</a></li>
-          <li><a class="nav-link w-full justify-start" href="#decisiones">Decisiones abiertas</a></li>
-        </ul>
-      </nav>
-
-      <main id="contenido" class="flex min-w-0 flex-1 flex-col gap-16">
-        <div>
-          <h1 class="text-h2">Sistema de diseño de la Academia</h1>
-          <p class="mt-4 max-w-2xl text-lg text-gray-700">
-            Lenguaje visual heredado de sigmma.net: corporativo, luminoso, solo modo claro. Esta
-            página documenta lo que se reutiliza tal cual, lo que se corrigió, y lo que la Academia
-            aporta de nuevo al sistema — sobre todo el set de formularios y los tokens de estado,
-            que no existían.
-          </p>
-          <div class="mt-6 flex flex-wrap gap-3">
-            <a class="btn btn-primary" href="modulos.html">Ver el prototipo</a>
-            <a class="btn btn-bordered" href="#pantallas">Mapa de pantallas<span class="icon" data-icon="arrow-right"></span></a>
-          </div>
+          <span class="text-h6 font-bold text-primary">Academia · Backoffice</span>
         </div>
-
-        <!-- ══════════ MAPA DE PANTALLAS ══════════ -->
-        <section id="pantallas" class="flex flex-col gap-5">
-          <div>
-            <h2 class="text-h3">Mapa de pantallas</h2>
-            <p class="mt-2 max-w-2xl text-gray-700">
-              Las pantallas del wireframe viven en 9 archivos: los estados transversales y los
-              overlays se abren sobre su pantalla padre con un parámetro en la URL, igual que
-              ocurriría en el producto real.
-            </p>
-            <div class="alert alert-info mt-4 max-w-2xl">
-              <span class="icon" data-icon="info"></span>
-              <p>
-                <strong>Antes de recorrer, abrí <a class="font-bold underline" href="modulos.html?reset=1">modulos.html?reset=1</a></strong>
-                para volver al estado inicial. Los enlaces de esta tabla se recorren como
-                <strong>Lucía</strong>, la persona por defecto: <span class="font-mono">BAK-M00</span>
-                y <span class="font-mono">BAK-M10</span> aprobados,
-                <span class="font-mono">BAK-M20</span> en curso, el resto del recorrido bloqueado, y
-                <span class="font-mono">BAK-M90</span> / <span class="font-mono">BAK-M95</span> fuera
-                del plan Professional. La fila 21 muestra la guarda de secuencia hasta que apruebes
-                los módulos anteriores: es el mismo comportamiento del producto, no un error del
-                enlace. Para ver las mismas pantallas con otro avance, mirá
-                <a class="font-bold underline" href="#personas">Personas de prueba</a>.
-              </p>
-            </div>
-          </div>
-
-          <div class="table-wrap">
-            <div class="table-scroll">
-              <table class="table-app">
-                <thead>
-                  <tr>
-                    <th style="width: 72px">#</th>
-                    <th>Pantalla</th>
-                    <th>Dónde vive</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr><td class="text-ink-soft">01</td><td><a href="index.html">Login</a></td><td class="meta font-mono">index.html</td></tr>
-                  <tr><td class="text-ink-soft">01b</td><td><a href="index.html?state=error">Login con error de credenciales</a></td><td class="meta font-mono">index.html?state=error</td></tr>
-                  <tr><td class="text-ink-soft">02</td><td><a href="modulos.html">Listado de módulos</a></td><td class="meta font-mono">modulos.html</td></tr>
-                  <tr><td class="text-ink-soft">03</td><td><a href="modulo.html?m=20">Detalle de módulo (syllabus)</a></td><td class="meta font-mono">modulo.html?m=20</td></tr>
-                  <tr><td class="text-ink-soft">03b</td><td><a href="modulo.html?m=0">Detalle de módulo aprobado</a></td><td class="meta font-mono">modulo.html?m=0</td></tr>
-                  <tr><td class="text-ink-soft">04</td><td><a href="video.html?v=BAK-M20.030">Reproducción de video</a></td><td class="meta font-mono">video.html?v=BAK-M20.030</td></tr>
-                  <tr><td class="text-ink-soft">05</td><td><a href="evaluacion.html?m=20">Evaluación — intro</a></td><td class="meta font-mono">evaluacion.html?m=20</td></tr>
-                  <tr><td class="text-ink-soft">06</td><td><a href="evaluacion.html?m=20&amp;phase=quiz">Evaluación — en curso</a></td><td class="meta font-mono">?phase=quiz</td></tr>
-                  <tr><td class="text-ink-soft">07</td><td><a href="evaluacion.html?m=20&amp;phase=result&amp;score=9">Resultado aprobado</a></td><td class="meta font-mono">?phase=result&amp;score=9</td></tr>
-                  <tr><td class="text-ink-soft">08</td><td><a href="evaluacion.html?m=20&amp;phase=result&amp;score=6">Resultado desaprobado</a></td><td class="meta font-mono">?phase=result&amp;score=6</td></tr>
-                  <tr><td class="text-ink-soft">09</td><td><a href="meet.html?u=martin&amp;m=10">Coordinar Meet — cola y turnos</a></td><td class="meta font-mono">meet.html?u=martin&amp;m=10</td></tr>
-                  <tr><td class="text-ink-soft">09b</td><td><a href="meet.html?u=martin&amp;m=20">Coordinar Meet — turno ya agendado</a></td><td class="meta font-mono">?u=martin&amp;m=20</td></tr>
-                  <tr><td class="text-ink-soft">09c</td><td><a href="meet.html?u=martin&amp;m=80">Coordinar Meet — sin turnos en la franja</a></td><td class="meta font-mono">?u=martin&amp;m=80</td></tr>
-                  <tr><td class="text-ink-soft">09d</td><td><a href="meet.html?u=sofia&amp;m=40">Coordinar Meet — el coordinador agenda sin haber aprobado</a></td><td class="meta font-mono">?u=sofia&amp;m=40</td></tr>
-                  <tr><td class="text-ink-soft">09e</td><td><a href="meet.html?u=lucia&amp;m=10">Guarda — no sos el coordinador</a></td><td class="meta font-mono">?u=lucia&amp;m=10</td></tr>
-                  <tr><td class="text-ink-soft">09f</td><td><a href="meet.html?u=martin&amp;m=70">Guarda — no hay dudas en la cola</a></td><td class="meta font-mono">?u=martin&amp;m=70</td></tr>
-                  <tr><td class="text-ink-soft">09g</td><td><a href="meet.html?u=martin&amp;m=30">Guarda — la Meet del módulo ya se realizó</a></td><td class="meta font-mono">?u=martin&amp;m=30</td></tr>
-                  <tr><td class="text-ink-soft">10</td><td><a href="certificaciones.html">Mi progreso y certificación</a></td><td class="meta font-mono">certificaciones.html</td></tr>
-                  <tr><td class="text-ink-soft">10b</td><td><a href="certificaciones.html?state=complete">Certificación — recorrido completo</a></td><td class="meta font-mono">?state=complete</td></tr>
-                  <tr><td class="text-ink-soft">11</td><td><a href="agencia.html">Mi agencia</a></td><td class="meta font-mono">agencia.html</td></tr>
-                  <tr><td class="text-ink-soft">11b</td><td><a href="agencia.html?ver=ranking">Mi agencia — ranking del equipo</a></td><td class="meta font-mono">agencia.html?ver=ranking</td></tr>
-                  <tr><td class="text-ink-soft">12a</td><td><a href="modulos.html?state=empty">Vacío — primera visita al listado</a></td><td class="meta font-mono">modulos.html?state=empty</td></tr>
-                  <tr><td class="text-ink-soft">12b</td><td><a href="agencia.html?state=empty">Vacío — agencia sin actividad</a></td><td class="meta font-mono">agencia.html?state=empty</td></tr>
-                  <tr><td class="text-ink-soft">12c</td><td><a href="video.html?state=error">Error de carga del video</a></td><td class="meta font-mono">video.html?state=error</td></tr>
-                  <tr><td class="text-ink-soft">12d</td><td><a href="modulos.html?state=loading">Carga — skeleton del listado</a></td><td class="meta font-mono">modulos.html?state=loading</td></tr>
-                  <tr><td class="text-ink-soft">13</td><td><a href="modulos.html?menu=open">Menú de avatar abierto</a></td><td class="meta font-mono">modulos.html?menu=open</td></tr>
-                  <tr><td class="text-ink-soft">14.1</td><td><a href="modulo.html?u=nicolas&amp;m=0">Meet 1 · sin aprobar el módulo</a></td><td class="meta font-mono">?u=nicolas&amp;m=0</td></tr>
-                  <tr><td class="text-ink-soft">14.2</td><td><a href="modulo.html?u=lucia&amp;m=10&amp;meet=sin-lugares">Meet 2 · aprobado, nadie dejó dudas</a></td><td class="meta font-mono">&amp;meet=sin-lugares</td></tr>
-                  <tr><td class="text-ink-soft">14.3</td><td><a href="modulo.html?u=lucia&amp;m=10">Meet 3 · aprobado, cola del equipo abierta</a></td><td class="meta font-mono">?u=lucia&amp;m=10</td></tr>
-                  <tr><td class="text-ink-soft">14.4</td><td><a href="modulo.html?u=lucia&amp;m=10&amp;meet=agendado">Meet 4 · turno agendado</a></td><td class="meta font-mono">&amp;meet=agendado</td></tr>
-                  <tr><td class="text-ink-soft">14.5</td><td><a href="modulo.html?u=lucia&amp;m=10&amp;meet=consumido">Meet 5 · la Meet ya se realizó</a></td><td class="meta font-mono">&amp;meet=consumido</td></tr>
-                  <tr><td class="text-ink-soft">14.6</td><td><a href="modulo.html?u=martin&amp;m=70">Meet 6 · coordinador, cola vacía</a></td><td class="meta font-mono">?u=martin&amp;m=70</td></tr>
-                  <tr><td class="text-ink-soft">14.7</td><td><a href="modulo.html?u=martin&amp;m=10">Meet 7 · coordinador, cola con turnos libres</a></td><td class="meta font-mono">?u=martin&amp;m=10</td></tr>
-                  <tr><td class="text-ink-soft">14.8</td><td><a href="modulo.html?u=martin&amp;m=20">Meet 8 · coordinador, turno agendado</a></td><td class="meta font-mono">?u=martin&amp;m=20</td></tr>
-                  <tr><td class="text-ink-soft">14.9</td><td><a href="modulo.html?u=martin&amp;m=30">Meet 9 · coordinador, Meet realizada</a></td><td class="meta font-mono">?u=martin&amp;m=30</td></tr>
-                  <tr><td class="text-ink-soft">14.10</td><td><a href="modulo.html?u=martin&amp;m=80">Meet 10 · coordinador, cola sin turnos libres</a></td><td class="meta font-mono">?u=martin&amp;m=80</td></tr>
-                  <tr><td class="text-ink-soft">15</td><td><a href="evaluacion.html?m=20&amp;phase=quiz&amp;confirm=1">Confirmación con preguntas sin responder</a></td><td class="meta font-mono">?phase=quiz&amp;confirm=1</td></tr>
-                  <tr><td class="text-ink-soft">16</td><td><a href="modulos.html?state=expired">Sesión expirada (takeover)</a></td><td class="meta font-mono">?state=expired</td></tr>
-                  <tr><td class="text-ink-soft">17</td><td><a href="modulo.html?m=50">Guarda — módulo bloqueado por secuencia</a></td><td class="meta font-mono">modulo.html?m=50</td></tr>
-                  <tr><td class="text-ink-soft">18</td><td><a href="modulo.html?m=90">Guarda — módulo fuera del plan de la agencia</a></td><td class="meta font-mono">modulo.html?m=90</td></tr>
-                  <tr><td class="text-ink-soft">21</td><td><a href="modulo.html?m=80">Video con plan propio dentro del módulo</a></td><td class="meta font-mono">modulo.html?m=80</td></tr>
-                  <tr><td class="text-ink-soft">22</td><td><a href="agencia.html?u=martin">Colas del equipo — punto de entrada del coordinador</a></td><td class="meta font-mono">agencia.html?u=martin</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <!-- ══════════ PERSONAS DE PRUEBA ══════════ -->
-        <section id="personas" class="flex flex-col gap-5">
-          <div>
-            <h2 class="text-h3">Personas de prueba</h2>
-            <p class="mt-2 max-w-2xl text-gray-700">
-              El avance de una sola usuaria no puede mostrar a la vez el recorrido en curso, el
-              terminado y el que no empezó. Estas cuatro personas existen para eso: cada una entra
-              con un avance distinto y todas las pantallas quedan coherentes entre sí. Son andamiaje
-              del prototipo, no del producto: en sigmma.net la identidad viene del SSO.
-            </p>
-            <p class="mt-3 max-w-2xl text-gray-700">
-              Se cambia con <span class="font-mono">?u=</span> en cualquier página y queda
-              persistida, así que se puede navegar sin volver a pasarla.
-              <span class="font-mono">?reset=1</span> limpia el avance de las cuatro y vuelve a
-              Lucía — salvo que se pase <span class="font-mono">?u=</span> en la misma URL, que
-              entonces entra limpio con esa persona.
-            </p>
-          </div>
-
-          <div class="table-wrap">
-            <div class="table-scroll">
-              <table class="table-app">
-                <thead>
-                  <tr>
-                    <th>Persona</th>
-                    <th>Agencia · plan</th>
-                    <th>Cómo llega</th>
-                    <th style="width: 260px">Entrar como</th>
-                  </tr>
-                </thead>
-                <tbody id="tabla-personas"></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <!-- ══════════ COLOR ══════════ -->
-        <section id="color" class="flex flex-col gap-6">
-          <div>
-            <h2 class="text-h3">Color</h2>
-            <p class="mt-2 max-w-2xl text-gray-700">
-              Nombrado por rol, no por número. En el sistema actual los colores se llaman
-              <code class="font-mono text-sm">color-2-normal</code>, que no dice «primario»; acá el
-              hex queda como capa de abajo.
-            </p>
-          </div>
-
-          <div>
-            <h3 class="text-h5">Marca</h3>
-            <div class="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-              <div class="overflow-hidden rounded-lg border border-line">
-                <div class="h-20 bg-primary"></div>
-                <div class="p-3"><p class="text-sm font-bold">primary</p><p class="meta font-mono">#004f9f</p><p class="meta mt-1">Botones sólidos, foco</p></div>
-              </div>
-              <div class="overflow-hidden rounded-lg border border-line">
-                <div class="h-20 bg-primary-light"></div>
-                <div class="p-3"><p class="text-sm font-bold">primary-light</p><p class="meta font-mono">#006fe0</p><p class="meta mt-1">Links, hover, borde activo</p></div>
-              </div>
-              <div class="overflow-hidden rounded-lg border border-line">
-                <div class="h-20 bg-primary-dark"></div>
-                <div class="p-3"><p class="text-sm font-bold">primary-dark</p><p class="meta font-mono">#003f7f</p></div>
-              </div>
-              <div class="overflow-hidden rounded-lg border border-line">
-                <div class="h-20 bg-accent-light"></div>
-                <div class="p-3"><p class="text-sm font-bold">accent-light</p><p class="meta font-mono">#3dc4f4</p><p class="meta mt-1">Solo en gradientes y washes</p></div>
-              </div>
-              <div class="overflow-hidden rounded-lg border border-line">
-                <div class="h-20 bg-accent"></div>
-                <div class="p-3"><p class="text-sm font-bold">accent</p><p class="meta font-mono">#00a6e2</p></div>
-              </div>
-              <div class="overflow-hidden rounded-lg border border-line">
-                <div class="h-20 bg-indigo"></div>
-                <div class="p-3"><p class="text-sm font-bold">indigo</p><p class="meta font-mono">#2f346c</p><p class="meta mt-1">Títulos de card</p></div>
-              </div>
-              <div class="overflow-hidden rounded-lg border border-line">
-                <div class="h-20 bg-indigo-dark"></div>
-                <div class="p-3"><p class="text-sm font-bold">indigo-dark</p><p class="meta font-mono">#212556</p><p class="meta mt-1">Logo, tooltips</p></div>
-              </div>
-              <div class="overflow-hidden rounded-lg border border-line">
-                <div class="h-20 bg-cta"></div>
-                <div class="p-3"><p class="text-sm font-bold">cta</p><p class="meta font-mono">#ff6b35</p><p class="meta mt-1"><strong>Un solo uso:</strong> descargar el certificado. Lleva texto oscuro: con blanco da 2.84:1.</p></div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="text-h5">Estado</h3>
-            <p class="mt-1 max-w-2xl text-sm text-gray-700">
-              El sistema actual no tiene tokens de feedback: los rojos aparecen hardcodeados y sin
-              criterio. Este set se creó para la Academia. <em>success</em> e <em>info</em> se anclan
-              en la marca; <em>error</em> y <em>warning</em> son nuevos. El ámbar de warning se eligió
-              lejos del naranja de CTA para que un aviso nunca se lea como una acción. El verde
-              oscuro de marca (<span class="font-mono">#219667</span>) da 3.46:1 sobre el fondo verde
-              claro, así que el tono de texto se bajó un paso hasta
-              <span class="font-mono">#17694a</span>.
-            </p>
-            <div class="mt-3 grid gap-3 md:grid-cols-2">
-              <div class="flex items-center gap-4 rounded-lg border border-success-line bg-success-bg p-4">
-                <span class="grid h-11 w-11 place-items-center rounded-full bg-success-dark text-white"><span class="icon" data-icon="check"></span></span>
-                <div><p class="text-sm font-bold text-success-dark">success</p><p class="meta font-mono">#2dbe83 · texto #17694a · bg #eafaf3 · borde #b7ecd4</p></div>
-              </div>
-              <div class="flex items-center gap-4 rounded-lg border border-error-line bg-error-bg p-4">
-                <span class="grid h-11 w-11 place-items-center rounded-full bg-error text-white"><span class="icon" data-icon="alert-triangle"></span></span>
-                <div><p class="text-sm font-bold text-error-dark">error</p><p class="meta font-mono">#d92d20 · bg #fef3f2 · borde #fecdca</p></div>
-              </div>
-              <div class="flex items-center gap-4 rounded-lg border border-warning-line bg-warning-bg p-4">
-                <span class="grid h-11 w-11 place-items-center rounded-full bg-warning text-white"><span class="icon" data-icon="alert-circle"></span></span>
-                <div><p class="text-sm font-bold text-warning-dark">warning</p><p class="meta font-mono">#f79009 · bg #fffaeb · borde #fedf89</p></div>
-              </div>
-              <div class="flex items-center gap-4 rounded-lg border border-info-line bg-info-bg p-4">
-                <span class="grid h-11 w-11 place-items-center rounded-full bg-info text-white"><span class="icon" data-icon="info"></span></span>
-                <div><p class="text-sm font-bold text-primary-dark">info</p><p class="meta font-mono">#006fe0 · bg #e5f1fd · borde #b9d9f8</p></div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="text-h5">Grises y superficies</h3>
-            <div class="mt-3 grid grid-cols-3 gap-2 md:grid-cols-5 lg:grid-cols-9">
-              <div><div class="h-14 rounded-md border border-line bg-gray-100"></div><p class="meta mt-1 font-mono">100</p><p class="meta">superficie</p></div>
-              <div><div class="h-14 rounded-md border border-line bg-gray-200"></div><p class="meta mt-1 font-mono">200</p></div>
-              <div><div class="h-14 rounded-md border border-line bg-gray-300"></div><p class="meta mt-1 font-mono">300</p><p class="meta">borde</p></div>
-              <div><div class="h-14 rounded-md bg-gray-400"></div><p class="meta mt-1 font-mono">400</p></div>
-              <div><div class="h-14 rounded-md bg-gray-500"></div><p class="meta mt-1 font-mono">500</p></div>
-              <div><div class="h-14 rounded-md bg-gray-600"></div><p class="meta mt-1 font-mono">600</p><p class="meta">secundario</p></div>
-              <div><div class="h-14 rounded-md bg-gray-700"></div><p class="meta mt-1 font-mono">700</p></div>
-              <div><div class="h-14 rounded-md bg-gray-800"></div><p class="meta mt-1 font-mono">800</p></div>
-              <div><div class="h-14 rounded-md bg-gray-900"></div><p class="meta mt-1 font-mono">900</p><p class="meta">texto</p></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ══════════ TIPOGRAFÍA ══════════ -->
-        <section id="tipografia" class="flex flex-col gap-5">
-          <div>
-            <h2 class="text-h3">Tipografía</h2>
-            <p class="mt-2 max-w-2xl text-gray-700">
-              Sofia Sans, condensada y técnica, en los <strong>únicos dos pesos que existen como
-              archivo: 400 y 700</strong>. Los pesos intermedios se borraron del sistema: si
-              <code class="font-mono text-sm">font-medium</code> no compila, no puede colarse un peso
-              sintetizado. La escala es fluida entre 375 y 1440 px — la del sitio comercial (H1 de
-              72 px) es de landing y en una app desborda.
-            </p>
-          </div>
-          <div class="flex flex-col divide-y divide-line rounded-xl border border-line bg-surface">
-            <div class="flex flex-wrap items-baseline gap-x-6 gap-y-1 p-5"><span class="meta w-40 shrink-0 font-mono">h1 · 40 → 48</span><span class="text-h1">Voucher / Servicios</span></div>
-            <div class="flex flex-wrap items-baseline gap-x-6 gap-y-1 p-5"><span class="meta w-40 shrink-0 font-mono">h2 · 28 → 36</span><span class="text-h2">Voucher / Servicios</span></div>
-            <div class="flex flex-wrap items-baseline gap-x-6 gap-y-1 p-5"><span class="meta w-40 shrink-0 font-mono">h3 · 22 → 28</span><span class="text-h3">Voucher / Servicios</span></div>
-            <div class="flex flex-wrap items-baseline gap-x-6 gap-y-1 p-5"><span class="meta w-40 shrink-0 font-mono">h4 · 18 → 22</span><span class="text-h4">Voucher / Servicios</span></div>
-            <div class="flex flex-wrap items-baseline gap-x-6 gap-y-1 p-5"><span class="meta w-40 shrink-0 font-mono">h5 · 16 → 18</span><span class="text-h5">Voucher / Servicios</span></div>
-            <div class="flex flex-wrap items-baseline gap-x-6 gap-y-1 p-5"><span class="meta w-40 shrink-0 font-mono">lg · 18</span><span class="text-lg">Cotización, emisión y modificación de reservas de vuelos.</span></div>
-            <div class="flex flex-wrap items-baseline gap-x-6 gap-y-1 p-5"><span class="meta w-40 shrink-0 font-mono">base · 16</span><span class="text-base">Cotización, emisión y modificación de reservas de vuelos.</span></div>
-            <div class="flex flex-wrap items-baseline gap-x-6 gap-y-1 p-5"><span class="meta w-40 shrink-0 font-mono">sm · 14</span><span class="text-sm">Cotización, emisión y modificación de reservas de vuelos.</span></div>
-            <div class="flex flex-wrap items-baseline gap-x-6 gap-y-1 p-5"><span class="meta w-40 shrink-0 font-mono">xs · 13</span><span class="text-xs">8 videos · 34 min · Nivel intermedio</span></div>
-            <div class="flex flex-wrap items-baseline gap-x-6 gap-y-1 p-5"><span class="meta w-40 shrink-0 font-mono">2xs · 12 (mínimo)</span><span class="eyebrow">Módulo 03</span></div>
-          </div>
-
-          <div class="card">
-            <h3 class="text-h5">Números tabulares</h3>
-            <p class="meta mt-1">
-              Los dos <span class="font-mono">.woff2</span> son subsets, pero
-              <strong>conservan la feature <span class="font-mono">tnum</span></strong> — verificado
-              midiendo el avance de «111» contra «000» con la fuente ya resuelta. Va donde los
-              números se apilan en columna: el <span class="font-mono">%</span> y el «N de M» de la
-              tabla del plantel, y el avance agregado. En un dígito suelto no alinea nada.
-            </p>
-            <div class="mt-4 flex flex-col gap-1">
-              <span class="flex items-baseline gap-4">
-                <span class="meta w-32 shrink-0 font-mono">proporcional</span>
-                <span class="text-h4">111 · 000</span>
-              </span>
-              <span class="flex items-baseline gap-4">
-                <span class="meta w-32 shrink-0 font-mono">tabular-nums</span>
-                <span class="text-h4 tabular-nums">111 · 000</span>
-              </span>
-            </div>
-          </div>
-        </section>
-
-        <!-- ══════════ ESPACIO Y FORMA ══════════ -->
-        <section id="espacio" class="flex flex-col gap-5">
-          <div>
-            <h2 class="text-h3">Espacio y forma</h2>
-            <p class="mt-2 max-w-2xl text-gray-700">
-              Grilla de 4 px, con la escala 4·8·16·24·32·48·64·96 como valores de referencia. Es la
-              parte mejor adoptada del sistema actual. La jerarquía se construye con borde de 1 px +
-              fondo gris claro, <strong>no con sombra</strong>: solo el modal y el menú flotan.
-            </p>
-          </div>
-          <div class="grid items-start gap-6 md:grid-cols-2">
-            <div class="card">
-              <h3 class="text-h5">Escala de espaciado</h3>
-              <div class="mt-4 flex flex-col gap-2">
-                <div class="flex items-center gap-3"><span class="meta w-16 font-mono">4</span><span class="h-3 bg-accent-light" style="width: 4px"></span></div>
-                <div class="flex items-center gap-3"><span class="meta w-16 font-mono">8</span><span class="h-3 bg-accent-light" style="width: 8px"></span></div>
-                <div class="flex items-center gap-3"><span class="meta w-16 font-mono">16</span><span class="h-3 bg-accent" style="width: 16px"></span></div>
-                <div class="flex items-center gap-3"><span class="meta w-16 font-mono">24</span><span class="h-3 bg-accent" style="width: 24px"></span></div>
-                <div class="flex items-center gap-3"><span class="meta w-16 font-mono">32</span><span class="h-3 bg-primary-light" style="width: 32px"></span></div>
-                <div class="flex items-center gap-3"><span class="meta w-16 font-mono">48</span><span class="h-3 bg-primary-light" style="width: 48px"></span></div>
-                <div class="flex items-center gap-3"><span class="meta w-16 font-mono">64</span><span class="h-3 bg-primary" style="width: 64px"></span></div>
-                <div class="flex items-center gap-3"><span class="meta w-16 font-mono">96</span><span class="h-3 bg-primary" style="width: 96px"></span></div>
-              </div>
-            </div>
-            <div class="flex flex-col gap-6">
-              <div class="card">
-                <h3 class="text-h5">Radios</h3>
-                <div class="mt-4 flex flex-wrap items-end gap-4">
-                  <div class="text-center"><div class="h-16 w-16 rounded-sm border border-line-strong bg-white"></div><p class="meta mt-1 font-mono">4 · sm</p></div>
-                  <div class="text-center"><div class="h-16 w-16 rounded-md border border-line-strong bg-white"></div><p class="meta mt-1 font-mono">8 · md</p></div>
-                  <div class="text-center"><div class="h-16 w-16 rounded-lg border border-line-strong bg-white"></div><p class="meta mt-1 font-mono">12 · botones</p></div>
-                  <div class="text-center"><div class="h-16 w-16 rounded-xl border border-line-strong bg-white"></div><p class="meta mt-1 font-mono">16 · cards</p></div>
-                  <div class="text-center"><div class="h-16 w-16 rounded-full border border-line-strong bg-white"></div><p class="meta mt-1 font-mono">píldora</p></div>
-                </div>
-              </div>
-              <div class="card">
-                <h3 class="text-h5">Profundidad</h3>
-                <div class="mt-4 flex flex-wrap gap-4">
-                  <div class="text-center"><div class="grid h-16 w-28 place-items-center rounded-lg border border-line bg-white shadow-dropdown"></div><p class="meta mt-1 font-mono">dropdown</p></div>
-                  <div class="text-center"><div class="grid h-16 w-28 place-items-center rounded-lg bg-white shadow-modal"></div><p class="meta mt-1 font-mono">modal</p></div>
-                  <div class="text-center"><div class="grid h-16 w-28 place-items-center rounded-lg border border-line bg-white shadow-glow"></div><p class="meta mt-1 font-mono">glow</p></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ══════════ ÍCONOS ══════════ -->
-        <section id="iconos" class="flex flex-col gap-5">
-          <div>
-            <h2 class="text-h3">Íconos</h2>
-            <p class="mt-2 max-w-2xl text-gray-700">
-              Trazo de 2 px sobre grilla de 24, sin relleno, extremos redondeados y
-              <span class="font-mono">currentColor</span>: el ícono toma el color del texto que lo
-              rodea, así que no lleva color propio casi nunca. Se hidratan desde
-              <span class="font-mono">&lt;span class="icon" data-icon="nombre"&gt;</span> contra un mapa
-              en JS y <strong>no</strong> contra un sprite: un
-              <span class="font-mono">&lt;use href="archivo.svg#id"&gt;</span> no carga bajo
-              <span class="font-mono">file://</span> y el prototipo tiene que abrir con doble click.
-            </p>
-          </div>
-
-          <div class="card">
-            <h3 class="text-h5">El set completo</h3>
-            <p class="meta mt-1">
-              Se pinta desde <span class="font-mono">window.ICONS</span>: al agregar uno aparece acá
-              solo. Tamaños: <span class="font-mono">.icon</span> 18 ·
-              <span class="font-mono">.icon-sm</span> 14 · <span class="font-mono">.icon-lg</span> 24
-              · <span class="font-mono">.icon-xl</span> 28.
-            </p>
-            <div
-              class="mt-4 grid grid-cols-3 gap-3 md:grid-cols-6 lg:grid-cols-8"
-              id="grilla-iconos"
-            ></div>
-          </div>
-
-          <div class="grid items-start gap-6 md:grid-cols-2">
-            <div class="card">
-              <h3 class="text-h5">Pairing ícono ↔ token</h3>
-              <p class="meta mt-1">
-                Las métricas del dashboard de <span class="font-mono">agencia.html</span>. Dos reglas:
-                <strong>un solo acento de color por pantalla</strong> —el resto en gris— y
-                <strong>nunca ámbar ni rojo sobre una persona</strong> por no haber capacitado.
-              </p>
-              <div class="mt-4 flex flex-col gap-3">
-                <span class="flex items-center gap-2 text-ink-soft">
-                  <span class="icon icon-sm" data-icon="users"></span>
-                  <span class="eyebrow">Personas</span>
-                  <span class="meta font-mono">neutral</span>
-                </span>
-                <span class="flex items-center gap-2 text-ink-soft">
-                  <span class="icon icon-sm" data-icon="activity"></span>
-                  <span class="eyebrow">Con actividad</span>
-                  <span class="meta font-mono">neutral</span>
-                </span>
-                <span class="flex items-center gap-2 text-ink-soft">
-                  <span class="icon icon-sm text-success-dark" data-icon="check-circle"></span>
-                  <span class="eyebrow">Completado</span>
-                  <span class="meta font-mono">success-dark · el único</span>
-                </span>
-                <span class="flex items-center gap-2 text-ink-soft">
-                  <span class="icon icon-sm" data-icon="clock"></span>
-                  <span class="eyebrow">Sin empezar</span>
-                  <span class="meta font-mono">neutral, nunca warning</span>
-                </span>
-                <span class="flex items-center gap-2 text-ink-soft">
-                  <span class="icon icon-sm" data-icon="trophy"></span>
-                  <span class="eyebrow">Tu puesto</span>
-                  <span class="meta font-mono">neutral</span>
-                </span>
-              </div>
-              <div class="alert alert-info mt-4">
-                <span class="icon" data-icon="info"></span>
-                <p>
-                  El acento se enciende con el <strong>dato</strong>, no con la pantalla: con cero
-                  recorridos completos el tilde vuelve al gris. Un cero no se pinta de verde.
-                </p>
-              </div>
-            </div>
-
-            <div class="card">
-              <h3 class="text-h5">Equivalencia con Lucide</h3>
-              <p class="meta mt-1">
-                Los nombres del mapa vienen de Feather, que Lucide continuó renombrando los de dos
-                palabras a «forma primero». <strong>La clave pública es nuestro nombre</strong>; el
-                slug es la referencia para quien tenga que dibujar uno nuevo. Lucide no se importa
-                como paquete: rompe <span class="font-mono">file://</span>.
-              </p>
-              <div class="table-wrap mt-4">
-                <div class="table-scroll">
-                  <table class="table-app">
-                    <thead>
-                      <tr>
-                        <th>Nuestro <span class="font-mono">data-icon</span></th>
-                        <th>Slug en lucide.dev</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr><td class="font-mono">check-circle</td><td class="font-mono text-ink-soft">circle-check</td></tr>
-                      <tr><td class="font-mono">play-circle</td><td class="font-mono text-ink-soft">circle-play</td></tr>
-                      <tr><td class="font-mono">alert-circle</td><td class="font-mono text-ink-soft">circle-alert</td></tr>
-                      <tr><td class="font-mono">alert-triangle</td><td class="font-mono text-ink-soft">triangle-alert</td></tr>
-                      <tr><td class="font-mono">help-circle</td><td class="font-mono text-ink-soft">circle-help</td></tr>
-                      <tr><td class="font-mono">refresh</td><td class="font-mono text-ink-soft">refresh-cw</td></tr>
-                      <tr><td class="font-mono">unlock</td><td class="font-mono text-ink-soft">lock-open</td></tr>
-                      <tr><td class="font-mono">logout</td><td class="font-mono text-ink-soft">log-out</td></tr>
-                      <tr><td class="text-ink-soft" colspan="2">El resto coincide con su slug.</td></tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              <p class="meta mt-3">
-                Para agregar uno: buscá el slug en lucide.dev y <strong>redibujalo</strong> en este
-                lenguaje. No pegues el path oficial tal cual — la simplificación del set es
-                deliberada, y a 14 px el detalle de más es barro.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <!-- ══════════ GESTO DE MARCA ══════════ -->
-        <section id="gesto" class="flex flex-col gap-5">
-          <div>
-            <h2 class="text-h3">Gesto de marca</h2>
-            <p class="mt-2 max-w-2xl text-gray-700">
-              El recurso estético distintivo de sigmma.net no es un color plano: es un borde de 1 px
-              pintado con un gradiente celeste→azul sobre relleno blanco. Está definido
-              <strong>una sola vez</strong> — en el sitio actual está reimplementado en tres
-              archivos distintos. En la Academia además <strong>encoda estado</strong>: lo lleva la
-              card del módulo en curso, y hay una sola por vez. El gradiente dice «acá estás».
-            </p>
-          </div>
-          <div class="grid gap-4 md:grid-cols-3">
-            <div class="brand-edge rounded-lg p-6">
-              <p class="text-sm font-bold">Panel con borde de gradiente</p>
-              <p class="meta mt-1">Relleno blanco · borde 180° #3dc4f4 20% → #006fe0 50%</p>
-            </div>
-            <div class="brand-edge-soft rounded-lg p-6">
-              <p class="text-sm font-bold">Variante sobre superficie</p>
-              <p class="meta mt-1">Relleno #f9fafb, mismo borde</p>
-            </div>
-            <div class="flex items-center justify-center rounded-lg border border-dashed border-line-strong p-6">
-              <button type="button" class="btn btn-bordered">Pasá el mouse<span class="icon" data-icon="arrow-right"></span></button>
-            </div>
-          </div>
-        </section>
-
-        <!-- ══════════ BOTONES ══════════ -->
-        <section id="botones" class="flex flex-col gap-5">
-          <div>
-            <h2 class="text-h3">Botones</h2>
-            <p class="mt-2 max-w-2xl text-gray-700">
-              La guía solo definía dos variantes en un único tamaño de 48 px de alto y 223 px de
-              ancho mínimo — inviable para una acción dentro de una card. Se agregaron los tres
-              tamaños y los estados que faltaban: deshabilitado, cargando y una variante fantasma.
-              El ancho mínimo de 223 px queda solo para el CTA de pantalla completa.
-            </p>
-          </div>
-          <div class="table-wrap">
-            <div class="table-scroll">
-              <table class="table-app">
-                <thead>
-                  <tr><th>Variante</th><th>S · 36</th><th>M · 44</th><th>L · 48</th><th>Deshabilitado</th><th>Cargando</th></tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="font-bold">Primario</td>
-                    <td><button class="btn btn-primary btn-sm" type="button">Continuar</button></td>
-                    <td><button class="btn btn-primary" type="button">Continuar</button></td>
-                    <td><button class="btn btn-primary btn-lg" type="button">Continuar</button></td>
-                    <td><button class="btn btn-primary" type="button" disabled>Continuar</button></td>
-                    <td><button class="btn btn-primary is-loading" type="button">Continuar</button></td>
-                  </tr>
-                  <tr>
-                    <td class="font-bold">Borde gradiente</td>
-                    <td><button class="btn btn-bordered btn-sm" type="button">Rehacer</button></td>
-                    <td><button class="btn btn-bordered" type="button">Rehacer<span class="icon" data-icon="refresh"></span></button></td>
-                    <td><button class="btn btn-bordered btn-lg" type="button">Rehacer</button></td>
-                    <td><button class="btn btn-bordered" type="button" disabled>Rehacer</button></td>
-                    <td><button class="btn btn-bordered is-loading" type="button">Rehacer</button></td>
-                  </tr>
-                  <tr>
-                    <td class="font-bold">Fantasma</td>
-                    <td><button class="btn btn-ghost btn-sm" type="button">Cancelar</button></td>
-                    <td><button class="btn btn-ghost" type="button">Cancelar</button></td>
-                    <td><button class="btn btn-ghost btn-lg" type="button">Cancelar</button></td>
-                    <td><button class="btn btn-ghost" type="button" disabled>Cancelar</button></td>
-                    <td><button class="btn btn-ghost is-loading" type="button">Cancelar</button></td>
-                  </tr>
-                  <tr>
-                    <td class="font-bold">CTA naranja</td>
-                    <td colspan="5">
-                      <div class="flex flex-wrap items-center gap-4">
-                        <button class="btn btn-cta" type="button"><span class="icon" data-icon="download"></span>Descargar certificado PDF</button>
-                        <span class="meta">Reservado. Es la única acción culminante del recorrido; no se reparte.</span>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <p class="meta">
-            El foco visible es un contorno de 3 px en <span class="font-mono">#004f9f</span> con 3 px
-            de separación. Es generoso a propósito: no se quita nunca. Probalo con la tecla Tab.
-          </p>
-        </section>
-
-        <!-- ══════════ CARDS ══════════ -->
-        <section id="cards" class="flex flex-col gap-5">
-          <div>
-            <h2 class="text-h3">Cards de módulo</h2>
-            <p class="mt-2 max-w-2xl text-gray-700">
-              Hereda de la card canónica el radio 16, el borde de 1 px, la superficie
-              <span class="font-mono">#f9fafb</span>, el título en índigo y el hover firma: borde
-              azul + wash celeste al 10 % + título en azul, sin elevación ni escala. No hereda el
-              alto mínimo de 382 px ni el bloque de imagen: un módulo no tiene portada.
-            </p>
-            <p class="mt-3 max-w-2xl text-gray-700">
-              El número es la <strong>posición en el recorrido</strong>, nunca el id del módulo: los
-              ids del mapa de contenido van de 10 en 10 y saltan (<span class="font-mono">BAK-M95</span>
-              sigue a <span class="font-mono">BAK-M90</span>). Un módulo que el plan de la agencia no
-              incluye no tiene posición —no es parte de tu recorrido—, así que en su lugar lleva el
-              ícono del plan.
-            </p>
-          </div>
-          <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            <!-- Aprobado -->
-            <article class="card card-interactive flex flex-col gap-3">
-              <div class="flex items-start justify-between gap-3">
-                <div class="leading-none">
-                  <span class="text-h3 font-bold text-indigo">1°</span>
-                  <span class="block text-2xs font-bold uppercase tracking-wide text-ink-soft">módulo</span>
-                </div>
-                <div class="flex flex-col items-end gap-1">
-                  <span class="badge badge-success"><span class="icon icon-sm" data-icon="check"></span>Aprobado</span>
-                  <span class="block text-2xs font-bold text-gray-800">Nota 9/10</span>
-                </div>
-              </div>
-              <div class="flex flex-1 flex-col gap-2">
-                <h3 class="card-title clamp-2"><a href="modulo.html?m=0" class="text-inherit">Fundamentos</a></h3>
-                <p class="text-xs text-ink-soft">Qué es SIGMMA, cómo piensa el sistema y cómo moverse por él.</p>
-              </div>
-              <div class="text-xs text-ink-soft">4 videos · 2 secciones</div>
-              <button class="btn btn-bordered btn-sm btn-block" type="button">Rehacer evaluación</button>
-            </article>
-
-            <!-- En progreso: lleva el gesto de marca -->
-            <article class="card card-active flex flex-col gap-3">
-              <div class="flex items-start justify-between gap-3">
-                <div class="leading-none">
-                  <span class="text-h3 font-bold text-indigo">3°</span>
-                  <span class="block text-2xs font-bold uppercase tracking-wide text-ink-soft">módulo</span>
-                </div>
-                <span class="badge badge-info"><span class="icon icon-sm" data-icon="play"></span>En curso</span>
-              </div>
-              <div class="flex flex-1 flex-col gap-2">
-                <h3 class="card-title clamp-2">Entidades: clientes, pasajeros y proveedores</h3>
-                <p class="text-xs text-ink-soft">Quién es quién en el sistema y cómo se cargan las tres entidades.</p>
-              </div>
-              <div class="flex flex-col gap-1.5">
-                <div class="flex justify-between text-xs text-ink-soft"><span>2 vistos</span><span>6 videos · 3 secciones</span></div>
-                <div class="progress progress-sm"><span style="width: 33%"></span></div>
-              </div>
-              <a class="btn btn-primary btn-sm btn-block" href="modulo.html?m=20">Continuar</a>
-            </article>
-
-            <!-- Disponible -->
-            <article class="card card-interactive flex flex-col gap-3">
-              <div class="flex items-start justify-between gap-3">
-                <div class="leading-none">
-                  <span class="text-h3 font-bold text-indigo">4°</span>
-                  <span class="block text-2xs font-bold uppercase tracking-wide text-ink-soft">módulo</span>
-                </div>
-                <span class="badge badge-neutral">Disponible</span>
-              </div>
-              <div class="flex flex-1 flex-col gap-2">
-                <h3 class="card-title clamp-2">Voucher / Servicios</h3>
-                <p class="text-xs text-ink-soft">El corazón operativo: cargar, valorizar y procesar los servicios.</p>
-              </div>
-              <div class="text-xs text-ink-soft">7 videos · 4 secciones</div>
-              <a class="btn btn-primary btn-sm btn-block" href="modulo.html?m=30">Empezar módulo</a>
-            </article>
-
-            <!-- Bloqueado por secuencia -->
-            <article class="card card-locked relative flex flex-col gap-3 has-tooltip" aria-disabled="true">
-              <div class="flex items-start justify-between gap-3">
-                <div class="leading-none">
-                  <span class="text-h3 font-bold text-indigo">5°</span>
-                  <span class="block text-2xs font-bold uppercase tracking-wide text-ink-soft">módulo</span>
-                </div>
-                <span class="badge badge-muted"><span class="icon icon-sm" data-icon="lock"></span>Bloqueado</span>
-              </div>
-              <div class="flex flex-1 flex-col gap-2">
-                <h3 class="card-title clamp-2">Cobranzas / Recibos</h3>
-                <p class="text-xs text-ink-soft">Emitir el recibo, registrar los valores y leer la cuenta corriente.</p>
-              </div>
-              <div class="text-xs text-ink-soft">5 videos · 3 secciones</div>
-              <span class="btn btn-sm btn-block" aria-disabled="true">Bloqueado</span>
-              <span class="tooltip" role="tooltip">Aprobá el módulo 04 para desbloquear</span>
-            </article>
-
-            <!-- Fuera del plan de la agencia. Mismo tratamiento visual que el
-                 bloqueo por secuencia, pero se distingue en tres puntos: sin
-                 posición, ícono e ícono de badge propios, y el aviso apunta al
-                 canal de soporte en vez de a un prerequisito. -->
-            <article class="card card-locked relative flex flex-col gap-3 has-tooltip" aria-disabled="true">
-              <div class="flex items-start justify-between gap-3">
-                <div class="leading-none">
-                  <span class="grid h-9 w-9 place-items-center text-ink-soft"><span class="icon icon-lg" data-icon="sparkles"></span></span>
-                  <span class="block text-2xs font-bold uppercase tracking-wide text-ink-soft">módulo</span>
-                </div>
-                <span class="badge badge-muted"><span class="icon icon-sm" data-icon="sparkles"></span>Plan Business</span>
-              </div>
-              <div class="flex flex-1 flex-col gap-2">
-                <h3 class="card-title clamp-2">Contable</h3>
-                <p class="text-xs text-ink-soft">Plan de cuentas, libros, balances y cierre de ejercicio.</p>
-              </div>
-              <div class="text-xs text-ink-soft">5 videos · 3 secciones</div>
-              <span class="btn btn-sm btn-block" aria-disabled="true">No incluido en tu plan</span>
-              <span class="tooltip" role="tooltip">Es parte del plan Business. Si tu agencia lo necesita, escribinos.</span>
-            </article>
-          </div>
-        </section>
-
-        <!-- ══════════ ETIQUETAS DE ESTADO ══════════ -->
-        <section id="estado" class="flex flex-col gap-5">
-          <div>
-            <h2 class="text-h3">Etiquetas de estado</h2>
-            <p class="mt-2 max-w-2xl text-gray-700">
-              Variantes cerradas, no color libre por instancia. En el sistema actual el color de los
-              chips se pasa como parámetro en cada uso, lo que hace imposible leer un estado por su
-              color.
-            </p>
-          </div>
-          <div class="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface p-6">
-            <span class="badge badge-success"><span class="icon icon-sm" data-icon="check"></span>Aprobado</span>
-            <span class="badge badge-info"><span class="icon icon-sm" data-icon="play"></span>En curso</span>
-            <span class="badge badge-neutral">Disponible</span>
-            <span class="badge badge-muted"><span class="icon icon-sm" data-icon="lock"></span>Bloqueado</span>
-            <span class="badge badge-warning">Pendiente</span>
-            <span class="badge badge-error">No alcanzaste el umbral</span>
-            <span class="badge badge-success"><span class="icon icon-sm" data-icon="award"></span>Certificado</span>
-            <span class="badge badge-muted">Sin empezar</span>
-            <span class="eyebrow">Módulo 03</span>
-          </div>
-          <p class="meta">
-            El número del eyebrow no es decoración: el recorrido es secuencial y el orden es la
-            regla de desbloqueo. Cuando el orden no informa nada, no se numera.
-          </p>
-          <p class="meta">
-            <strong class="text-ink">Estados que califican a una persona</strong> (ranking de
-            <span class="font-mono">agencia.html?ver=ranking</span>): la escala se limita a
-            <span class="font-mono">success</span> Certificado ·
-            <span class="font-mono">info</span> En curso ·
-            <span class="font-mono">muted</span> Sin empezar. <strong class="text-ink">Nunca
-            <span class="font-mono">warning</span> ni <span class="font-mono">error</span> sobre una
-            persona</strong>: pintar de ámbar o rojo a quien todavía no capacitó es punitivo, y el
-            producto ya decidió no serlo en el repaso de evaluaciones. Esos dos tonos quedan para
-            estados de una evaluación, no de alguien.
-          </p>
-        </section>
-
-        <!-- ══════════ PROGRESO ══════════ -->
-        <section id="progreso" class="flex flex-col gap-5">
-          <h2 class="text-h3">Progreso</h2>
-          <div class="grid gap-5 md:grid-cols-2">
-            <div class="card flex flex-col gap-5">
-              <div class="flex flex-col gap-2">
-                <div class="flex justify-between text-sm"><span class="font-bold">Progreso general</span><span class="text-ink-soft">3 de 10 módulos</span></div>
-                <div class="progress"><span style="width: 30%"></span></div>
-              </div>
-              <div class="flex flex-col gap-2">
-                <div class="flex justify-between text-sm"><span class="font-bold">Videos vistos</span><span class="text-ink-soft">5 de 8 · 62 %</span></div>
-                <div class="progress progress-sm"><span style="width: 62%"></span></div>
-              </div>
-              <div class="flex flex-col gap-2">
-                <div class="flex justify-between text-sm"><span class="font-bold">Recorrido completo</span><span class="text-success-dark">100 %</span></div>
-                <div class="progress progress-lg progress-complete"><span style="width: 100%"></span></div>
-              </div>
-            </div>
-            <div class="card flex flex-col gap-5">
-              <div class="flex flex-col gap-2">
-                <div class="flex justify-between text-sm"><span class="font-bold">Pregunta 3 de 10</span><span class="text-ink-soft">Umbral 8/10</span></div>
-                <div class="steps" role="presentation">
-                  <span data-state="done"></span><span data-state="done"></span><span data-state="current"></span>
-                  <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-                </div>
-              </div>
-              <div class="flex flex-col gap-2">
-                <div class="flex items-baseline justify-between text-sm"><span class="font-bold">Progreso de reproducción</span><span class="flex items-center gap-1.5 text-xs font-bold text-success-dark"><span class="icon icon-sm" data-icon="check"></span>Visto</span></div>
-                <div class="progress relative">
-                  <span style="width: 84%"></span>
-                  <span class="absolute -top-1 h-4 w-0.5 bg-indigo-dark" style="left: 80%"></span>
-                </div>
-                <p class="meta">La marca fija señala el umbral del 80 %. Al cruzarlo el video queda visto y no vuelve atrás.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ══════════ FORMULARIOS ══════════ -->
-        <section id="formularios" class="flex flex-col gap-5">
-          <div>
-            <h2 class="text-h3">Formularios</h2>
-            <p class="mt-2 max-w-2xl text-gray-700">
-              <strong>El aporte más grande de la Academia al sistema.</strong> El sitio actual no
-              tiene formularios propios — la captación de leads usa embebidos de un proveedor
-              externo — así que no había estándar de input, label, error ni validación que heredar.
-              Este set se diseñó desde cero.
-            </p>
-          </div>
-          <div class="grid gap-6 md:grid-cols-2">
-            <div class="card flex flex-col gap-5">
-              <h3 class="text-h5">Campos</h3>
-              <div class="field">
-                <label class="label" for="ds-1">Usuario</label>
-                <input class="input" id="ds-1" type="email" placeholder="usuario@agencia.com" />
-                <p class="hint">Es el mismo usuario con el que entrás a sigmma.net.</p>
-              </div>
-              <div class="field">
-                <label class="label" for="ds-2">Contraseña <span class="label-optional">(con error)</span></label>
-                <input class="input" id="ds-2" type="password" value="123456" aria-invalid="true" aria-describedby="ds-2-error" />
-                <p class="error-text" id="ds-2-error"><span class="icon icon-sm" data-icon="alert-circle"></span>Usuario o contraseña incorrectos.</p>
-              </div>
-              <div class="field">
-                <label class="label" for="ds-3">Plan de la agencia <span class="label-optional">(solo lectura)</span></label>
-                <input class="input" id="ds-3" type="text" value="Professional" readonly />
-              </div>
-              <div class="field">
-                <label class="label" for="ds-4">Módulo <span class="label-optional">(deshabilitado)</span></label>
-                <select class="select" id="ds-4" disabled>
-                  <option>Voucher / Servicios</option>
-                </select>
-              </div>
-              <div class="field">
-                <label class="label" for="ds-5">Sección</label>
-                <select class="select" id="ds-5">
-                  <option>Cotización y disponibilidad</option>
-                  <option>Emisión y reemisión</option>
-                  <option>Cancelaciones</option>
-                </select>
-              </div>
-              <div class="field">
-                <label class="label" for="ds-6">Contanos tu duda</label>
-                <textarea class="textarea" id="ds-6" maxlength="500" placeholder="Describí lo más puntual posible qué no te quedó claro."></textarea>
-                <div class="flex justify-between">
-                  <span class="hint">Se suma a la cola del módulo, con tu nombre.</span>
-                  <span class="hint" data-counter-for="ds-6">0 / 500</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="card flex flex-col gap-5">
-              <h3 class="text-h5">Opciones</h3>
-              <fieldset class="flex flex-col gap-2.5">
-                <legend class="label mb-1">Opción de respuesta (radio)</legend>
-                <label class="choice"><input type="radio" name="ds-q" /><span class="choice-text">Generar una nota de crédito asociada al ticket original.</span></label>
-                <label class="choice"><input type="radio" name="ds-q" checked /><span class="choice-text">Registrar el saldo a favor y aplicarlo en la nueva emisión.</span></label>
-                <label class="choice"><input type="radio" name="ds-q" /><span class="choice-text">Cancelar la reserva y volver a cotizar desde cero.</span></label>
-              </fieldset>
-              <div>
-                <p class="label mb-1">Respuesta marcada como incorrecta</p>
-                <div class="choice choice-wrong">
-                  <span class="icon mt-0.5 text-error" data-icon="x"></span>
-                  <span class="choice-text line-through">Que el ticket original haya sido emitido en el mismo mes.</span>
-                  <span class="badge badge-error ml-auto shrink-0">Tu respuesta</span>
-                </div>
-                <p class="hint mt-2">
-                  Nunca se marca cuál era la correcta. Está explicada en los videos del módulo.
-                </p>
-              </div>
-              <fieldset class="flex flex-col gap-2.5">
-                <legend class="label mb-1">Casilla (checkbox)</legend>
-                <label class="choice"><input type="checkbox" checked /><span class="choice-text">Avisarme cuando se publique un módulo nuevo.</span></label>
-              </fieldset>
-            </div>
-          </div>
-        </section>
-
-        <!-- ══════════ AVISOS ══════════ -->
-        <section id="avisos" class="flex flex-col gap-5">
-          <h2 class="text-h3">Avisos y modal</h2>
-          <div class="grid gap-3 md:grid-cols-2">
-            <div class="alert alert-error" role="alert"><span class="icon" data-icon="alert-triangle"></span><p>Usuario o contraseña incorrectos. Probá de nuevo o resolvé tu acceso desde sigmma.net.</p></div>
-            <div class="alert alert-success"><span class="icon" data-icon="unlock"></span><p>Se desbloqueó el <strong>Módulo 04 · Voucher / Servicios</strong>.</p></div>
-            <div class="alert alert-info"><span class="icon" data-icon="info"></span><p>La evaluación está siempre disponible: no hace falta ver todos los videos.</p></div>
-            <div class="alert alert-warning"><span class="icon" data-icon="alert-circle"></span><p>Quedaron <strong>3 preguntas sin responder</strong>. Si terminás ahora, se cuentan como incorrectas.</p></div>
-          </div>
-          <div class="flex flex-wrap gap-3">
-            <button class="btn btn-bordered" type="button" data-modal-open="ds-modal">Abrir el modal de confirmación</button>
-            <button class="btn btn-ghost" type="button" onclick="UI.sessionExpired()">Ver el takeover de sesión expirada</button>
-          </div>
-          <p class="meta">
-            Un solo patrón de modal para todo el producto — el sitio actual tiene dos en paralelo y
-            eso es deuda. Overlay negro al 60 %, panel de radio 12, foco atrapado, cierre con
-            <kbd class="font-mono">Esc</kbd>, y el foco vuelve al botón que lo abrió.
-          </p>
-        </section>
-
-        <!-- ══════════ CHROME ══════════ -->
-        <section id="chrome" class="flex flex-col gap-5">
-          <div>
-            <h2 class="text-h3">Chrome y menú de usuario</h2>
-            <p class="mt-2 max-w-2xl text-gray-700">
-              Una sola barra de 72 px, la altura real del navbar del sistema. Se descartó la topbar
-              de 36 px del sitio comercial: la Academia es una app y no tiene links institucionales
-              que justifiquen una segunda fila. En mobile los tres destinos bajan a una barra propia.
-            </p>
-          </div>
-          <div class="overflow-hidden rounded-xl border border-line">
-            <div class="flex h-[72px] items-center gap-4 bg-white px-6">
-              <span class="flex shrink-0 items-center gap-3">
-                <img src="assets/img/logo.svg" alt="SIGMMA" width="124" height="20" class="w-[124px]" />
-                <span class="h-6 w-px bg-line" aria-hidden="true"></span>
-                <span class="text-h6 font-bold text-primary">Academia</span>
-              </span>
-              <span class="ml-auto hidden items-center gap-1 md:flex">
-                <span class="nav-link" aria-current="page">Módulos</span>
-                <span class="nav-link">Mis certificaciones</span>
-                <span class="nav-link">Mi agencia</span>
-              </span>
-              <span class="hidden h-7 w-px bg-line md:block" aria-hidden="true"></span>
-              <span class="relative flex items-center gap-3" data-dropdown>
-                <span class="hidden text-right leading-tight md:block">
-                  <span class="block text-sm font-bold text-gray-800" data-user-name></span>
-                  <span class="block text-2xs text-ink-soft"><span data-user-agency></span> · <span data-user-profile></span></span>
-                </span>
-                <button
-                  type="button"
-                  class="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-info-line bg-info-bg text-2xs font-bold text-primary transition-colors duration-300 hover:border-primary-light aria-expanded:border-primary aria-expanded:bg-primary aria-expanded:text-white"
-                  data-dropdown-trigger aria-expanded="false" aria-haspopup="true" aria-label="Menú de usuario"
-                ><span data-user-initials></span></button>
-                <span class="menu" role="menu" data-dropdown-menu hidden>
-                  <a href="index.html" class="menu-item" role="menuitem"><span class="icon icon-sm" data-icon="logout"></span>Cerrar sesión</a>
-                </span>
-              </span>
-            </div>
-            <div class="border-t border-surface-sunken bg-surface p-4">
-              <p class="meta">
-                Un solo ítem en el menú: cerrar sesión. Ni perfil, ni preferencias, ni ayuda — no hay
-                nada que configurar en el MVP, y un menú con un solo ítem es más honesto que uno
-                lleno de destinos muertos. El avatar es un <code class="font-mono">button</code> con
-                <code class="font-mono">aria-expanded</code>; el menú es un
-                <code class="font-mono">role="menu"</code> navegable con flechas y
-                <kbd class="font-mono">Esc</kbd>.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <!-- ══════════ TABLAS Y FILAS ══════════ -->
-        <section id="datos" class="flex flex-col gap-5">
-          <h2 class="text-h3">Tablas y filas de contenido</h2>
-          <div class="table-wrap">
-            <div class="table-scroll">
-              <table class="table-app">
-                <thead>
-                  <tr><th style="width: 64px">#</th><th>Módulo</th><th style="width: 150px">Estado</th><th style="width: 90px">Nota</th><th style="width: 130px">Fecha</th></tr>
-                </thead>
-                <tbody>
-                  <tr><td class="text-ink-soft">01</td><td>Fundamentos</td><td><span class="badge badge-success"><span class="icon icon-sm" data-icon="check"></span>Aprobado</span></td><td>9/10</td><td class="text-ink-soft">02/06/2026</td></tr>
-                  <tr><td class="text-ink-soft">03</td><td>Entidades: clientes, pasajeros y proveedores</td><td><span class="badge badge-info"><span class="icon icon-sm" data-icon="play"></span>En curso</span></td><td class="text-ink-soft">—</td><td class="text-ink-soft">—</td></tr>
-                  <tr data-muted="true"><td>05</td><td>Cobranzas / Recibos</td><td><span class="badge badge-muted"><span class="icon icon-sm" data-icon="lock"></span>Bloqueado</span></td><td>—</td><td>—</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div class="overflow-hidden rounded-xl border border-line">
-            <button class="video-row" type="button">
-              <span class="icon text-success" data-icon="check-circle"></span>
-              <span class="video-thumb"><span class="icon icon-sm" data-icon="play"></span></span>
-              <span class="flex-1 text-sm">Buscar disponibilidad de vuelos</span>
-              <span class="meta shrink-0">03:40 min</span>
-              <span class="badge badge-success">Visto</span>
-            </button>
-            <button class="video-row" type="button" aria-current="true">
-              <span class="icon text-primary" data-icon="play-circle"></span>
-              <span class="video-thumb"><span class="icon icon-sm" data-icon="play"></span></span>
-              <span class="flex-1 text-sm font-bold">Comparar tarifas y armar la propuesta</span>
-              <span class="meta shrink-0">03:15 min</span>
-              <span class="badge badge-info">Retomar 41 %</span>
-            </button>
-            <button class="video-row" type="button">
-              <span class="icon text-ink-soft" data-icon="play-circle"></span>
-              <span class="video-thumb"><span class="icon icon-sm" data-icon="play"></span></span>
-              <span class="flex-1 text-sm">Emitir un ticket</span>
-              <span class="meta shrink-0">04:20 min</span>
-              <span class="badge badge-neutral">No visto</span>
-            </button>
-          </div>
-        </section>
-
-        <!-- ══════════ VACÍO, ERROR, CARGA ══════════ -->
-        <section id="vacios" class="flex flex-col gap-5">
-          <div>
-            <h2 class="text-h3">Vacío, error y carga</h2>
-            <p class="mt-2 max-w-2xl text-gray-700">
-              Una pantalla vacía es una invitación a actuar, y un error explica qué pasó y cómo
-              seguir. Los tres estados conservan siempre el chrome de la pantalla para no desorientar.
-            </p>
-          </div>
-          <div class="grid gap-5 lg:grid-cols-2">
-            <div class="placeholder-box">
-              <span class="placeholder-icon"><span class="icon icon-lg" data-icon="list-checks"></span></span>
-              <h3 class="text-h5">Estos son los módulos de tu recorrido</h3>
-              <p class="max-w-sm text-sm text-ink-soft">Empezá por el primero. Cada módulo tiene videos cortos y una evaluación al final.</p>
-              <a class="btn btn-primary btn-sm mt-2" href="modulo.html">Empezar por el módulo 01</a>
-            </div>
-            <div class="placeholder-box border-error-line bg-error-bg">
-              <span class="placeholder-icon bg-white text-error"><span class="icon icon-lg" data-icon="wifi"></span></span>
-              <h3 class="text-h5 text-error-dark">No pudimos cargar el video</h3>
-              <p class="max-w-sm text-sm text-error-dark">Puede ser un problema de conexión o que la red de tu agencia bloquee YouTube. Probá de nuevo; si sigue igual, escribinos.</p>
-              <div class="mt-2 flex flex-wrap justify-center gap-2">
-                <button class="btn btn-primary btn-sm" type="button">Reintentar</button>
-                <a class="btn btn-bordered btn-sm" href="#" data-support-link><span class="icon" data-icon="message"></span>Contactar a soporte</a>
-              </div>
-            </div>
-          </div>
-          <div class="grid gap-5 md:grid-cols-3">
-            <div class="card flex flex-col gap-3">
-              <span class="skeleton h-3 w-16"></span>
-              <span class="skeleton h-5 w-full"></span>
-              <span class="skeleton h-3 w-11/12"></span>
-              <span class="skeleton h-3 w-3/4"></span>
-              <span class="skeleton mt-2 h-9 w-full rounded-lg"></span>
-            </div>
-            <div class="card flex flex-col gap-3">
-              <span class="skeleton h-3 w-16"></span>
-              <span class="skeleton h-5 w-full"></span>
-              <span class="skeleton h-3 w-4/5"></span>
-              <span class="skeleton h-3 w-2/3"></span>
-              <span class="skeleton mt-2 h-9 w-full rounded-lg"></span>
-            </div>
-            <div class="card flex flex-col gap-3">
-              <span class="skeleton h-3 w-16"></span>
-              <span class="skeleton h-5 w-full"></span>
-              <span class="skeleton h-3 w-10/12"></span>
-              <span class="skeleton h-3 w-1/2"></span>
-              <span class="skeleton mt-2 h-9 w-full rounded-lg"></span>
-            </div>
-          </div>
-          <p class="meta">
-            El skeleton respeta la geometría del contenido real para que no salte el layout, y
-            aparece recién a los 200 ms: en una carga rápida nunca se ve titilar.
-          </p>
-        </section>
-
-        <!-- ══════════ MOVIMIENTO ══════════ -->
-        <section id="movimiento" class="flex flex-col gap-5">
-          <div>
-            <h2 class="text-h3">Movimiento</h2>
-            <p class="mt-2 max-w-2xl text-gray-700">
-              150 / 250 / 350 ms con <code class="font-mono text-sm">ease-in-out</code>. Los hovers
-              corren a 300 ms y animan color, borde y <code class="font-mono text-sm">transform</code>
-              — nunca alto ni ancho. Cada animación tiene su versión reducida: en el sistema actual
-              <code class="font-mono text-sm">prefers-reduced-motion</code> está casi ausente, acá es
-              parte del sistema.
-            </p>
-          </div>
-          <div class="grid gap-4 md:grid-cols-3">
-            <div class="card"><p class="text-sm font-bold">rápida · 150 ms</p><p class="meta mt-1">Color de link, hover de fila de menú</p></div>
-            <div class="card"><p class="text-sm font-bold">base · 250 ms</p><p class="meta mt-1">Entrada del modal, cambio de fase del quiz</p></div>
-            <div class="card"><p class="text-sm font-bold">lenta · 350 ms</p><p class="meta mt-1">Avance de las barras de progreso</p></div>
-          </div>
-        </section>
-
-        <!-- ══════════ DECISIONES ABIERTAS ══════════ -->
-        <section id="decisiones" class="flex flex-col gap-5">
-          <div>
-            <h2 class="text-h3">Decisiones abiertas</h2>
-            <p class="mt-2 max-w-2xl text-gray-700">
-              Lo que el prototipo resuelve de una manera pero todavía no está decidido. Está acá para
-              que nadie lo lea como definición de producto.
-            </p>
-          </div>
-          <div class="table-wrap">
-            <div class="table-scroll">
-              <table class="table-app">
-                <thead>
-                  <tr>
-                    <th style="width: 80px">Caso</th>
-                    <th>Qué está sin decidir</th>
-                    <th>Qué hace el prototipo mientras tanto</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="text-ink-soft">P04.3</td>
-                    <td><strong>Cómo se mide el 80 %</strong> de un video: posición máxima alcanzada o segundos efectivamente reproducidos (anti-scrub).</td>
-                    <td class="text-ink-soft">Usa la posición. Arrastrar la barra al final marca el video como visto. La API de YouTube alcanza para el criterio estricto: es decisión de producto, no límite técnico.</td>
-                  </tr>
-                  <tr>
-                    <td class="text-ink-soft">C-1</td>
-                    <td><strong>Plan a nivel video</strong>. El alcance funcional pone el plan en el módulo; <span class="font-mono">BAK-M80.030</span> es el único video con plan propio.</td>
-                    <td class="text-ink-soft">Le aplica la misma regla que al módulo: se lista con su aviso de plan y no cuenta para el progreso.</td>
-                  </tr>
-                  <tr>
-                    <td class="text-ink-soft">C-2</td>
-                    <td><strong>Persistencia del video visto</strong>. Las aprobaciones sobreviven a la navegación; los videos vistos, no.</td>
-                    <td class="text-ink-soft">Marcar un video al 80 % vale mientras dura la pantalla. Al volver, cuenta el avance del seed de la persona. Es límite del prototipo, no regla de producto.</td>
-                  </tr>
-                  <tr>
-                    <td class="text-ink-soft">C-5</td>
-                    <td><strong>Bancos de preguntas</strong> de <span class="font-mono">BAK-M40</span> a <span class="font-mono">BAK-M95</span>: son 50 preguntas por módulo de trabajo de contenido.</td>
-                    <td class="text-ink-soft">Sortea sobre un banco de estructura del módulo, avisado en la antesala. Escrito y real: M00, M10, M20 y M30.</td>
-                  </tr>
-                  <tr>
-                    <td class="text-ink-soft">P05.4</td>
-                    <td><strong>Rehacer una evaluación aprobada</strong>: ¿la nota nueva reemplaza o se guarda el mejor intento?</td>
-                    <td class="text-ink-soft">Gana la última nota aprobada, y desaprobar después no revoca la aprobación.</td>
-                  </tr>
-                  <tr>
-                    <td class="text-ink-soft">P06.1</td>
-                    <td><strong>Navegación del intento</strong>: libre con revisión final, o lineal.</td>
-                    <td class="text-ink-soft">Se puede volver atrás, pero para avanzar hay que responder la pregunta actual.</td>
-                  </tr>
-                  <tr>
-                    <td class="text-ink-soft">P07.6</td>
-                    <td><strong>Mostrar las respuestas correctas</strong> al aprobar.</td>
-                    <td class="text-ink-soft">No las muestra. Al desaprobar tampoco: solo marca la elegida y el sub-tema.</td>
-                  </tr>
-                  <tr>
-                    <td class="text-ink-soft">D-1</td>
-                    <td><strong>Cuál es la métrica estrella</strong> del dashboard de agencia: ¿completitud o activación?</td>
-                    <td class="text-ink-soft">Pone el único acento de color en <span class="font-mono">Completado</span>. Se muda cambiando de ícono el <span class="font-mono">text-success-dark</span>. Si el negocio prioriza activación, va a <span class="font-mono">Con actividad</span>.</td>
-                  </tr>
-                  <tr>
-                    <td class="text-ink-soft">D-2</td>
-                    <td><strong>El trofeo de «Tu puesto»</strong>: ¿toma acento cuando hay dato?</td>
-                    <td class="text-ink-soft">Queda neutral siempre. Una posición no es un logro que celebrar —pintar de verde un «6º de 6» es la semaforización que el producto ya decidió no hacer— y dos acentos en una pantalla se anulan.</td>
-                  </tr>
-                  <tr>
-                    <td class="text-ink-soft">D-3</td>
-                    <td><strong>Formato del puesto</strong>: ¿posición, percentil («top 30 %») o tramo, y con delta?</td>
-                    <td class="text-ink-soft">Muestra la posición en una frase. El percentil pierde sentido con 6 personas, y el delta («subiste 1 lugar») necesita histórico que el mock no modela.</td>
-                  </tr>
-                  <tr>
-                    <td class="text-ink-soft">D-4</td>
-                    <td><strong>Las KPI cards como control</strong>: el fondo del filtro activo pinta un <span class="font-mono">div</span> que no recibe foco, y los cuatro botones se llaman «Ver».</td>
-                    <td class="text-ink-soft">Card tintada + <span class="font-mono">aria-pressed</span> en el botón + región viva que nombra el filtro. Convertir la card entera en <span class="font-mono">button</span> es la alternativa y cambia el orden de tabulación.</td>
-                  </tr>
-                  <tr>
-                    <td class="text-ink-soft">P09.6</td>
-                    <td><strong>La unidad del cupo de Meet.</strong> El alcance funcional dice «una Meet por módulo» sin aclarar si es por usuario o por agencia, y el cotejo del wireframe lo dejó abierto. Con una por usuario, la carga de Soporte escala con el plantel de cada agencia, que es lo que la Academia venía a evitar.</td>
-                    <td class="text-ink-soft">Una Meet por módulo <strong>por agencia</strong>, con cola de dudas compartida y un coordinador que agenda. Con los dos planteles del prototipo, el techo pasa de 109 Meets a 20.</td>
-                  </tr>
-                  <tr>
-                    <td class="text-ink-soft">M-1</td>
-                    <td><strong>Quién designa al coordinador</strong> y qué pasa si se va de la agencia. En el producto lo resuelve el backend y llega de solo lectura; no hay ABM ni política de sucesión definida.</td>
-                    <td class="text-ink-soft"><code>coordinadorId</code> cargado a mano en la agencia. No hay ninguna UI para designar, cambiar ni transferir el rol, a propósito.</td>
-                  </tr>
-                  <tr>
-                    <td class="text-ink-soft">M-2</td>
-                    <td><strong>Quién ve el texto de las dudas ajenas.</strong> Son consultas de trabajo de un compañero de equipo.</td>
-                    <td class="text-ink-soft">El coordinador ve todas con autor; el resto ve la cantidad y solo el texto de las propias. Es lo más restrictivo de lo razonable y hay que confirmarlo.</td>
-                  </tr>
-                  <tr>
-                    <td class="text-ink-soft">M-3</td>
-                    <td><strong>Si la cola vence.</strong> Decidido que no: el cupo queda agendable indefinidamente. La contracara es que si el coordinador nunca agenda, la cola no tiene salida propia.</td>
-                    <td class="text-ink-soft">Sin estado «vencido»: la matriz tiene 10 estados y no 11. Con la Meet ya realizada —el único cupo que no se reabre— la pantalla ofrece el canal de soporte para no dejar un callejón sin salida.</td>
-                  </tr>
-                  <tr>
-                    <td class="text-ink-soft">M-4</td>
-                    <td><strong>Hasta cuándo se puede sumar una duda.</strong> Una vez tomado el turno, Soporte ya recibió la agenda.</td>
-                    <td class="text-ink-soft">Se admite hasta que la Meet ocurre; con el cupo consumido, no. El turno agendado todavía no pasó, así que la agenda sigue abierta.</td>
-                  </tr>
-                  <tr>
-                    <td class="text-ink-soft">M-5</td>
-                    <td><strong>Zona horaria.</strong> Soporte atiende en ART (UTC-3), pero el prototipo corre en la hora local del navegador y no convierte husos.</td>
-                    <td class="text-ink-soft">Los turnos se guardan en hora local y <strong>todo</strong> horario en pantalla se rotula «(ART)». Una agencia en otro huso vería la hora de su máquina.</td>
-                  </tr>
-                  <tr>
-                    <td class="text-ink-soft">P08.6</td>
-                    <td><strong>Si la Meet se ofrece antes de aprobar.</strong> El cotejo lo marca como la objeción más fuerte: hoy la Meet exige aprobación, que es al revés de donde está la necesidad — el que necesita ayuda es el que desaprueba.</td>
-                    <td class="text-ink-soft">Se mantiene el filtro: solo deja duda quien aprobó con ≥8/10. Es lo que hace que la Meet no reemplace al contenido, pero deja sin puerta a quien desaprueba varias veces.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <footer class="border-t border-line pt-8">
-          <p class="text-sm text-ink-soft">
-            Prototipo de alta fidelidad. Datos ficticios. Lenguaje visual derivado de
-            <span class="font-bold">ESTILOS-ACADEMIA.md</span> y del repo
-            <span class="font-mono">web-2026</span>. Módulos, secciones y videos del mapa de contenido
-            <span class="font-mono">Estrategia_Grabado_Academia_SIGMMA_mapa_pareto_v2</span>.
-          </p>
-        </footer>
-      </main>
-    </div>
-
-    <!-- Modal de muestra -->
-    <div class="modal" id="ds-modal" role="dialog" aria-modal="true" aria-labelledby="ds-modal-titulo" hidden>
-      <div class="modal-overlay"></div>
-      <div class="modal-panel modal-panel-dismissible">
-        <button class="modal-close" type="button" data-modal-close aria-label="Cerrar">
-          <span class="icon" data-icon="x"></span>
-        </button>
-        <span class="placeholder-icon bg-warning-bg text-warning-dark"><span class="icon icon-lg" data-icon="alert-circle"></span></span>
-        <h2 class="mt-4 text-h4" id="ds-modal-titulo">Tenés preguntas sin responder</h2>
-        <p class="mt-2 text-sm text-gray-700">
-          Quedaron <strong>3 preguntas sin responder</strong>. Si terminás ahora, se cuentan como
-          incorrectas.
+        <h1 class="text-h2">Sistema de diseño</h1>
+        <p class="mt-3 max-w-[72ch] text-lg text-gray-700">
+          El design system de la Academia se construyó para la <strong>vista agencia</strong>: un
+          producto de cara al cliente. El backoffice es una herramienta interna de alta densidad de
+          datos, y necesita componentes que ese sistema no tiene. Acá está qué se hereda tal cual y
+          qué hubo que extender.
         </p>
-        <div class="mt-4 rounded-md border border-line bg-surface p-3 text-sm text-gray-700">
-          Sin responder: preguntas 4, 6 y 9
+        <nav class="mt-6 flex flex-wrap gap-2 text-sm" aria-label="Secciones">
+          <a href="index.html" class="btn btn-primary btn-sm">Índice de las 8 vistas</a>
+          <a href="#shell" class="btn btn-bordered btn-sm">Layout maestro</a>
+          <a href="#estados" class="btn btn-bordered btn-sm">Los 7 estados</a>
+          <a href="#componentes" class="btn btn-bordered btn-sm">Componentes</a>
+          <a href="#decisiones" class="btn btn-bordered btn-sm">Decisiones abiertas</a>
+        </nav>
+      </header>
+
+      <!-- ==================== HERENCIA ==================== -->
+      <section class="mb-14">
+        <h2 class="text-h3">Qué se hereda, sin tocar</h2>
+        <p class="mt-2 max-w-[72ch] text-gray-700">
+          El bloque <code class="font-mono text-sm">@theme</code> de
+          <code class="font-mono text-sm">src/input.css</code> viene del repo
+          <strong>wireframe-academia-AGENCIA</strong> literal: no se cambió un solo valor. La paleta
+          por defecto de Tailwind está borrada, así que un color que no esté en el theme no existe en
+          el producto.
+        </p>
+        <div class="mt-6 grid grid-cols-3 gap-4">
+          <div class="card p-5">
+            <h3 class="text-h5">Color y tipografía</h3>
+            <p class="mt-2 text-sm text-gray-700">
+              Tokens nombrados por rol: <code class="font-mono text-xs">primary</code>,
+              <code class="font-mono text-xs">accent</code>, <code class="font-mono text-xs">indigo</code>,
+              <code class="font-mono text-xs">success</code>, <code class="font-mono text-xs">error</code>,
+              <code class="font-mono text-xs">warning</code>, <code class="font-mono text-xs">info</code>.
+              Sofia Sans en 400 y 700, los dos únicos pesos que existen como archivo.
+            </p>
+          </div>
+          <div class="card p-5">
+            <h3 class="text-h5">Espacio y forma</h3>
+            <p class="mt-2 text-sm text-gray-700">
+              Escala de 8 (4 · 8 · 16 · 24 · 32 · 48 · 64 · 96). Radios 4 / 8 / 12 / 16 / píldora.
+              Jerarquía por <strong>borde de 1 px + fondo gris</strong>, no por sombra.
+            </p>
+          </div>
+          <div class="card p-5">
+            <h3 class="text-h5">Componentes</h3>
+            <p class="mt-2 text-sm text-gray-700">
+              <code class="font-mono text-xs">.btn</code>, <code class="font-mono text-xs">.card</code>,
+              <code class="font-mono text-xs">.badge</code>, <code class="font-mono text-xs">.progress</code>,
+              <code class="font-mono text-xs">.input</code>, <code class="font-mono text-xs">.alert</code>,
+              <code class="font-mono text-xs">.modal</code>, <code class="font-mono text-xs">.menu</code>,
+              <code class="font-mono text-xs">.table-app</code>, <code class="font-mono text-xs">.placeholder-box</code>.
+            </p>
+          </div>
         </div>
-        <div class="mt-6 flex flex-col gap-2.5 md:flex-row md:justify-end">
-          <button class="btn btn-bordered" type="button" data-modal-close>Terminar igual</button>
-          <button class="btn btn-primary" type="button" data-modal-close data-autofocus>Volver a responder</button>
+        <p class="alert alert-info mt-6">
+          <span class="icon" data-icon="info"></span>
+          <span>
+            <strong>El naranja <code class="font-mono">#ff6b35</code> no aparece ni una vez.</strong>
+            En la vista agencia tiene una sola aparición, el botón de descargar el certificado. Acá no
+            hay ningún momento que lo justifique, y repartirlo le sacaría la función.
+          </span>
+        </p>
+      </section>
+
+      <!-- ==================== SHELL ==================== -->
+      <section class="mb-14" id="shell">
+        <h2 class="text-h3">S00 · Layout maestro</h2>
+        <p class="mt-2 max-w-[72ch] text-gray-700">
+          El contenedor de todas las demás pantallas. Es la extensión más grande respecto de la vista
+          agencia, que usa un header horizontal de 72 px con tres destinos: el backoffice tiene
+          <strong>16 destinos agrupados en 6 funciones</strong> y no entran en una barra.
+        </p>
+
+        <div class="mt-6 overflow-hidden rounded-xl border border-line">
+          <div class="grid grid-cols-[200px_1fr] text-xs">
+            <div class="border-r border-line bg-surface p-4">
+              <p class="side-title">Sidebar · 200 px</p>
+              <ul class="mt-3 flex flex-col gap-3 text-gray-700">
+                <li>Identidad</li>
+                <li><strong class="text-ink">Selector de superficie</strong><br />BAK · FRT · CRM</li>
+                <li>
+                  <strong class="text-ink">Menú por función</strong><br />
+                  Contenido · Evaluación · Currícula · Pipeline · Seguimiento · Administración
+                </li>
+                <li>Usuario y rol</li>
+              </ul>
+            </div>
+            <div>
+              <div class="border-b border-line p-4">
+                <p class="side-title">Encabezado de pantalla</p>
+                <p class="mt-2 text-gray-700">
+                  Breadcrumb · título con chips de estado · botonera a la derecha
+                </p>
+              </div>
+              <div class="p-4">
+                <p class="side-title">Área de contenido · 1240 px</p>
+                <p class="mt-2 text-gray-700">
+                  <strong>Sin footer:</strong> la tabla usa todo el alto y scrollea sola. El alto del
+                  shell es <code class="font-mono">100vh</code> fijo, y el scroll vive en los
+                  contenedores de adentro.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+
+        <p class="mt-4 text-sm text-ink-soft">
+          Verlo en vivo: <a href="modulos.html">modulos.html</a> · <a href="tablero.html">tablero.html</a>.
+          La fuente canónica del sidebar es <code class="font-mono text-xs">src/partials/app-shell.html</code>,
+          copiada literal en las 5 páginas. Al copiarla se cambia <strong>solo</strong> el
+          <code class="font-mono text-xs">aria-current="page"</code>.
+        </p>
+      </section>
+
+      <!-- ==================== ESTADOS ==================== -->
+      <section class="mb-14" id="estados">
+        <h2 class="text-h3">Los 7 estados de producción</h2>
+        <p class="mt-2 max-w-[72ch] text-gray-700">
+          El ciclo de vida de un video, en orden. Cada estado se mapea a un token de estado que ya
+          existía: no se inventó ni un color. <strong>El color nunca es el único portador de
+          significado</strong> — cada chip lleva su etiqueta escrita.
+        </p>
+
+        <div class="mt-6 flex flex-wrap items-center gap-2">
+          <span class="chip chip-backlog">backlog</span>
+          <span class="text-gray-600" aria-hidden="true">→</span>
+          <span class="chip chip-guionado">guionado</span>
+          <span class="text-gray-600" aria-hidden="true">→</span>
+          <span class="chip chip-grabado">grabado</span>
+          <span class="text-gray-600" aria-hidden="true">→</span>
+          <span class="chip chip-editado">editado</span>
+          <span class="text-gray-600" aria-hidden="true">→</span>
+          <span class="chip chip-publicado">publicado</span>
+          <span class="text-gray-600" aria-hidden="true">→</span>
+          <span class="chip chip-regrabar">a regrabar</span>
+          <span class="text-gray-600" aria-hidden="true">→</span>
+          <span class="chip chip-obsoleto">obsoleto</span>
+        </div>
+
+        <div class="table-wrap mt-6">
+          <table class="table-app">
+            <thead>
+              <tr>
+                <th scope="col">Estado</th>
+                <th scope="col">Tokens</th>
+                <th scope="col">Contraste</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="chip chip-backlog">backlog</span></td><td class="font-mono text-xs">surface-sunken / line / gray-700</td><td class="font-mono text-xs">6.79:1</td></tr>
+              <tr><td><span class="chip chip-guionado">guionado</span></td><td class="font-mono text-xs">white / line-strong / gray-700</td><td class="font-mono text-xs">7.56:1</td></tr>
+              <tr><td><span class="chip chip-grabado">grabado</span></td><td class="font-mono text-xs">info-bg / info-line / primary</td><td class="font-mono text-xs">7.00:1</td></tr>
+              <tr><td><span class="chip chip-editado">editado</span></td><td class="font-mono text-xs">warning-bg / warning-line / warning-dark</td><td class="font-mono text-xs">5.20:1</td></tr>
+              <tr><td><span class="chip chip-publicado">publicado</span></td><td class="font-mono text-xs">success-bg / success-line / success-dark</td><td class="font-mono text-xs">6.17:1</td></tr>
+              <tr><td><span class="chip chip-regrabar">a regrabar</span></td><td class="font-mono text-xs">error-bg / error-line / error-dark</td><td class="font-mono text-xs">6.05:1</td></tr>
+              <tr><td><span class="chip chip-obsoleto">obsoleto</span></td><td class="font-mono text-xs">surface-sunken / punteado / gray-700</td><td class="font-mono text-xs">6.79:1</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="alert alert-warning mt-6">
+          <span class="icon" data-icon="alert-triangle"></span>
+          <span>
+            <strong>El estado de producción y la visibilidad en el Front son dos ejes
+            independientes.</strong> El chip dice en qué punto del ciclo está el video; el
+            interruptor dice si se ve en el Front, y solo se habilita si el estado es
+            <code class="font-mono">publicado</code>. En el kanban la visibilidad viaja como chip
+            dentro de la tarjeta, <strong>nunca como columna</strong>.
+          </span>
+        </p>
+
+        <div class="mt-6 flex flex-wrap items-center gap-8">
+          <label class="switch">
+            <input type="checkbox" checked />
+            <span class="switch-track"></span>
+            Visible en el Front
+          </label>
+          <label class="switch">
+            <input type="checkbox" disabled />
+            <span class="switch-track"></span>
+            Visible en el Front <span class="text-gray-600">(deshabilitado: no está publicado)</span>
+          </label>
+        </div>
+
+        <h3 class="text-h5 mt-8">Chips de apoyo</h3>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <span class="chip chip-meta">plan A · plan B</span>
+          <span class="chip chip-meta is-mono">v2</span>
+          <span class="chip chip-meta is-mono">sgm2026.03</span>
+          <span class="chip chip-outline">0 preg.</span>
+          <span class="chip chip-outline">reservado</span>
+          <span class="chip chip-outline">faltan 15</span>
+          <span class="chip chip-alerta">7 preg. a revisar</span>
+        </div>
+        <p class="mt-3 text-sm text-ink-soft">
+          El punteado de <code class="font-mono text-xs">.chip-outline</code> comunica «todavía no»,
+          no «error». Es el mismo recurso que usa <code class="font-mono text-xs">.card-locked</code>
+          en la vista agencia.
+        </p>
+      </section>
+
+      <!-- ==================== COMPONENTES ==================== -->
+      <section class="mb-14" id="componentes">
+        <h2 class="text-h3">Componentes nuevos</h2>
+        <p class="mt-2 max-w-[72ch] text-gray-700">
+          Las 18 piezas que hubo que extender. Todas derivan de tokens existentes. El detalle de cada
+          una —para qué se creó, qué tokens usa y si conviene promoverla al design system oficial—
+          está en <a href="DESIGN-SYSTEM-EXTENSIONS.md">DESIGN-SYSTEM-EXTENSIONS.md</a>.
+        </p>
+
+        <h3 class="text-h5 mt-8">Barra de filtros</h3>
+        <div class="filter-bar mt-3">
+          <button type="button" class="filter-pill">Estado: todos <span class="icon" data-icon="chevron-down"></span></button>
+          <button type="button" class="filter-pill" data-active="true">Superficie: BAK <span class="icon" data-icon="x"></span></button>
+          <label class="filter-search">
+            <span class="icon" data-icon="search"></span>
+            <span class="sr-only">Buscar</span>
+            <input type="search" placeholder="buscar por ID o nombre" />
+          </label>
+          <span class="filter-count">55 de 55</span>
+        </div>
+        <p class="mt-2 text-sm text-ink-soft">
+          El filtro con valor puesto se distingue del que está en «todos»: sin eso, una barra con seis
+          filtros no dice cuál está recortando la lista.
+        </p>
+
+        <h3 class="text-h5 mt-8">Tiles de métrica</h3>
+        <div class="mt-3 flex gap-3">
+          <div class="metric-tile"><span class="metric-label">Pendientes de grabar</span><p class="metric-value">14</p></div>
+          <div class="metric-tile"><span class="metric-label">En cola de regrabación</span><p class="metric-value" data-tone="alerta">3</p></div>
+          <div class="metric-tile"><span class="metric-label">Publicados</span><p class="metric-value">26</p></div>
+        </div>
+
+        <h3 class="text-h5 mt-8">Conmutador de vista</h3>
+        <div class="mt-3 flex flex-wrap items-center gap-4">
+          <div class="segmented">
+            <button type="button" class="segmented-option" aria-pressed="true"><span class="icon" data-icon="list"></span>Tabla</button>
+            <button type="button" class="segmented-option" aria-pressed="false"><span class="icon" data-icon="columns"></span>Kanban</button>
+          </div>
+          <span class="text-sm text-ink-soft">La tabla es el default. Los usuarios vienen de Google Sheets.</span>
+        </div>
+
+        <h3 class="text-h5 mt-8">Zona de identidad bloqueada</h3>
+        <div class="locked-zone mt-3 max-w-[520px]">
+          <h4 class="side-title">Identidad · no editable</h4>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <span class="label !text-2xs !font-normal">ID permanente</span>
+              <p class="input-locked is-mono">BAK-M30.050 <span class="icon" data-icon="lock"></span></p>
+            </div>
+            <div>
+              <span class="label !text-2xs !font-normal">Secuencia</span>
+              <p class="input-locked is-mono">050 <span class="icon" data-icon="lock"></span></p>
+            </div>
+          </div>
+          <p class="foot-note !border-none !pt-2">El ID sobrevive al regrabado: nunca cambia.</p>
+        </div>
+        <p class="mt-2 text-sm text-ink-soft">
+          El punteado, el candado y el fondo hundido son tres señales redundantes a propósito:
+          <strong>la interfaz enseña la regla</strong>. Un
+          <code class="font-mono text-xs">.input:disabled</code> solo se lee como «deshabilitado
+          ahora», no como «no editable nunca».
+        </p>
+
+        <h3 class="text-h5 mt-8">Medidores y contador grande</h3>
+        <div class="mt-3 grid grid-cols-2 gap-4">
+          <div class="side-card side-card-strong">
+            <h4 class="side-title">Aptitud para activar</h4>
+            <div class="meter-row"><span>Videos publicados</span><b class="meter-value" data-ok="false">4 / 7</b></div>
+            <div class="progress progress-sm my-2"><span style="width: 57%"></span></div>
+            <div class="meter-row"><span>Config. de evaluación</span><b class="meter-value" data-ok="true">cargada</b></div>
+          </div>
+          <div class="side-card">
+            <h4 class="side-title">Banco vigente / mínimo exigido</h4>
+            <p class="counter-big"><b>20</b><span>/ 35</span></p>
+          </div>
+        </div>
+        <p class="mt-2 text-sm text-ink-soft">
+          Los contadores <strong>se ven siempre</strong>, durante toda la carga. Nunca aparecen como
+          error al final: quien carga contenido tiene que saber cuánto le falta mientras trabaja.
+        </p>
+
+        <h3 class="text-h5 mt-8">Checklist</h3>
+        <ul class="checklist mt-3 max-w-[420px]">
+          <li class="checklist-item" data-done="true"><span class="icon" data-icon="check-circle"></span>Link cargado y validado</li>
+          <li class="checklist-item" data-done="false"><span class="icon" data-icon="alert-circle"></span>Tiene al menos 1 pregunta asociada</li>
+        </ul>
+        <p class="mt-2 text-sm text-ink-soft">Advierte, no bloquea. Que sea bloqueante es una decisión abierta.</p>
+
+        <h3 class="text-h5 mt-8">Tabla densa</h3>
+        <table class="table-dense mt-3">
+          <thead>
+            <tr><th scope="col">ID</th><th scope="col">Título</th><th scope="col">Cohorte</th><th scope="col">Estado</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="cell-mono">BAK-M30.050</td><td>Procesar el voucher</td><td class="cell-mono">C03</td><td><span class="chip chip-publicado">publicado</span></td></tr>
+            <tr data-selected="true"><td class="cell-mono">BAK-M30.060</td><td>Estados del voucher</td><td class="cell-mono">C03</td><td><span class="chip chip-regrabar">a regrabar</span></td></tr>
+            <tr data-reservado="true"><td class="cell-mono">BAK-M35</td><td>reservado (Tráfico)</td><td>—</td><td><span class="chip chip-outline">reservado</span></td></tr>
+          </tbody>
+        </table>
+        <p class="mt-2 text-sm text-ink-soft">
+          Filas de 30 px, encabezado pegado arriba y números tabulares.
+          <code class="font-mono text-xs">.table-app</code> es de densidad normal: a 55 filas es
+          scroll infinito.
+        </p>
+      </section>
+
+      <!-- ==================== DECISIONES ABIERTAS ==================== -->
+      <section class="mb-14" id="decisiones">
+        <h2 class="text-h3">Decisiones abiertas</h2>
+        <p class="mt-2 max-w-[72ch] text-gray-700">
+          Lo que el prototipo resuelve de una manera pero <strong>todavía no está decidido</strong>.
+          Cada fila es una pregunta para el proyecto, no un pendiente de maquetación.
+        </p>
+
+        <div class="table-wrap mt-6">
+          <table class="table-app">
+            <thead>
+              <tr>
+                <th scope="col" class="w-[52px]">#</th>
+                <th scope="col">Punto</th>
+                <th scope="col">Cómo lo resuelve el prototipo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-mono text-xs">D-1</td>
+                <td><strong>¿La checklist de publicación bloquea o advierte?</strong></td>
+                <td>Advierte. Se puede publicar sin pregunta asociada y el video queda listado en «publicados sin pregunta». Lo pregunta el propio wireframe.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">D-2</td>
+                <td><strong>Modal o drawer para el alta</strong></td>
+                <td>Sin resolver. El design system tiene un solo patrón de modal, bien resuelto, y <strong>no tiene drawer</strong>. El wireframe de esta tanda no dibuja ninguno de los dos, así que «Agregar sección», «Agregar video» y «Escribir pregunta» no abren nada.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">D-3</td>
+                <td><strong>El diccionario real de planes</strong></td>
+                <td>Se mantiene «plan A · plan B» verbatim: es un placeholder deliberado del proyecto. El Maestro de Producción usa <code class="font-mono text-xs">P+B / B / B-nicho</code> y la vista agencia usa Professional / Business. Son tres nomenclaturas para lo mismo.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">D-4</td>
+                <td><strong>¿Un módulo activo puede tener videos sin publicar?</strong></td>
+                <td>Sí. La «aptitud para activar» es una compuerta al momento de activar, no una condición permanente: <code class="font-mono text-xs">BAK-M40</code> está activo con 4 de 5 videos publicados porque el quinto entró en producción después.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">D-5</td>
+                <td><strong>Cómo hereda el banco de la Ruta Esencial</strong></td>
+                <td>Se muestra etiquetado como <span class="chip chip-meta">derivado</span> con 18 heredadas de 60 mínimas. La regla exacta de herencia —qué pasa si el video de origen cambia de estado— no está definida.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">D-6</td>
+                <td><strong>Reordenar por arrastre</strong></td>
+                <td>El asa (<span class="grip">⠿</span>) comunica que la fila se puede reordenar, pero el arrastre <strong>no está implementado</strong>: esto es maquetación.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">D-7</td>
+                <td><strong>Cohortes: el wireframe contradice al Maestro de Producción</strong></td>
+                <td>Manda el wireframe en los videos que nombra. Ejemplo: pone <code class="font-mono text-xs">BAK-M30.030</code> en C03 y el Maestro en C07.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">D-8</td>
+                <td><strong>El borde de los inputs no llega a WCAG AA</strong></td>
+                <td>No se tocó. <code class="font-mono text-xs">--color-line-strong</code> sobre blanco da 1.47:1 y WCAG pide 3:1 para el borde de un control. Es el borde de todos los inputs del design system heredado, así que afecta a los dos repos: cambiarlo es una decisión de design system.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">D-9</td>
+                <td><strong>Biblioteca de videos no tiene listado propio</strong></td>
+                <td>El wireframe muestra el destino en el menú y entra al detalle de un video desde ahí, pero no dibuja el listado. Queda para la tanda 2.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ==================== COHERENCIA NUMÉRICA ==================== -->
+      <section class="mb-14" id="numeros">
+        <h2 class="text-h3">Coherencia numérica</h2>
+        <p class="mt-2 max-w-[72ch] text-gray-700">
+          Los datos están escritos a mano en el HTML, así que los números tienen que cerrar entre
+          pantallas. Estas son las cadenas que se verificaron, y los tres lugares donde el wireframe
+          no cerraba consigo mismo.
+        </p>
+
+        <h3 class="text-h5 mt-6">Las 5 cadenas de BAK-M30</h3>
+        <div class="table-wrap mt-3">
+          <table class="table-app">
+            <thead><tr><th scope="col">Cadena</th><th scope="col">Verificación</th></tr></thead>
+            <tbody>
+              <tr><td>Preguntas por sección = total del módulo</td><td class="font-mono text-xs">6 + 8 + 7 + 7 = 28</td></tr>
+              <tr><td>Total − a revisar − borradores = banco vigente</td><td class="font-mono text-xs">28 − 7 − 1 = 20</td></tr>
+              <tr><td>Faltantes por sección = faltante del módulo</td><td class="font-mono text-xs">3 + 2 + 2 + 8 = 15</td></tr>
+              <tr><td>Banco mínimo por sección = mínimo del módulo</td><td class="font-mono text-xs">8 + 10 + 9 + 8 = 35</td></tr>
+              <tr><td>Mínimos por sorteo = preguntas del intento</td><td class="font-mono text-xs">2 + 3 + 3 + 2 = 10</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="mt-3 text-sm text-ink-soft">
+          Y la regla que las une: al pasar <code class="font-mono text-xs">BAK-M30.060</code> a
+          «a regrabar», <strong>sus 7 preguntas vigentes pasaron todas a «a revisar»</strong>. Por eso
+          la sección 4 tiene 0 vigentes de 7, y por eso el sorteo saca 8 de 10.
+        </p>
+
+        <h3 class="text-h5 mt-8">Dónde el wireframe no cerraba</h3>
+        <div class="table-wrap mt-3">
+          <table class="table-app">
+            <thead><tr><th scope="col">Qué</th><th scope="col">Decía</th><th scope="col">Queda</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code class="font-mono text-xs">BAK-M10</code> videos publicados</td>
+                <td>6 / 6</td>
+                <td><strong>5 / 6</strong> — <code class="font-mono text-xs">BAK-M10.050</code> está obsoleto, y un video no puede estar en dos columnas</td>
+              </tr>
+              <tr>
+                <td><code class="font-mono text-xs">BAK-M40</code> videos publicados</td>
+                <td>5 / 5</td>
+                <td><strong>4 / 5</strong> — <code class="font-mono text-xs">BAK-M40.010</code> está guionado</td>
+              </tr>
+              <tr>
+                <td>Columnas del kanban</td>
+                <td>sumaban 58, con 55 videos</td>
+                <td><strong>suman 55</strong> — se derivan de los 55 videos, cada uno con un estado</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <p class="border-t border-line pt-6 text-xs text-ink-soft">
+        El índice de las 8 vistas vive en <a href="index.html">index.html</a>, para no mantener dos
+        copias de la misma tabla. Repo hermano: <strong>wireframe-academia-AGENCIA</strong>.
+      </p>
     </div>
 
-    <script src="assets/js/mock-data.js"></script>
     <script src="assets/js/icons.js"></script>
     <script src="assets/js/ui.js"></script>
-    <script>
-      (function () {
-        "use strict";
-        /* La tabla se pinta desde `ACADEMIA.personas`: si se agrega una persona,
-           aparece acá sola. Una lista escrita a mano se desfasa. */
-        const DESTINOS = [
-          { archivo: "modulos.html", rotulo: "Módulos" },
-          { archivo: "certificaciones.html", rotulo: "Certificación" },
-          { archivo: "agencia.html", rotulo: "Mi agencia" },
-        ];
-
-        document.getElementById("tabla-personas").innerHTML = ACADEMIA.personas
-          .map(function (p) {
-            const activa = p.clave === ACADEMIA.persona.clave;
-            const enlaces = DESTINOS.map(function (d) {
-              return '<a href="' + d.archivo + "?reset=1&amp;u=" + p.clave + '">' + d.rotulo + "</a>";
-            }).join(' <span class="text-ink-soft" aria-hidden="true">·</span> ');
-
-            return (
-              "<tr>" +
-              "<td><span class=\"font-bold\">" + p.nombre + "</span>" +
-              (activa
-                ? ' <span class="badge badge-info">Estás acá</span>'
-                : "") +
-              '<span class="meta block font-mono">?u=' + p.clave + "</span></td>" +
-              "<td>" + ACADEMIA.agenciaDe(p).nombre +
-              '<span class="meta block">Plan ' + ACADEMIA.agenciaDe(p).plan + "</span></td>" +
-              '<td class="text-gray-700">' + p.resumen + "</td>" +
-              '<td class="text-sm">' + enlaces + "</td>" +
-              "</tr>"
-            );
-          })
-          .join("");
-
-        /* Mismo criterio que la tabla de personas: la grilla sale de
-           `window.ICONS`, no de una lista escrita a mano que se desfasa al
-           agregar el ícono 37. */
-        document.getElementById("grilla-iconos").innerHTML = Object.keys(window.ICONS)
-          .map(function (nombre) {
-            return (
-              '<div class="flex flex-col items-center gap-2 rounded-md border border-line bg-white p-3 text-center">' +
-              '<span class="icon icon-lg text-indigo" data-icon="' + nombre + '"></span>' +
-              '<span class="meta font-mono break-all">' + nombre + "</span>" +
-              "</div>"
-            );
-          })
-          .join("");
-        renderIcons();
-      })();
-    </script>
   </body>
 </html>

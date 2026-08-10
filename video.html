@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BAK-M30.050 Procesar el voucher · Backoffice Academia SIGMMA</title>
+    <meta name="description" content="Ficha del video BAK-M30.050: identidad, versión vigente, estado de producción y checklist de publicación." />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="stylesheet" href="assets/css/academia.css" />
+  </head>
+  <body>
+    <a href="#contenido" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[1001] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-white">Saltar al contenido</a>
+
+    <div class="app-shell">
+      <!-- app-shell: sincronizar con src/partials/app-shell.html -->
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img src="assets/img/logo.svg" alt="SIGMMA" width="96" height="16" class="w-[96px]" />
+          <span class="text-2xs font-bold text-primary">Academia</span>
+        </div>
+
+        <!-- Selector global de superficie. Todo el contenido del backoffice cuelga
+             de cuál está activa. Solo BAK tiene módulos mapeados. -->
+        <div class="relative" data-dropdown>
+          <span class="side-title mb-1 block">Superficie</span>
+          <button type="button" class="surface-picker" data-dropdown-trigger aria-expanded="false" aria-haspopup="true">
+            <span><strong>BAK</strong> · Backoffice</span>
+            <span class="icon icon-sm" data-icon="chevron-down"></span>
+          </button>
+          <div class="menu" role="menu" data-dropdown-menu hidden>
+            <a href="modulos.html?sup=BAK" class="menu-item" role="menuitem">BAK · Backoffice</a>
+            <a href="modulos.html?sup=FRT" class="menu-item" role="menuitem">FRT · Front</a>
+            <a href="modulos.html?sup=CRM" class="menu-item" role="menuitem">CRM</a>
+          </div>
+        </div>
+
+        <nav class="flex flex-col gap-4" aria-label="Secciones del backoffice">
+          <!-- Inicio va suelto, sin grupo: no es una función más sino el punto de
+               partida. En las etapas de construcción es el panel de obra. -->
+          <div class="nav-group">
+            <a href="home.html" class="nav-item" data-escena-keep>
+              <span class="icon" data-icon="activity"></span>Inicio
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Contenido</span>
+            <a href="modulos.html" class="nav-item">
+              <span class="icon" data-icon="layers"></span>Módulos
+            </a>
+            <span class="nav-item" aria-disabled="true" aria-current="page">
+              <span class="icon" data-icon="film"></span>Biblioteca de videos
+            </span>
+            <a href="tablero.html" class="nav-item">
+              <span class="icon" data-icon="columns"></span>Tablero de producción
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="refresh"></span>Cola de regrabación
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Evaluación</span>
+            <a href="banco.html?m=30" class="nav-item">
+              <span class="icon" data-icon="help-circle"></span>Bancos de preguntas
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="settings"></span>Configuración
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Currícula</span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="route"></span>Ruta Esencial
+            </span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Pipeline</span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="git-branch"></span>Impactos en Academia
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Seguimiento</span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="bar-chart"></span>Panel macro
+            </span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="users"></span>Detalle por agencia
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Administración</span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="target"></span>Superficies y planes
+            </span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="shield"></span>Usuarios y roles
+            </span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="activity"></span>Auditoría
+            </span>
+          </div>
+        </nav>
+
+        <div class="sidebar-foot">
+          <span class="text-2xs text-gray-700">Majo · Contenido</span>
+        </div>
+      </aside>
+      <!-- /app-shell -->
+
+      <div class="main-col">
+        <header class="page-head">
+          <div>
+            <div class="breadcrumb">
+              <a href="modulos.html">Contenido / Módulos</a> /
+              <a href="modulo.html?m=30">BAK-M30</a> / BAK-M30.050
+            </div>
+            <h1 class="page-title">
+              <span class="id-mono">BAK-M30.050</span> Procesar el voucher
+              <span class="chip chip-publicado">publicado</span>
+              <span class="chip chip-meta is-mono">v2</span>
+              <span class="chip chip-outline">cohorte C03</span>
+              <span class="escena-badge" data-escena-label></span>
+            </h1>
+          </div>
+          <div class="page-actions">
+            <!-- R3: la visibilidad en el Front es un eje independiente del
+                 estado de producción. Habilitado porque el estado es publicado. -->
+            <label class="switch rounded-sm border border-dashed border-line-strong px-[9px] py-[5px]">
+              <input type="checkbox" checked />
+              <span class="switch-track"></span>
+              Visible en el Front
+            </label>
+            <button type="button" class="btn btn-bordered btn-sm">
+              Cambiar estado <span class="icon" data-icon="chevron-down"></span>
+            </button>
+            <button type="button" class="btn btn-primary btn-sm">Guardar</button>
+          </div>
+        </header>
+
+        <main id="contenido" class="page-body !gap-0">
+          <!-- Solo BAK-M30.050 tiene la ficha maquetada: es el video que el
+               wireframe dibuja entero. -->
+          <div id="sin-maquetar" class="placeholder-box" hidden>
+            <span class="placeholder-icon" data-icon="film"></span>
+            <h2 class="text-h5">La ficha de <span id="sin-maquetar-id" class="font-mono">este video</span> no está maquetada</h2>
+            <p class="mt-2 max-w-[52ch] text-sm text-ink-soft">
+              Esta tanda maqueta la ficha de <strong class="font-mono">BAK-M30.050</strong>, que es el
+              video que el wireframe dibuja. Los 54 videos restantes usan exactamente la misma
+              pantalla, con sus cinco solapas.
+            </p>
+            <div class="mt-6 flex gap-2">
+              <a href="video.html?v=BAK-M30.050" class="btn btn-primary btn-sm">Ver BAK-M30.050</a>
+              <a href="tablero.html" class="btn btn-bordered btn-sm">Volver al tablero</a>
+            </div>
+          </div>
+
+          <div id="ficha-completa" class="contents" data-escena="E5">
+            <div class="tabs" role="tablist" aria-label="Secciones del video" data-tabs="paneles">
+              <button type="button" class="tab" role="tab" data-tab="ficha" aria-selected="true" aria-controls="panel-ficha" id="tab-ficha">Ficha</button>
+              <button type="button" class="tab" role="tab" data-tab="versiones" aria-selected="false" aria-controls="panel-versiones" id="tab-versiones">
+                Versiones <span class="tab-count">2</span>
+              </button>
+              <button type="button" class="tab" role="tab" data-tab="guion" aria-selected="false" aria-controls="panel-guion" id="tab-guion">Guión y receta</button>
+              <button type="button" class="tab" role="tab" data-tab="preguntas" aria-selected="false" aria-controls="panel-preguntas" id="tab-preguntas">
+                Preguntas <span class="tab-count">0</span>
+              </button>
+              <button type="button" class="tab" role="tab" data-tab="ubicaciones" aria-selected="false" aria-controls="panel-ubicaciones" id="tab-ubicaciones">
+                Ubicaciones <span class="tab-count">2</span>
+              </button>
+            </div>
+
+            <div id="paneles" class="pt-4">
+              <!-- ===================== 1 · FICHA ===================== -->
+              <div id="panel-ficha" role="tabpanel" aria-labelledby="tab-ficha" data-panel="ficha" tabindex="0">
+                <div class="grid grid-cols-[1fr_1fr_330px] gap-[18px]">
+                  <div class="flex flex-col gap-[14px]">
+                    <!-- R2: la identidad no se edita después del alta. El ID
+                         sobrevive al regrabado, así que la interfaz lo enseña. -->
+                    <section class="locked-zone" aria-labelledby="lbl-identidad">
+                      <h2 class="side-title" id="lbl-identidad">Identidad · no editable</h2>
+                      <div class="grid grid-cols-2 gap-[9px]">
+                        <div>
+                          <span class="label !text-2xs !font-normal">ID permanente</span>
+                          <p class="input-locked is-mono">BAK-M30.050 <span class="icon" data-icon="lock"></span></p>
+                        </div>
+                        <div>
+                          <span class="label !text-2xs !font-normal">Superficie</span>
+                          <p class="input-locked">BAK <span class="icon" data-icon="lock"></span></p>
+                        </div>
+                        <div>
+                          <span class="label !text-2xs !font-normal">Módulo</span>
+                          <p class="input-locked">M30 · Voucher / Servicios <span class="icon" data-icon="lock"></span></p>
+                        </div>
+                        <div>
+                          <span class="label !text-2xs !font-normal">Secuencia</span>
+                          <p class="input-locked is-mono">050 <span class="icon" data-icon="lock"></span></p>
+                        </div>
+                      </div>
+                      <p class="foot-note !border-none !pt-2">El ID sobrevive al regrabado: nunca cambia.</p>
+                    </section>
+
+                    <section class="side-card" aria-labelledby="lbl-editables">
+                      <h2 class="side-title" id="lbl-editables">Datos editables</h2>
+                      <div class="flex flex-col gap-[9px]">
+                        <div class="field">
+                          <label class="label !text-2xs !font-normal" for="f-titulo">Título</label>
+                          <input class="input !h-9 !text-xs" id="f-titulo" type="text" value="Procesar el voucher" />
+                        </div>
+                        <div class="grid grid-cols-2 gap-[9px]">
+                          <div class="field">
+                            <label class="label !text-2xs !font-normal" for="f-plan">Tag de plan</label>
+                            <select class="select !h-9 !text-xs" id="f-plan">
+                              <option selected>plan A · plan B</option>
+                              <option>plan A</option>
+                              <option>plan B</option>
+                            </select>
+                          </div>
+                          <div class="field">
+                            <label class="label !text-2xs !font-normal" for="f-cohorte">Cohorte</label>
+                            <select class="select !h-9 !text-xs" id="f-cohorte">
+                              <option selected>C03</option>
+                              <option>C01</option>
+                              <option>C02</option>
+                              <option>C04</option>
+                            </select>
+                          </div>
+                          <div class="field">
+                            <label class="label !text-2xs !font-normal" for="f-prioridad">Prioridad Pareto</label>
+                            <select class="select !h-9 !text-xs" id="f-prioridad">
+                              <option selected>P1</option>
+                              <option>P2</option>
+                              <option>P3</option>
+                              <option>P4</option>
+                            </select>
+                          </div>
+                          <div class="field">
+                            <label class="label !text-2xs !font-normal" for="f-duracion">Duración objetivo</label>
+                            <input class="input !h-9 !text-xs" id="f-duracion" type="text" value="3:30" />
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+
+                  <div class="flex flex-col gap-[14px]">
+                    <!-- R1: NO hay carga de archivos. Los videos viven en YouTube:
+                         se pega el link, «Traer datos» completa título y duración
+                         por API, y se valida el embebido. Nunca un dropzone. -->
+                    <section class="side-card" aria-labelledby="lbl-version">
+                      <h2 class="side-title" id="lbl-version">Versión vigente · v2</h2>
+                      <div class="mb-[9px] flex gap-2">
+                        <label class="sr-only" for="f-link">Link de YouTube</label>
+                        <input class="input !h-9 flex-1 font-mono !text-xs" id="f-link" type="url" value="https://youtu.be/xxxxxxxxxxx" />
+                        <button type="button" class="btn btn-bordered btn-sm shrink-0">Traer datos</button>
+                      </div>
+                      <div class="flex h-[190px] items-center justify-center rounded-md border border-line bg-surface-sunken text-xs text-gray-600">
+                        <span class="icon icon-lg mr-2" data-icon="play-circle"></span> preview embebido de YouTube
+                      </div>
+                      <dl class="mt-[9px] flex gap-4 text-2xs text-gray-600">
+                        <div><dt class="inline">Título API:</dt> <dd class="inline text-gray-800">Procesar el voucher</dd></div>
+                        <div><dt class="inline">Duración:</dt> <dd class="inline text-gray-800">3:41</dd></div>
+                        <div><dt class="inline">Embebido:</dt> <dd class="inline text-success-dark">permitido ✓</dd></div>
+                      </dl>
+                      <p class="foot-note">No hay carga de archivos: se pega el link y la API completa lo demás.</p>
+                    </section>
+
+                    <section class="side-card" aria-labelledby="lbl-estado">
+                      <h2 class="side-title" id="lbl-estado">Estado de producción</h2>
+                      <div class="flex flex-wrap gap-[5px]" role="radiogroup" aria-labelledby="lbl-estado">
+                        <button type="button" role="radio" aria-checked="false" class="chip chip-outline">backlog</button>
+                        <button type="button" role="radio" aria-checked="false" class="chip chip-outline">guionado</button>
+                        <button type="button" role="radio" aria-checked="false" class="chip chip-outline">grabado</button>
+                        <button type="button" role="radio" aria-checked="false" class="chip chip-outline">editado</button>
+                        <button type="button" role="radio" aria-checked="true" class="chip chip-publicado">publicado</button>
+                        <button type="button" role="radio" aria-checked="false" class="chip chip-outline">a regrabar</button>
+                        <button type="button" role="radio" aria-checked="false" class="chip chip-outline">obsoleto</button>
+                      </div>
+                      <div class="mt-[10px] flex items-center justify-between border-t border-dashed border-line pt-[9px]">
+                        <label class="switch">
+                          <input type="checkbox" checked />
+                          <span class="switch-track"></span>
+                          Visible en el Front <span class="text-gray-600">(solo si está publicado)</span>
+                        </label>
+                      </div>
+                    </section>
+                  </div>
+
+                  <aside class="side-card self-start">
+                    <h2 class="side-title">Checklist de publicación</h2>
+                    <ul class="checklist">
+                      <li class="checklist-item" data-done="true">
+                        <span class="icon" data-icon="check-circle"></span>Link cargado y validado
+                      </li>
+                      <li class="checklist-item" data-done="true">
+                        <span class="icon" data-icon="check-circle"></span>Embebido permitido en el dominio
+                      </li>
+                      <li class="checklist-item" data-done="true">
+                        <span class="icon" data-icon="check-circle"></span>Guión versionado
+                      </li>
+                      <li class="checklist-item" data-done="true">
+                        <span class="icon" data-icon="check-circle"></span>Duración dentro del objetivo
+                        <span class="chip chip-outline ml-1">recomendado</span>
+                      </li>
+                      <li class="checklist-item" data-done="false">
+                        <span class="icon" data-icon="alert-circle"></span>Tiene al menos 1 pregunta asociada
+                      </li>
+                      <li class="checklist-item" data-done="true">
+                        <span class="icon" data-icon="check-circle"></span>Ubicación canónica definida
+                      </li>
+                    </ul>
+                    <p class="alert alert-warning mt-3 !text-2xs">
+                      <span class="icon" data-icon="alert-triangle"></span>
+                      <span><strong>4 de 5 obligatorios.</strong> Advierte, no bloquea: se puede
+                      publicar y queda listado en «publicados sin pregunta».</span>
+                    </p>
+
+                    <div class="mt-3 border-t border-dashed border-line pt-[10px]">
+                      <h3 class="side-title">Afectado por</h3>
+                      <p><span class="chip chip-meta is-mono">sgm2026.03 · voucher</span></p>
+                      <p class="mt-2 text-2xs text-gray-600">
+                        Este video no tiene preguntas: <strong>0</strong> pasarían a «a revisar».
+                      </p>
+                    </div>
+                  </aside>
+                </div>
+              </div>
+
+              <!-- ===================== 2 · VERSIONES ===================== -->
+              <div id="panel-versiones" role="tabpanel" aria-labelledby="tab-versiones" data-panel="versiones" tabindex="0" hidden>
+                <div class="mb-2 flex items-center justify-between">
+                  <h2 class="side-title !mb-0">Versiones</h2>
+                  <button type="button" class="btn btn-bordered btn-sm">
+                    <span class="icon" data-icon="plus"></span>Cargar nueva versión
+                  </button>
+                </div>
+                <table class="table-dense">
+                  <caption class="sr-only">
+                    Versiones del video. El ID no cambia entre versiones: lo que cambia es el link,
+                    la versión de producto que documenta y el motivo del regrabado.
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col" class="w-[70px]">Versión</th>
+                      <th scope="col" class="w-[280px]">Link</th>
+                      <th scope="col" class="w-[150px]">Versión de producto</th>
+                      <th scope="col" class="w-[110px]">Fecha</th>
+                      <th scope="col">Motivo de regrabado</th>
+                      <th scope="col" class="w-[90px]">Vigente</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="cell-mono">v2</td>
+                      <td class="cell-mono">youtu.be/xxxxxxxxxxx</td>
+                      <td class="cell-mono">sgm2026.02</td>
+                      <td class="cell-num">12/06/2026</td>
+                      <td>Cambió la pantalla de proceso del voucher</td>
+                      <td><span class="chip chip-publicado">vigente</span></td>
+                    </tr>
+                    <tr>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-mono">youtu.be/yyyyyyyyyyy</td>
+                      <td class="cell-mono">sgm2026.01</td>
+                      <td class="cell-num">02/02/2026</td>
+                      <td class="text-gray-600">—</td>
+                      <td class="text-gray-600">archivada</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- ===================== 3 · GUIÓN Y RECETA ===================== -->
+              <div id="panel-guion" role="tabpanel" aria-labelledby="tab-guion" data-panel="guion" tabindex="0" hidden>
+                <div class="grid grid-cols-2 gap-[18px]">
+                  <section class="side-card flex flex-col gap-[10px]">
+                    <div class="locked-zone !p-[10px]">
+                      <h2 class="side-title !mb-1">Receta</h2>
+                      <p class="text-2xs text-gray-600">
+                        Estado del sistema antes de grabar: qué tiene que estar cargado en el entorno
+                        de demo. Si el video encadena con el anterior del cohorte, desde dónde se sigue.
+                      </p>
+                      <div class="mt-2 flex flex-col gap-[5px]" aria-hidden="true">
+                        <span class="block h-2 w-full rounded-sm bg-surface-sunken"></span>
+                        <span class="block h-2 w-[88%] rounded-sm bg-surface-sunken"></span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 class="side-title !mb-1">Intro <span class="font-normal normal-case tracking-normal">· a cámara · ~15 seg</span></h3>
+                      <div class="side-card !p-[9px]" aria-hidden="true">
+                        <span class="mb-[5px] block h-2 w-[96%] rounded-sm bg-surface-sunken"></span>
+                        <span class="block h-2 w-[70%] rounded-sm bg-surface-sunken"></span>
+                      </div>
+                    </div>
+                    <div>
+                      <h3 class="side-title !mb-1">Cuerpo <span class="font-normal normal-case tracking-normal">· voz sobre pantalla</span></h3>
+                      <div class="side-card !p-[9px]" aria-hidden="true">
+                        <span class="mb-[5px] block h-2 w-full rounded-sm bg-surface-sunken"></span>
+                        <span class="mb-[5px] block h-2 w-full rounded-sm bg-surface-sunken"></span>
+                        <span class="mb-[5px] block h-2 w-full rounded-sm bg-surface-sunken"></span>
+                        <span class="block h-2 w-[54%] rounded-sm bg-surface-sunken"></span>
+                      </div>
+                    </div>
+                    <div>
+                      <h3 class="side-title !mb-1">Cierre <span class="font-normal normal-case tracking-normal">· a cámara · ~10 seg</span></h3>
+                      <div class="side-card !p-[9px]" aria-hidden="true">
+                        <span class="block h-2 w-[82%] rounded-sm bg-surface-sunken"></span>
+                      </div>
+                    </div>
+                  </section>
+
+                  <div>
+                    <p class="alert alert-info !text-2xs">
+                      <span class="icon" data-icon="info"></span>
+                      <span>El guión de este video todavía no está escrito. La estructura
+                      —receta, intro, cuerpo, cierre— es la de la plantilla de guión de la Academia,
+                      y es igual para los 55 videos.</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ===================== 4 · PREGUNTAS ===================== -->
+              <div id="panel-preguntas" role="tabpanel" aria-labelledby="tab-preguntas" data-panel="preguntas" tabindex="0" hidden>
+                <h2 class="side-title">Preguntas con este video de origen <span class="font-normal">(0)</span></h2>
+                <div class="placeholder-box">
+                  <span class="placeholder-icon" data-icon="help-circle"></span>
+                  <p class="text-sm text-gray-800">Este video publicado todavía no tiene ninguna pregunta.</p>
+                  <p class="mt-1 text-xs text-ink-soft">
+                    Figura en «publicados sin pregunta» del
+                    <a href="banco.html?m=30">banco de BAK-M30</a>.
+                  </p>
+                  <button type="button" class="btn btn-bordered btn-sm mt-5">
+                    <span class="icon" data-icon="plus"></span>Escribir pregunta
+                  </button>
+                </div>
+              </div>
+
+              <!-- ===================== 5 · UBICACIONES ===================== -->
+              <div id="panel-ubicaciones" role="tabpanel" aria-labelledby="tab-ubicaciones" data-panel="ubicaciones" tabindex="0" hidden>
+                <h2 class="side-title">Ubicaciones</h2>
+                <table class="table-dense">
+                  <caption class="sr-only">
+                    Dónde aparece este video. Tiene una sola ubicación canónica; el resto son
+                    referencias.
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Módulo / sección</th>
+                      <th scope="col" class="w-[120px]">Orden</th>
+                      <th scope="col" class="w-[110px]">Canónica</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>BAK-M30 · Carga y proceso</td>
+                      <td class="cell-num">2 de 2</td>
+                      <td><span class="chip chip-publicado">canónica</span></td>
+                    </tr>
+                    <tr>
+                      <td>BAK-R01 · Ruta Esencial · Voucher y cobro</td>
+                      <td class="cell-num">9 de 12</td>
+                      <td class="text-gray-600">referencia</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <!-- R8: la Ruta Esencial referencia videos, no los copia. Un video
+                     vive una sola vez en la biblioteca. -->
+                <div class="mt-[9px] flex items-center gap-3">
+                  <button type="button" class="btn btn-bordered btn-sm">
+                    <span class="icon" data-icon="route"></span>Agregar a la Ruta Esencial
+                  </button>
+                  <span class="text-xs text-ink-soft">Referencia, no copia.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="assets/js/icons.js"></script>
+    <script src="assets/js/ui.js"></script>
+    <script>
+      /* Controlador de la pantalla. Las solapas las maneja ui.js (?tab=).
+         Acá solo se avisa cuando el video pedido no es el que está maquetado. */
+      (function () {
+        "use strict";
+        const v = UI.param("v");
+        if (v === null || v === "BAK-M30.050") return;
+
+        document.getElementById("ficha-completa").hidden = true;
+        document.getElementById("sin-maquetar").hidden = false;
+        document.getElementById("sin-maquetar-id").textContent = v;
+        document.querySelectorAll(".page-actions button, .page-actions input").forEach(function (b) {
+          b.disabled = true;
+        });
+      })();
+    </script>
+  </body>
+</html>

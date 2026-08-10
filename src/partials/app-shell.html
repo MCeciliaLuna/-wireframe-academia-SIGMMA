@@ -1,0 +1,121 @@
+<!-- ============================================================================
+     FUENTE CANÓNICA DEL CHROME DEL BACKOFFICE
+     ----------------------------------------------------------------------------
+     Este archivo no se sirve: es la única versión de referencia del sidebar.
+     Está copiado literal en cada página de app, marcado con
+        <!-- app-shell: sincronizar con src/partials/app-shell.html -->
+        ...
+        <!-- /app-shell -->
+     Si tocás algo acá, replicalo en las 5 páginas (todas menos index.html, que
+     es el índice, y design-system.html, que lo muestra como muestra).
+
+     Al copiarlo, cambiar SOLO el `aria-current="page"` al destino que
+     corresponda. Nada más.
+
+     Los destinos que esta tanda NO maqueta van como <span aria-disabled="true">,
+     no como <a>: el wireframe dibuja el menú completo y hay que mostrarlo
+     entero, pero un link que no lleva a ningún lado miente. Quedan fuera del
+     orden de tabulación.
+     ========================================================================= -->
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <img src="assets/img/logo.svg" alt="SIGMMA" width="96" height="16" class="w-[96px]" />
+    <span class="text-2xs font-bold text-primary">Academia</span>
+  </div>
+
+  <!-- Selector global de superficie. Todo el contenido del backoffice cuelga
+       de cuál está activa. Solo BAK tiene módulos mapeados. -->
+  <div class="relative" data-dropdown>
+    <span class="side-title mb-1 block">Superficie</span>
+    <button type="button" class="surface-picker" data-dropdown-trigger aria-expanded="false" aria-haspopup="true">
+      <span><strong>BAK</strong> · Backoffice</span>
+      <span class="icon icon-sm" data-icon="chevron-down"></span>
+    </button>
+    <div class="menu" role="menu" data-dropdown-menu hidden>
+      <a href="modulos.html?sup=BAK" class="menu-item" role="menuitem">BAK · Backoffice</a>
+      <a href="modulos.html?sup=FRT" class="menu-item" role="menuitem">FRT · Front</a>
+      <a href="modulos.html?sup=CRM" class="menu-item" role="menuitem">CRM</a>
+    </div>
+  </div>
+
+  <nav class="flex flex-col gap-4" aria-label="Secciones del backoffice">
+    <!-- Inicio va suelto, sin grupo: no es una función más sino el punto de
+         partida. En las etapas de construcción es el panel de obra. -->
+    <div class="nav-group">
+      <a href="home.html" class="nav-item" data-escena-keep>
+        <span class="icon" data-icon="activity"></span>Inicio
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-title">Contenido</span>
+      <a href="modulos.html" class="nav-item" aria-current="page">
+        <span class="icon" data-icon="layers"></span>Módulos
+      </a>
+      <span class="nav-item" aria-disabled="true">
+        <span class="icon" data-icon="film"></span>Biblioteca de videos
+      </span>
+      <a href="tablero.html" class="nav-item">
+        <span class="icon" data-icon="columns"></span>Tablero de producción
+      </a>
+      <span class="nav-item" aria-disabled="true">
+        <span class="icon" data-icon="refresh"></span>Cola de regrabación
+      </span>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-title">Evaluación</span>
+      <a href="banco.html?m=30" class="nav-item">
+        <span class="icon" data-icon="help-circle"></span>Bancos de preguntas
+      </a>
+      <span class="nav-item" aria-disabled="true">
+        <span class="icon" data-icon="settings"></span>Configuración
+      </span>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-title">Currícula</span>
+      <span class="nav-item" aria-disabled="true">
+        <span class="icon" data-icon="route"></span>Ruta Esencial
+      </span>
+      <span class="nav-item" aria-disabled="true">
+        <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
+      </span>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-title">Pipeline</span>
+      <span class="nav-item" aria-disabled="true">
+        <span class="icon" data-icon="git-branch"></span>Impactos en Academia
+      </span>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-title">Seguimiento</span>
+      <span class="nav-item" aria-disabled="true">
+        <span class="icon" data-icon="bar-chart"></span>Panel macro
+      </span>
+      <span class="nav-item" aria-disabled="true">
+        <span class="icon" data-icon="users"></span>Detalle por agencia
+      </span>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-title">Administración</span>
+      <span class="nav-item" aria-disabled="true">
+        <span class="icon" data-icon="target"></span>Superficies y planes
+      </span>
+      <span class="nav-item" aria-disabled="true">
+        <span class="icon" data-icon="shield"></span>Usuarios y roles
+      </span>
+      <span class="nav-item" aria-disabled="true">
+        <span class="icon" data-icon="activity"></span>Auditoría
+      </span>
+    </div>
+  </nav>
+
+  <div class="sidebar-foot">
+    <span class="text-2xs text-gray-700">Majo · Contenido</span>
+  </div>
+</aside>

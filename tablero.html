@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tablero de producción · Backoffice Academia SIGMMA</title>
+    <meta name="description" content="Tablero de producción de los 55 videos de la Academia SIGMMA: vista tabla y vista kanban por estado." />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="stylesheet" href="assets/css/academia.css" />
+  </head>
+  <body>
+    <a href="#contenido" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[1001] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-white">Saltar al contenido</a>
+
+    <div class="app-shell">
+      <!-- app-shell: sincronizar con src/partials/app-shell.html -->
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img src="assets/img/logo.svg" alt="SIGMMA" width="96" height="16" class="w-[96px]" />
+          <span class="text-2xs font-bold text-primary">Academia</span>
+        </div>
+
+        <!-- Selector global de superficie. Todo el contenido del backoffice cuelga
+             de cuál está activa. Solo BAK tiene módulos mapeados. -->
+        <div class="relative" data-dropdown>
+          <span class="side-title mb-1 block">Superficie</span>
+          <button type="button" class="surface-picker" data-dropdown-trigger aria-expanded="false" aria-haspopup="true">
+            <span><strong>BAK</strong> · Backoffice</span>
+            <span class="icon icon-sm" data-icon="chevron-down"></span>
+          </button>
+          <div class="menu" role="menu" data-dropdown-menu hidden>
+            <a href="modulos.html?sup=BAK" class="menu-item" role="menuitem">BAK · Backoffice</a>
+            <a href="modulos.html?sup=FRT" class="menu-item" role="menuitem">FRT · Front</a>
+            <a href="modulos.html?sup=CRM" class="menu-item" role="menuitem">CRM</a>
+          </div>
+        </div>
+
+        <nav class="flex flex-col gap-4" aria-label="Secciones del backoffice">
+          <!-- Inicio va suelto, sin grupo: no es una función más sino el punto de
+               partida. En las etapas de construcción es el panel de obra. -->
+          <div class="nav-group">
+            <a href="home.html" class="nav-item" data-escena-keep>
+              <span class="icon" data-icon="activity"></span>Inicio
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Contenido</span>
+            <a href="modulos.html" class="nav-item">
+              <span class="icon" data-icon="layers"></span>Módulos
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="film"></span>Biblioteca de videos
+            </span>
+            <a href="tablero.html" class="nav-item" aria-current="page">
+              <span class="icon" data-icon="columns"></span>Tablero de producción
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="refresh"></span>Cola de regrabación
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Evaluación</span>
+            <a href="banco.html?m=30" class="nav-item">
+              <span class="icon" data-icon="help-circle"></span>Bancos de preguntas
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="settings"></span>Configuración
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Currícula</span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="route"></span>Ruta Esencial
+            </span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Pipeline</span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="git-branch"></span>Impactos en Academia
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Seguimiento</span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="bar-chart"></span>Panel macro
+            </span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="users"></span>Detalle por agencia
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Administración</span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="target"></span>Superficies y planes
+            </span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="shield"></span>Usuarios y roles
+            </span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="activity"></span>Auditoría
+            </span>
+          </div>
+        </nav>
+
+        <div class="sidebar-foot">
+          <span class="text-2xs text-gray-700">Majo · Contenido</span>
+        </div>
+      </aside>
+      <!-- /app-shell -->
+
+      <div class="main-col">
+        <header class="page-head">
+          <div>
+            <div class="breadcrumb">Contenido / Tablero de producción</div>
+            <h1 class="page-title">
+              Tablero de producción
+              <span class="chip chip-meta">55 videos</span>
+              <span class="escena-badge" data-escena-label></span>
+            </h1>
+          </div>
+          <div class="page-actions">
+            <!-- R5: la tabla es el default; el kanban es un conmutador. -->
+            <div class="segmented" data-view-switch>
+              <button type="button" class="segmented-option" data-view="tabla" aria-pressed="true">
+                <span class="icon" data-icon="list"></span>Tabla
+              </button>
+              <button type="button" class="segmented-option" data-view="kanban" aria-pressed="false">
+                <span class="icon" data-icon="columns"></span>Kanban
+              </button>
+            </div>
+            <button type="button" class="btn btn-bordered btn-sm">
+              <span class="icon" data-icon="download"></span>Exportar
+            </button>
+            <button type="button" class="btn btn-primary btn-sm">
+              <span class="icon" data-icon="plus"></span>Nuevo video
+            </button>
+          </div>
+        </header>
+
+        <main id="contenido" class="page-body">
+          <div class="flex gap-3" data-escena="E5">
+            <div class="metric-tile">
+              <span class="metric-label">Pendientes de grabar</span>
+              <p class="metric-value">14</p>
+            </div>
+            <div class="metric-tile">
+              <span class="metric-label">En cola de regrabación</span>
+              <p class="metric-value" data-tone="alerta">3</p>
+            </div>
+            <div class="metric-tile">
+              <span class="metric-label">Publicados sin pregunta</span>
+              <p class="metric-value" data-tone="alerta">9</p>
+            </div>
+            <div class="metric-tile">
+              <span class="metric-label">Publicados</span>
+              <p class="metric-value">26</p>
+            </div>
+          </div>
+
+          <div class="filter-bar" data-escena="E5">
+            <button type="button" class="filter-pill">
+              Cohorte: todas <span class="icon" data-icon="chevron-down"></span>
+            </button>
+            <button type="button" class="filter-pill">
+              Prioridad: todas <span class="icon" data-icon="chevron-down"></span>
+            </button>
+            <button type="button" class="filter-pill">
+              Estado: todos <span class="icon" data-icon="chevron-down"></span>
+            </button>
+            <button type="button" class="filter-pill" data-active="true">
+              Superficie: BAK <span class="icon" data-icon="x"></span>
+            </button>
+            <button type="button" class="filter-pill">
+              Módulo: todos <span class="icon" data-icon="chevron-down"></span>
+            </button>
+            <span class="filter-count">55 de 55</span>
+          </div>
+
+          <!-- ===================== VISTA TABLA (default) ===================== -->
+          <div data-view-panel="tabla" class="contents" data-escena="E5">
+            <div class="bulk-bar" id="bulk" hidden>
+              <strong data-bulk-count>3 seleccionados</strong>
+              <button type="button" class="btn btn-bordered btn-sm">Cambiar estado</button>
+              <button type="button" class="btn btn-bordered btn-sm">Asignar cohorte</button>
+              <button type="button" class="btn btn-bordered btn-sm">Agregar a la cola</button>
+              <button type="button" class="link-quiet ml-auto" data-bulk-clear>limpiar selección</button>
+            </div>
+
+            <div class="table-scroll-y">
+              <table class="table-dense" data-sortable data-bulk="bulk">
+                <caption class="sr-only">
+                  Los 55 videos de la superficie BAK, con su cohorte de grabación, prioridad Pareto y
+                  estado de producción. Cada video tiene un solo estado.
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col" class="w-[34px]">
+                      <input type="checkbox" id="sel-todos" />
+                      <label class="sr-only" for="sel-todos">Seleccionar todos</label>
+                    </th>
+                    <th scope="col" class="w-[130px]" data-sort-key="id">ID</th>
+                    <th scope="col" data-sort-key="titulo">Título</th>
+                    <th scope="col" class="w-[80px]">Cohorte</th>
+                    <th scope="col" class="w-[90px]">Prioridad</th>
+                    <th scope="col" class="w-[120px]" data-sort-key="estado">Estado</th>
+                    <th scope="col" class="w-[70px]">Versión</th>
+                    <th scope="col" class="w-[80px]">Fecha</th>
+                    <th scope="col" class="w-[120px]">Afectado por</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    <tr data-id="BAK-M00.010" data-titulo="Qué es SIGMMA: el sistema operativo de la agencia" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M00010" /><label class="sr-only" for="sel-M00010">Seleccionar BAK-M00.010</label></td>
+                      <td class="cell-mono">BAK-M00.010</td>
+                      <td><a href="video.html?v=BAK-M00.010">Qué es SIGMMA: el sistema operativo de la agencia</a></td>
+                      <td class="cell-mono">C01</td>
+                      <td class="cell-mono">P1</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M00.020" data-titulo="El ciclo 360° de la operación turística: cliente, prestador y utilidad" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M00020" /><label class="sr-only" for="sel-M00020">Seleccionar BAK-M00.020</label></td>
+                      <td class="cell-mono">BAK-M00.020</td>
+                      <td><a href="video.html?v=BAK-M00.020">El ciclo 360° de la operación turística: cliente, prestador y utilidad</a></td>
+                      <td class="cell-mono">C04</td>
+                      <td class="cell-mono">P2</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M00.030" data-titulo="Los 7 principios y los procesos atomizados" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M00030" /><label class="sr-only" for="sel-M00030">Seleccionar BAK-M00.030</label></td>
+                      <td class="cell-mono">BAK-M00.030</td>
+                      <td><a href="video.html?v=BAK-M00.030">Los 7 principios y los procesos atomizados</a></td>
+                      <td class="cell-mono">C04</td>
+                      <td class="cell-mono">P2</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M00.040" data-titulo="Navegación: ingreso, menú, botones, último file y rueda de progreso" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M00040" /><label class="sr-only" for="sel-M00040">Seleccionar BAK-M00.040</label></td>
+                      <td class="cell-mono">BAK-M00.040</td>
+                      <td><a href="video.html?v=BAK-M00.040">Navegación: ingreso, menú, botones, último file y rueda de progreso</a></td>
+                      <td class="cell-mono">C01</td>
+                      <td class="cell-mono">P1</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M10.010" data-titulo="Buscar file: número, filtros y por nombre" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M10010" /><label class="sr-only" for="sel-M10010">Seleccionar BAK-M10.010</label></td>
+                      <td class="cell-mono">BAK-M10.010</td>
+                      <td><a href="video.html?v=BAK-M10.010">Buscar file: número, filtros y por nombre</a></td>
+                      <td class="cell-mono">C02</td>
+                      <td class="cell-mono">P1</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M10.020" data-titulo="Crear y editar un file: tipo de servicio, individual vs. grupal" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M10020" /><label class="sr-only" for="sel-M10020">Seleccionar BAK-M10.020</label></td>
+                      <td class="cell-mono">BAK-M10.020</td>
+                      <td><a href="video.html?v=BAK-M10.020">Crear y editar un file: tipo de servicio, individual vs. grupal</a></td>
+                      <td class="cell-mono">C02</td>
+                      <td class="cell-mono">P1</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M10.030" data-titulo="Moneda de registro vs. moneda de documento" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M10030" /><label class="sr-only" for="sel-M10030">Seleccionar BAK-M10.030</label></td>
+                      <td class="cell-mono">BAK-M10.030</td>
+                      <td><a href="video.html?v=BAK-M10.030">Moneda de registro vs. moneda de documento</a></td>
+                      <td class="cell-mono">C02</td>
+                      <td class="cell-mono">P1</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M10.040" data-titulo="Datos del file: nombre, destino IATA, fechas y segmentación" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M10040" /><label class="sr-only" for="sel-M10040">Seleccionar BAK-M10.040</label></td>
+                      <td class="cell-mono">BAK-M10.040</td>
+                      <td><a href="video.html?v=BAK-M10.040">Datos del file: nombre, destino IATA, fechas y segmentación</a></td>
+                      <td class="cell-mono">C05</td>
+                      <td class="cell-mono">P2</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M10.050" data-titulo="Estados del file" data-estado="obsoleto">
+                      <td><input type="checkbox" id="sel-M10050" /><label class="sr-only" for="sel-M10050">Seleccionar BAK-M10.050</label></td>
+                      <td class="cell-mono">BAK-M10.050</td>
+                      <td><a href="video.html?v=BAK-M10.050">Estados del file</a></td>
+                      <td class="cell-mono">C05</td>
+                      <td class="cell-mono">P2</td>
+                      <td><span class="chip chip-obsoleto">obsoleto</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num">14/03</td>
+                      <td class="cell-mono">sgm2026.01</td>
+                    </tr>
+                    <tr data-id="BAK-M10.060" data-titulo="Salida grupal: vincular files e informe de salida" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M10060" /><label class="sr-only" for="sel-M10060">Seleccionar BAK-M10.060</label></td>
+                      <td class="cell-mono">BAK-M10.060</td>
+                      <td><a href="video.html?v=BAK-M10.060">Salida grupal: vincular files e informe de salida</a></td>
+                      <td class="cell-mono">C13</td>
+                      <td class="cell-mono">P3</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M20.010" data-titulo="Cargar un cliente: físico vs. jurídico y autocompletado por ARCA/CUIT" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M20010" /><label class="sr-only" for="sel-M20010">Seleccionar BAK-M20.010</label></td>
+                      <td class="cell-mono">BAK-M20.010</td>
+                      <td><a href="video.html?v=BAK-M20.010">Cargar un cliente: físico vs. jurídico y autocompletado por ARCA/CUIT</a></td>
+                      <td class="cell-mono">C02</td>
+                      <td class="cell-mono">P1</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M20.020" data-titulo="Cliente: solapas de documentación, tarjetas, clasificación y adjuntos" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M20020" /><label class="sr-only" for="sel-M20020">Seleccionar BAK-M20.020</label></td>
+                      <td class="cell-mono">BAK-M20.020</td>
+                      <td><a href="video.html?v=BAK-M20.020">Cliente: solapas de documentación, tarjetas, clasificación y adjuntos</a></td>
+                      <td class="cell-mono">C06</td>
+                      <td class="cell-mono">P2</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M20.030" data-titulo="Pasajeros" data-estado="editado">
+                      <td><input type="checkbox" id="sel-M20030" /><label class="sr-only" for="sel-M20030">Seleccionar BAK-M20.030</label></td>
+                      <td class="cell-mono">BAK-M20.030</td>
+                      <td><a href="video.html?v=BAK-M20.030">Pasajeros</a></td>
+                      <td class="cell-mono">C02</td>
+                      <td class="cell-mono">P1</td>
+                      <td><span class="chip chip-editado">editado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num">28/07</td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M20.040" data-titulo="Cargar pasajero" data-estado="grabado">
+                      <td><input type="checkbox" id="sel-M20040" /><label class="sr-only" for="sel-M20040">Seleccionar BAK-M20.040</label></td>
+                      <td class="cell-mono">BAK-M20.040</td>
+                      <td><a href="video.html?v=BAK-M20.040">Cargar pasajero</a></td>
+                      <td class="cell-mono">C02</td>
+                      <td class="cell-mono">P1</td>
+                      <td><span class="chip chip-grabado">grabado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num">30/07</td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M20.050" data-titulo="Proveedor turístico y no turístico" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M20050" /><label class="sr-only" for="sel-M20050">Seleccionar BAK-M20.050</label></td>
+                      <td class="cell-mono">BAK-M20.050</td>
+                      <td><a href="video.html?v=BAK-M20.050">Proveedor turístico y no turístico</a></td>
+                      <td class="cell-mono">C06</td>
+                      <td class="cell-mono">P2</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M20.060" data-titulo="Importar la base de clientes y proveedores desde Excel" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M20060" /><label class="sr-only" for="sel-M20060">Seleccionar BAK-M20.060</label></td>
+                      <td class="cell-mono">BAK-M20.060</td>
+                      <td><a href="video.html?v=BAK-M20.060">Importar la base de clientes y proveedores desde Excel</a></td>
+                      <td class="cell-mono">C06</td>
+                      <td class="cell-mono">P2</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M30.010" data-titulo="Qué es el voucher" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M30010" /><label class="sr-only" for="sel-M30010">Seleccionar BAK-M30.010</label></td>
+                      <td class="cell-mono">BAK-M30.010</td>
+                      <td><a href="video.html?v=BAK-M30.010">Qué es el voucher</a></td>
+                      <td class="cell-mono">C03</td>
+                      <td class="cell-mono">P1</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M30.020" data-titulo="Cargar voucher" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M30020" /><label class="sr-only" for="sel-M30020">Seleccionar BAK-M30.020</label></td>
+                      <td class="cell-mono">BAK-M30.020</td>
+                      <td><a href="video.html?v=BAK-M30.020">Cargar voucher</a></td>
+                      <td class="cell-mono">C03</td>
+                      <td class="cell-mono">P1</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M30.030" data-titulo="Margen comisión vs utilidad" data-estado="editado">
+                      <td><input type="checkbox" id="sel-M30030" /><label class="sr-only" for="sel-M30030">Seleccionar BAK-M30.030</label></td>
+                      <td class="cell-mono">BAK-M30.030</td>
+                      <td><a href="video.html?v=BAK-M30.030">Margen comisión vs utilidad</a></td>
+                      <td class="cell-mono">C07</td>
+                      <td class="cell-mono">P2</td>
+                      <td><span class="chip chip-editado">editado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num">28/07</td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M30.040" data-titulo="Conceptos impositivos e IVA" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M30040" /><label class="sr-only" for="sel-M30040">Seleccionar BAK-M30.040</label></td>
+                      <td class="cell-mono">BAK-M30.040</td>
+                      <td><a href="video.html?v=BAK-M30.040">Conceptos impositivos e IVA</a></td>
+                      <td class="cell-mono">C07</td>
+                      <td class="cell-mono">P2</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M30.050" data-titulo="Procesar el voucher" data-estado="publicado" data-selected="true">
+                      <td><input type="checkbox" id="sel-M30050" checked /><label class="sr-only" for="sel-M30050">Seleccionar BAK-M30.050</label></td>
+                      <td class="cell-mono">BAK-M30.050</td>
+                      <td><a href="video.html?v=BAK-M30.050">Procesar el voucher</a></td>
+                      <td class="cell-mono">C03</td>
+                      <td class="cell-mono">P1</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v2</td>
+                      <td class="cell-num">12/06</td>
+                      <td class="cell-mono">sgm2026.03</td>
+                    </tr>
+                    <tr data-id="BAK-M30.060" data-titulo="Estados del voucher" data-estado="regrabar" data-selected="true">
+                      <td><input type="checkbox" id="sel-M30060" checked /><label class="sr-only" for="sel-M30060">Seleccionar BAK-M30.060</label></td>
+                      <td class="cell-mono">BAK-M30.060</td>
+                      <td><a href="video.html?v=BAK-M30.060">Estados del voucher</a></td>
+                      <td class="cell-mono">C12</td>
+                      <td class="cell-mono">P3</td>
+                      <td><span class="chip chip-regrabar">a regrabar</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num">02/02</td>
+                      <td class="cell-mono">sgm2026.03</td>
+                    </tr>
+                    <tr data-id="BAK-M30.070" data-titulo="Modelos de venta" data-estado="backlog" data-selected="true">
+                      <td><input type="checkbox" id="sel-M30070" checked /><label class="sr-only" for="sel-M30070">Seleccionar BAK-M30.070</label></td>
+                      <td class="cell-mono">BAK-M30.070</td>
+                      <td><a href="video.html?v=BAK-M30.070">Modelos de venta</a></td>
+                      <td class="cell-mono">C12</td>
+                      <td class="cell-mono">P3</td>
+                      <td><span class="chip chip-backlog">en backlog</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M40.010" data-titulo="Recibos de cobranza" data-estado="guionado">
+                      <td><input type="checkbox" id="sel-M40010" /><label class="sr-only" for="sel-M40010">Seleccionar BAK-M40.010</label></td>
+                      <td class="cell-mono">BAK-M40.010</td>
+                      <td><a href="video.html?v=BAK-M40.010">Recibos de cobranza</a></td>
+                      <td class="cell-mono">C03</td>
+                      <td class="cell-mono">P1</td>
+                      <td><span class="chip chip-guionado">guionado</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                      <td class="cell-num">21/07</td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M40.020" data-titulo="Valores: efectivo, transferencia, tarjeta y de tercero (TR3/TC3)" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M40020" /><label class="sr-only" for="sel-M40020">Seleccionar BAK-M40.020</label></td>
+                      <td class="cell-mono">BAK-M40.020</td>
+                      <td><a href="video.html?v=BAK-M40.020">Valores: efectivo, transferencia, tarjeta y de tercero (TR3/TC3)</a></td>
+                      <td class="cell-mono">C08</td>
+                      <td class="cell-mono">P2</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M40.030" data-titulo="Moneda y tipo de cambio en el recibo" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M40030" /><label class="sr-only" for="sel-M40030">Seleccionar BAK-M40.030</label></td>
+                      <td class="cell-mono">BAK-M40.030</td>
+                      <td><a href="video.html?v=BAK-M40.030">Moneda y tipo de cambio en el recibo</a></td>
+                      <td class="cell-mono">C08</td>
+                      <td class="cell-mono">P2</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M40.040" data-titulo="Devolución y egreso" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M40040" /><label class="sr-only" for="sel-M40040">Seleccionar BAK-M40.040</label></td>
+                      <td class="cell-mono">BAK-M40.040</td>
+                      <td><a href="video.html?v=BAK-M40.040">Devolución y egreso</a></td>
+                      <td class="cell-mono">C14</td>
+                      <td class="cell-mono">P3</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M40.050" data-titulo="Cuenta corriente del cliente y saldos por moneda" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M40050" /><label class="sr-only" for="sel-M40050">Seleccionar BAK-M40.050</label></td>
+                      <td class="cell-mono">BAK-M40.050</td>
+                      <td><a href="video.html?v=BAK-M40.050">Cuenta corriente del cliente y saldos por moneda</a></td>
+                      <td class="cell-mono">C08</td>
+                      <td class="cell-mono">P2</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M50.010" data-titulo="Factura al pasajero: por servicio vs. por producto" data-estado="guionado">
+                      <td><input type="checkbox" id="sel-M50010" /><label class="sr-only" for="sel-M50010">Seleccionar BAK-M50.010</label></td>
+                      <td class="cell-mono">BAK-M50.010</td>
+                      <td><a href="video.html?v=BAK-M50.010">Factura al pasajero: por servicio vs. por producto</a></td>
+                      <td class="cell-mono">C09</td>
+                      <td class="cell-mono">P2</td>
+                      <td><span class="chip chip-guionado">guionado</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M50.020" data-titulo="Emitir factura" data-estado="backlog">
+                      <td><input type="checkbox" id="sel-M50020" /><label class="sr-only" for="sel-M50020">Seleccionar BAK-M50.020</label></td>
+                      <td class="cell-mono">BAK-M50.020</td>
+                      <td><a href="video.html?v=BAK-M50.020">Emitir factura</a></td>
+                      <td class="cell-mono">C09</td>
+                      <td class="cell-mono">P2</td>
+                      <td><span class="chip chip-backlog">en backlog</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M50.030" data-titulo="Verificar el voucher antes de facturar: prestador vs. proveedor" data-estado="grabado">
+                      <td><input type="checkbox" id="sel-M50030" /><label class="sr-only" for="sel-M50030">Seleccionar BAK-M50.030</label></td>
+                      <td class="cell-mono">BAK-M50.030</td>
+                      <td><a href="video.html?v=BAK-M50.030">Verificar el voucher antes de facturar: prestador vs. proveedor</a></td>
+                      <td class="cell-mono">C09</td>
+                      <td class="cell-mono">P2</td>
+                      <td><span class="chip chip-grabado">grabado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M50.040" data-titulo="Notas de crédito" data-estado="backlog">
+                      <td><input type="checkbox" id="sel-M50040" /><label class="sr-only" for="sel-M50040">Seleccionar BAK-M50.040</label></td>
+                      <td class="cell-mono">BAK-M50.040</td>
+                      <td><a href="video.html?v=BAK-M50.040">Notas de crédito</a></td>
+                      <td class="cell-mono">C15</td>
+                      <td class="cell-mono">P3</td>
+                      <td><span class="chip chip-backlog">en backlog</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M50.050" data-titulo="Factura parcial: dividir entre pasajeros" data-estado="backlog">
+                      <td><input type="checkbox" id="sel-M50050" /><label class="sr-only" for="sel-M50050">Seleccionar BAK-M50.050</label></td>
+                      <td class="cell-mono">BAK-M50.050</td>
+                      <td><a href="video.html?v=BAK-M50.050">Factura parcial: dividir entre pasajeros</a></td>
+                      <td class="cell-mono">C15</td>
+                      <td class="cell-mono">P3</td>
+                      <td><span class="chip chip-backlog">en backlog</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M50.060" data-titulo="Tipo de cambio promedio ponderado" data-estado="backlog">
+                      <td><input type="checkbox" id="sel-M50060" /><label class="sr-only" for="sel-M50060">Seleccionar BAK-M50.060</label></td>
+                      <td class="cell-mono">BAK-M50.060</td>
+                      <td><a href="video.html?v=BAK-M50.060">Tipo de cambio promedio ponderado</a></td>
+                      <td class="cell-mono">C15</td>
+                      <td class="cell-mono">P3</td>
+                      <td><span class="chip chip-backlog">en backlog</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M60.010" data-titulo="Orden de pago: automática, dividida y manual" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M60010" /><label class="sr-only" for="sel-M60010">Seleccionar BAK-M60.010</label></td>
+                      <td class="cell-mono">BAK-M60.010</td>
+                      <td><a href="video.html?v=BAK-M60.010">Orden de pago: automática, dividida y manual</a></td>
+                      <td class="cell-mono">C10</td>
+                      <td class="cell-mono">P2</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M60.020" data-titulo="Vincular la factura de compra y el importador ARCA" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M60020" /><label class="sr-only" for="sel-M60020">Seleccionar BAK-M60.020</label></td>
+                      <td class="cell-mono">BAK-M60.020</td>
+                      <td><a href="video.html?v=BAK-M60.020">Vincular la factura de compra y el importador ARCA</a></td>
+                      <td class="cell-mono">C16</td>
+                      <td class="cell-mono">P3</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M60.030" data-titulo="Saldo a favor, anular y reabrir" data-estado="regrabar">
+                      <td><input type="checkbox" id="sel-M60030" /><label class="sr-only" for="sel-M60030">Seleccionar BAK-M60.030</label></td>
+                      <td class="cell-mono">BAK-M60.030</td>
+                      <td><a href="video.html?v=BAK-M60.030">Saldo a favor, anular y reabrir</a></td>
+                      <td class="cell-mono">C16</td>
+                      <td class="cell-mono">P3</td>
+                      <td><span class="chip chip-regrabar">a regrabar</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M60.040" data-titulo="Cuenta corriente del proveedor" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M60040" /><label class="sr-only" for="sel-M60040">Seleccionar BAK-M60.040</label></td>
+                      <td class="cell-mono">BAK-M60.040</td>
+                      <td><a href="video.html?v=BAK-M60.040">Cuenta corriente del proveedor</a></td>
+                      <td class="cell-mono">C10</td>
+                      <td class="cell-mono">P2</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M70.010" data-titulo="Caja: única vs por vendedor" data-estado="backlog">
+                      <td><input type="checkbox" id="sel-M70010" /><label class="sr-only" for="sel-M70010">Seleccionar BAK-M70.010</label></td>
+                      <td class="cell-mono">BAK-M70.010</td>
+                      <td><a href="video.html?v=BAK-M70.010">Caja: única vs por vendedor</a></td>
+                      <td class="cell-mono">C11</td>
+                      <td class="cell-mono">P2</td>
+                      <td><span class="chip chip-backlog">en backlog</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M70.020" data-titulo="Asientos automáticos y manuales, egresos y centro de costo" data-estado="regrabar">
+                      <td><input type="checkbox" id="sel-M70020" /><label class="sr-only" for="sel-M70020">Seleccionar BAK-M70.020</label></td>
+                      <td class="cell-mono">BAK-M70.020</td>
+                      <td><a href="video.html?v=BAK-M70.020">Asientos automáticos y manuales, egresos y centro de costo</a></td>
+                      <td class="cell-mono">C17</td>
+                      <td class="cell-mono">P3</td>
+                      <td><span class="chip chip-regrabar">a regrabar</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M70.030" data-titulo="Apertura y cierre de caja" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M70030" /><label class="sr-only" for="sel-M70030">Seleccionar BAK-M70.030</label></td>
+                      <td class="cell-mono">BAK-M70.030</td>
+                      <td><a href="video.html?v=BAK-M70.030">Apertura y cierre de caja</a></td>
+                      <td class="cell-mono">C17</td>
+                      <td class="cell-mono">P3</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M70.040" data-titulo="Bancos, transferencias y scan de comprobantes con IA" data-estado="publicado">
+                      <td><input type="checkbox" id="sel-M70040" /><label class="sr-only" for="sel-M70040">Seleccionar BAK-M70.040</label></td>
+                      <td class="cell-mono">BAK-M70.040</td>
+                      <td><a href="video.html?v=BAK-M70.040">Bancos, transferencias y scan de comprobantes con IA</a></td>
+                      <td class="cell-mono">C17</td>
+                      <td class="cell-mono">P3</td>
+                      <td><span class="chip chip-publicado">publicado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M80.010" data-titulo="Informes operativos: saldos, listados y comisiones" data-estado="guionado">
+                      <td><input type="checkbox" id="sel-M80010" /><label class="sr-only" for="sel-M80010">Seleccionar BAK-M80.010</label></td>
+                      <td class="cell-mono">BAK-M80.010</td>
+                      <td><a href="video.html?v=BAK-M80.010">Informes operativos: saldos, listados y comisiones</a></td>
+                      <td class="cell-mono">C11</td>
+                      <td class="cell-mono">P2</td>
+                      <td><span class="chip chip-guionado">guionado</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M80.020" data-titulo="Informe de ventas" data-estado="guionado">
+                      <td><input type="checkbox" id="sel-M80020" /><label class="sr-only" for="sel-M80020">Seleccionar BAK-M80.020</label></td>
+                      <td class="cell-mono">BAK-M80.020</td>
+                      <td><a href="video.html?v=BAK-M80.020">Informe de ventas</a></td>
+                      <td class="cell-mono">C11</td>
+                      <td class="cell-mono">P2</td>
+                      <td><span class="chip chip-guionado">guionado</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                      <td class="cell-num">05/08</td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M80.030" data-titulo="Dashboard: KPIs del negocio" data-estado="backlog">
+                      <td><input type="checkbox" id="sel-M80030" /><label class="sr-only" for="sel-M80030">Seleccionar BAK-M80.030</label></td>
+                      <td class="cell-mono">BAK-M80.030</td>
+                      <td><a href="video.html?v=BAK-M80.030">Dashboard: KPIs del negocio</a></td>
+                      <td class="cell-mono">C18</td>
+                      <td class="cell-mono">P3</td>
+                      <td><span class="chip chip-backlog">en backlog</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M80.040" data-titulo="Informes administrativos: ingresos y egresos" data-estado="backlog">
+                      <td><input type="checkbox" id="sel-M80040" /><label class="sr-only" for="sel-M80040">Seleccionar BAK-M80.040</label></td>
+                      <td class="cell-mono">BAK-M80.040</td>
+                      <td><a href="video.html?v=BAK-M80.040">Informes administrativos: ingresos y egresos</a></td>
+                      <td class="cell-mono">C18</td>
+                      <td class="cell-mono">P3</td>
+                      <td><span class="chip chip-backlog">en backlog</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M90.010" data-titulo="Plan de cuentas: para qué sirve" data-estado="editado">
+                      <td><input type="checkbox" id="sel-M90010" /><label class="sr-only" for="sel-M90010">Seleccionar BAK-M90.010</label></td>
+                      <td class="cell-mono">BAK-M90.010</td>
+                      <td><a href="video.html?v=BAK-M90.010">Plan de cuentas: para qué sirve</a></td>
+                      <td class="cell-mono">C19</td>
+                      <td class="cell-mono">P4</td>
+                      <td><span class="chip chip-editado">editado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M90.020" data-titulo="Asientos automáticos: cómo se configuran" data-estado="grabado">
+                      <td><input type="checkbox" id="sel-M90020" /><label class="sr-only" for="sel-M90020">Seleccionar BAK-M90.020</label></td>
+                      <td class="cell-mono">BAK-M90.020</td>
+                      <td><a href="video.html?v=BAK-M90.020">Asientos automáticos: cómo se configuran</a></td>
+                      <td class="cell-mono">C19</td>
+                      <td class="cell-mono">P4</td>
+                      <td><span class="chip chip-grabado">grabado</span></td>
+                      <td class="cell-mono">v1</td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M90.030" data-titulo="Libro diario, libro banco y mayor" data-estado="backlog">
+                      <td><input type="checkbox" id="sel-M90030" /><label class="sr-only" for="sel-M90030">Seleccionar BAK-M90.030</label></td>
+                      <td class="cell-mono">BAK-M90.030</td>
+                      <td><a href="video.html?v=BAK-M90.030">Libro diario, libro banco y mayor</a></td>
+                      <td class="cell-mono">C19</td>
+                      <td class="cell-mono">P4</td>
+                      <td><span class="chip chip-backlog">en backlog</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M90.040" data-titulo="Balance de suma y saldo" data-estado="backlog">
+                      <td><input type="checkbox" id="sel-M90040" /><label class="sr-only" for="sel-M90040">Seleccionar BAK-M90.040</label></td>
+                      <td class="cell-mono">BAK-M90.040</td>
+                      <td><a href="video.html?v=BAK-M90.040">Balance de suma y saldo</a></td>
+                      <td class="cell-mono">C19</td>
+                      <td class="cell-mono">P4</td>
+                      <td><span class="chip chip-backlog">en backlog</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M90.050" data-titulo="Ejercicios contables y cierres" data-estado="backlog">
+                      <td><input type="checkbox" id="sel-M90050" /><label class="sr-only" for="sel-M90050">Seleccionar BAK-M90.050</label></td>
+                      <td class="cell-mono">BAK-M90.050</td>
+                      <td><a href="video.html?v=BAK-M90.050">Ejercicios contables y cierres</a></td>
+                      <td class="cell-mono">C19</td>
+                      <td class="cell-mono">P4</td>
+                      <td><span class="chip chip-backlog">en backlog</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M95.010" data-titulo="Tarifario por proveedor: tipo, categoría, vigencia y temporada" data-estado="guionado">
+                      <td><input type="checkbox" id="sel-M95010" /><label class="sr-only" for="sel-M95010">Seleccionar BAK-M95.010</label></td>
+                      <td class="cell-mono">BAK-M95.010</td>
+                      <td><a href="video.html?v=BAK-M95.010">Tarifario por proveedor: tipo, categoría, vigencia y temporada</a></td>
+                      <td class="cell-mono">C20</td>
+                      <td class="cell-mono">P4</td>
+                      <td><span class="chip chip-guionado">guionado</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M95.020" data-titulo="Armar el itinerario con el tarifario" data-estado="backlog">
+                      <td><input type="checkbox" id="sel-M95020" /><label class="sr-only" for="sel-M95020">Seleccionar BAK-M95.020</label></td>
+                      <td class="cell-mono">BAK-M95.020</td>
+                      <td><a href="video.html?v=BAK-M95.020">Armar el itinerario con el tarifario</a></td>
+                      <td class="cell-mono">C20</td>
+                      <td class="cell-mono">P4</td>
+                      <td><span class="chip chip-backlog">en backlog</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M95.030" data-titulo="Modelos multidestino: paquetes" data-estado="backlog">
+                      <td><input type="checkbox" id="sel-M95030" /><label class="sr-only" for="sel-M95030">Seleccionar BAK-M95.030</label></td>
+                      <td class="cell-mono">BAK-M95.030</td>
+                      <td><a href="video.html?v=BAK-M95.030">Modelos multidestino: paquetes</a></td>
+                      <td class="cell-mono">C20</td>
+                      <td class="cell-mono">P4</td>
+                      <td><span class="chip chip-backlog">en backlog</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                    <tr data-id="BAK-M95.040" data-titulo="Prestador nacional vs. internacional e impacto impositivo" data-estado="backlog">
+                      <td><input type="checkbox" id="sel-M95040" /><label class="sr-only" for="sel-M95040">Seleccionar BAK-M95.040</label></td>
+                      <td class="cell-mono">BAK-M95.040</td>
+                      <td><a href="video.html?v=BAK-M95.040">Prestador nacional vs. internacional e impacto impositivo</a></td>
+                      <td class="cell-mono">C20</td>
+                      <td class="cell-mono">P4</td>
+                      <td><span class="chip chip-backlog">en backlog</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                      <td class="cell-num"><span class="text-gray-600">—</span></td>
+                      <td class="cell-mono"><span class="text-gray-600">—</span></td>
+                    </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p class="text-xs text-ink-soft">
+              La edición en línea del estado, el cohorte y la prioridad se hace desde la celda, sin
+              abrir el detalle. Las <strong>fechas y versiones de producto</strong> son las que
+              especifica el wireframe: los videos que no detalla las muestran vacías.
+            </p>
+          </div>
+
+          <!-- ===================== VISTA KANBAN ===================== -->
+          <div data-view-panel="kanban" class="contents" data-escena="E5" hidden>
+            <div class="kanban">
+                <section class="kanban-col" aria-labelledby="col-backlog">
+                  <h2 class="kanban-head" id="col-backlog">En backlog<span class="kanban-count">14</span></h2>
+                  <ul class="kanban-body">
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M30.070" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M30.070</span>Modelos de venta</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C12</span><span class="chip chip-outline">P3</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M50.020" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M50.020</span>Emitir factura</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C09</span><span class="chip chip-outline">P2</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M50.040" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M50.040</span>Notas de crédito</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C15</span><span class="chip chip-outline">P3</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M50.050" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M50.050</span>Factura parcial: dividir entre pasajeros</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C15</span><span class="chip chip-outline">P3</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M50.060" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M50.060</span>Tipo de cambio promedio ponderado</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C15</span><span class="chip chip-outline">P3</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M70.010" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M70.010</span>Caja: única vs por vendedor</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C11</span><span class="chip chip-outline">P2</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M80.030" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M80.030</span>Dashboard: KPIs del negocio</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C18</span><span class="chip chip-outline">P3</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M80.040" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M80.040</span>Informes administrativos: ingresos y egresos</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C18</span><span class="chip chip-outline">P3</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M90.030" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M90.030</span>Libro diario, libro banco y mayor</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C19</span><span class="chip chip-outline">P4</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M90.040" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M90.040</span>Balance de suma y saldo</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C19</span><span class="chip chip-outline">P4</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M90.050" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M90.050</span>Ejercicios contables y cierres</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C19</span><span class="chip chip-outline">P4</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M95.020" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M95.020</span>Armar el itinerario con el tarifario</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C20</span><span class="chip chip-outline">P4</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M95.030" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M95.030</span>Modelos multidestino: paquetes</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C20</span><span class="chip chip-outline">P4</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M95.040" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M95.040</span>Prestador nacional vs. internacional e impacto impositivo</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C20</span><span class="chip chip-outline">P4</span></p>
+                    </li>
+                  </ul>
+                </section>
+                <section class="kanban-col" aria-labelledby="col-guionado">
+                  <h2 class="kanban-head" id="col-guionado">Guionado<span class="kanban-count">5</span></h2>
+                  <ul class="kanban-body">
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M40.010" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M40.010</span>Recibos de cobranza</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C03</span><span class="chip chip-outline">P1</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M50.010" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M50.010</span>Factura al pasajero: por servicio vs. por producto</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C09</span><span class="chip chip-outline">P2</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M80.010" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M80.010</span>Informes operativos: saldos, listados y comisiones</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C11</span><span class="chip chip-outline">P2</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M80.020" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M80.020</span>Informe de ventas</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C11</span><span class="chip chip-outline">P2</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M95.010" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M95.010</span>Tarifario por proveedor: tipo, categoría, vigencia y temporada</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C20</span><span class="chip chip-outline">P4</span></p>
+                    </li>
+                  </ul>
+                </section>
+                <section class="kanban-col" aria-labelledby="col-grabado">
+                  <h2 class="kanban-head" id="col-grabado">Grabado<span class="kanban-count">3</span></h2>
+                  <ul class="kanban-body">
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M20.040" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M20.040</span>Cargar pasajero</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C02</span><span class="chip chip-outline">P1</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M50.030" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M50.030</span>Verificar el voucher antes de facturar: prestador vs. proveedor</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C09</span><span class="chip chip-outline">P2</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M90.020" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M90.020</span>Asientos automáticos: cómo se configuran</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C19</span><span class="chip chip-outline">P4</span></p>
+                    </li>
+                  </ul>
+                </section>
+                <section class="kanban-col" aria-labelledby="col-editado">
+                  <h2 class="kanban-head" id="col-editado">Editado<span class="kanban-count">3</span></h2>
+                  <ul class="kanban-body">
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M20.030" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M20.030</span>Pasajeros</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C02</span><span class="chip chip-outline">P1</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M30.030" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M30.030</span>Margen comisión vs utilidad</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C07</span><span class="chip chip-outline">P2</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M90.010" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M90.010</span>Plan de cuentas: para qué sirve</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C19</span><span class="chip chip-outline">P4</span></p>
+                    </li>
+                  </ul>
+                </section>
+                <section class="kanban-col" aria-labelledby="col-publicado">
+                  <h2 class="kanban-head" id="col-publicado">Publicado<span class="kanban-count">26</span></h2>
+                  <ul class="kanban-body">
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M00.010" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M00.010</span>Qué es SIGMMA: el sistema operativo de la agencia</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C01</span><span class="chip chip-outline">P1</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M00.020" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M00.020</span>El ciclo 360° de la operación turística: cliente, prestador y utilidad</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C04</span><span class="chip chip-outline">P2</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M00.030" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M00.030</span>Los 7 principios y los procesos atomizados</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C04</span><span class="chip chip-outline">P2</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M00.040" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M00.040</span>Navegación: ingreso, menú, botones, último file y rueda de progreso</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C01</span><span class="chip chip-outline">P1</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M10.010" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M10.010</span>Buscar file: número, filtros y por nombre</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C02</span><span class="chip chip-outline">P1</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M10.020" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M10.020</span>Crear y editar un file: tipo de servicio, individual vs. grupal</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C02</span><span class="chip chip-outline">P1</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M10.030" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M10.030</span>Moneda de registro vs. moneda de documento</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C02</span><span class="chip chip-outline">P1</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M10.040" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M10.040</span>Datos del file: nombre, destino IATA, fechas y segmentación</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C05</span><span class="chip chip-outline">P2</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M10.060" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M10.060</span>Salida grupal: vincular files e informe de salida</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C13</span><span class="chip chip-outline">P3</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M20.010" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M20.010</span>Cargar un cliente: físico vs. jurídico y autocompletado por ARCA/CUIT</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C02</span><span class="chip chip-outline">P1</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M20.020" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M20.020</span>Cliente: solapas de documentación, tarjetas, clasificación y adjuntos</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C06</span><span class="chip chip-outline">P2</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M20.050" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M20.050</span>Proveedor turístico y no turístico</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C06</span><span class="chip chip-outline">P2</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M20.060" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M20.060</span>Importar la base de clientes y proveedores desde Excel</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C06</span><span class="chip chip-outline">P2</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M30.010" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M30.010</span>Qué es el voucher</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C03</span><span class="chip chip-outline">P1</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M30.020" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M30.020</span>Cargar voucher</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C03</span><span class="chip chip-outline">P1</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M30.040" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M30.040</span>Conceptos impositivos e IVA</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C07</span><span class="chip chip-outline">P2</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M30.050" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M30.050</span>Procesar el voucher</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C03</span><span class="chip chip-outline">P1</span><span class="chip chip-outline">0 preg.</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M40.020" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M40.020</span>Valores: efectivo, transferencia, tarjeta y de tercero (TR3/TC3)</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C08</span><span class="chip chip-outline">P2</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M40.030" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M40.030</span>Moneda y tipo de cambio en el recibo</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C08</span><span class="chip chip-outline">P2</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M40.040" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M40.040</span>Devolución y egreso</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C14</span><span class="chip chip-outline">P3</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M40.050" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M40.050</span>Cuenta corriente del cliente y saldos por moneda</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C08</span><span class="chip chip-outline">P2</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M60.010" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M60.010</span>Orden de pago: automática, dividida y manual</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C10</span><span class="chip chip-outline">P2</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M60.020" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M60.020</span>Vincular la factura de compra y el importador ARCA</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C16</span><span class="chip chip-outline">P3</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M60.040" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M60.040</span>Cuenta corriente del proveedor</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C10</span><span class="chip chip-outline">P2</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M70.030" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M70.030</span>Apertura y cierre de caja</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C17</span><span class="chip chip-outline">P3</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M70.040" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M70.040</span>Bancos, transferencias y scan de comprobantes con IA</a>
+                      <p class="kanban-card-tags"><span class="chip chip-publicado">front: on</span><span class="chip chip-meta">C17</span><span class="chip chip-outline">P3</span></p>
+                    </li>
+                  </ul>
+                </section>
+                <section class="kanban-col" aria-labelledby="col-regrabar">
+                  <h2 class="kanban-head" id="col-regrabar">A regrabar<span class="kanban-count">3</span></h2>
+                  <ul class="kanban-body">
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M30.060" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M30.060</span>Estados del voucher</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C12</span><span class="chip chip-outline">P3</span><span class="chip chip-meta is-mono">sgm2026.03</span></p>
+                      <p class="mt-[5px] text-2xs text-error-dark">Sus 7 preguntas pasaron a «a revisar».</p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M60.030" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M60.030</span>Saldo a favor, anular y reabrir</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C16</span><span class="chip chip-outline">P3</span><span class="chip chip-meta is-mono">sgm2026.03</span></p>
+                    </li>
+                    <li class="kanban-card">
+                      <a href="video.html?v=BAK-M70.020" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M70.020</span>Asientos automáticos y manuales, egresos y centro de costo</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C17</span><span class="chip chip-outline">P3</span><span class="chip chip-meta is-mono">sgm2026.03</span></p>
+                    </li>
+                  </ul>
+                </section>
+                <section class="kanban-col" aria-labelledby="col-obsoleto">
+                  <h2 class="kanban-head" id="col-obsoleto">Obsoleto<span class="kanban-count">1</span></h2>
+                  <ul class="kanban-body">
+                    <li class="kanban-card" data-obsoleto="true">
+                      <a href="video.html?v=BAK-M10.050" class="text-ink hover:text-primary-light">
+                        <span class="card-id">BAK-M10.050</span>Estados del file</a>
+                      <p class="kanban-card-tags"><span class="chip chip-meta">C05</span><span class="chip chip-outline">P2</span></p>
+                    </li>
+                  </ul>
+                </section>
+            </div>
+            <p class="text-xs text-ink-soft">
+              Las 7 columnas son los 7 estados de producción, y suman los 55 videos. Arrastrar una
+              tarjeta cambia su estado. <strong>La visibilidad en el Front nunca es una columna</strong>:
+              viaja como chip dentro de la tarjeta, porque es un eje independiente del estado.
+            </p>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="assets/js/icons.js"></script>
+    <script src="assets/js/ui.js"></script>
+  </body>
+</html>
