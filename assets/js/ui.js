@@ -314,22 +314,26 @@ window.UI = (function () {
   function bindViewSwitch() {
     const root = document.querySelector("[data-view-switch]");
     if (!root) return;
+    /* El nombre del parámetro es configurable: el tablero conmuta `?vista=`
+       (tabla/kanban) y la hoja de cohorte `?modo=` (planificación/sesión). Son
+       ejes distintos y compartirlos confundiría los deep links. */
+    const clave = root.dataset.viewSwitch || "vista";
     const opciones = Array.prototype.slice.call(root.querySelectorAll("[data-view]"));
 
-    function activar(clave, empujarUrl) {
+    function activar(valor, empujarUrl) {
       let hubo = false;
       opciones.forEach(function (o) {
-        const on = o.dataset.view === clave;
+        const on = o.dataset.view === valor;
         if (on) hubo = true;
         o.setAttribute("aria-pressed", on ? "true" : "false");
       });
       if (!hubo) return;
       document.querySelectorAll("[data-view-panel]").forEach(function (p) {
-        p.hidden = p.dataset.viewPanel !== clave;
+        p.hidden = p.dataset.viewPanel !== valor;
       });
       if (empujarUrl && window.history && window.history.replaceState) {
         const u = new URL(window.location.href);
-        u.searchParams.set("vista", clave);
+        u.searchParams.set(clave, valor);
         window.history.replaceState({}, "", u);
       }
     }
@@ -340,7 +344,7 @@ window.UI = (function () {
       });
     });
 
-    activar(param("vista") || "tabla");
+    activar(param(clave) || opciones[0].dataset.view);
   }
 
   /* -- Selección múltiple de tabla ------------------------------------------

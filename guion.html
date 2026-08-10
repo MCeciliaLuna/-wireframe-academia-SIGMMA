@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Guión de BAK-M30.050 · Backoffice Academia SIGMMA</title>
+    <meta name="description" content="Editor de guión y receta: contexto de la cadena del cohorte y plantilla estructurada." />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="stylesheet" href="assets/css/academia.css" />
+  </head>
+  <body>
+    <a href="#contenido" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[1001] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-white">Saltar al contenido</a>
+
+    <div class="app-shell">
+      <!-- app-shell: sincronizar con src/partials/app-shell.html -->
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img src="assets/img/logo.svg" alt="SIGMMA" width="96" height="16" class="w-[96px]" />
+          <span class="text-2xs font-bold text-primary">Academia</span>
+        </div>
+
+        <!-- Selector global de superficie. Todo el contenido del backoffice cuelga
+             de cuál está activa. Solo BAK tiene módulos mapeados. -->
+        <div class="relative" data-dropdown>
+          <span class="side-title mb-1 block">Superficie</span>
+          <button type="button" class="surface-picker" data-dropdown-trigger aria-expanded="false" aria-haspopup="true">
+            <span><strong>BAK</strong> · Backoffice</span>
+            <span class="icon icon-sm" data-icon="chevron-down"></span>
+          </button>
+          <div class="menu" role="menu" data-dropdown-menu hidden>
+            <a href="modulos.html?sup=BAK" class="menu-item" role="menuitem">BAK · Backoffice</a>
+            <a href="modulos.html?sup=FRT" class="menu-item" role="menuitem">FRT · Front</a>
+            <a href="modulos.html?sup=CRM" class="menu-item" role="menuitem">CRM</a>
+          </div>
+        </div>
+
+        <nav class="flex flex-col gap-4" aria-label="Secciones del backoffice">
+          <!-- Inicio va suelto, sin grupo: no es una función más sino el punto de
+               partida. En las etapas de construcción es el panel de obra. -->
+          <div class="nav-group">
+            <a href="home.html" class="nav-item" data-escena-keep>
+              <span class="icon" data-icon="activity"></span>Inicio
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Contenido</span>
+            <a href="modulos.html" class="nav-item">
+              <span class="icon" data-icon="layers"></span>Módulos
+            </a>
+            <span class="nav-item" aria-disabled="true" aria-current="page">
+              <span class="icon" data-icon="film"></span>Biblioteca de videos
+            </span>
+            <a href="tablero.html" class="nav-item">
+              <span class="icon" data-icon="columns"></span>Tablero de producción
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="refresh"></span>Cola de regrabación
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Evaluación</span>
+            <a href="banco.html?m=30" class="nav-item">
+              <span class="icon" data-icon="help-circle"></span>Bancos de preguntas
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="settings"></span>Configuración
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Currícula</span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="route"></span>Ruta Esencial
+            </span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Pipeline</span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="git-branch"></span>Impactos en Academia
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Seguimiento</span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="bar-chart"></span>Panel macro
+            </span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="users"></span>Detalle por agencia
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Administración</span>
+            <a href="superficies.html" class="nav-item">
+              <span class="icon" data-icon="target"></span>Superficies y planes
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="shield"></span>Usuarios y roles
+            </span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="activity"></span>Auditoría
+            </span>
+          </div>
+        </nav>
+
+        <div class="sidebar-foot">
+          <span class="text-2xs text-gray-700">Majo · Contenido</span>
+        </div>
+      </aside>
+      <!-- /app-shell -->
+
+      <div class="main-col">
+        <header class="page-head">
+          <div>
+            <div class="breadcrumb">
+              <a href="cohorte.html?c=C03&amp;escena=E3">Cohorte C03</a> /
+              <a href="video.html?v=BAK-M30.050&amp;escena=E3">BAK-M30.050</a> / Guión
+            </div>
+            <h1 class="page-title">
+              <span class="id-mono">BAK-M30.050</span> Procesar el voucher
+              <span class="chip chip-guionado">guionado</span>
+              <span class="chip chip-meta">2-3 min</span>
+              <span class="escena-badge" data-escena-label></span>
+            </h1>
+          </div>
+          <div class="page-actions">
+            <button type="button" class="btn btn-bordered btn-sm">Vista de rodaje</button>
+            <button type="button" class="btn btn-primary btn-sm">Guardar guión</button>
+          </div>
+        </header>
+
+        <main id="contenido" class="page-body">
+          <!-- Pantalla partida: contexto a la izquierda, plantilla a la derecha.
+               El guión no se escribe aislado — se escribe sabiendo de dónde viene
+               el escenario y en qué estado lo deja para el video siguiente. -->
+          <div class="split-editor">
+            <aside class="flex flex-col gap-3" aria-labelledby="ctx">
+              <h2 class="side-title !mb-0" id="ctx">Contexto de la cadena</h2>
+
+              <div class="side-card side-card-strong">
+                <h3 class="side-title">Receta del cohorte C03</h3>
+                <p class="text-xs text-gray-800">
+                  Se sigue con el file que quedó armado en <strong>C02</strong> (cliente + pasajero
+                  cargados). Acá le agregamos el servicio y cobramos.
+                </p>
+                <p class="foot-note !border-none !pt-2">
+                  Entorno: <strong>Viajando.com</strong> · 4 videos de corrido.
+                </p>
+              </div>
+
+              <div class="side-card">
+                <h3 class="side-title">Viene de</h3>
+                <p class="flex items-center gap-2 text-xs">
+                  <span class="row-id">BAK-M30.020</span>
+                  <span class="flex-1">Cargar voucher</span>
+                  <span class="chip chip-guionado">guionado</span>
+                </p>
+                <p class="chain-link">
+                  <span class="icon" data-icon="git-branch"></span>
+                  Estado en que lo deja: <strong>el voucher recién cargado, sin procesar</strong>.
+                  Es exactamente la receta de este video.
+                </p>
+              </div>
+
+              <div class="side-card">
+                <h3 class="side-title">Sigue</h3>
+                <p class="flex items-center gap-2 text-xs">
+                  <span class="row-id">BAK-M40.010</span>
+                  <span class="flex-1">Recibos de cobranza</span>
+                  <span class="chip chip-guionado">guionado</span>
+                </p>
+                <p class="chain-link">
+                  <span class="icon" data-icon="git-branch"></span>
+                  Necesita <strong>el file con el voucher procesado</strong>: este video se lo tiene
+                  que dejar así.
+                </p>
+              </div>
+
+              <div class="side-card">
+                <h3 class="side-title text-error-dark">Qué NO mostrar</h3>
+                <ul class="flex flex-col gap-1 text-xs text-gray-800">
+                  <li>CUIT o documentos de personas reales</li>
+                  <li>Precios comerciales reales</li>
+                  <li>Credenciales</li>
+                </ul>
+              </div>
+            </aside>
+
+            <!-- La plantilla NO es texto libre: es la estructura del documento de
+                 Plantilla de Guión, que existe para que los 55 videos queden
+                 parejos aunque se graben con meses de diferencia. -->
+            <form class="flex flex-col gap-4" onsubmit="return false" aria-labelledby="plantilla">
+              <h2 class="side-title !mb-0" id="plantilla">Plantilla de guión</h2>
+
+              <section class="recipe-box">
+                <label class="label" for="receta">Receta de preparación de este video</label>
+                <p class="hint !mt-0 mb-2">Qué tiene que estar cargado antes de apretar REC.</p>
+                <textarea class="textarea !text-xs" id="receta" rows="2">El voucher recién cargado en M30.020.</textarea>
+              </section>
+
+              <section class="side-card">
+                <div class="mb-2 flex items-baseline gap-2">
+                  <h3 class="side-title !mb-0">Intro</h3>
+                  <span class="chip chip-meta">a cámara</span>
+                  <span class="chip chip-outline">~15 seg</span>
+                </div>
+                <label class="sr-only" for="intro">Texto de la intro</label>
+                <textarea class="textarea !text-xs" id="intro" rows="2">El paso que hace que todo impacte donde tiene que impactar.</textarea>
+                <p class="hint">Gancho breve + qué vas a aprender, en una frase.</p>
+              </section>
+
+              <section class="side-card">
+                <div class="mb-2 flex items-baseline gap-2">
+                  <h3 class="side-title !mb-0">Cuerpo</h3>
+                  <span class="chip chip-meta">voz sobre pantalla</span>
+                  <span class="chip chip-outline">el grueso</span>
+                </div>
+                <p class="hint !mt-0 mb-2">
+                  Pasos numerados. Cada paso, <strong>una acción visible</strong>. Entre corchetes,
+                  qué mostrar o resaltar.
+                </p>
+                <ol class="flex flex-col gap-2">
+                  <li class="flex items-start gap-2">
+                    <span class="wizard-num mt-1">1</span>
+                    <span class="flex-1">
+                      <label class="sr-only" for="paso1">Paso 1</label>
+                      <textarea class="textarea !text-xs" id="paso1" rows="2">Qué significa procesar el voucher. [mostrar botón]</textarea>
+                    </span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="wizard-num mt-1">2</span>
+                    <span class="flex-1">
+                      <label class="sr-only" for="paso2">Paso 2</label>
+                      <textarea class="textarea !text-xs" id="paso2" rows="3">Al procesar, impacta en la cuenta del proveedor y aparece en los informes. Sin procesar, no existe para la administración. [mostrar el antes y después]</textarea>
+                    </span>
+                  </li>
+                </ol>
+                <button type="button" class="btn btn-bordered btn-sm mt-3">
+                  <span class="icon" data-icon="plus"></span>Agregar paso
+                </button>
+              </section>
+
+              <section class="side-card">
+                <div class="mb-2 flex items-baseline gap-2">
+                  <h3 class="side-title !mb-0">Cierre</h3>
+                  <span class="chip chip-meta">a cámara</span>
+                  <span class="chip chip-outline">~10 seg</span>
+                </div>
+                <label class="sr-only" for="cierre">Texto del cierre</label>
+                <textarea class="textarea !text-xs" id="cierre" rows="2">Regla de oro: voucher que no se procesa, es plata que no se ve. Ahora cobramos.</textarea>
+                <p class="hint">
+                  Todos los cierres invitan a la evaluación del módulo. El de este encadena con
+                  <span class="font-mono">M40.010</span>.
+                </p>
+              </section>
+
+              <section class="side-card">
+                <label class="label" for="notas">Notas de producción</label>
+                <textarea class="textarea !text-xs" id="notas" rows="2" placeholder="Detalles de pantalla a cuidar, zooms, qué resaltar…"></textarea>
+              </section>
+
+              <section class="side-card">
+                <h3 class="side-title">Checklist de la plantilla</h3>
+                <ul class="checklist">
+                  <li class="checklist-item" data-done="true">
+                    <span class="icon" data-icon="check-circle"></span>Un solo concepto
+                  </li>
+                  <li class="checklist-item" data-done="true">
+                    <span class="icon" data-icon="check-circle"></span>Dura menos de 5 minutos
+                  </li>
+                  <li class="checklist-item" data-done="true">
+                    <span class="icon" data-icon="check-circle"></span>Intro y cierre a cámara, cuerpo con voz sobre pantalla
+                  </li>
+                  <li class="checklist-item" data-done="false">
+                    <span class="icon" data-icon="alert-circle"></span>Notas de producción sin completar
+                  </li>
+                </ul>
+                <p class="foot-note">
+                  <strong>La evaluación se diseña después de grabar</strong>, para que la pregunta use
+                  el mismo lenguaje y el mismo ejemplo que el video.
+                </p>
+              </section>
+            </form>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="assets/js/icons.js"></script>
+    <script src="assets/js/ui.js"></script>
+  </body>
+</html>

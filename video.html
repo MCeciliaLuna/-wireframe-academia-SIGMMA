@@ -99,9 +99,9 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Administración</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="superficies.html" class="nav-item">
               <span class="icon" data-icon="target"></span>Superficies y planes
-            </span>
+            </a>
             <span class="nav-item" aria-disabled="true">
               <span class="icon" data-icon="shield"></span>Usuarios y roles
             </span>
@@ -121,22 +121,43 @@
         <header class="page-head">
           <div>
             <div class="breadcrumb">
-              <a href="modulos.html">Contenido / Módulos</a> /
-              <a href="modulo.html?m=30">BAK-M30</a> / BAK-M30.050
+              <span data-escena="E5">
+                <a href="modulos.html">Contenido / Módulos</a> /
+                <a href="modulo.html?m=30">BAK-M30</a> / BAK-M30.050
+              </span>
+              <span data-escena="E3">
+                <a href="modulos.html?escena=E3">Contenido / Módulos</a> /
+                <a href="cohorte.html?c=C02&amp;escena=E3">Cohorte C02</a> / BAK-M10.020
+              </span>
             </div>
             <h1 class="page-title">
-              <span class="id-mono">BAK-M30.050</span> Procesar el voucher
-              <span class="chip chip-publicado">publicado</span>
-              <span class="chip chip-meta is-mono">v2</span>
-              <span class="chip chip-outline">cohorte C03</span>
+              <span data-escena="E5">
+                <span class="id-mono">BAK-M30.050</span> Procesar el voucher
+              </span>
+              <span data-escena="E3">
+                <span class="id-mono">BAK-M10.020</span> Crear y editar un file
+              </span>
+              <span class="chip chip-publicado" data-escena="E5">publicado</span>
+              <span class="chip chip-meta is-mono" data-escena="E5">v2</span>
+              <span class="chip chip-outline" data-escena="E5">cohorte C03</span>
+              <span class="chip chip-editado" data-escena="E3">editado</span>
+              <span class="chip chip-meta is-mono" data-escena="E3">v1</span>
+              <span class="chip chip-outline" data-escena="E3">cohorte C02</span>
               <span class="escena-badge" data-escena-label></span>
             </h1>
           </div>
           <div class="page-actions">
             <!-- R3: la visibilidad en el Front es un eje independiente del
                  estado de producción. Habilitado porque el estado es publicado. -->
-            <label class="switch rounded-sm border border-dashed border-line-strong px-[9px] py-[5px]">
+            <label class="switch rounded-sm border border-dashed border-line-strong px-[9px] py-[5px]" data-escena="E5">
               <input type="checkbox" checked />
+              <span class="switch-track"></span>
+              Visible en el Front
+            </label>
+            <!-- R3: el interruptor se habilita SOLO si el estado es publicado.
+                 En E3 el video está editado: todavía no hay nada que mostrar. -->
+            <label class="switch rounded-sm border border-dashed border-line-strong px-[9px] py-[5px]" data-escena="E3">
+              <input type="checkbox" disabled />
               <span class="switch-track"></span>
               Visible en el Front
             </label>
@@ -469,7 +490,7 @@
                     </tr>
                     <tr>
                       <td>BAK-R01 · Ruta Esencial · Voucher y cobro</td>
-                      <td class="cell-num">9 de 12</td>
+                      <td class="cell-num">11 de 12</td>
                       <td class="text-gray-600">referencia</td>
                     </tr>
                   </tbody>
@@ -485,6 +506,243 @@
               </div>
             </div>
           </div>
+
+          <!-- ══════════════════ E3 · MES 1 · VIDEO EDITADO ══════════════════
+               El contraste con la vista publicada de la tanda 1: el video está
+               grabado y editado, pero NO tiene link todavía. Es el estado en el
+               que vive un video entre la sesión de grabación y la publicación. -->
+          <div data-escena="E3" class="contents">
+            <div class="tabs" role="tablist" aria-label="Secciones del video" data-tabs="paneles-e3">
+              <button type="button" class="tab" role="tab" data-tab="ficha" aria-selected="true" aria-controls="e3-panel-ficha" id="e3-tab-ficha">Ficha</button>
+              <button type="button" class="tab" role="tab" data-tab="versiones" aria-selected="false" aria-controls="e3-panel-versiones" id="e3-tab-versiones">
+                Versiones <span class="tab-count">1</span>
+              </button>
+              <button type="button" class="tab" role="tab" data-tab="guion" aria-selected="false" aria-controls="e3-panel-guion" id="e3-tab-guion">Guión y receta</button>
+              <button type="button" class="tab" role="tab" data-tab="preguntas" aria-selected="false" aria-controls="e3-panel-preguntas" id="e3-tab-preguntas">
+                Preguntas <span class="tab-count">0</span>
+              </button>
+              <button type="button" class="tab" role="tab" data-tab="ubicaciones" aria-selected="false" aria-controls="e3-panel-ubicaciones" id="e3-tab-ubicaciones">
+                Ubicaciones <span class="tab-count">1</span>
+              </button>
+            </div>
+
+            <div id="paneles-e3" class="pt-4">
+              <div id="e3-panel-ficha" role="tabpanel" aria-labelledby="e3-tab-ficha" data-panel="ficha" tabindex="0">
+                <div class="grid grid-cols-[1fr_1fr_330px] gap-[18px]">
+                  <div class="flex flex-col gap-[14px]">
+                    <section class="locked-zone" aria-labelledby="e3-lbl-identidad">
+                      <h2 class="side-title" id="e3-lbl-identidad">Identidad · no editable</h2>
+                      <div class="grid grid-cols-2 gap-[9px]">
+                        <div>
+                          <span class="label !text-2xs !font-normal">ID permanente</span>
+                          <p class="input-locked is-mono">BAK-M10.020 <span class="icon" data-icon="lock"></span></p>
+                        </div>
+                        <div>
+                          <span class="label !text-2xs !font-normal">Superficie</span>
+                          <p class="input-locked">BAK <span class="icon" data-icon="lock"></span></p>
+                        </div>
+                        <div>
+                          <span class="label !text-2xs !font-normal">Módulo</span>
+                          <p class="input-locked">M10 · File <span class="icon" data-icon="lock"></span></p>
+                        </div>
+                        <div>
+                          <span class="label !text-2xs !font-normal">Secuencia</span>
+                          <p class="input-locked is-mono">020 <span class="icon" data-icon="lock"></span></p>
+                        </div>
+                      </div>
+                      <p class="foot-note !border-none !pt-2">
+                        El ID se reservó el día de la importación, mucho antes de grabar.
+                      </p>
+                    </section>
+
+                    <section class="side-card" aria-labelledby="e3-lbl-editables">
+                      <h2 class="side-title" id="e3-lbl-editables">Datos editables</h2>
+                      <div class="flex flex-col gap-[9px]">
+                        <div class="field">
+                          <label class="label !text-2xs !font-normal" for="e3-f-titulo">Título</label>
+                          <input class="input !h-9 !text-xs" id="e3-f-titulo" type="text" value="Crear y editar un file: tipo de servicio, individual vs. grupal" />
+                        </div>
+                        <div class="grid grid-cols-2 gap-[9px]">
+                          <div class="field">
+                            <label class="label !text-2xs !font-normal" for="e3-f-plan">Tag de plan</label>
+                            <select class="select !h-9 !text-xs" id="e3-f-plan"><option selected>plan A · plan B</option></select>
+                          </div>
+                          <div class="field">
+                            <label class="label !text-2xs !font-normal" for="e3-f-cohorte">Cohorte</label>
+                            <select class="select !h-9 !text-xs" id="e3-f-cohorte"><option selected>C02</option></select>
+                          </div>
+                          <div class="field">
+                            <label class="label !text-2xs !font-normal" for="e3-f-prioridad">Prioridad Pareto</label>
+                            <select class="select !h-9 !text-xs" id="e3-f-prioridad"><option selected>P1</option></select>
+                          </div>
+                          <div class="field">
+                            <label class="label !text-2xs !font-normal" for="e3-f-duracion">Duración objetivo</label>
+                            <input class="input !h-9 !text-xs" id="e3-f-duracion" type="text" value="4:30" />
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+
+                  <div class="flex flex-col gap-[14px]">
+                    <!-- LA diferencia con la vista publicada: no hay link. El video
+                         existe como archivo editado, pero todavía no vive en YouTube. -->
+                    <section class="side-card" aria-labelledby="e3-lbl-version">
+                      <h2 class="side-title" id="e3-lbl-version">Versión vigente · v1</h2>
+                      <div class="mb-[9px] flex gap-2">
+                        <label class="sr-only" for="e3-f-link">Link de YouTube</label>
+                        <input class="input !h-9 flex-1 font-mono !text-xs" id="e3-f-link" type="url" placeholder="pegá el link de YouTube" />
+                        <button type="button" class="btn btn-bordered btn-sm shrink-0" disabled>Traer datos</button>
+                      </div>
+                      <div class="placeholder-box !py-10">
+                        <span class="placeholder-icon" data-icon="film"></span>
+                        <p class="text-xs text-gray-800">Todavía no hay nada que previsualizar</p>
+                        <p class="mt-1 max-w-[38ch] text-2xs text-ink-soft">
+                          El video está <strong>editado</strong> pero no se subió a YouTube. Cuando se
+                          suba, se pega el link acá y la API completa título y duración.
+                        </p>
+                      </div>
+                      <p class="foot-note">
+                        Sigue sin haber carga de archivos: el sistema no aloja video, ni siquiera en
+                        este estado.
+                      </p>
+                    </section>
+
+                    <section class="side-card" aria-labelledby="e3-lbl-estado">
+                      <h2 class="side-title" id="e3-lbl-estado">Estado de producción</h2>
+                      <div class="flex flex-wrap gap-[5px]" role="radiogroup" aria-labelledby="e3-lbl-estado">
+                        <button type="button" role="radio" aria-checked="false" class="chip chip-outline">backlog</button>
+                        <button type="button" role="radio" aria-checked="false" class="chip chip-outline">guionado</button>
+                        <button type="button" role="radio" aria-checked="false" class="chip chip-outline">grabado</button>
+                        <button type="button" role="radio" aria-checked="true" class="chip chip-editado">editado</button>
+                        <button type="button" role="radio" aria-checked="false" class="chip chip-outline">publicado</button>
+                        <button type="button" role="radio" aria-checked="false" class="chip chip-outline">a regrabar</button>
+                        <button type="button" role="radio" aria-checked="false" class="chip chip-outline">obsoleto</button>
+                      </div>
+                      <div class="mt-[10px] flex items-center justify-between border-t border-dashed border-line pt-[9px]">
+                        <label class="switch">
+                          <input type="checkbox" disabled />
+                          <span class="switch-track"></span>
+                          Visible en el Front <span class="text-gray-600">(solo si está publicado)</span>
+                        </label>
+                      </div>
+                    </section>
+                  </div>
+
+                  <aside class="side-card self-start">
+                    <h2 class="side-title">Checklist de publicación</h2>
+                    <ul class="checklist">
+                      <li class="checklist-item" data-done="false"><span class="icon" data-icon="alert-circle"></span>Link cargado y validado</li>
+                      <li class="checklist-item" data-done="false"><span class="icon" data-icon="alert-circle"></span>Embebido permitido en el dominio</li>
+                      <li class="checklist-item" data-done="true"><span class="icon" data-icon="check-circle"></span>Guión versionado</li>
+                      <li class="checklist-item" data-done="true">
+                        <span class="icon" data-icon="check-circle"></span>Duración dentro del objetivo
+                        <span class="chip chip-outline ml-1">recomendado</span>
+                      </li>
+                      <li class="checklist-item" data-done="false"><span class="icon" data-icon="alert-circle"></span>Tiene al menos 1 pregunta asociada</li>
+                      <li class="checklist-item" data-done="true"><span class="icon" data-icon="check-circle"></span>Ubicación canónica definida</li>
+                    </ul>
+                    <p class="alert alert-warning mt-3 !text-2xs">
+                      <span class="icon" data-icon="alert-triangle"></span>
+                      <span>
+                        <strong>2 de 5 obligatorios.</strong> Falta lo que depende de subir el video:
+                        link y embebido. La pregunta se escribe después de publicar.
+                      </span>
+                    </p>
+                    <div class="mt-3 border-t border-dashed border-line pt-[10px]">
+                      <h3 class="side-title">Cohorte</h3>
+                      <p class="text-2xs text-gray-700">
+                        Se grabó con <a href="cohorte.html?c=C02&amp;escena=E3">C02 Alta de file y
+                        cliente</a>, junto con otros 5 videos sobre el mismo escenario.
+                      </p>
+                    </div>
+                  </aside>
+                </div>
+              </div>
+
+              <div id="e3-panel-versiones" role="tabpanel" aria-labelledby="e3-tab-versiones" data-panel="versiones" tabindex="0" hidden>
+                <h2 class="side-title">Versiones</h2>
+                <table class="table-dense">
+                  <caption class="sr-only">Versiones del video. La v1 está grabada y editada, sin link todavía.</caption>
+                  <thead>
+                    <tr><th scope="col" class="w-[70px]">Versión</th><th scope="col" class="w-[280px]">Link</th><th scope="col" class="w-[150px]">Versión de producto</th><th scope="col" class="w-[110px]">Fecha</th><th scope="col">Motivo</th><th scope="col" class="w-[90px]">Vigente</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="cell-mono">v1</td>
+                      <td class="text-gray-600">sin subir</td>
+                      <td class="text-gray-600">—</td>
+                      <td class="text-gray-600">—</td>
+                      <td class="text-gray-600">primera grabación</td>
+                      <td><span class="chip chip-editado">editada</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div id="e3-panel-guion" role="tabpanel" aria-labelledby="e3-tab-guion" data-panel="guion" tabindex="0" hidden>
+                <h2 class="side-title">Guión y receta</h2>
+                <div class="side-card">
+                  <p class="text-xs text-gray-800">
+                    El guión está escrito y versionado. Receta:
+                    <strong>viene de M10.010, sin file nuevo creado todavía</strong>.
+                  </p>
+                  <p class="foot-note">
+                    A4 — decisión abierta: si el guión queda congelado con la versión una vez
+                    publicado, o se puede seguir editando.
+                  </p>
+                  <a href="guion.html?v=BAK-M10.020&amp;escena=E3" class="btn btn-bordered btn-sm mt-3">Abrir el editor de guión</a>
+                </div>
+              </div>
+
+              <div id="e3-panel-preguntas" role="tabpanel" aria-labelledby="e3-tab-preguntas" data-panel="preguntas" tabindex="0" hidden>
+                <h2 class="side-title">Preguntas con este video de origen <span class="font-normal">(0)</span></h2>
+                <div class="placeholder-box">
+                  <span class="placeholder-icon" data-icon="help-circle"></span>
+                  <p class="text-sm text-gray-800">Todavía no corresponde escribir preguntas</p>
+                  <p class="mt-1 max-w-[46ch] text-xs text-ink-soft">
+                    La pregunta se escribe <strong>después de grabar y publicar</strong>, para que use
+                    el mismo lenguaje y el mismo ejemplo que el video.
+                  </p>
+                </div>
+              </div>
+
+              <div id="e3-panel-ubicaciones" role="tabpanel" aria-labelledby="e3-tab-ubicaciones" data-panel="ubicaciones" tabindex="0" hidden>
+                <h2 class="side-title">Ubicaciones</h2>
+                <table class="table-dense">
+                  <caption class="sr-only">Dónde aparece este video.</caption>
+                  <thead><tr><th scope="col">Módulo / sección</th><th scope="col" class="w-[120px]">Orden</th><th scope="col" class="w-[110px]">Canónica</th></tr></thead>
+                  <tbody>
+                    <tr><td>BAK-M10 · Encontrar y crear un file</td><td class="cell-num">2 de 2</td><td><span class="chip chip-publicado">canónica</span></td></tr>
+                  </tbody>
+                </table>
+                <p class="mt-3 text-xs text-ink-soft">
+                  Todavía no está en la Ruta Esencial: se agrega cuando se publica.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══════════════ E2 · VIDEO EN BACKLOG, SIN GUIÓN ══════════════ -->
+          <div data-escena="E2" class="contents">
+            <div class="placeholder-box !py-14">
+              <span class="placeholder-icon" data-icon="film"></span>
+              <h2 class="text-h4">Este video es un ID reservado</h2>
+              <p class="mt-3 max-w-[60ch] text-base text-gray-700">
+                <span class="font-mono">BAK-M10.020</span> existe en el mapa pero está en
+                <strong>backlog</strong>: no tiene guión, no se grabó y no tiene link. Es lo normal en
+                la semana 1 — el mapa reserva los IDs mucho antes de que haya contenido.
+              </p>
+              <p class="mt-4 max-w-[60ch] text-sm text-ink-soft">
+                El orden es: escribir el guión, grabar con su cohorte, editar, subir a YouTube y
+                recién ahí publicar. Las preguntas se escriben al final, cuando el video ya existe.
+              </p>
+              <div class="mt-8 flex gap-2">
+                <a href="guion.html?v=BAK-M10.020&amp;escena=E2" class="btn btn-primary btn-sm">Escribir el guión</a>
+                <a href="cohorte.html?c=C02&amp;escena=E2" class="btn btn-bordered btn-sm">Ver su cohorte</a>
+              </div>
+            </div>
+          </div>
         </main>
       </div>
     </div>
@@ -492,16 +750,33 @@
     <script src="assets/js/icons.js"></script>
     <script src="assets/js/ui.js"></script>
     <script>
-      /* Controlador de la pantalla. Las solapas las maneja ui.js (?tab=).
-         Acá solo se avisa cuando el video pedido no es el que está maquetado. */
+      /* Controlador de la pantalla. Las solapas y la escena las maneja ui.js.
+         Acá solo se avisa cuando el video pedido no es el que esta escena
+         maqueta: cada momento tiene su ejemplo, porque el mismo video no está
+         en el mismo estado en E3 que en régimen. */
       (function () {
         "use strict";
+        const MAQUETADO = { E5: "BAK-M30.050", E3: "BAK-M10.020", E2: "BAK-M10.020" };
+        const escena = UI.escena();
+        const esperado = MAQUETADO[escena];
+        /* Si esta escena no declara un ejemplo, no se interviene: el aviso
+           genérico de `bindEscena` ya explica que la pantalla no la maqueta. */
         const v = UI.param("v");
-        if (v === null || v === "BAK-M30.050") return;
+        if (esperado === undefined || v === null || v === esperado) return;
 
-        document.getElementById("ficha-completa").hidden = true;
+        /* Se usa `hidden`, no `data-escena-off`: este script corre durante el
+           parseo y `bindEscena` —que corre en DOMContentLoaded— le sacaría el
+           atributo al bloque de la escena activa. `hidden` no lo toca nadie. */
+        document.querySelectorAll("#contenido > [data-escena]").forEach(function (el) {
+          el.hidden = true;
+        });
         document.getElementById("sin-maquetar").hidden = false;
         document.getElementById("sin-maquetar-id").textContent = v;
+        document.querySelector("#sin-maquetar a").setAttribute(
+          "href",
+          "video.html?v=" + esperado + (escena === "E5" ? "" : "&escena=" + escena)
+        );
+        document.querySelector("#sin-maquetar strong").textContent = esperado;
         document.querySelectorAll(".page-actions button, .page-actions input").forEach(function (b) {
           b.disabled = true;
         });

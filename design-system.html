@@ -26,6 +26,7 @@
         </p>
         <nav class="mt-6 flex flex-wrap gap-2 text-sm" aria-label="Secciones">
           <a href="index.html" class="btn btn-primary btn-sm">Índice de las 8 vistas</a>
+          <a href="#escenas" class="btn btn-bordered btn-sm">Escenas</a>
           <a href="#shell" class="btn btn-bordered btn-sm">Layout maestro</a>
           <a href="#estados" class="btn btn-bordered btn-sm">Los 7 estados</a>
           <a href="#componentes" class="btn btn-bordered btn-sm">Componentes</a>
@@ -79,6 +80,78 @@
             En la vista agencia tiene una sola aparición, el botón de descargar el certificado. Acá no
             hay ningún momento que lo justifique, y repartirlo le sacaría la función.
           </span>
+        </p>
+      </section>
+
+      <!-- ==================== ESCENAS ==================== -->
+      <section class="mb-14" id="escenas">
+        <h2 class="text-h3">El concepto de escena</h2>
+        <p class="mt-2 max-w-[72ch] text-gray-700">
+          Cada vista declara <strong>en qué momento de la construcción de la Academia está el
+          sistema</strong>. Corrige un problema silencioso de la primera tanda: dibujó el sistema en
+          régimen sin declararlo, y eso podía llevar a priorizar como si el estado normal fuera el de
+          dentro de un año.
+        </p>
+
+        <div class="mt-6 flex flex-wrap items-center gap-3">
+          <span class="escena-badge">E1 · Día 0 — sistema vacío</span>
+          <span class="text-gray-600" aria-hidden="true">→</span>
+          <span class="escena-badge">E2 · Semana 1 — mapa cargado</span>
+          <span class="text-gray-600" aria-hidden="true">→</span>
+          <span class="escena-badge">E3 · Mes 1 — P1 en producción</span>
+          <span class="text-gray-600" aria-hidden="true">→</span>
+          <span class="escena-badge">E4 · Mes 2 — hito de lanzamiento</span>
+          <span class="text-gray-600" aria-hidden="true">→</span>
+          <span class="escena-badge">E5 · Régimen</span>
+        </div>
+
+        <p class="alert alert-warning mt-6">
+          <span class="icon" data-icon="alert-triangle"></span>
+          <span>
+            <strong>Los datos de una escena nunca se mezclan con los de otra.</strong> Por eso el
+            mecanismo alterna bloques enteros de HTML y no celdas sueltas: no hay forma de que una
+            tabla quede con la mitad de los números de un momento y la mitad de otro.
+          </span>
+        </p>
+
+        <h3 class="text-h5 mt-8">Cómo funciona</h3>
+        <p class="mt-2 max-w-[72ch] text-gray-700">
+          Es un parámetro de URL, <code class="font-mono text-sm">?escena=</code>, y sin él se muestra
+          <strong>E5</strong>. Un bloque se marca con
+          <code class="font-mono text-sm">data-escena="E2"</code>, o con varias separadas por coma
+          cuando la misma maqueta sirve para dos momentos. Si se pide una escena que la pantalla no
+          maqueta, <strong>avisa</strong> en vez de mostrar los datos de otro momento con el rótulo
+          cambiado.
+        </p>
+        <p class="mt-3 max-w-[72ch] text-sm text-ink-soft">
+          El atributo que oculta es <code class="font-mono text-xs">data-escena-off</code>, no
+          <code class="font-mono text-xs">hidden</code>: las solapas y el conmutador de vista usan
+          <code class="font-mono text-xs">hidden</code>, y si compartieran atributo se pisarían. Así
+          componen — un bloque fuera de escena queda oculto aunque su solapa esté activa.
+        </p>
+
+        <h3 class="text-h5 mt-8">Los estados vacíos son escenas</h3>
+        <p class="mt-2 max-w-[72ch] text-gray-700">
+          El estado vacío de una pantalla no necesita un parámetro propio: <strong>es esa pantalla en
+          E1 o E2</strong>. Eso evita tener dos mecanismos para lo mismo.
+        </p>
+        <div class="table-wrap mt-4">
+          <table class="table-app">
+            <thead><tr><th scope="col">Estado vacío</th><th scope="col">URL</th></tr></thead>
+            <tbody>
+              <tr><td>Listado de módulos sin contenido</td><td><a href="modulos.html?escena=E1" class="font-mono text-xs">modulos.html?escena=E1</a></td></tr>
+              <tr><td>Módulo sin secciones</td><td><a href="modulo.html?m=30&amp;escena=E1" class="font-mono text-xs">modulo.html?m=30&amp;escena=E1</a></td></tr>
+              <tr><td>Tablero sin videos</td><td><a href="tablero.html?escena=E1" class="font-mono text-xs">tablero.html?escena=E1</a></td></tr>
+              <tr><td>Video en backlog, sin guión</td><td><a href="video.html?v=BAK-M10.020&amp;escena=E2" class="font-mono text-xs">video.html?v=…&amp;escena=E2</a></td></tr>
+              <tr><td><strong>Banco sin videos publicados</strong></td><td><a href="banco.html?m=30&amp;escena=E2" class="font-mono text-xs">banco.html?m=30&amp;escena=E2</a></td></tr>
+              <tr><td>Superficie sin mapear</td><td><a href="modulos.html?sup=FRT" class="font-mono text-xs">modulos.html?sup=FRT</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="mt-3 max-w-[72ch] text-sm text-ink-soft">
+          El del banco es el más importante: sin su explicación, un módulo con 0 preguntas y 0 videos
+          publicados <strong>parece un error del sistema</strong>, cuando es exactamente lo que
+          corresponde.
         </p>
       </section>
 
@@ -307,6 +380,82 @@
         </ul>
         <p class="mt-2 text-sm text-ink-soft">Advierte, no bloquea. Que sea bloqueante es una decisión abierta.</p>
 
+        <h3 class="text-h5 mt-8">Asistente por pasos</h3>
+        <ol class="wizard mt-3">
+          <li class="wizard-step" data-estado="hecho"><span class="wizard-num">1</span><span><b>Origen</b>El archivo del tablero</span></li>
+          <li class="wizard-step" data-estado="actual"><span class="wizard-num">2</span><span><b>Mapeo</b>Columna → campo</span></li>
+          <li class="wizard-step" data-estado="pendiente"><span class="wizard-num">3</span><span><b>Validación</b>Qué entra y qué no</span></li>
+          <li class="wizard-step" data-estado="pendiente"><span class="wizard-num">4</span><span><b>Confirmación</b>Qué se va a crear</span></li>
+        </ol>
+        <p class="mt-2 text-sm text-ink-soft">
+          El rótulo importa: «mapeo» y «validación» no son intercambiables, así que
+          <code class="font-mono text-xs">.steps</code> —que es solo una fila de puntos— no alcanzaba.
+        </p>
+
+        <h3 class="text-h5 mt-8">Grupos de validación</h3>
+        <div class="validation-group mt-3" data-tono="error">
+          <div class="validation-head"><span class="icon" data-icon="alert-triangle"></span>2 filas con error</div>
+          <div class="validation-row">
+            <span class="validation-fila">fila 34</span><span class="font-mono">BAK-M4O.010</span>
+            <span class="validation-motivo">ID mal formado: «M4O» lleva la letra O en vez de un cero</span>
+          </div>
+        </div>
+        <p class="mt-2 text-sm text-ink-soft">
+          Cada error dice <strong>su motivo y su número de fila</strong>. Es lo que hace que un
+          importador sirva: sin la pantalla de errores, importar 58 filas a ciegas es peor que
+          cargarlas a mano.
+        </p>
+
+        <h3 class="text-h5 mt-8">Embudo de producción</h3>
+        <div class="funnel mt-3">
+          <span data-estado="backlog" style="width: 25.45%">14</span>
+          <span data-estado="guionado" style="width: 9.09%">5</span>
+          <span data-estado="grabado" style="width: 5.45%">3</span>
+          <span data-estado="editado" style="width: 5.45%">3</span>
+          <span data-estado="publicado" style="width: 47.27%">26 publicados</span>
+          <span data-estado="regrabar" style="width: 5.45%">3</span>
+          <span data-estado="obsoleto" style="width: 1.82%">1</span>
+        </div>
+        <p class="mt-2 text-sm text-ink-soft">
+          Los 55 videos en los 7 estados, en una sola barra. Es el bloque que hace que el Home mida
+          <strong>construcción</strong> y no operación. <code class="font-mono text-xs">backlog</code>
+          es el único con texto oscuro: sobre gris el blanco daba 2.54:1, y es justo el segmento más
+          grande del arranque.
+        </p>
+
+        <h3 class="text-h5 mt-8">Tarjeta de hito</h3>
+        <div class="mt-3 grid grid-cols-2 gap-4">
+          <div class="hito-card">
+            <p class="side-title !mb-2">Próximo hito</p>
+            <h4 class="hito-titulo">Ruta Esencial: faltan 10 videos publicados y 50 preguntas</h4>
+          </div>
+          <div class="hito-card" data-cumplido="true">
+            <p class="side-title !mb-2">Hito alcanzado</p>
+            <h4 class="hito-titulo">12 de 12 videos y 60 de 60 preguntas</h4>
+          </div>
+        </div>
+        <p class="mt-2 text-sm text-ink-soft">
+          <strong>Un solo hito por vez.</strong> Es lo que convierte un tablero con once módulos en
+          alerta en un objetivo.
+        </p>
+
+        <h3 class="text-h5 mt-8">Encadenamiento del cohorte</h3>
+        <div class="side-card mt-3 max-w-[600px]">
+          <div class="flex items-center gap-3">
+            <span class="row-id">BAK-M30.050</span>
+            <strong class="flex-1 text-xs">Procesar el voucher</strong>
+            <span class="chip chip-guionado">guionado</span>
+          </div>
+          <p class="chain-link">
+            <span class="icon" data-icon="git-branch"></span>
+            Viene del <strong>voucher recién cargado en M30.020</strong>.
+          </p>
+        </div>
+        <p class="mt-2 text-sm text-ink-soft">
+          Es el dato que justifica que el cohorte exista: cada video arranca donde terminó el
+          anterior. Sin él, habría que rearmar el escenario entre uno y otro.
+        </p>
+
         <h3 class="text-h5 mt-8">Tabla densa</h3>
         <table class="table-dense mt-3">
           <thead>
@@ -384,6 +533,31 @@
                 <td>No se tocó. <code class="font-mono text-xs">--color-line-strong</code> sobre blanco da 1.47:1 y WCAG pide 3:1 para el borde de un control. Es el borde de todos los inputs del design system heredado, así que afecta a los dos repos: cambiarlo es una decisión de design system.</td>
               </tr>
               <tr>
+                <td class="font-mono text-xs">A-1</td>
+                <td><strong>¿El importador crea las entidades faltantes o rechaza la fila?</strong></td>
+                <td>Las <strong>crea</strong>, marcadas como <span class="chip chip-outline">creado por importación</span>. Rechazarlas obligaría a cargar todo a mano primero, que es justo lo que el importador viene a evitar.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">A-2</td>
+                <td><strong>¿Las 3 superficies vienen precargadas o se crean a mano?</strong></td>
+                <td><strong>Precargadas como semilla.</strong> El selector global del sidebar cuelga de ellas y sin al menos una el backoffice no tiene contexto.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">A-3</td>
+                <td><strong>Hoja de cohorte: ¿una pantalla con dos modos o dos pantallas?</strong></td>
+                <td><strong>Una pantalla, dos modos</strong> (<code class="font-mono text-xs">?modo=</code>), siguiendo el conmutador tabla/kanban que ya existía.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">A-4</td>
+                <td><strong>¿El guión se edita después de publicar, o queda congelado con la versión?</strong></td>
+                <td><strong>Congelado con la versión</strong>, coherente con «el ID sobrevive al regrabado» y con las versiones archivadas.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">A-5</td>
+                <td><strong>Al activar la Ruta, ¿los 12 videos quedan vistos en su ubicación canónica?</strong></td>
+                <td>Sin resolver acá: es la <strong>D5 del modelo de datos</strong> y afecta al desbloqueo del Front. Está anotada en el detalle de la Ruta.</td>
+              </tr>
+              <tr>
                 <td class="font-mono text-xs">D-9</td>
                 <td><strong>Biblioteca de videos no tiene listado propio</strong></td>
                 <td>El wireframe muestra el destino en el menú y entra al detalle de un video desde ahí, pero no dibuja el listado. Queda para la tanda 2.</td>
@@ -435,6 +609,16 @@
                 <td><code class="font-mono text-xs">BAK-M40</code> videos publicados</td>
                 <td>5 / 5</td>
                 <td><strong>4 / 5</strong> — <code class="font-mono text-xs">BAK-M40.010</code> está guionado</td>
+              </tr>
+              <tr>
+                <td>Cohortes de la primera tanda</td>
+                <td>8 de 9 contradecían al Maestro</td>
+                <td><strong>alineados al Maestro de Producción</strong> — el plan de rodaje real. Cierra la decisión D-7</td>
+              </tr>
+              <tr>
+                <td><code class="font-mono text-xs">BAK-M30.050</code> en la Ruta</td>
+                <td>9 de 12</td>
+                <td><strong>11 de 12</strong> — con las 3 secciones de la Ruta (C01, C02, C03) cae en la posición 11</td>
               </tr>
               <tr>
                 <td>Columnas del kanban</td>

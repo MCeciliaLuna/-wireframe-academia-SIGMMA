@@ -99,9 +99,9 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Administración</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="superficies.html" class="nav-item">
               <span class="icon" data-icon="target"></span>Superficies y planes
-            </span>
+            </a>
             <span class="nav-item" aria-disabled="true">
               <span class="icon" data-icon="shield"></span>Usuarios y roles
             </span>
@@ -120,26 +120,39 @@
       <div class="main-col">
         <header class="page-head">
           <div>
-            <div class="breadcrumb"><a href="modulos.html">Contenido / Módulos</a> / BAK-M30</div>
+            <div class="breadcrumb">
+              <span data-escena="E5"><a href="modulos.html">Contenido / Módulos</a> / BAK-M30</span>
+              <span data-escena="E4"><a href="modulos.html?escena=E4">Contenido / Módulos</a> / BAK-R01</span>
+            </div>
             <h1 class="page-title">
-              <span class="id-mono">BAK-M30</span> Voucher / Servicios
-              <span class="chip chip-meta">borrador</span>
-              <span class="chip chip-meta">biblioteca</span>
+              <span data-escena="E5"><span class="id-mono">BAK-M30</span> Voucher / Servicios</span>
+              <span data-escena="E4"><span class="id-mono">BAK-R01</span> Ruta Esencial P1</span>
+              <span class="chip chip-meta" data-escena="E5">borrador</span>
+              <span class="chip chip-meta" data-escena="E5">biblioteca</span>
+              <span class="chip chip-publicado" data-escena="E4">apta para activar</span>
+              <span class="chip chip-meta" data-escena="E4">ruta</span>
               <span class="chip chip-meta">plan A · plan B</span>
               <span class="escena-badge" data-escena-label></span>
             </h1>
           </div>
           <div class="page-actions">
-            <button type="button" class="btn btn-bordered btn-sm">
+            <a href="alta-seccion.html" class="btn btn-bordered btn-sm" data-escena="E5">
               <span class="icon" data-icon="plus"></span>Agregar sección
-            </button>
-            <button type="button" class="btn btn-bordered btn-sm">
+            </a>
+            <button type="button" class="btn btn-bordered btn-sm" data-escena="E5">
               <span class="icon" data-icon="plus"></span>Agregar video
             </button>
             <!-- No apto para activar: faltan 3 videos publicados y 15 preguntas
                  vigentes. El motivo está entero en la tarjeta de aptitud. -->
-            <button type="button" class="btn btn-primary btn-sm" disabled aria-describedby="aptitud-motivo">
+            <button type="button" class="btn btn-primary btn-sm" disabled aria-describedby="aptitud-motivo" data-escena="E5">
               Activar módulo
+            </button>
+            <!-- E4: cumple los dos criterios. Es el clic que lanza la Academia. -->
+            <button type="button" class="btn btn-bordered btn-sm" data-escena="E4">
+              <span class="icon" data-icon="route"></span>Agregar video a la Ruta
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" data-escena="E4">
+              Activar la Ruta Esencial
             </button>
           </div>
         </header>
@@ -303,6 +316,195 @@
               </div>
             </aside>
           </div>
+
+          <!-- ══════════════ E4 · HITO · LA RUTA ESENCIAL ES APTA ══════════════
+               R8: la Ruta REFERENCIA videos, no los copia. Cada fila dice en qué
+               módulo vive su copia canónica. Su banco es derivado: hereda las
+               preguntas de los videos que referencia. -->
+          <div data-escena="E4" class="grid grid-cols-[1fr_340px] items-start gap-[18px]">
+            <div class="flex flex-col gap-[10px]">
+              <h2 class="side-title !mb-0">Los 12 videos que referencia · en orden de recorrido</h2>
+              <section class="tree-section" aria-labelledby="ruta-sC01">
+                <div class="tree-head">
+                  <span id="ruta-sC01">1 · Arranque</span>
+                  <span class="chip chip-meta">2 videos</span>
+                  <span class="chip chip-meta">10 preguntas</span>
+                  <span class="ml-auto text-2xs font-normal text-gray-600">cohorte C01 · Sin datos. Concepto + navegación</span>
+                </div>
+                <div class="tree-row">
+                  <span class="row-id">BAK-M00.010</span>
+                  <span class="row-title"><a href="video.html?v=BAK-M00.010&amp;escena=E4">Qué es SIGMMA: el sistema operativo de la agencia</a></span>
+                  <span class="chip chip-publicado">publicado</span>
+                  <span class="chip chip-meta">5 preg.</span>
+                  <span class="chip chip-outline">canónico en BAK-M00</span>
+                </div>
+                <div class="tree-row">
+                  <span class="row-id">BAK-M00.040</span>
+                  <span class="row-title"><a href="video.html?v=BAK-M00.040&amp;escena=E4">Navegación: ingreso, menú, botones y rueda de progreso</a></span>
+                  <span class="chip chip-publicado">publicado</span>
+                  <span class="chip chip-meta">5 preg.</span>
+                  <span class="chip chip-outline">canónico en BAK-M00</span>
+                </div>
+              </section>
+              <section class="tree-section" aria-labelledby="ruta-sC02">
+                <div class="tree-head">
+                  <span id="ruta-sC02">2 · Alta de file y cliente</span>
+                  <span class="chip chip-meta">6 videos</span>
+                  <span class="chip chip-meta">30 preguntas</span>
+                  <span class="ml-auto text-2xs font-normal text-gray-600">cohorte C02 · Cliente demo nuevo + file nuevo</span>
+                </div>
+                <div class="tree-row">
+                  <span class="row-id">BAK-M10.010</span>
+                  <span class="row-title"><a href="video.html?v=BAK-M10.010&amp;escena=E4">Buscar file: número, filtros y por nombre</a></span>
+                  <span class="chip chip-publicado">publicado</span>
+                  <span class="chip chip-meta">5 preg.</span>
+                  <span class="chip chip-outline">canónico en BAK-M10</span>
+                </div>
+                <div class="tree-row">
+                  <span class="row-id">BAK-M10.020</span>
+                  <span class="row-title"><a href="video.html?v=BAK-M10.020&amp;escena=E4">Crear y editar un file: tipo de servicio, individual vs. grupal</a></span>
+                  <span class="chip chip-publicado">publicado</span>
+                  <span class="chip chip-meta">5 preg.</span>
+                  <span class="chip chip-outline">canónico en BAK-M10</span>
+                </div>
+                <div class="tree-row">
+                  <span class="row-id">BAK-M10.030</span>
+                  <span class="row-title"><a href="video.html?v=BAK-M10.030&amp;escena=E4">Moneda de registro vs. moneda de documento</a></span>
+                  <span class="chip chip-publicado">publicado</span>
+                  <span class="chip chip-meta">5 preg.</span>
+                  <span class="chip chip-outline">canónico en BAK-M10</span>
+                </div>
+                <div class="tree-row">
+                  <span class="row-id">BAK-M20.010</span>
+                  <span class="row-title"><a href="video.html?v=BAK-M20.010&amp;escena=E4">Cargar un cliente: físico vs. jurídico y autocompletado por ARCA/CUIT</a></span>
+                  <span class="chip chip-publicado">publicado</span>
+                  <span class="chip chip-meta">5 preg.</span>
+                  <span class="chip chip-outline">canónico en BAK-M20</span>
+                </div>
+                <div class="tree-row">
+                  <span class="row-id">BAK-M20.030</span>
+                  <span class="row-title"><a href="video.html?v=BAK-M20.030&amp;escena=E4">Pasajeros</a></span>
+                  <span class="chip chip-publicado">publicado</span>
+                  <span class="chip chip-meta">5 preg.</span>
+                  <span class="chip chip-outline">canónico en BAK-M20</span>
+                </div>
+                <div class="tree-row">
+                  <span class="row-id">BAK-M20.040</span>
+                  <span class="row-title"><a href="video.html?v=BAK-M20.040&amp;escena=E4">Cargar pasajero</a></span>
+                  <span class="chip chip-publicado">publicado</span>
+                  <span class="chip chip-meta">5 preg.</span>
+                  <span class="chip chip-outline">canónico en BAK-M20</span>
+                </div>
+              </section>
+              <section class="tree-section" aria-labelledby="ruta-sC03">
+                <div class="tree-head">
+                  <span id="ruta-sC03">3 · Voucher y cobro</span>
+                  <span class="chip chip-meta">4 videos</span>
+                  <span class="chip chip-meta">20 preguntas</span>
+                  <span class="ml-auto text-2xs font-normal text-gray-600">cohorte C03 · El file de C02, se le agrega voucher</span>
+                </div>
+                <div class="tree-row">
+                  <span class="row-id">BAK-M30.010</span>
+                  <span class="row-title"><a href="video.html?v=BAK-M30.010&amp;escena=E4">Qué es el voucher</a></span>
+                  <span class="chip chip-publicado">publicado</span>
+                  <span class="chip chip-meta">5 preg.</span>
+                  <span class="chip chip-outline">canónico en BAK-M30</span>
+                </div>
+                <div class="tree-row">
+                  <span class="row-id">BAK-M30.020</span>
+                  <span class="row-title"><a href="video.html?v=BAK-M30.020&amp;escena=E4">Cargar voucher</a></span>
+                  <span class="chip chip-publicado">publicado</span>
+                  <span class="chip chip-meta">5 preg.</span>
+                  <span class="chip chip-outline">canónico en BAK-M30</span>
+                </div>
+                <div class="tree-row">
+                  <span class="row-id">BAK-M30.050</span>
+                  <span class="row-title"><a href="video.html?v=BAK-M30.050&amp;escena=E4">Procesar el voucher</a></span>
+                  <span class="chip chip-publicado">publicado</span>
+                  <span class="chip chip-meta">5 preg.</span>
+                  <span class="chip chip-outline">canónico en BAK-M30</span>
+                </div>
+                <div class="tree-row">
+                  <span class="row-id">BAK-M40.010</span>
+                  <span class="row-title"><a href="video.html?v=BAK-M40.010&amp;escena=E4">Recibos de cobranza</a></span>
+                  <span class="chip chip-publicado">publicado</span>
+                  <span class="chip chip-meta">5 preg.</span>
+                  <span class="chip chip-outline">canónico en BAK-M40</span>
+                </div>
+              </section>
+              <p class="alert alert-info !text-xs">
+                <span class="icon" data-icon="route"></span>
+                <span>
+                  <strong>La Ruta no tiene videos propios: los referencia.</strong> Cada uno vive una
+                  sola vez en la biblioteca, en su módulo canónico. Si se regraba, se regraba una vez
+                  y la Ruta lo refleja sola.
+                </span>
+              </p>
+            </div>
+
+            <aside class="sticky top-0 flex flex-col gap-3">
+              <div class="side-card side-card-strong">
+                <h2 class="side-title">Aptitud para activar</h2>
+                <div class="flex flex-col gap-[9px]">
+                  <div class="meter-row">
+                    <span>Videos publicados</span><b class="meter-value" data-ok="true">12 / 12</b>
+                  </div>
+                  <div class="progress progress-sm progress-complete"><span style="width: 100%"></span></div>
+                  <div class="meter-row">
+                    <span>Banco heredado</span><b class="meter-value" data-ok="true">60 / 60</b>
+                  </div>
+                  <div class="progress progress-sm progress-complete"><span style="width: 100%"></span></div>
+                  <div class="meter-row">
+                    <span>Config. de evaluación</span><b class="meter-value" data-ok="true">cargada</b>
+                  </div>
+                  <div class="meter-row">
+                    <span>Preguntas «a revisar»</span><b class="meter-value" data-ok="true">0</b>
+                  </div>
+                </div>
+                <p class="foot-note">
+                  <strong>Cumple los cuatro criterios.</strong> Activarla habilita la Academia para
+                  las agencias: es el clic del lanzamiento.
+                </p>
+                <button type="button" class="btn btn-primary btn-sm btn-block mt-3">Activar la Ruta Esencial</button>
+              </div>
+
+              <div class="side-card">
+                <h2 class="side-title">Y la biblioteca, mientras tanto</h2>
+                <p class="text-xs text-gray-700">
+                  Ningún módulo de biblioteca está completo: el mejor va 3 de 6. Sin la Ruta habría
+                  que esperar a terminar un módulo entero para poder lanzar.
+                </p>
+                <p class="foot-note">
+                  <a href="home.html?escena=E4">Ver el panel de obra ›</a>
+                </p>
+              </div>
+
+              <div class="side-card">
+                <h2 class="side-title">Decisión abierta · A5</h2>
+                <p class="text-xs text-gray-700">
+                  Al activar la Ruta, ¿los 12 videos quedan marcados como vistos también en su
+                  ubicación canónica de la biblioteca? Afecta al desbloqueo del Front y todavía no
+                  está decidido.
+                </p>
+              </div>
+            </aside>
+          </div>
+
+          <!-- ══════════════ E1 · MÓDULO SIN SECCIONES ══════════════ -->
+          <div data-escena="E1" class="contents">
+            <div class="placeholder-box !py-14">
+              <span class="placeholder-icon" data-icon="layers"></span>
+              <h2 class="text-h4">Este módulo todavía no tiene secciones</h2>
+              <p class="mt-3 max-w-[58ch] text-base text-gray-700">
+                Un módulo se organiza en secciones, y los videos cuelgan de ellas. La sección no es
+                solo un agrupamiento visual: es la unidad sobre la que se exige banco mínimo y mínimo
+                por sorteo en la evaluación.
+              </p>
+              <a href="alta-seccion.html" class="btn btn-primary btn-lg mt-8">
+                <span class="icon" data-icon="plus"></span>Crear la primera sección
+              </a>
+            </div>
+          </div>
         </main>
       </div>
     </div>
@@ -314,13 +516,30 @@
          para cualquier otro módulo se avisa en vez de inventar su árbol. */
       (function () {
         "use strict";
+        /* Cada escena maqueta el módulo que le da sentido: en régimen el que el
+           wireframe dibuja, y en el hito la Ruta Esencial, que es lo que se
+           activa. */
+        const MAQUETADO = { E5: "30", E4: "R01", E1: "30" };
+        const escena = UI.escena();
+        const esperado = MAQUETADO[escena];
+        /* Si esta escena no declara un ejemplo, no se interviene: el aviso
+           genérico de `bindEscena` ya explica que la pantalla no la maqueta. */
         const m = UI.param("m");
-        if (m === null || m === "30") return;
+        if (esperado === undefined || m === null || m === esperado) return;
 
-        document.getElementById("detalle").hidden = true;
+        /* `hidden` y no `data-escena-off`: este script corre durante el parseo y
+           `bindEscena` le sacaría el atributo al bloque de la escena activa. */
+        document.querySelectorAll("#contenido > [data-escena]").forEach(function (el) {
+          el.hidden = true;
+        });
         document.getElementById("sin-maquetar").hidden = false;
         document.getElementById("sin-maquetar-id").textContent =
           "BAK-" + (m === "R01" ? "R01" : "M" + String(m).padStart(2, "0"));
+        document.querySelector("#sin-maquetar strong").textContent = "BAK-" + (esperado === "R01" ? "R01" : "M" + esperado);
+        document.querySelector("#sin-maquetar a").setAttribute(
+          "href",
+          "modulo.html?m=" + esperado + (escena === "E5" ? "" : "&escena=" + escena)
+        );
         document.querySelectorAll(".page-actions button").forEach(function (b) {
           b.disabled = true;
         });

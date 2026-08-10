@@ -40,6 +40,17 @@
 | `.meter-row` · `.counter-big` | Contador con umbral y su barra | **Sí** |
 | `.checklist` · `.checklist-item` | Checklist de estado, solo lectura | **Sí** |
 | `.foot-note` | Nota aclaratoria al pie de un bloque | **Sí** |
+| `.escena-badge` | Rótulo del momento de construcción | No — es una anotación del prototipo |
+| `.wizard` · `.wizard-step` | Asistente por pasos con rótulo | **Sí** |
+| `.dropzone-csv` | Importación de un archivo de datos | **Sí** |
+| `.validation-group` | Filas listas / con error / a saltear | **Sí** |
+| `.funnel` | Distribución de N ítems entre estados | **Sí** |
+| `.hito-card` | Un objetivo por vez | **Sí** |
+| `.grid-editable` | Carga por lote tipo planilla | **Sí** |
+| `.split-editor` | Contexto \| edición | **Sí** |
+| `.recipe-box` | Precondición antes de una acción | Tal vez |
+| `.chain-link` | Dependencia entre ítems de una secuencia | Tal vez |
+| `.checklist-live` | Checklist operable, no de solo lectura | **Sí** |
 
 ---
 
@@ -290,6 +301,120 @@ cuando ya es tarde.
 
 **`.checklist` advierte, no bloquea:** el ítem incumplido se marca en rojo pero el botón de publicar
 sigue habilitado. Que la checklist sea bloqueante es una **decisión abierta** del proyecto.
+
+---
+
+## Bloque de arranque — las 11 piezas nuevas
+
+Estas salieron del segundo bloque de trabajo: el sistema en los momentos previos al régimen.
+
+### `.escena-badge`
+
+**Por qué.** Cada vista declara en qué momento de la construcción está el sistema. Sin ese rótulo, un
+listado vacío se lee como un error en vez de como el día 1.
+
+**Tokens.** `--color-indigo` sobre blanco, con borde punteado.
+
+**Decisión.** Usa el **índigo**, que en el design system es color de titular y nunca de estado. Eso lo
+saca de la familia de los 7 chips de producción a propósito: **no es un dato del producto, es una
+anotación del prototipo**. En régimen se atenúa a gris sólido, porque es el estado por defecto y no
+tiene que competir con el título.
+
+**Por eso no conviene promoverlo:** en el producto real la escena no existe.
+
+---
+
+### `.wizard` · `.wizard-step` · `.wizard-num`
+
+**Por qué.** El importador tiene 4 pasos y hay que saber en cuál se está y cuántos faltan.
+`.steps` heredado es una fila de puntos sin rótulo, y acá el rótulo importa: «mapeo» y «validación»
+no son intercambiables.
+
+**Tokens.** `--color-success-bg` (paso hecho), `--color-primary` (actual), `--font-mono` (número).
+
+---
+
+### `.dropzone-csv`
+
+**Por qué.** Cargar 11 módulos, 55 videos y 20 cohortes por formulario son unos 100 registros. La
+fuente de verdad hoy es un Google Sheets, así que hace falta importar.
+
+**Cuidado deliberado.** **R1 prohíbe el dropzone de video.** Este es de datos y tiene que leerse
+inequívocamente como tal: el ícono es una tabla, el copy nombra el archivo esperado y el panel lateral
+aclara que *no hay columna de link* porque el sistema no aloja video.
+
+---
+
+### `.validation-group` · `.validation-row` · `.validation-fila` · `.validation-motivo`
+
+**Por qué.** Es el paso 3 del importador y **el más importante de los cuatro**. Un importador sin
+pantalla de errores es peor que cargar a mano: no se sabe qué entró.
+
+**Decisión.** Cada error lleva **su motivo y su número de fila**, no un contador agregado. «2 filas
+con error» no sirve; «fila 34: ID mal formado, "M4O" lleva la letra O en vez de un cero» sí.
+
+---
+
+### `.funnel` · `.funnel-legend`
+
+**Por qué.** Los 55 videos repartidos en los 7 estados, en una sola barra. Es el bloque que hace que
+el Home mida **construcción** y no operación (R10).
+
+**Accesibilidad.** Los segmentos llevan el número adentro, así que necesitan contraste de texto.
+Seis pasan con blanco; **`backlog` es el único con texto oscuro**: sobre `gray-500` el blanco daba
+**2.54:1** y el oscuro **6.99:1**. Y es justo el segmento más grande del arranque —los 55 videos en
+E2—, o sea el que no podía quedar ilegible.
+
+---
+
+### `.hito-card` · `.hito-titulo`
+
+**Por qué.** **Un solo próximo hito, no once módulos en alerta.** Es lo que convierte un tablero rojo
+en un objetivo.
+
+**Tokens.** `--color-info-bg` + `--color-primary` (pendiente), `--color-success-bg` +
+`--color-success-dark` (`data-cumplido="true"`).
+
+---
+
+### `.grid-editable` · `.cell-input` · `.grid-error`
+
+**Por qué.** El alta masiva se elige superficie y módulo una vez y se cargan filas. Que sean 30
+inputs sueltos con borde propio se lee como un formulario gigante; que se lea como una planilla es lo
+que espera alguien que viene de Sheets.
+
+**Decisión.** El campo no tiene borde hasta que se lo apunta o se lo enfoca. **El motivo del error va
+en la fila de abajo, no en un tooltip**: tiene que poder leerse sin apuntar con el mouse.
+
+---
+
+### `.split-editor`
+
+**Por qué.** El editor de guión es contexto a la izquierda, plantilla a la derecha. El guión **no se
+escribe aislado**: se escribe sabiendo de dónde viene el escenario del cohorte y en qué estado lo
+tiene que dejar para el video siguiente.
+
+---
+
+### `.recipe-box` y `.chain-link`
+
+**Por qué.** La receta es el estado que tiene que tener el sistema **antes** de apretar REC; el
+encadenamiento dice de dónde viene ese estado.
+
+**`.chain-link` es el componente que justifica que el cohorte exista.** Sin él, la hoja de cohorte es
+una lista de videos filtrada; con él, se ve que grabarlos desordenados obliga a rearmar el escenario
+entre uno y otro.
+
+**Tokens.** `.recipe-box` reusa el lenguaje de `.locked-zone` (punteado + fondo hundido): es una
+precondición, no un formulario.
+
+---
+
+### `.checklist-live`
+
+**Por qué.** `.checklist` es de **solo lectura** —el estado de publicación de un video—. Esta se
+tilda de verdad: es la que se usa antes de grabar, con el `.choice` heredado adentro para que el
+checkbox sea real y se opere con teclado.
 
 ---
 

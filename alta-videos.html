@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reservar IDs de video · Backoffice Academia SIGMMA</title>
+    <meta name="description" content="Alta masiva de videos: reserva de IDs con secuencia de 10 en 10, sin link ni versión." />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="stylesheet" href="assets/css/academia.css" />
+  </head>
+  <body>
+    <a href="#contenido" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[1001] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-white">Saltar al contenido</a>
+
+    <div class="app-shell">
+      <!-- app-shell: sincronizar con src/partials/app-shell.html -->
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img src="assets/img/logo.svg" alt="SIGMMA" width="96" height="16" class="w-[96px]" />
+          <span class="text-2xs font-bold text-primary">Academia</span>
+        </div>
+
+        <!-- Selector global de superficie. Todo el contenido del backoffice cuelga
+             de cuál está activa. Solo BAK tiene módulos mapeados. -->
+        <div class="relative" data-dropdown>
+          <span class="side-title mb-1 block">Superficie</span>
+          <button type="button" class="surface-picker" data-dropdown-trigger aria-expanded="false" aria-haspopup="true">
+            <span><strong>BAK</strong> · Backoffice</span>
+            <span class="icon icon-sm" data-icon="chevron-down"></span>
+          </button>
+          <div class="menu" role="menu" data-dropdown-menu hidden>
+            <a href="modulos.html?sup=BAK" class="menu-item" role="menuitem">BAK · Backoffice</a>
+            <a href="modulos.html?sup=FRT" class="menu-item" role="menuitem">FRT · Front</a>
+            <a href="modulos.html?sup=CRM" class="menu-item" role="menuitem">CRM</a>
+          </div>
+        </div>
+
+        <nav class="flex flex-col gap-4" aria-label="Secciones del backoffice">
+          <!-- Inicio va suelto, sin grupo: no es una función más sino el punto de
+               partida. En las etapas de construcción es el panel de obra. -->
+          <div class="nav-group">
+            <a href="home.html" class="nav-item" data-escena-keep>
+              <span class="icon" data-icon="activity"></span>Inicio
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Contenido</span>
+            <a href="modulos.html" class="nav-item">
+              <span class="icon" data-icon="layers"></span>Módulos
+            </a>
+            <span class="nav-item" aria-disabled="true" aria-current="page">
+              <span class="icon" data-icon="film"></span>Biblioteca de videos
+            </span>
+            <a href="tablero.html" class="nav-item">
+              <span class="icon" data-icon="columns"></span>Tablero de producción
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="refresh"></span>Cola de regrabación
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Evaluación</span>
+            <a href="banco.html?m=30" class="nav-item">
+              <span class="icon" data-icon="help-circle"></span>Bancos de preguntas
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="settings"></span>Configuración
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Currícula</span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="route"></span>Ruta Esencial
+            </span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Pipeline</span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="git-branch"></span>Impactos en Academia
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Seguimiento</span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="bar-chart"></span>Panel macro
+            </span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="users"></span>Detalle por agencia
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Administración</span>
+            <a href="superficies.html" class="nav-item">
+              <span class="icon" data-icon="target"></span>Superficies y planes
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="shield"></span>Usuarios y roles
+            </span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="activity"></span>Auditoría
+            </span>
+          </div>
+        </nav>
+
+        <div class="sidebar-foot">
+          <span class="text-2xs text-gray-700">Majo · Contenido</span>
+        </div>
+      </aside>
+      <!-- /app-shell -->
+
+      <div class="main-col">
+        <header class="page-head">
+          <div>
+            <div class="breadcrumb"><a href="modulos.html?escena=E2">Contenido / Módulos</a> / Reservar IDs</div>
+            <h1 class="page-title">
+              Reservar IDs de video
+              <span class="chip chip-meta">alta masiva</span>
+            </h1>
+          </div>
+          <div class="page-actions">
+            <a href="modulos.html?escena=E2" class="btn btn-bordered btn-sm">Cancelar</a>
+            <button type="button" class="btn btn-primary btn-sm">Reservar 4 IDs</button>
+          </div>
+        </header>
+
+        <main id="contenido" class="page-body">
+          <div class="grid grid-cols-[1fr_360px] items-start gap-[18px]">
+            <div class="flex flex-col gap-4">
+              <!-- Superficie y módulo se eligen UNA vez para todo el lote: es lo
+                   que hace que cargar 6 videos no sea cargar 6 formularios. -->
+              <section class="side-card" aria-labelledby="destino">
+                <h2 class="side-title" id="destino">Destino del lote</h2>
+                <div class="grid grid-cols-3 gap-3">
+                  <div class="field">
+                    <label class="label" for="sup">Superficie</label>
+                    <select class="select !h-9 !text-xs" id="sup">
+                      <option selected>BAK · Backoffice</option>
+                      <option>FRT · Front</option>
+                      <option>CRM</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label class="label" for="mod">Módulo</label>
+                    <select class="select !h-9 !text-xs" id="mod">
+                      <option selected>BAK-M95 · Receptivo operador</option>
+                      <option>BAK-M35 · reservado (Tráfico)</option>
+                      <option>BAK-M90 · Contable</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label class="label" for="desde">Secuencia desde</label>
+                    <input class="input !h-9 font-mono !text-xs" id="desde" type="text" value="010" />
+                    <p class="hint">Se sugiere de 10 en 10.</p>
+                  </div>
+                </div>
+              </section>
+
+              <section aria-labelledby="filas">
+                <div class="mb-2 flex items-center justify-between">
+                  <h2 class="side-title !mb-0" id="filas">Videos del lote</h2>
+                  <button type="button" class="btn btn-bordered btn-sm">
+                    <span class="icon" data-icon="plus"></span>Agregar fila
+                  </button>
+                </div>
+
+                <table class="table-dense grid-editable">
+                  <caption class="sr-only">
+                    Videos a reservar. Cada fila crea un ID permanente en estado backlog, sin link
+                    y sin versión.
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col" class="w-[90px]">Secuencia</th>
+                      <th scope="col" class="w-[140px]">ID que queda</th>
+                      <th scope="col">Título</th>
+                      <th scope="col" class="w-[130px]">Tag de plan</th>
+                      <th scope="col" class="w-[90px]">Cohorte</th>
+                      <th scope="col" class="w-[90px]">Prioridad</th>
+                      <th scope="col" class="w-[40px]"><span class="sr-only">Quitar</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><label class="sr-only" for="s1">Secuencia fila 1</label><input class="cell-input is-mono" id="s1" value="010" /></td>
+                      <td class="cell-mono">BAK-M95.010</td>
+                      <td><label class="sr-only" for="t1">Título fila 1</label><input class="cell-input" id="t1" value="Tarifario por proveedor: tipo, categoría, vigencia y temporada" /></td>
+                      <td><label class="sr-only" for="p1">Plan fila 1</label><input class="cell-input" id="p1" value="plan B" /></td>
+                      <td><label class="sr-only" for="c1">Cohorte fila 1</label><input class="cell-input is-mono" id="c1" value="C20" /></td>
+                      <td><label class="sr-only" for="r1">Prioridad fila 1</label><input class="cell-input is-mono" id="r1" value="P4" /></td>
+                      <td><button type="button" class="link-quiet" aria-label="Quitar la fila 1"><span class="icon icon-sm" data-icon="x"></span></button></td>
+                    </tr>
+                    <tr>
+                      <td><label class="sr-only" for="s2">Secuencia fila 2</label><input class="cell-input is-mono" id="s2" value="020" /></td>
+                      <td class="cell-mono">BAK-M95.020</td>
+                      <td><label class="sr-only" for="t2">Título fila 2</label><input class="cell-input" id="t2" value="Armar el itinerario con el tarifario" /></td>
+                      <td><label class="sr-only" for="p2">Plan fila 2</label><input class="cell-input" id="p2" value="plan B" /></td>
+                      <td><label class="sr-only" for="c2">Cohorte fila 2</label><input class="cell-input is-mono" id="c2" value="C20" /></td>
+                      <td><label class="sr-only" for="r2">Prioridad fila 2</label><input class="cell-input is-mono" id="r2" value="P4" /></td>
+                      <td><button type="button" class="link-quiet" aria-label="Quitar la fila 2"><span class="icon icon-sm" data-icon="x"></span></button></td>
+                    </tr>
+                    <!-- Validación de secuencia duplicada, en vivo. El motivo va
+                         debajo de la fila, no en un tooltip. -->
+                    <tr data-error="true">
+                      <td><label class="sr-only" for="s3">Secuencia fila 3</label><input class="cell-input is-mono" id="s3" value="020" aria-invalid="true" aria-describedby="err3" /></td>
+                      <td class="cell-mono">BAK-M95.020</td>
+                      <td><label class="sr-only" for="t3">Título fila 3</label><input class="cell-input" id="t3" value="Modelos multidestino: paquetes" /></td>
+                      <td><label class="sr-only" for="p3">Plan fila 3</label><input class="cell-input" id="p3" value="plan B" /></td>
+                      <td><label class="sr-only" for="c3">Cohorte fila 3</label><input class="cell-input is-mono" id="c3" value="C20" /></td>
+                      <td><label class="sr-only" for="r3">Prioridad fila 3</label><input class="cell-input is-mono" id="r3" value="P4" /></td>
+                      <td><button type="button" class="link-quiet" aria-label="Quitar la fila 3"><span class="icon icon-sm" data-icon="x"></span></button></td>
+                    </tr>
+                    <tr data-error="true">
+                      <td colspan="7">
+                        <p class="grid-error" id="err3">
+                          <span class="icon" data-icon="alert-circle"></span>
+                          La secuencia <strong>020</strong> ya está en la fila 2. La sugerencia libre
+                          más cercana es <strong>030</strong>.
+                        </p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><label class="sr-only" for="s4">Secuencia fila 4</label><input class="cell-input is-mono" id="s4" value="040" /></td>
+                      <td class="cell-mono">BAK-M95.040</td>
+                      <td><label class="sr-only" for="t4">Título fila 4</label><input class="cell-input" id="t4" value="Prestador nacional vs. internacional e impacto impositivo" /></td>
+                      <td><label class="sr-only" for="p4">Plan fila 4</label><input class="cell-input" id="p4" value="plan B" /></td>
+                      <td><label class="sr-only" for="c4">Cohorte fila 4</label><input class="cell-input is-mono" id="c4" value="C20" /></td>
+                      <td><label class="sr-only" for="r4">Prioridad fila 4</label><input class="cell-input is-mono" id="r4" value="P4" /></td>
+                      <td><button type="button" class="link-quiet" aria-label="Quitar la fila 4"><span class="icon icon-sm" data-icon="x"></span></button></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+            </div>
+
+            <aside class="flex flex-col gap-3">
+              <!-- R11: los videos nacen en backlog, sin link y sin versión. Esta
+                   pantalla NO tiene campo de link de YouTube, y eso es a propósito. -->
+              <div class="side-card side-card-strong">
+                <h2 class="side-title">Qué se crea</h2>
+                <ul class="flex flex-col gap-2 text-xs text-gray-700">
+                  <li><strong>4 IDs permanentes</strong>, todos en <span class="chip chip-backlog">backlog</span>.</li>
+                  <li><strong>Sin link y sin versión.</strong> El link de YouTube se carga recién al publicar: acá se reserva el lugar, no se sube nada.</li>
+                  <li>El ID queda fijo para siempre, aunque el video se regrabe.</li>
+                </ul>
+                <p class="foot-note">
+                  Por eso se puede reservar hacia adelante: <span class="font-mono">BAK-M35</span>
+                  (Tráfico) todavía está en desarrollo de producto y ya tiene su lugar en el mapa.
+                </p>
+              </div>
+
+              <div class="side-card">
+                <h2 class="side-title">La secuencia va de 10 en 10</h2>
+                <p class="text-xs text-gray-700">
+                  Deja lugar para intercalar un video después sin renumerar nada. Si mañana hace
+                  falta algo entre <span class="font-mono">.020</span> y
+                  <span class="font-mono">.030</span>, entra como
+                  <span class="font-mono">.025</span>.
+                </p>
+              </div>
+
+              <div class="side-card">
+                <h2 class="side-title">Estado del lote</h2>
+                <dl class="flex flex-col gap-2 text-xs">
+                  <div class="meter-row"><dt>Filas</dt><dd class="meter-value">4</dd></div>
+                  <div class="meter-row"><dt>Listas</dt><dd class="meter-value" data-ok="true">3</dd></div>
+                  <div class="meter-row"><dt>Con error</dt><dd class="meter-value" data-ok="false">1</dd></div>
+                </dl>
+              </div>
+            </aside>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="assets/js/icons.js"></script>
+    <script src="assets/js/ui.js"></script>
+  </body>
+</html>

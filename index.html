@@ -4,13 +4,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Backoffice Academia SIGMMA · prototipo</title>
-    <meta name="description" content="Índice del prototipo de alta fidelidad del backoffice de la Academia de Autocapacitación SIGMMA." />
+    <meta name="description" content="Índice del prototipo de alta fidelidad del backoffice de la Academia de Autocapacitación SIGMMA, organizado por momento de la construcción." />
     <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
     <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
     <link rel="stylesheet" href="assets/css/academia.css" />
   </head>
   <body class="bg-surface">
-    <div class="mx-auto max-w-[1000px] px-8 py-12">
+    <div class="mx-auto max-w-[1060px] px-8 py-12">
       <header class="mb-10">
         <div class="mb-6 flex items-center gap-3">
           <img src="assets/img/logo.svg" alt="SIGMMA" width="124" height="20" class="w-[124px]" />
@@ -18,140 +18,235 @@
           <span class="text-h6 font-bold text-primary">Academia · Backoffice</span>
         </div>
         <h1 class="text-h2">Prototipo de alta fidelidad</h1>
-        <p class="mt-3 max-w-[70ch] text-lg text-gray-700">
-          Backoffice de gestión interna de la Academia de Autocapacitación SIGMMA: donde el staff
-          carga los videos, gestiona el ciclo de vida del contenido y administra los bancos de
-          preguntas.
+        <p class="mt-3 max-w-[74ch] text-lg text-gray-700">
+          Backoffice de gestión interna de la Academia de Autocapacitación SIGMMA. Las pantallas están
+          organizadas por <strong>escena</strong>: en qué momento de la construcción de la Academia
+          está el sistema.
         </p>
         <p class="alert alert-info mt-6">
           <span class="icon" data-icon="info"></span>
           <span>
             <strong>Es solo maquetación.</strong> No hay backend, ni API, ni videos reales, ni
-            persistencia. Los datos están escritos en el HTML. Diseñado a <strong>1440 px</strong>:
-            no hay responsive en este alcance.
+            persistencia. Los datos están escritos en el HTML. Diseñado a <strong>1440 px</strong>.
           </span>
         </p>
       </header>
 
-      <h2 class="text-h4 mb-1">Las 8 vistas</h2>
-      <p class="mb-5 text-sm text-ink-soft">
-        Las 6 pantallas del wireframe aprobado, en 8 vistas. Los estados y las solapas no tienen
-        archivo propio: se abren sobre su pantalla con un parámetro en la URL.
-      </p>
+      <section class="mb-10">
+        <h2 class="text-h4 mb-1">Las cinco escenas</h2>
+        <p class="mb-5 max-w-[74ch] text-sm text-ink-soft">
+          La misma pantalla se maqueta más de una vez si su estado en distintos momentos enseña cosas
+          distintas. Cada vista declara su escena con un rótulo, y los datos de una escena nunca se
+          mezclan con los de otra.
+        </p>
+        <div class="table-wrap">
+          <table class="table-app">
+            <thead>
+              <tr><th scope="col" class="w-[64px]">Escena</th><th scope="col" class="w-[150px]">Momento</th><th scope="col">Qué se ve</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="font-mono text-xs">E1</td><td>Día 0</td><td>Nada cargado. Un solo camino posible: importar el mapa</td></tr>
+              <tr><td class="font-mono text-xs">E2</td><td>Semana 1</td><td>55 IDs reservados en <code class="font-mono text-xs">backlog</code>. Nada grabado, 0 preguntas</td></tr>
+              <tr><td class="font-mono text-xs">E3</td><td>Mes 1</td><td>C01 publicado, C02 editado, C03 guionado. El resto en backlog</td></tr>
+              <tr><td class="font-mono text-xs">E4</td><td>Mes 2</td><td><strong>El hito:</strong> los 12 de P1 publicados, Ruta Esencial apta</td></tr>
+              <tr><td class="font-mono text-xs">E5</td><td>Régimen</td><td>La Academia en marcha: bancos parciales, un video a regrabar</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-      <div class="table-wrap">
-        <table class="table-app">
-          <thead>
-            <tr>
-              <th scope="col" class="w-[56px]">#</th>
-              <th scope="col">Pantalla</th>
-              <th scope="col">URL</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="font-mono text-xs">S00</td>
-              <td>Layout maestro (shell)</td>
-              <td><a href="design-system.html#shell" class="font-mono text-xs">design-system.html#shell</a></td>
-            </tr>
-            <tr>
-              <td class="font-mono text-xs">S02</td>
-              <td>Listado de módulos</td>
-              <td><a href="modulos.html" class="font-mono text-xs">modulos.html</a></td>
-            </tr>
-            <tr>
-              <td class="font-mono text-xs">S03</td>
-              <td>Detalle de módulo</td>
-              <td><a href="modulo.html?m=30" class="font-mono text-xs">modulo.html?m=30</a></td>
-            </tr>
-            <tr>
-              <td class="font-mono text-xs">S04</td>
-              <td>Detalle de video — solapa Ficha</td>
-              <td><a href="video.html?v=BAK-M30.050" class="font-mono text-xs">video.html?v=BAK-M30.050</a></td>
-            </tr>
-            <tr>
-              <td class="font-mono text-xs">S04</td>
-              <td>Detalle de video — las otras cuatro solapas</td>
-              <td class="text-xs">
-                <a href="video.html?v=BAK-M30.050&amp;tab=versiones" class="font-mono">…&amp;tab=versiones</a> ·
-                <a href="video.html?v=BAK-M30.050&amp;tab=guion" class="font-mono">guion</a> ·
-                <a href="video.html?v=BAK-M30.050&amp;tab=preguntas" class="font-mono">preguntas</a> ·
-                <a href="video.html?v=BAK-M30.050&amp;tab=ubicaciones" class="font-mono">ubicaciones</a>
-              </td>
-            </tr>
-            <tr>
-              <td class="font-mono text-xs">S06</td>
-              <td>Tablero de producción — vista tabla <span class="chip chip-meta">default</span></td>
-              <td><a href="tablero.html" class="font-mono text-xs">tablero.html</a></td>
-            </tr>
-            <tr>
-              <td class="font-mono text-xs">S06</td>
-              <td>Tablero de producción — vista kanban</td>
-              <td><a href="tablero.html?vista=kanban" class="font-mono text-xs">tablero.html?vista=kanban</a></td>
-            </tr>
-            <tr>
-              <td class="font-mono text-xs">S08</td>
-              <td>Banco de preguntas del módulo</td>
-              <td><a href="banco.html?m=30" class="font-mono text-xs">banco.html?m=30</a></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <!-- ══════════════════ E1 ══════════════════ -->
+      <section class="mb-10">
+        <h2 class="text-h4 mb-1">
+          <span class="escena-badge" data-escena-actual="E1">E1 · Día 0 — sistema vacío</span>
+        </h2>
+        <p class="mb-4 text-sm text-ink-soft">
+          El día que Majo abre el backoffice por primera vez. Todo lo que hay es un camino de salida.
+        </p>
+        <div class="table-wrap">
+          <table class="table-app">
+            <thead><tr><th scope="col" class="w-[64px]">#</th><th scope="col">Pantalla</th><th scope="col">URL</th></tr></thead>
+            <tbody>
+              <tr><td class="font-mono text-xs">V01</td><td><strong>Home — panel de obra vacío</strong></td><td><a href="home.html?escena=E1" class="font-mono text-xs">home.html?escena=E1</a></td></tr>
+              <tr><td class="font-mono text-xs">V02</td><td><strong>Importador — paso 1, origen</strong></td><td><a href="importador.html?paso=1" class="font-mono text-xs">importador.html?paso=1</a></td></tr>
+              <tr><td class="font-mono text-xs">V02</td><td>Importador — paso 2, mapeo de columnas</td><td><a href="importador.html?paso=2" class="font-mono text-xs">?paso=2</a></td></tr>
+              <tr><td class="font-mono text-xs">V02</td><td>Importador — <strong>paso 3, validación</strong></td><td><a href="importador.html?paso=3" class="font-mono text-xs">?paso=3</a></td></tr>
+              <tr><td class="font-mono text-xs">V02</td><td>Importador — paso 4, confirmación</td><td><a href="importador.html?paso=4" class="font-mono text-xs">?paso=4</a></td></tr>
+              <tr><td class="font-mono text-xs">V02</td><td>Importador — resultado</td><td><a href="importador.html?paso=resultado" class="font-mono text-xs">?paso=resultado</a></td></tr>
+              <tr><td class="font-mono text-xs">V03</td><td>Listado de módulos — vacío</td><td><a href="modulos.html?escena=E1" class="font-mono text-xs">modulos.html?escena=E1</a></td></tr>
+              <tr><td class="font-mono text-xs">V04</td><td>Alta de módulo</td><td><a href="alta-modulo.html" class="font-mono text-xs">alta-modulo.html</a></td></tr>
+              <tr><td class="font-mono text-xs">V05</td><td>Alta de sección</td><td><a href="alta-seccion.html" class="font-mono text-xs">alta-seccion.html</a></td></tr>
+              <tr><td class="font-mono text-xs">V06</td><td>Superficies y planes</td><td><a href="superficies.html" class="font-mono text-xs">superficies.html</a></td></tr>
+              <tr><td class="font-mono text-xs">—</td><td>Módulo sin secciones</td><td><a href="modulo.html?m=30&amp;escena=E1" class="font-mono text-xs">modulo.html?m=30&amp;escena=E1</a></td></tr>
+              <tr><td class="font-mono text-xs">—</td><td>Tablero sin videos</td><td><a href="tablero.html?escena=E1" class="font-mono text-xs">tablero.html?escena=E1</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-      <h2 class="text-h4 mb-1 mt-10">Estados y variantes</h2>
-      <p class="mb-5 text-sm text-ink-soft">
-        Lo que se abre por URL sobre una pantalla que ya existe.
-      </p>
+      <!-- ══════════════════ E2 ══════════════════ -->
+      <section class="mb-10">
+        <h2 class="text-h4 mb-1">
+          <span class="escena-badge" data-escena-actual="E2">E2 · Semana 1 — mapa cargado</span>
+        </h2>
+        <p class="mb-4 text-sm text-ink-soft">
+          Los 55 IDs reservados, todos en backlog. Ningún módulo es apto y eso es lo esperado.
+        </p>
+        <div class="table-wrap">
+          <table class="table-app">
+            <thead><tr><th scope="col" class="w-[64px]">#</th><th scope="col">Pantalla</th><th scope="col">URL</th></tr></thead>
+            <tbody>
+              <tr><td class="font-mono text-xs">V07</td><td><strong>Home — mapa cargado</strong></td><td><a href="home.html?escena=E2" class="font-mono text-xs">home.html?escena=E2</a></td></tr>
+              <tr><td class="font-mono text-xs">V08</td><td>Listado — 13 filas, todo en backlog</td><td><a href="modulos.html?escena=E2" class="font-mono text-xs">modulos.html?escena=E2</a></td></tr>
+              <tr><td class="font-mono text-xs">V09</td><td><strong>Alta masiva / reserva de IDs</strong></td><td><a href="alta-videos.html" class="font-mono text-xs">alta-videos.html</a></td></tr>
+              <tr><td class="font-mono text-xs">V10</td><td><strong>Kanban — 55 en una sola columna</strong></td><td><a href="tablero.html?escena=E2&amp;vista=kanban" class="font-mono text-xs">tablero.html?escena=E2&amp;vista=kanban</a></td></tr>
+              <tr><td class="font-mono text-xs">—</td><td>Tablero — vista tabla</td><td><a href="tablero.html?escena=E2" class="font-mono text-xs">tablero.html?escena=E2</a></td></tr>
+              <tr><td class="font-mono text-xs">—</td><td>Video en backlog, sin guión</td><td><a href="video.html?v=BAK-M10.020&amp;escena=E2" class="font-mono text-xs">video.html?v=BAK-M10.020&amp;escena=E2</a></td></tr>
+              <tr><td class="font-mono text-xs">—</td><td>Banco sin videos publicados</td><td><a href="banco.html?m=30&amp;escena=E2" class="font-mono text-xs">banco.html?m=30&amp;escena=E2</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-      <div class="table-wrap">
-        <table class="table-app">
-          <thead>
-            <tr>
-              <th scope="col">Qué muestra</th>
-              <th scope="col">URL</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Superficie sin módulos mapeados (FRT)</td>
-              <td><a href="modulos.html?sup=FRT" class="font-mono text-xs">modulos.html?sup=FRT</a></td>
-            </tr>
-            <tr>
-              <td>Superficie sin módulos mapeados (CRM)</td>
-              <td><a href="modulos.html?sup=CRM" class="font-mono text-xs">modulos.html?sup=CRM</a></td>
-            </tr>
-            <tr>
-              <td>Módulo cuyo detalle no maqueta esta tanda</td>
-              <td><a href="modulo.html?m=50" class="font-mono text-xs">modulo.html?m=50</a></td>
-            </tr>
-            <tr>
-              <td>Video cuya ficha no maqueta esta tanda</td>
-              <td><a href="video.html?v=BAK-M10.050" class="font-mono text-xs">video.html?v=BAK-M10.050</a></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <!-- ══════════════════ E3 ══════════════════ -->
+      <section class="mb-10">
+        <h2 class="text-h4 mb-1">
+          <span class="escena-badge" data-escena-actual="E3">E3 · Mes 1 — P1 en producción</span>
+        </h2>
+        <p class="mb-4 text-sm text-ink-soft">
+          Los tres cohortes de P1 en tres estados distintos: publicado, editado y guionado.
+        </p>
+        <div class="table-wrap">
+          <table class="table-app">
+            <thead><tr><th scope="col" class="w-[64px]">#</th><th scope="col">Pantalla</th><th scope="col">URL</th></tr></thead>
+            <tbody>
+              <tr><td class="font-mono text-xs">V11</td><td><strong>Editor de guión y receta</strong></td><td><a href="guion.html?v=BAK-M30.050&amp;escena=E3" class="font-mono text-xs">guion.html?v=BAK-M30.050&amp;escena=E3</a></td></tr>
+              <tr><td class="font-mono text-xs">V12</td><td><strong>Hoja de cohorte — planificación</strong></td><td><a href="cohorte.html?c=C03&amp;escena=E3&amp;modo=planificacion" class="font-mono text-xs">cohorte.html?c=C03&amp;escena=E3</a></td></tr>
+              <tr><td class="font-mono text-xs">V13</td><td>Tablero — avance mixto entre cohortes</td><td><a href="tablero.html?escena=E3" class="font-mono text-xs">tablero.html?escena=E3</a></td></tr>
+              <tr><td class="font-mono text-xs">V14</td><td><strong>Hoja de cohorte — sesión de grabación</strong></td><td><a href="cohorte.html?c=C03&amp;escena=E3&amp;modo=sesion" class="font-mono text-xs">…&amp;modo=sesion</a></td></tr>
+              <tr><td class="font-mono text-xs">V15</td><td>Video <code class="font-mono text-xs">editado</code> — sin link todavía</td><td><a href="video.html?v=BAK-M10.020&amp;escena=E3" class="font-mono text-xs">video.html?v=BAK-M10.020&amp;escena=E3</a></td></tr>
+              <tr><td class="font-mono text-xs">—</td><td>Home — falta para el hito</td><td><a href="home.html?escena=E3" class="font-mono text-xs">home.html?escena=E3</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-      <h2 class="text-h4 mb-1 mt-10">Referencia</h2>
-      <ul class="flex flex-col gap-2 text-base">
-        <li>
-          <a href="design-system.html">Sistema de diseño</a> — el catálogo de componentes, el layout
-          maestro y la tabla de decisiones abiertas.
-        </li>
-        <li>
-          <a href="DESIGN-SYSTEM-EXTENSIONS.md">DESIGN-SYSTEM-EXTENSIONS.md</a> — qué se extendió del
-          design system de la vista agencia y por qué.
-        </li>
-        <li>
-          <a href="README.md">README.md</a> — estructura del proyecto, cómo correrlo y qué queda
-          fuera de alcance.
-        </li>
-      </ul>
+      <!-- ══════════════════ E4 ══════════════════ -->
+      <section class="mb-10">
+        <h2 class="text-h4 mb-1">
+          <span class="escena-badge" data-escena-actual="E4">E4 · Mes 2 — hito de lanzamiento</span>
+        </h2>
+        <p class="mb-4 max-w-[74ch] text-sm text-ink-soft">
+          <strong>Responde cuándo se puede lanzar la Academia.</strong> Con el Pareto grabado ningún
+          módulo de biblioteca queda completo, y aun así se puede lanzar: para eso existe la Ruta.
+        </p>
+        <div class="table-wrap">
+          <table class="table-app">
+            <thead><tr><th scope="col" class="w-[64px]">#</th><th scope="col">Pantalla</th><th scope="col">URL</th></tr></thead>
+            <tbody>
+              <tr><td class="font-mono text-xs">V16</td><td><strong>Home — Ruta Esencial apta</strong></td><td><a href="home.html?escena=E4" class="font-mono text-xs">home.html?escena=E4</a></td></tr>
+              <tr><td class="font-mono text-xs">V17</td><td><strong>Detalle de la Ruta — apta para activar</strong></td><td><a href="modulo.html?m=R01&amp;escena=E4" class="font-mono text-xs">modulo.html?m=R01&amp;escena=E4</a></td></tr>
+              <tr><td class="font-mono text-xs">—</td><td>Tablero — los 12 de P1 publicados</td><td><a href="tablero.html?escena=E4" class="font-mono text-xs">tablero.html?escena=E4</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-      <p class="mt-12 border-t border-line pt-6 text-xs text-ink-soft">
-        Repo hermano: <strong>wireframe-academia-AGENCIA</strong>, la vista que usan las agencias.
-        Mismo design system, mismas convenciones.
-      </p>
+      <!-- ══════════════════ E5 ══════════════════ -->
+      <section class="mb-10">
+        <h2 class="text-h4 mb-1">
+          <span class="escena-badge" data-escena-actual="E5">E5 · Régimen — la Academia en marcha</span>
+        </h2>
+        <p class="mb-4 text-sm text-ink-soft">
+          Las 8 vistas de la primera tanda. Sin parámetro de escena, todas las pantallas abren acá.
+        </p>
+        <div class="table-wrap">
+          <table class="table-app">
+            <thead><tr><th scope="col" class="w-[64px]">#</th><th scope="col">Pantalla</th><th scope="col">URL</th></tr></thead>
+            <tbody>
+              <tr><td class="font-mono text-xs">S00</td><td>Layout maestro (shell)</td><td><a href="design-system.html#shell" class="font-mono text-xs">design-system.html#shell</a></td></tr>
+              <tr><td class="font-mono text-xs">S02</td><td>Listado de módulos</td><td><a href="modulos.html" class="font-mono text-xs">modulos.html</a></td></tr>
+              <tr><td class="font-mono text-xs">S03</td><td>Detalle de módulo</td><td><a href="modulo.html?m=30" class="font-mono text-xs">modulo.html?m=30</a></td></tr>
+              <tr><td class="font-mono text-xs">S04</td><td>Video — solapa Ficha</td><td><a href="video.html?v=BAK-M30.050" class="font-mono text-xs">video.html?v=BAK-M30.050</a></td></tr>
+              <tr>
+                <td class="font-mono text-xs">S04</td><td>Video — las otras cuatro solapas</td>
+                <td class="text-xs">
+                  <a href="video.html?v=BAK-M30.050&amp;tab=versiones" class="font-mono">versiones</a> ·
+                  <a href="video.html?v=BAK-M30.050&amp;tab=guion" class="font-mono">guion</a> ·
+                  <a href="video.html?v=BAK-M30.050&amp;tab=preguntas" class="font-mono">preguntas</a> ·
+                  <a href="video.html?v=BAK-M30.050&amp;tab=ubicaciones" class="font-mono">ubicaciones</a>
+                </td>
+              </tr>
+              <tr><td class="font-mono text-xs">S06</td><td>Tablero — vista tabla <span class="chip chip-meta">default</span></td><td><a href="tablero.html" class="font-mono text-xs">tablero.html</a></td></tr>
+              <tr><td class="font-mono text-xs">S06</td><td>Tablero — vista kanban</td><td><a href="tablero.html?vista=kanban" class="font-mono text-xs">tablero.html?vista=kanban</a></td></tr>
+              <tr><td class="font-mono text-xs">S08</td><td>Banco de preguntas del módulo</td><td><a href="banco.html?m=30" class="font-mono text-xs">banco.html?m=30</a></td></tr>
+              <tr><td class="font-mono text-xs">—</td><td>Superficie sin mapear</td><td><a href="modulos.html?sup=FRT" class="font-mono text-xs">modulos.html?sup=FRT</a> · <a href="modulos.html?sup=CRM" class="font-mono text-xs">?sup=CRM</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ══════════════════ FLUJOS ══════════════════ -->
+      <section class="mb-10">
+        <h2 class="text-h4 mb-1">Los cuatro flujos</h2>
+        <p class="mb-4 text-sm text-ink-soft">Recorridos completos, en orden.</p>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="card p-5">
+            <h3 class="text-h5">F5 · Arranque en frío</h3>
+            <p class="mt-2 text-sm text-gray-700">Valida que el día 1 tenga un camino claro.</p>
+            <p class="mt-3 text-xs">
+              <a href="home.html?escena=E1">Home vacío</a> →
+              <a href="importador.html?paso=1">origen</a> →
+              <a href="importador.html?paso=2">mapeo</a> →
+              <a href="importador.html?paso=3">validación</a> →
+              <a href="importador.html?paso=4">confirmar</a> →
+              <a href="importador.html?paso=resultado">resultado</a> →
+              <a href="modulos.html?escena=E2">13 módulos</a>
+            </p>
+          </div>
+          <div class="card p-5">
+            <h3 class="text-h5">F6 · Guionar un cohorte</h3>
+            <p class="mt-2 text-sm text-gray-700">Valida que el guión se escriba en contexto de cadena.</p>
+            <p class="mt-3 text-xs">
+              <a href="cohorte.html?c=C03&amp;escena=E3">Hoja de C03</a> →
+              <a href="guion.html?v=BAK-M30.050&amp;escena=E3">editor de guión</a> →
+              <a href="tablero.html?escena=E3">tablero</a>
+            </p>
+          </div>
+          <div class="card p-5">
+            <h3 class="text-h5">F7 · Sesión de grabación</h3>
+            <p class="mt-2 text-sm text-gray-700">La pantalla que Majo tiene abierta mientras graba.</p>
+            <p class="mt-3 text-xs">
+              <a href="cohorte.html?c=C03&amp;escena=E3&amp;modo=sesion">Modo sesión</a> →
+              <a href="video.html?v=BAK-M10.020&amp;escena=E3">video editado</a>
+            </p>
+          </div>
+          <div class="card card-active p-5">
+            <h3 class="text-h5">F8 · Camino al lanzamiento</h3>
+            <p class="mt-2 text-sm text-gray-700">
+              <strong>El más valioso para negocio:</strong> responde cuándo se puede lanzar.
+            </p>
+            <p class="mt-3 text-xs">
+              <a href="home.html?escena=E3">Home E3 — falta</a> →
+              <a href="home.html?escena=E4">Home E4 — apta</a> →
+              <a href="modulo.html?m=R01&amp;escena=E4">detalle de la Ruta</a> → activar
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-h4 mb-1">Referencia</h2>
+        <ul class="flex flex-col gap-2 text-base">
+          <li><a href="design-system.html">Sistema de diseño</a> — catálogo, layout maestro y decisiones abiertas.</li>
+          <li><a href="DESIGN-SYSTEM-EXTENSIONS.md">DESIGN-SYSTEM-EXTENSIONS.md</a> — qué se extendió y por qué.</li>
+          <li><a href="README.md">README.md</a> — estructura, cómo correrlo y qué queda fuera de alcance.</li>
+        </ul>
+        <p class="mt-10 border-t border-line pt-6 text-xs text-ink-soft">
+          Repo hermano: <strong>wireframe-academia-AGENCIA</strong>, la vista que usan las agencias.
+          Mismo design system, mismas convenciones.
+        </p>
+      </section>
     </div>
 
     <script src="assets/js/icons.js"></script>

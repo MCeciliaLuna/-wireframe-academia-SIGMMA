@@ -2412,6 +2412,116 @@
     text-align: right;
   }
 
+  /* -- Editor partido -------------------------------------------------------
+     Contexto a la izquierda, plantilla a la derecha. El guión no se escribe
+     aislado: se escribe sabiendo de dónde viene el escenario del cohorte y en
+     qué estado lo tiene que dejar para el video siguiente. */
+  .split-editor {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 18px;
+    align-items: start;
+  }
+
+  /* -- Receta de preparación ------------------------------------------------
+     El estado que tiene que tener el sistema ANTES de apretar REC. Usa el mismo
+     recurso visual que `.locked-zone`: es una precondición, no un formulario. */
+  .recipe-box {
+    padding: 12px 14px;
+    border: 1px dashed var(--color-line-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+
+  /* -- Encadenamiento del cohorte -------------------------------------------
+     «viene de M10.010, sin file nuevo creado todavía». Es el dato que justifica
+     que el cohorte exista: sin él, cada video habría que prepararlo de cero. */
+  .chain-link {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    margin-top: 7px;
+    padding-top: 7px;
+    border-top: 1px dashed var(--color-line);
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: var(--color-gray-700);
+  }
+  .chain-link .icon {
+    width: 13px;
+    height: 13px;
+    flex: none;
+    color: var(--color-primary);
+    transform: translateY(2px);
+  }
+
+  /* -- Checklist operable ---------------------------------------------------
+     A diferencia de `.checklist` —que es de solo lectura, el estado de un
+     video— esta se tilda de verdad: es la que Majo usa antes de grabar. */
+  .checklist-live {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .checklist-live .choice {
+    border-color: transparent;
+  }
+  .checklist-live .choice:hover {
+    border-color: var(--color-line);
+  }
+  .checklist-live .choice-text {
+    font-size: var(--text-xs);
+  }
+
+  /* -- Grilla editable ------------------------------------------------------
+     Alta masiva: se eligen superficie y módulo una vez y se cargan filas. Los
+     campos van dentro de la celda, sin bordes propios, para que la grilla se
+     lea como una planilla y no como 30 inputs sueltos — que es de donde viene
+     el usuario. */
+  .grid-editable .cell-input {
+    width: 100%;
+    height: 30px;
+    padding: 0 6px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    color: var(--color-ink);
+  }
+  .grid-editable .cell-input.is-mono {
+    font-family: var(--font-mono);
+  }
+  .grid-editable .cell-input:hover {
+    border-color: var(--color-line-strong);
+    background: var(--color-white);
+  }
+  .grid-editable .cell-input:focus {
+    border-color: var(--color-primary);
+    background: var(--color-white);
+    outline: 3px solid var(--color-primary);
+    outline-offset: 1px;
+  }
+  .grid-editable .cell-input::placeholder {
+    color: var(--color-gray-600);
+  }
+  /* Fila con un error de validación en vivo. El motivo va en la fila de abajo,
+     no en un tooltip: tiene que poder leerse sin apuntar con el mouse. */
+  .grid-editable tr[data-error="true"] td {
+    background: var(--color-error-bg);
+  }
+  .grid-editable tr[data-error="true"] .cell-input {
+    border-color: var(--color-error);
+  }
+  .grid-error {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 8px 8px;
+    font-size: 11px;
+    color: var(--color-error-dark);
+  }
+
   /* -- Embudo de producción -------------------------------------------------
      Los 55 videos repartidos en los 7 estados, en una sola barra. Es el bloque
      que hace que el Home mida CONSTRUCCIÓN y no operación (R10). */

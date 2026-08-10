@@ -99,9 +99,9 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Administración</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="superficies.html" class="nav-item">
               <span class="icon" data-icon="target"></span>Superficies y planes
-            </span>
+            </a>
             <span class="nav-item" aria-disabled="true">
               <span class="icon" data-icon="shield"></span>Usuarios y roles
             </span>
@@ -371,6 +371,32 @@
               </section>
             </aside>
           </div>
+
+          <!-- ══════════════ E2 · MÓDULO SIN VIDEOS PUBLICADOS ══════════════
+               Es el estado vacío más importante de todos: sin esta explicación,
+               un módulo con 0 preguntas y 0 videos publicados parece un error del
+               sistema, cuando es exactamente lo que corresponde. -->
+          <div data-escena="E2" class="contents">
+            <div class="placeholder-box !py-14">
+              <span class="placeholder-icon" data-icon="help-circle"></span>
+              <h2 class="text-h4">Todavía no corresponde escribir preguntas</h2>
+              <p class="mt-3 max-w-[62ch] text-base text-gray-700">
+                <span class="font-mono">BAK-M30</span> no tiene ningún video publicado, así que su
+                banco está en <strong>0</strong>. <strong>No es un error ni un pendiente
+                atrasado:</strong> la pregunta se escribe <em>después</em> de grabar el video, para
+                que use el mismo lenguaje y el mismo ejemplo que se ve en pantalla.
+              </p>
+              <p class="mt-4 max-w-[62ch] text-sm text-ink-soft">
+                Escribir la pregunta antes obliga a reescribirla cuando el video queda distinto de lo
+                imaginado. Por eso el banco de un módulo arranca vacío y se llena a medida que se
+                publica.
+              </p>
+              <div class="mt-8 flex gap-2">
+                <a href="modulo.html?m=30&amp;escena=E2" class="btn btn-primary btn-sm">Ver el módulo</a>
+                <a href="tablero.html?escena=E2" class="btn btn-bordered btn-sm">Ver qué falta grabar</a>
+              </div>
+            </div>
+          </div>
         </main>
       </div>
     </div>
@@ -378,13 +404,19 @@
     <script src="assets/js/icons.js"></script>
     <script src="assets/js/ui.js"></script>
     <script>
-      /* Controlador de la pantalla. El wireframe dibuja el banco de BAK-M30. */
+      /* Controlador de la pantalla. Cada escena maqueta el banco que le da
+         sentido; si la escena no declara ninguno, no se interviene y el aviso
+         genérico de `bindEscena` explica por qué. */
       (function () {
         "use strict";
+        const MAQUETADO = { E5: "30", E2: "30" };
+        const esperado = MAQUETADO[UI.escena()];
         const m = UI.param("m");
-        if (m === null || m === "30") return;
+        if (esperado === undefined || m === null || m === esperado) return;
 
-        document.getElementById("banco").hidden = true;
+        document.querySelectorAll("#contenido > [data-escena]").forEach(function (el) {
+          el.hidden = true;
+        });
         document.getElementById("sin-maquetar").hidden = false;
         document.getElementById("sin-maquetar-id").textContent =
           "BAK-M" + String(m).padStart(2, "0");

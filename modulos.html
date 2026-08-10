@@ -99,9 +99,9 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Administración</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="superficies.html" class="nav-item">
               <span class="icon" data-icon="target"></span>Superficies y planes
-            </span>
+            </a>
             <span class="nav-item" aria-disabled="true">
               <span class="icon" data-icon="shield"></span>Usuarios y roles
             </span>
@@ -150,6 +150,220 @@
             <button type="button" class="btn btn-bordered mt-6">
               <span class="icon" data-icon="plus"></span>Crear el primer módulo
             </button>
+          </div>
+
+          <!-- ══════════════ E1 · DÍA 0 · SISTEMA VACÍO ══════════════
+               Un solo camino posible: importar el mapa. El alta manual se
+               ofrece como alternativa secundaria, no como opción equivalente. -->
+          <div data-escena="E1" class="contents">
+            <div class="placeholder-box !py-14">
+              <span class="placeholder-icon" data-icon="layers"></span>
+              <h2 class="text-h4">La Academia no tiene contenido cargado</h2>
+              <p class="mt-3 max-w-[58ch] text-base text-gray-700">
+                No hay ningún módulo en <strong>BAK</strong>. El mapa de contenido —11 módulos, 55
+                videos y 20 cohortes— vive hoy en el tablero de Google Sheets y se carga de una vez
+                desde ahí.
+              </p>
+              <a href="importador.html" class="btn btn-primary btn-lg mt-8">
+                <span class="icon" data-icon="layers"></span>Importar el mapa de contenido
+              </a>
+              <p class="mt-4 text-xs text-ink-soft">
+                O <a href="alta-modulo.html">crear el primer módulo a mano</a>.
+              </p>
+            </div>
+          </div>
+
+          <!-- ══════════════ E2 · SEMANA 1 · MAPA CARGADO ══════════════
+               Las 13 filas existen y ninguna es apta: 0 videos publicados y
+               ninguna evaluación configurada. Es el estado normal de la semana 1,
+               no una alerta. -->
+          <div data-escena="E2" class="contents">
+            <div class="filter-bar">
+              <button type="button" class="filter-pill">Tipo: todos <span class="icon" data-icon="chevron-down"></span></button>
+              <button type="button" class="filter-pill">Estado: todos <span class="icon" data-icon="chevron-down"></span></button>
+              <button type="button" class="filter-pill">Plan: todos <span class="icon" data-icon="chevron-down"></span></button>
+              <label class="filter-search">
+                <span class="icon" data-icon="search"></span>
+                <span class="sr-only">Buscar módulo por ID o nombre</span>
+                <input type="search" placeholder="buscar por ID o nombre" />
+              </label>
+              <span class="filter-count">13 resultados</span>
+            </div>
+
+            <div class="table-scroll-y">
+              <table class="table-dense" data-sortable>
+                <caption class="sr-only">
+                  Los 13 módulos de BAK recién importados. Ninguno tiene videos publicados ni banco
+                  de preguntas configurado.
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col" data-sort-key="orden" data-sort-type="number">Orden</th>
+                    <th scope="col" data-sort-key="id">ID</th>
+                    <th scope="col" data-sort-key="nombre">Nombre</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Videos publ. / total</th>
+                    <th scope="col">Banco / mínimo</th>
+                    <th scope="col">Planes</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Últ. actividad</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr data-orden="0" data-id="BAK-R01" data-nombre="Ruta Esencial P1">
+                    <td class="cell-mono">R</td>
+                    <td class="cell-mono">BAK-R01</td>
+                    <td><a href="modulo.html?m=R01&amp;escena=E2">Ruta Esencial P1</a> <span class="chip chip-meta">creado a mano</span></td>
+                    <td><strong>ruta</strong></td>
+                    <td class="cell-num">0 / 12</td>
+                    <td class="cell-num"><span class="chip chip-meta">derivado</span> <strong>0</strong> / — <span class="chip chip-outline">sin configurar</span></td>
+                    <td>plan A · plan B</td>
+                    <td><span class="chip chip-meta">borrador</span></td>
+                    <td class="text-gray-600">hoy 11:20</td>
+                  </tr>
+                  <tr data-orden="1" data-id="BAK-M00" data-nombre="Fundamentos">
+                    <td class="cell-mono">1</td>
+                    <td class="cell-mono">BAK-M00</td>
+                    <td><a href="modulo.html?m=00&amp;escena=E2">Fundamentos</a> <span class="chip chip-outline">creado por importación</span></td>
+                    <td>biblioteca</td>
+                    <td class="cell-num">0 / 4</td>
+                    <td class="cell-num"><strong>0</strong> / — <span class="chip chip-outline">sin configurar</span></td>
+                    <td>plan A · plan B</td>
+                    <td><span class="chip chip-meta">borrador</span></td>
+                    <td class="text-gray-600">hoy 09:14</td>
+                  </tr>
+                  <tr data-orden="2" data-id="BAK-M10" data-nombre="File">
+                    <td class="cell-mono">2</td>
+                    <td class="cell-mono">BAK-M10</td>
+                    <td><a href="modulo.html?m=10&amp;escena=E2">File</a> <span class="chip chip-outline">creado por importación</span></td>
+                    <td>biblioteca</td>
+                    <td class="cell-num">0 / 6</td>
+                    <td class="cell-num"><strong>0</strong> / — <span class="chip chip-outline">sin configurar</span></td>
+                    <td>plan A · plan B</td>
+                    <td><span class="chip chip-meta">borrador</span></td>
+                    <td class="text-gray-600">hoy 09:14</td>
+                  </tr>
+                  <tr data-orden="3" data-id="BAK-M20" data-nombre="Entidades (clientes,">
+                    <td class="cell-mono">3</td>
+                    <td class="cell-mono">BAK-M20</td>
+                    <td><a href="modulo.html?m=20&amp;escena=E2">Entidades (clientes, pasajeros, proveedores)</a> <span class="chip chip-outline">creado por importación</span></td>
+                    <td>biblioteca</td>
+                    <td class="cell-num">0 / 6</td>
+                    <td class="cell-num"><strong>0</strong> / — <span class="chip chip-outline">sin configurar</span></td>
+                    <td>plan A</td>
+                    <td><span class="chip chip-meta">borrador</span></td>
+                    <td class="text-gray-600">hoy 09:14</td>
+                  </tr>
+                  <tr data-orden="4" data-id="BAK-M30" data-nombre="Voucher / Servicios">
+                    <td class="cell-mono">4</td>
+                    <td class="cell-mono">BAK-M30</td>
+                    <td><a href="modulo.html?m=30&amp;escena=E2">Voucher / Servicios</a> <span class="chip chip-outline">creado por importación</span></td>
+                    <td>biblioteca</td>
+                    <td class="cell-num">0 / 7</td>
+                    <td class="cell-num"><strong>0</strong> / — <span class="chip chip-outline">sin configurar</span></td>
+                    <td>plan A · plan B</td>
+                    <td><span class="chip chip-meta">borrador</span></td>
+                    <td class="text-gray-600">hoy 09:14</td>
+                  </tr>
+                  <tr data-reservado="true" data-orden="99" data-id="BAK-M35" data-nombre="reservado">
+                    <td class="cell-mono">—</td>
+                    <td class="cell-mono">BAK-M35</td>
+                    <td>reservado (Tráfico) <span class="chip chip-meta">creado a mano</span></td>
+                    <td>—</td><td class="cell-num">—</td><td>—</td><td>—</td>
+                    <td><span class="chip chip-outline">reservado</span></td>
+                    <td>hoy 11:18</td>
+                  </tr>
+                  <tr data-orden="5" data-id="BAK-M40" data-nombre="Cobranzas / Recibos">
+                    <td class="cell-mono">5</td>
+                    <td class="cell-mono">BAK-M40</td>
+                    <td><a href="modulo.html?m=40&amp;escena=E2">Cobranzas / Recibos</a> <span class="chip chip-outline">creado por importación</span></td>
+                    <td>biblioteca</td>
+                    <td class="cell-num">0 / 5</td>
+                    <td class="cell-num"><strong>0</strong> / — <span class="chip chip-outline">sin configurar</span></td>
+                    <td>plan A</td>
+                    <td><span class="chip chip-meta">borrador</span></td>
+                    <td class="text-gray-600">hoy 09:14</td>
+                  </tr>
+                  <tr data-orden="6" data-id="BAK-M50" data-nombre="Facturación">
+                    <td class="cell-mono">6</td>
+                    <td class="cell-mono">BAK-M50</td>
+                    <td><a href="modulo.html?m=50&amp;escena=E2">Facturación</a> <span class="chip chip-outline">creado por importación</span></td>
+                    <td>biblioteca</td>
+                    <td class="cell-num">0 / 6</td>
+                    <td class="cell-num"><strong>0</strong> / — <span class="chip chip-outline">sin configurar</span></td>
+                    <td>plan A</td>
+                    <td><span class="chip chip-meta">borrador</span></td>
+                    <td class="text-gray-600">hoy 09:14</td>
+                  </tr>
+                  <tr data-orden="7" data-id="BAK-M60" data-nombre="Pagos a proveedores">
+                    <td class="cell-mono">7</td>
+                    <td class="cell-mono">BAK-M60</td>
+                    <td><a href="modulo.html?m=60&amp;escena=E2">Pagos a proveedores</a> <span class="chip chip-outline">creado por importación</span></td>
+                    <td>biblioteca</td>
+                    <td class="cell-num">0 / 4</td>
+                    <td class="cell-num"><strong>0</strong> / — <span class="chip chip-outline">sin configurar</span></td>
+                    <td>plan B</td>
+                    <td><span class="chip chip-meta">borrador</span></td>
+                    <td class="text-gray-600">hoy 09:14</td>
+                  </tr>
+                  <tr data-orden="8" data-id="BAK-M70" data-nombre="Caja y bancos">
+                    <td class="cell-mono">8</td>
+                    <td class="cell-mono">BAK-M70</td>
+                    <td><a href="modulo.html?m=70&amp;escena=E2">Caja y bancos</a> <span class="chip chip-outline">creado por importación</span></td>
+                    <td>biblioteca</td>
+                    <td class="cell-num">0 / 4</td>
+                    <td class="cell-num"><strong>0</strong> / — <span class="chip chip-outline">sin configurar</span></td>
+                    <td>plan A</td>
+                    <td><span class="chip chip-meta">borrador</span></td>
+                    <td class="text-gray-600">hoy 09:14</td>
+                  </tr>
+                  <tr data-orden="9" data-id="BAK-M80" data-nombre="Informes">
+                    <td class="cell-mono">9</td>
+                    <td class="cell-mono">BAK-M80</td>
+                    <td><a href="modulo.html?m=80&amp;escena=E2">Informes</a> <span class="chip chip-outline">creado por importación</span></td>
+                    <td>biblioteca</td>
+                    <td class="cell-num">0 / 4</td>
+                    <td class="cell-num"><strong>0</strong> / — <span class="chip chip-outline">sin configurar</span></td>
+                    <td>plan B</td>
+                    <td><span class="chip chip-meta">borrador</span></td>
+                    <td class="text-gray-600">hoy 09:14</td>
+                  </tr>
+                  <tr data-orden="10" data-id="BAK-M90" data-nombre="Contable">
+                    <td class="cell-mono">10</td>
+                    <td class="cell-mono">BAK-M90</td>
+                    <td><a href="modulo.html?m=90&amp;escena=E2">Contable</a> <span class="chip chip-outline">creado por importación</span></td>
+                    <td>biblioteca</td>
+                    <td class="cell-num">0 / 5</td>
+                    <td class="cell-num"><strong>0</strong> / — <span class="chip chip-outline">sin configurar</span></td>
+                    <td>plan A</td>
+                    <td><span class="chip chip-meta">borrador</span></td>
+                    <td class="text-gray-600">hoy 09:14</td>
+                  </tr>
+                  <tr data-orden="11" data-id="BAK-M95" data-nombre="Receptivo operador">
+                    <td class="cell-mono">11</td>
+                    <td class="cell-mono">BAK-M95</td>
+                    <td><a href="modulo.html?m=95&amp;escena=E2">Receptivo operador</a> <span class="chip chip-outline">creado por importación</span></td>
+                    <td>biblioteca</td>
+                    <td class="cell-num">0 / 4</td>
+                    <td class="cell-num"><strong>0</strong> / — <span class="chip chip-outline">sin configurar</span></td>
+                    <td>plan B</td>
+                    <td><span class="chip chip-meta">borrador</span></td>
+                    <td class="text-gray-600">hoy 09:14</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p class="alert alert-info !text-xs">
+              <span class="icon" data-icon="info"></span>
+              <span>
+                <strong>Ningún módulo es apto para activar, y está bien.</strong> Los 11 de biblioteca
+                los creó el importador; <span class="font-mono">BAK-M35</span> y
+                <span class="font-mono">BAK-R01</span> se cargaron a mano porque no venían en el
+                archivo. Lo que sigue es guionar y grabar: la columna «banco» se va a poder configurar
+                recién cuando haya videos publicados.
+              </span>
+            </p>
           </div>
 
           <div id="listado" class="contents" data-escena="E5">

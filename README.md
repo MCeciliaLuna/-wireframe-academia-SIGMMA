@@ -1,15 +1,35 @@
 # Backoffice de la Academia SIGMMA — prototipo de alta fidelidad
 
-Maquetación de las pantallas del wireframe `Academia SIGMMA Backoffice - Wireframes.dc.html`, con el
-lenguaje visual real de sigmma.net descrito en [`ESTILOS-ACADEMIA.md`](./ESTILOS-ACADEMIA.md).
+Maquetación del backoffice de gestión interna de la Academia de Autocapacitación SIGMMA: donde el
+staff carga los videos, gestiona el ciclo de vida del contenido y administra los bancos de preguntas.
+La otra cara —la que usan las agencias— vive en el repo hermano **`wireframe-academia-AGENCIA`**.
 
-Es el **backoffice de gestión interna**: donde el staff de SIGMMA carga los videos, gestiona el ciclo
-de vida del contenido y administra los bancos de preguntas. La otra cara de la Academia —la vista que
-usan las agencias— vive en el repo hermano **`wireframe-academia-AGENCIA`**.
+El lenguaje visual sale de [`ESTILOS-ACADEMIA.md`](./ESTILOS-ACADEMIA.md), extraído de sigmma.net.
 
 > **Es solo maquetación.** No hay backend, ni API, ni videos reales, ni SSO, ni persistencia. Los
-> datos están escritos a mano en el HTML. Sirve como referencia de construcción para desarrollo y
-> como pieza presentable a negocio.
+> datos están escritos a mano en el HTML.
+
+---
+
+## El concepto de escena
+
+Cada vista declara **en qué momento de la construcción de la Academia está el sistema**. Es lo que
+corrige el problema silencioso de la primera tanda: dibujó el sistema *en régimen* sin declararlo, y
+eso podía llevar a desarrollo a priorizar como si el estado normal fuera el de dentro de un año.
+
+| Escena | Momento | Qué se ve |
+|---|---|---|
+| **E1** | Día 0 | Nada cargado. Un solo camino posible: importar el mapa |
+| **E2** | Semana 1 | 55 IDs reservados en `backlog`. Nada grabado, 0 preguntas |
+| **E3** | Mes 1 | C01 publicado, C02 editado, C03 guionado. El resto en backlog |
+| **E4** | Mes 2 | **El hito:** los 12 de P1 publicados, Ruta Esencial apta |
+| **E5** | Régimen | La Academia en marcha. Es lo que maquetó la primera tanda |
+
+Se recorre con **`?escena=E1..E4`**. Sin parámetro, todas las pantallas abren en **E5**.
+
+**Los datos de una escena nunca se mezclan con los de otra**, y las sumas cierran dentro de cada una.
+Si se pide una escena que una pantalla no maqueta, **avisa** en vez de mostrar los datos de otro
+momento con el rótulo cambiado.
 
 ---
 
@@ -17,8 +37,6 @@ usan las agencias— vive en el repo hermano **`wireframe-academia-AGENCIA`**.
 
 **Sin instalar nada.** Abrí `index.html` con doble click. El CSS compilado está versionado en
 `assets/css/academia.css`, así que el prototipo funciona sobre `file://`.
-
-**Para editar los estilos:**
 
 ```bash
 npm install
@@ -33,180 +51,223 @@ Si tocás `src/input.css`, **recompilá y commiteá el CSS**: está versionado a
 
 ## Las pantallas
 
-Las 6 pantallas del wireframe, en 8 vistas, sobre 6 archivos. Las solapas y los estados no tienen
-archivo propio: se abren sobre su pantalla con un parámetro en la URL, igual que pasaría en el
-producto real. `index.html` tiene el índice completo enlazado.
+`index.html` tiene el índice completo, agrupado por escena. Lo esencial:
 
-| # | Pantalla | URL |
-|---|---|---|
-| S00 | Layout maestro (shell) | `design-system.html#shell` |
-| S02 | Listado de módulos | `modulos.html` |
-| S03 | Detalle de módulo | `modulo.html?m=30` |
-| S04 | Detalle de video — solapa Ficha | `video.html?v=BAK-M30.050` |
-| S04 | Detalle de video — las otras cuatro solapas | `…&tab=versiones` · `guion` · `preguntas` · `ubicaciones` |
-| S06 | Tablero de producción — vista tabla *(default)* | `tablero.html` |
-| S06 | Tablero de producción — vista kanban | `tablero.html?vista=kanban` |
-| S08 | Banco de preguntas del módulo | `banco.html?m=30` |
+### Etapa 0 · sistema vacío (E1)
 
-**Estados y variantes:**
-
-| Qué muestra | URL |
+| Pantalla | URL |
 |---|---|
-| Superficie sin módulos mapeados | `modulos.html?sup=FRT` · `?sup=CRM` |
-| Módulo cuyo detalle no maqueta esta tanda | `modulo.html?m=50` |
-| Video cuya ficha no maqueta esta tanda | `video.html?v=BAK-M10.050` |
+| **Home — panel de obra vacío** | `home.html?escena=E1` |
+| **Importador de carga inicial** | `importador.html?paso=1..4` · `?paso=resultado` |
+| Listado de módulos — vacío | `modulos.html?escena=E1` |
+| Alta de módulo · de sección | `alta-modulo.html` · `alta-seccion.html` |
+| Superficies y planes | `superficies.html` |
+
+### Etapa 1 · mapa cargado (E2)
+
+| Pantalla | URL |
+|---|---|
+| **Home — mapa cargado** | `home.html?escena=E2` |
+| Listado — 13 filas, todo en backlog | `modulos.html?escena=E2` |
+| **Alta masiva / reserva de IDs** | `alta-videos.html` |
+| **Kanban — los 55 en una sola columna** | `tablero.html?escena=E2&vista=kanban` |
+
+### Etapa 2 y 3 · guionado y grabación (E3)
+
+| Pantalla | URL |
+|---|---|
+| **Editor de guión y receta** | `guion.html?v=BAK-M30.050&escena=E3` |
+| **Hoja de cohorte — planificación** | `cohorte.html?c=C03&escena=E3` |
+| **Hoja de cohorte — sesión de grabación** | `cohorte.html?c=C03&escena=E3&modo=sesion` |
+| Tablero — avance mixto entre cohortes | `tablero.html?escena=E3` |
+| Video `editado`, sin link todavía | `video.html?v=BAK-M10.020&escena=E3` |
+
+### Hito de lanzamiento (E4)
+
+| Pantalla | URL |
+|---|---|
+| **Home — Ruta Esencial apta** | `home.html?escena=E4` |
+| **Detalle de la Ruta — apta para activar** | `modulo.html?m=R01&escena=E4` |
+
+### Régimen (E5) — la primera tanda
+
+`modulos.html` · `modulo.html?m=30` · `video.html?v=BAK-M30.050` (+ `&tab=`) · `tablero.html`
+(+ `?vista=kanban`) · `banco.html?m=30` · `design-system.html#shell`
+
+### Los cuatro flujos
+
+- **F5 · Arranque en frío** — home vacío → importador (4 pasos) → 13 módulos creados
+- **F6 · Guionar un cohorte** — hoja de C03 → editor de guión → tablero
+- **F7 · Sesión de grabación** — modo sesión → video editado
+- **F8 · Camino al lanzamiento** — home E3 (falta) → home E4 (apta) → detalle de la Ruta → activar
+
+**F8 es el que responde cuándo se puede lanzar la Academia**, y el más valioso para negocio.
 
 ### Contrato de URL
 
-| Param | Valores | Efecto |
-|---|---|---|
-| `?sup=` | `BAK` *(default)* · `FRT` · `CRM` | Superficie global |
-| `?m=` | `0`, `10`, `20` … `95`, `R01` | Módulo |
-| `?v=` | `BAK-M30.050` | Video, por ID permanente |
-| `?tab=` | `ficha` *(default)* · `versiones` · `guion` · `preguntas` · `ubicaciones` | Solapa del detalle de video |
-| `?vista=` | `tabla` *(default)* · `kanban` | Vista del tablero |
+| Param | Valores |
+|---|---|
+| `?escena=` | `E1` · `E2` · `E3` · `E4` — sin parámetro, E5 |
+| `?sup=` | `BAK` *(default)* · `FRT` · `CRM` |
+| `?m=` | `0`, `10`, `20` … `95`, `R01` |
+| `?v=` | `BAK-M30.050` |
+| `?tab=` | `ficha` *(default)* · `versiones` · `guion` · `preguntas` · `ubicaciones` |
+| `?vista=` | `tabla` *(default)* · `kanban` — tablero |
+| `?modo=` | `planificacion` *(default)* · `sesion` — hoja de cohorte |
+| `?paso=` | `1` · `2` · `3` · `4` · `resultado` — importador |
+| `?c=` | `C03` — cohorte |
 
 ---
 
 ## El contenido es el real del mapa
 
-**11 módulos BAK y los 55 videos con su ID permanente `BAK-Mxx.yyy`**, tomados del mapa de contenido
+**11 módulos BAK y los 55 videos con su ID permanente**, del mapa de contenido
 (`Estrategia_Grabado_..._pareto_v2`), más la Ruta Esencial `BAK-R01` y el ID reservado `BAK-M35`.
-Los títulos de los videos que el wireframe nombra están copiados **verbatim**; el resto sale del mapa.
+
+**Los 20 cohortes (C01–C20) y las prioridades P1–P4 salen del Maestro de Producción**, con su
+escenario compartido. **Las recetas y el encadenamiento de los guiones de P1** salen de
+`Majo_3_Cohorte_P1_guiones`, verbatim.
 
 Son de muestra: las fechas, los links de YouTube, los enunciados de las preguntas y la persona del
 sidebar.
 
 ### Convenciones de dato
 
-- **Prioridad:** `P1` a `P4`. Son tandas de grabación del Pareto, **no urgencia** — nunca Alta/Media/Baja.
-- **Planes:** «plan A» y «plan B», **placeholder deliberado**. El diccionario real es una decisión
-  abierta del proyecto.
-- **Versión de producto:** `sgm2026.XX`
-- **Fechas:** DD/MM/YYYY
-- **IDs de video:** `BAK-M30.050` — superficie-módulo.secuencia, de 10 en 10.
-- **Los 7 estados de producción**, en orden: `backlog` → `guionado` → `grabado` → `editado` →
-  `publicado` → `a regrabar` → `obsoleto`.
+- **Prioridad `P1` a `P4`:** tandas de grabación del Pareto, **no urgencia**.
+- **Planes:** «plan A» y «plan B», **placeholder deliberado** — el diccionario real es una decisión abierta.
+- **IDs de video:** `BAK-M30.050`, de 10 en 10, para poder intercalar sin renumerar.
+- **Los 7 estados:** `backlog` → `guionado` → `grabado` → `editado` → `publicado` → `a regrabar` → `obsoleto`.
 
 ---
 
 ## Estructura
 
 ```
-├── ESTILOS-ACADEMIA.md            guía de diseño (fuente de verdad visual, no se toca)
-├── DESIGN-SYSTEM-EXTENSIONS.md    los 18 componentes nuevos y su justificación
-├── package.json                   @tailwindcss/cli v4
-├── netlify.toml                   deploy estático, sin build
+├── ESTILOS-ACADEMIA.md            guía de diseño (fuente de verdad visual)
+├── DESIGN-SYSTEM-EXTENSIONS.md    los 30 componentes nuevos y su justificación
+├── package.json · netlify.toml · .gitignore
 ├── src/
 │   ├── input.css                  @theme heredado íntegro + capa backoffice (sección 6)
 │   └── partials/app-shell.html    fuente canónica del sidebar
 ├── assets/
 │   ├── css/academia.css           compilado y versionado
-│   ├── fonts/                     Sofia Sans + Roboto (400/700), de web-2026
-│   ├── img/logo.svg               de web-2026
-│   └── js/
-│       ├── icons.js               set de iconos, hidratados en el cliente
-│       └── ui.js                  solapas, conmutador, menús, modal, orden de tabla
-├── index.html                     índice de las 8 vistas
+│   ├── fonts/  img/logo.svg       de web-2026
+│   └── js/  icons.js  ui.js       set de iconos + comportamiento de interfaz
+├── index.html                     índice, agrupado por escena
+├── home.html                      panel de obra, en 5 escenas
+├── importador.html  alta-videos.html  alta-modulo.html  alta-seccion.html
+├── cohorte.html  guion.html  superficies.html
 ├── modulos.html  modulo.html  video.html  tablero.html  banco.html
-└── design-system.html             catálogo, layout maestro y decisiones abiertas
+└── design-system.html             catálogo, escenas y decisiones abiertas
 ```
 
-**El sidebar está duplicado en las 5 páginas de app**, a propósito: así los `.html` se abren con
-doble click, sin build ni servidor. La versión canónica es `src/partials/app-shell.html` y cada copia
-está marcada con `<!-- app-shell: sincronizar con src/partials/app-shell.html -->`. Si lo tocás,
-replicalo en las 5 y cambiá **solo** el `aria-current="page"`.
+**El sidebar está duplicado en las 13 páginas de app**, a propósito: así los `.html` se abren con
+doble click. La versión canónica es `src/partials/app-shell.html`, y cada copia está delimitada por
+`<!-- app-shell: sincronizar … -->`. El control es que el bloque, sin el `aria-current`, dé el mismo
+hash en todas.
 
 ---
 
 ## Diferencias con el repo de la vista agencia
 
-Los dos repos comparten design system, convenciones de código, estructura y criterio de deploy. Estas
-son las divergencias, todas deliberadas:
-
 | Punto | Vista agencia | Backoffice | Por qué |
 |---|---|---|---|
-| **Datos** | `mock-data.js` con reglas de negocio y derivados | **Hardcodeados en el HTML** | Aquel prototipo tiene estado real (personas, aprobaciones en `localStorage`, desbloqueo secuencial). Este es maquetación |
+| **Datos** | `mock-data.js` con reglas de negocio | **Hardcodeados en el HTML** | Aquel tiene estado real; este es maquetación |
 | **Chrome** | Header horizontal de 72 px, 3 destinos | **Sidebar de 200 px**, 16 destinos en 6 grupos | No entran en una barra |
-| **Responsive** | 3 breakpoints (base, md, lg) | **1440 px fijo** | Fuera de alcance del MVP |
-| **JS** | 6 archivos, con máquinas de estado | **2 archivos**, sin lógica de negocio | Solo solapas, conmutador y menús |
-| **Naranja `#ff6b35`** | Una aparición: el certificado | **Ninguna** | No hay nada acá que lo justifique |
+| **Responsive** | 3 breakpoints | **1440 px fijo** | Fuera de alcance |
+| **JS** | 6 archivos con máquinas de estado | **2 archivos**, sin lógica de negocio | Solo escenas, solapas, conmutadores y menús |
+| **Naranja `#ff6b35`** | Una aparición: el certificado | **Ninguna** | Nada acá lo justifica |
 
-El bloque `@theme` de `src/input.css` es **idéntico** al del repo hermano: no se cambió un solo
-valor. Lo propio del backoffice vive en la sección 6, al final del archivo.
+El bloque `@theme` de `src/input.css` es **idéntico** al del repo hermano.
 
 ---
 
 ## Decisiones tomadas
 
-Donde el wireframe manda, se siguió al pie de la letra. Donde no cerraba o no decía, se decidió.
-
 ### Los números se derivan de un solo dato
 
-Se construyeron los 55 videos con **un estado cada uno**, y de ahí salen tanto los contadores del
-kanban como la columna «videos publicados / total» del listado. Eso destapó **tres contradicciones**
-que el wireframe tenía escondidas — un video no puede estar en dos columnas:
+Los 55 videos tienen **un estado cada uno**, y de ahí salen los contadores del kanban, los tiles del
+tablero y la columna «publicados / total» del listado. Eso destapó contradicciones del wireframe:
 
-| Qué | El wireframe decía | Queda |
+| Qué | Decía | Queda |
 |---|---|---|
-| `BAK-M10` videos publicados | 6 / 6 | **5 / 6** — `BAK-M10.050` está `obsoleto` |
-| `BAK-M40` videos publicados | 5 / 5 | **4 / 5** — `BAK-M40.010` está `guionado` |
-| Columnas del kanban | sumaban 58, con 55 videos | **suman 55** |
+| `BAK-M10` publicados | 6 / 6 | **5 / 6** — `BAK-M10.050` está `obsoleto` |
+| `BAK-M40` publicados | 5 / 5 | **4 / 5** — `BAK-M40.010` está `guionado` |
+| Columnas del kanban | sumaban 58 con 55 videos | **suman 55** |
 
-Los cuatro tiles de métrica del tablero también se recalcularon: son la misma pantalla.
-«En cola de regrabación» bajó de 6 a **3**, porque `a regrabar` implica haber estado publicado y
-entre los módulos con contenido publicado no hay lugar para seis.
+### B-1 · Los cohortes se alinearon al Maestro
 
-### Otras decisiones
+**8 de 9 cohortes de la primera tanda contradecían al plan de rodaje real.** Era tolerable cuando el
+cohorte era una columna; dejó de serlo cuando pasó a ser una pantalla. Se alinearon los 55 videos —y
+sus prioridades— al Maestro de Producción. **Cierra la decisión abierta D-7.**
+
+### B-2 · El documento de guiones escribe «SIGMA»
+
+10 apariciones con una sola M en `Majo_3_Cohorte_P1_guiones`, incluido el título de `BAK-M00.010`.
+El prototipo escribe **SIGMMA**. **Conviene corregir el documento fuente.**
+
+### B-3 · La posición de `BAK-M30.050` en la Ruta
+
+Pasó de «9 de 12» a **«11 de 12»**: con las tres secciones de la Ruta (C01, C02, C03) cae en la 11.
+
+### Otras
 
 | # | Punto | Decisión |
 |---|---|---|
-| 1 | **Tabla y kanban completos** | Se renderizan los **55 videos**, no un extracto. Es lo que pide una herramienta densa, y hace que cada contador sea contable en el DOM en vez de un número que haya que creer |
-| 2 | **Fechas y versiones de producto** | Solo las que el wireframe especifica. Los videos que no detalla las muestran vacías: no se inventaron fechas |
-| 3 | **Cohortes** | Manda el wireframe donde nombra el video, aunque contradiga al Maestro de Producción (pone `BAK-M30.030` en C03 y el Maestro en C07) |
-| 4 | **Detalle de módulo y ficha de video** | Maquetados para `BAK-M30` y `BAK-M30.050`, que son los que el wireframe dibuja. Las otras URLs avisan en vez de inventar el árbol o la ficha |
-| 5 | **Checklist de publicación** | El wireframe lista 6 ítems y dice «4 de 5 obligatorios». Se marcó «Duración dentro del objetivo» como *recomendado* para que los dos números cierren |
-| 6 | **Destinos del menú sin pantalla** | Se listan (el wireframe dibuja el menú completo) pero no son links: un link que no lleva a ningún lado miente |
-| 7 | **Título de pantalla** | Usa `--text-h4` (18→22 px), no `--text-h1` (40→48). En una herramienta densa un título de 40 px se come el alto útil |
+| 1 | **Tabla y kanban completos** | Los 55 videos en las 4 escenas, no un extracto: cada contador es contable en el DOM |
+| 2 | **Fechas y versiones** | Solo las que el wireframe especifica; el resto vacías |
+| 3 | **Detalle de módulo y video** | Cada escena maqueta el ejemplo que le da sentido: `BAK-M30` en régimen, la Ruta en el hito, `BAK-M10.020` en E3 |
+| 4 | **El importador es un flujo, no una escena** | Su eje es `?paso=`, porque se usa el día 0 y también después |
+| 5 | **Los estados vacíos son escenas** | No hay un `?state=empty` aparte: el estado vacío *es* la pantalla en E1 o E2 |
 
-Las **decisiones abiertas** —lo que el prototipo resuelve de una manera pero todavía no está
-decidido— están en la tabla de [`design-system.html`](./design-system.html#decisiones).
+Las **decisiones abiertas** (A-1 a A-5, D-1 a D-9) están en la tabla de
+[`design-system.html`](./design-system.html#decisiones).
+
+---
+
+## Las reglas
+
+A las 9 reglas no negociables de la primera tanda se suman dos:
+
+- **R10 · El Home mide avance de construcción, no operación.** En esta etapa no hay uso: no se
+  inventan métricas de uso. Lo único de operación es «módulos activos» y «agencias con acceso».
+- **R11 · Los videos nacen en `backlog`, sin link y sin versión.** El alta **nunca** pide un link de
+  YouTube: son IDs reservados.
 
 ---
 
 ## Verificado
 
 - **Compila** con `@tailwindcss/cli` 4.3.3, sin errores.
-- **55 videos, 13 módulos**, cada video con exactamente un estado.
-- **Las 5 cadenas numéricas de `BAK-M30`** cierran: `6+8+7+7 = 28` · `28−7−1 = 20` ·
-  `3+2+2+8 = 15` · `8+10+9+8 = 35` · `2+3+3+2 = 10`.
-- **Los 7 contadores del kanban suman 55**, y cada uno coincide con las tarjetas que hay realmente
-  en su columna.
-- **La tabla y el kanban dicen lo mismo**, estado por estado.
-- **El listado de módulos coincide con el tablero**, módulo por módulo, y los totales suman 55.
-- Las 7 preguntas de `BAK-M30.060` figuran todas «a revisar» y la sección 4 queda en 0 vigentes de 7,
-  que es lo que hace que el sorteo saque 8 de 10.
-- **Sin `font-medium`/`font-semibold`, sin hex sueltos en el HTML, sin clases de la paleta default.**
-- **Sin apariciones de «SIGMA»** en el código ni en el contenido.
+- **Las 4 escenas cierran:** E2 los 55 en backlog · E3 `2+6+4+43 = 55` · E4 publicados por módulo
+  `2+3+3+3+1 = 12` y banco 60 · y en E4 **ningún módulo de biblioteca queda completo**, que es el
+  argumento de la Ruta Esencial.
+- **Los mismos 55 IDs en las 4 escenas:** ninguno aparece ni desaparece, solo cambia el estado.
+- **Los 7 contadores del kanban suman 55 en cada escena**, y coinciden con las tarjetas reales y con
+  las filas de la tabla, estado por estado.
+- **Las 5 cadenas de `BAK-M30`** siguen cerrando en régimen: 28 / 20 / 15 / 35 / 10.
+- **R10:** `home.html` no contiene métricas de uso. **R11:** ninguna pantalla de alta tiene campo de
+  link de YouTube.
+- **Los 6 estados vacíos** de las pantallas ya maquetadas, cada uno con su explicación y una sola
+  acción posible.
+- **Sin `font-medium`/`font-semibold`, sin hex sueltos, sin clases de la paleta default.**
+- **Sin apariciones de «SIGMA»** en la superficie del producto.
 - **Sin `fetch`, sin `localStorage`, sin lógica de negocio** en el JS.
-- **32 pares de color contra WCAG AA** (4.5:1 texto, 3:1 gráficos): todos pasan. Cinco tonos se
-  ajustaron respecto del primer borrador — están documentados en `DESIGN-SYSTEM-EXTENSIONS.md`.
-- Las **URLs del índice** renderizan la pantalla correcta, verificadas en Chrome headless leyendo el
-  DOM ya hidratado: las 5 solapas, el conmutador tabla↔kanban y los estados por `?sup=` / `?m=` / `?v=`.
-- Un solo `<h1>` por pantalla, jerarquía de headings sin saltos, todas las `<img>` con `alt`, sin IDs
-  duplicados, todos los campos con label, y todos los botones y links con nombre accesible.
+- **Contraste WCAG AA** de todos los pares nuevos, incluidos los 7 segmentos del embudo.
+- Un solo `<h1>` por pantalla, jerarquía sin saltos, `<img>` con `alt`, sin IDs duplicados, campos con
+  label, botones y links con nombre accesible.
+- **Los 13 sidebars idénticos**, verificado por hash.
 
-Lo que queda para probar a mano en un navegador real: el recorrido de teclado completo (foco visible,
-`Esc` en el menú, flechas entre solapas) y el comportamiento con `prefers-reduced-motion` activo.
+Queda para probar a mano: el recorrido de teclado completo y `prefers-reduced-motion`.
 
 ---
 
 ## Fuera de alcance
 
-- Las **14 pantallas restantes** del proyecto: esta es la primera de las dos tandas identificadas.
-- Backend, API de YouTube, persistencia y lógica de negocio.
-- **Responsive**: el prototipo está diseñado a 1440 px.
-- **La subida de archivos de video.** Los videos viven en YouTube: el flujo es pegar el link,
-  traer título y duración por API y validar el embebido. Nunca hay un dropzone.
-- El contenedor de alta de sección, video o pregunta: es una **decisión de UX pendiente** (el design
-  system tiene modal pero no drawer).
+- Los destinos del sidebar que este bloque no cubre: **Cola de regrabación, Biblioteca de videos,
+  Matriz perfil × módulo, Impactos en Academia, Panel macro, Detalle por agencia, Usuarios y roles,
+  Auditoría**. Se listan sin ser links.
+- Backend, persistencia, y la **importación real de CSV**: el importador simula sus cuatro pasos, no
+  parsea un archivo.
+- Responsive: 1440 px fijo.
+- La subida de archivos de video. Los videos viven en YouTube.

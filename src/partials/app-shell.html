@@ -6,8 +6,10 @@
         <!-- app-shell: sincronizar con src/partials/app-shell.html -->
         ...
         <!-- /app-shell -->
-     Si tocás algo acá, replicalo en las 5 páginas (todas menos index.html, que
-     es el índice, y design-system.html, que lo muestra como muestra).
+     Si tocás algo acá, replicalo en TODAS las páginas de app (todas menos
+     index.html, que es el índice, y design-system.html, que lo muestra como
+     muestra). El control es que el bloque, sin el aria-current, dé el mismo
+     hash en todas.
 
      Al copiarlo, cambiar SOLO el `aria-current="page"` al destino que
      corresponda. Nada más.
@@ -103,9 +105,9 @@
 
     <div class="nav-group">
       <span class="nav-group-title">Administración</span>
-      <span class="nav-item" aria-disabled="true">
+      <a href="superficies.html" class="nav-item">
         <span class="icon" data-icon="target"></span>Superficies y planes
-      </span>
+      </a>
       <span class="nav-item" aria-disabled="true">
         <span class="icon" data-icon="shield"></span>Usuarios y roles
       </span>
