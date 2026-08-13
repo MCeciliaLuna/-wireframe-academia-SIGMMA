@@ -31,7 +31,7 @@ eso podía llevar a desarrollo a priorizar como si el estado normal fuera el de 
 | **E5** | Régimen *(default)* | La Academia en marcha. Es lo que maquetó la primera tanda |
 | **E6** | En operación | **La Academia completa, con uso:** los 11 módulos activos, bancos de 50 preguntas y 12 agencias usándola |
 
-Se recorre con **`?escena=E1..E4`**. Sin parámetro, todas las pantallas abren en **E5**.
+Se recorre con **`?escena=E1..E6`**. Sin parámetro, todas las pantallas abren en **E5**.
 
 **Los datos de una escena nunca se mezclan con los de otra**, y las sumas cierran dentro de cada una.
 Si se pide una escena que una pantalla no maqueta, **avisa** en vez de mostrar los datos de otro
@@ -39,7 +39,7 @@ momento con el rótulo cambiado.
 
 ### Monotonía temporal
 
-Las cinco escenas son una **línea de tiempo**, no cinco variantes sueltas. De ahí sale la regla que
+Las seis escenas son una **línea de tiempo**, no seis variantes sueltas. De ahí sale la regla que
 las mantiene consistentes:
 
 > **Entre escenas sucesivas, el estado de un video solo puede avanzar.** Las únicas excepciones son
@@ -231,7 +231,10 @@ contenido, no de código.
 ### Convenciones de dato
 
 - **Prioridad `P1` a `P4`:** tandas de grabación del Pareto, **no urgencia**.
-- **Planes:** «plan A» y «plan B», **placeholder deliberado** — el diccionario real es una decisión abierta.
+- **Planes:** **Professional · Business · Corporate**, de `web.sigmma.net/planes.html` — **cierra D-3**.
+  Lo que sigue siendo provisorio es la **asignación de planes por módulo**: la vieja «plan A / plan B»
+  era arbitraria por admisión propia, así que se **re-derivó del Maestro de Producción** en vez de
+  renombrarse. Renombrarla habría disfrazado un dato inventado de dato real.
 - **IDs de video:** `BAK-M30.050`, de 10 en 10, para poder intercalar sin renumerar.
 - **Los 7 estados:** `backlog` → `guionado` → `grabado` → `editado` → `publicado` → `a regrabar` → `obsoleto`.
   El atributo `data-estado` lleva **el nombre exacto**, sin abreviar ni slugificar — incluido
@@ -340,14 +343,14 @@ Pasó de «9 de 12» a **«11 de 12»**: con las tres secciones de la Ruta (C01,
 
 | # | Punto | Decisión |
 |---|---|---|
-| 1 | **Tabla y kanban completos** | Los 55 videos en las 4 escenas, no un extracto: cada contador es contable en el DOM |
+| 1 | **Tabla y kanban completos** | Los 55 videos en las 6 escenas, no un extracto: cada contador es contable en el DOM |
 | 2 | **Fechas y versiones** | Solo las que el wireframe especifica; el resto vacías |
 | 3 | **Detalle de módulo y video** | Cada escena maqueta el ejemplo que le da sentido: `BAK-M30` en régimen, la Ruta en el hito, `BAK-M10.020` en E3 |
 | 4 | **El importador es un flujo, no una escena** | Su eje es `?paso=`, porque se usa el día 0 y también después |
 | 5 | **Los estados vacíos son escenas** | No hay un `?state=empty` aparte: el estado vacío *es* la pantalla en E1 o E2 |
 
-Las **decisiones abiertas** (A-1 a A-5, D-1 a D-9) están en la tabla de
-[`design-system.html`](./design-system.html#decisiones).
+Las **decisiones** (A-1 a A-5, D-1 a D-9) están en la tabla de
+[`design-system.html`](./design-system.html#decisiones), con **D-2, D-3, D-7 y D-9 ya cerradas**.
 
 ---
 
@@ -365,12 +368,12 @@ A las 9 reglas no negociables de la primera tanda se suman dos:
 ## Verificado
 
 - **Compila** con `@tailwindcss/cli` 4.3.3, sin errores.
-- **Las 4 escenas cierran:** E2 los 55 en backlog · E3 `2+6+4+43 = 55` · E4 publicados por módulo
-  `2+3+3+3+1 = 12` y banco 60 · E5 `14+4+2+2+29+3+1 = 55` · y en E4 **ningún módulo de biblioteca
-  queda completo**, que es el argumento de la Ruta Esencial.
-- **Los mismos 55 IDs en las 4 escenas:** ninguno aparece ni desaparece, solo cambia el estado.
+- **Las 5 escenas con dato cierran:** E2 los 55 en backlog · E3 `2+6+4+43 = 55` · E4 publicados por
+  módulo `2+3+3+3+1 = 12` y banco 60 · E5 `14+4+2+2+29+3+1 = 55` · E6 `51+3+1 = 55` · y en E4
+  **ningún módulo de biblioteca queda completo**, que es el argumento de la Ruta Esencial.
+- **Los mismos 55 IDs en las 6 escenas:** ninguno aparece ni desaparece, solo cambia el estado.
 - **Monotonía temporal: cero retrocesos.** Los 55 videos, video por video, cumplen
-  E2 ≤ E3 ≤ E4 ≤ E5 según el orden de avance. Los 12 de P1 están publicados en E4 **y** en E5, y la
+  E2 ≤ E3 ≤ E4 ≤ E5 ≤ E6 según el orden de avance. Los 12 de P1 están publicados en E4 **y** en E5, y la
   Ruta Esencial va de apta (E4) a activa (E5) con 12 / 12 videos y banco 60 / 60 en las dos.
 - **Los 7 contadores del kanban suman 55 en cada escena**, y coinciden con las tarjetas reales y con
   las filas de la tabla, estado por estado.
@@ -388,7 +391,7 @@ A las 9 reglas no negociables de la primera tanda se suman dos:
 - **Contraste WCAG AA** de todos los pares nuevos, incluidos los 7 segmentos del embudo.
 - Un solo `<h1>` por pantalla, jerarquía sin saltos, `<img>` con `alt`, sin IDs duplicados, campos con
   label, botones y links con nombre accesible.
-- **Los 13 sidebars idénticos**, verificado por hash.
+- **Los 18 sidebars idénticos**, verificado por hash.
 
 Queda para probar a mano: el recorrido de teclado completo y `prefers-reduced-motion`.
 
