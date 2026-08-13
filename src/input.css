@@ -1658,6 +1658,13 @@
     display: none !important;
   }
 
+  /* Fila o tarjeta que no pasa el filtro activo. Mismo motivo que el anterior
+     para no usar `hidden`, y atributo distinto del de escena para que las dos
+     cosas compongan: una fila puede quedar fuera por escena Y por filtro. */
+  [data-filtro-off] {
+    display: none !important;
+  }
+
   /* -- Rótulo de escena -----------------------------------------------------
      Declara en qué momento de la construcción de la Academia está el sistema.
      NO es un dato del producto: es una anotación del prototipo, y por eso usa

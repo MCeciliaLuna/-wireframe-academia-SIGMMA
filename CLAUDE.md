@@ -4,20 +4,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Qué es esto
 
-Prototipo de alta fidelidad del **backoffice de la Academia de Autocapacitación SIGMMA** (lado staff
-interno). Dos bloques de trabajo:
+Prototipo funcional del **backoffice de la Academia de Autocapacitación SIGMMA** (lado staff interno),
+con una **academia completa simulada**. Cuatro bloques de trabajo:
 
 - **Tanda 1** — las 6 pantallas del wireframe, en 8 vistas. Es el sistema **en régimen**.
 - **Bloque de arranque** — 17 vistas más, organizadas por **escena**: el sistema en los momentos
   previos al régimen (día 0, mapa cargado, P1 en producción, hito de lanzamiento).
+- **Simulación completa** — el dato dejó de estar escrito en el HTML y pasó a una capa propia, con
+  **550 preguntas, 12 agencias, 56 personas** y la escena **E6 · en operación**.
+- **Backoffice operable** — **18 pantallas de app**: se abrieron 5 destinos del sidebar y **toda
+  acción que se ofrece se puede ejecutar**, con el cambio persistido por escena.
 
-**Es solo maquetación.** No hay backend, ni API, ni videos reales, ni SSO, ni persistencia. Los datos
-están **escritos a mano en el HTML**. Si aparece un `fetch`, un `localStorage` o una función de
-cálculo, está de más.
+**Ya no es solo maquetación, ni solo navegación.** No hay backend, ni API, ni videos reales, ni SSO.
+Pero **sí hay capa de datos, reglas de negocio derivadas, mutaciones y persistencia en
+`localStorage`**. Eso revierte a propósito una decisión de la tanda 1 (ver «El cambio de
+arquitectura»).
 
-Es el repo hermano de **`wireframe-academia-AGENCIA`** (la vista que usan las agencias): mismo design
-system, mismas convenciones, misma estructura. Las divergencias están listadas en el README y todas
-son deliberadas.
+**Un botón que no hace nada es un bug, no una maqueta.** Es la regla que gobierna este bloque: si una
+acción no se puede ejecutar, el control va deshabilitado **con el motivo a la vista** —no presente y
+mudo. Los dos casos que lo motivaron enseñaban una compuerta funcionando y después no dejaban
+cruzarla: «Reservar IDs» se re-rotulaba solo, y «Activar módulo» se habilitaba al cumplir la aptitud.
+
+Es el repo hermano de **`academia-AGENCIA`** (la vista que usan las agencias): mismo design system,
+mismas convenciones, misma estructura. Las divergencias están listadas en el README y todas son
+deliberadas.
 
 **Nomenclatura obligatoria:** la empresa es **SIGMMA**, siempre en mayúsculas y con doble M (sigla de
 Sistema Integral de Gestión Multi Modal Administrativo). El producto es **SIGMMA.net** en contexto
@@ -29,10 +39,12 @@ Documentos de referencia, fuera de este repo:
 
 | Documento | Qué define |
 |---|---|
-| `ACADEMIA-BACKLOG/MD-PROYECTO-CLAUDE.md` | Alcance funcional del MVP |
+| `ACADEMIA-BACKLOG/MD-PROYECTO-CLAUDE.md` | Alcance funcional del MVP. **Ojo:** escribe «Standard» donde va «Professional» (B-4) |
 | `ACADEMIA-BACKLOG/Estrategia_Grabado_..._pareto_v2.md.pdf` | Mapa de contenido: los 55 videos con ID, tag de plan y prioridad Pareto |
-| `ACADEMIA-BACKLOG/Majo_1_Maestro_de_Produccion.md.pdf` | Plan de rodaje: cohortes C01–C15 y estándar de grabación |
-| `indicaciones/ACADEMIA-BACKOFFICE/.../Wireframes.dc.html` | **Fuente de verdad de layout, contenido y datos** |
+| `ACADEMIA-BACKLOG/Majo_1_Maestro_de_Produccion.md.pdf` | Plan de rodaje: cohortes C01–C20 y estándar de grabación |
+| `ACADEMIA-BACKLOG/Majo_3_Cohorte_P1_guiones.md.pdf` | Los 12 guiones de P1. **Escribe «SIGMA» 10 veces** (B-2) |
+| `indicaciones/ACADEMIA-BACKOFFICE/.../Wireframes.dc.html` | Fuente de verdad de layout del régimen |
+| `web.sigmma.net/planes.html` | Los tres planes comerciales. Cierra D-3 |
 
 ## Comandos
 
@@ -44,13 +56,40 @@ npm run build:dev  # igual pero sin minificar
 npm run serve      # servidor estático en http://localhost:4321
 ```
 
-**No hay suite de tests.** La verificación es por greps, lectura del HTML terminado y Chrome
-headless (ver abajo).
+> **`serve@14` descarta el query string.** Pide `/tablero.html?escena=E6` y responde un 301 a
+> `/tablero`, **sin el parámetro**: la página renderiza E5 en silencio. Para probar cualquier URL con
+> parámetros hay que usar la ruta **sin `.html`**:
+>
+> ```bash
+> #  mal → renderiza E5           bien → renderiza E6
+> curl "localhost:4321/tablero.html?escena=E6"   curl "localhost:4321/tablero?escena=E6"
+> ```
+
+**No hay suite de tests.** La verificación es `SIM.verificar()`, greps y Chrome headless (ver abajo).
 
 `assets/css/academia.css` **está versionado a propósito**: permite abrir cualquier `.html` con doble
 click sobre `file://`. Si tocás `src/input.css`, recompilá y commiteá el CSS.
 
-## Arquitectura
+## El cambio de arquitectura
+
+La tanda 1 declaraba: *«es solo maquetación; si aparece un `fetch`, un `localStorage` o una función de
+cálculo, está de más»*, y *«datos hardcodeados en el HTML»*. **Eso ya no vale**, y el cambio fue
+deliberado, no un descuido.
+
+El motivo: los agregados escritos a mano no cerraban entre pantallas y no podían cerrar. Los 55 IDs
+aparecían **1.320 veces** solo en `tablero.html` (4 escenas × 2 vistas × 6 lugares por video), y
+cambiar el estado de un video obligaba a recalcular unos 30 números en 4 archivos. El propio
+`design-system.html` documentaba tres lugares donde el wireframe **no cerraba consigo mismo**.
+
+Qué se conserva y qué cambió:
+
+| Sigue prohibido | Ahora permitido |
+|---|---|
+| `fetch`, `XMLHttpRequest`, módulos ES | Capa de datos en JS, por IIFE global |
+| Números agregados escritos a mano | `localStorage`, **solo** en `academia-sim.js` |
+| Inventar datos del proyecto | Reglas de negocio derivadas del dato |
+
+`file://` sigue funcionando por doble click: sin módulos ES, sin `fetch`, todo por global.
 
 ### Sistema de tokens cerrado (Tailwind v4, CSS-first)
 
@@ -59,19 +98,14 @@ Todo el diseño vive en `src/input.css`. No hay `tailwind.config.js`: la configu
 Tailwind **fueron borrados** con `--color-*: initial` y equivalentes.
 
 Consecuencia: `bg-blue-500`, `font-medium`, `text-2xl` **no compilan**. Si necesitás un valor nuevo,
-se agrega al `@theme` con nombre semántico — nunca un hex suelto en el HTML.
+se agrega al `@theme` con nombre semántico — nunca un hex suelto en el HTML ni en el JS.
 
-**Las secciones 1 a 5 de `src/input.css` son herencia literal del repo hermano.** No se cambió un
-solo valor: la consistencia entre los dos repos vale más que una mejora aislada. Lo propio del
-backoffice está en la **sección 6**, al final, y está documentado pieza por pieza en
-`DESIGN-SYSTEM-EXTENSIONS.md`.
-
-Si extendés el design system: **derivá de los tokens que ya hay**. Ni un hex nuevo, ni una fuente
-nueva, ni una escala nueva. Y documentá la extensión — es un entregable, no un opcional.
+**Las secciones 1 a 5 de `src/input.css` son herencia literal del repo hermano.** No se cambió un solo
+valor. Lo propio del backoffice está en la **sección 6**, documentado en `DESIGN-SYSTEM-EXTENSIONS.md`.
 
 ### Sin build de HTML — sidebar duplicado a propósito
 
-Los `.html` son archivos planos, sin templating. El sidebar está **copiado literal en las 13 páginas
+Los `.html` son archivos planos, sin templating. El sidebar está **copiado literal en las 18 páginas
 de app**, delimitado por:
 
 ```html
@@ -81,91 +115,113 @@ de app**, delimitado por:
 ```
 
 `src/partials/app-shell.html` es la **fuente canónica** (no se sirve). Si modificás el sidebar,
-replicá el cambio en todas las páginas de app y actualizá el partial. Al copiarlo, cambiá **solo** el
-`aria-current="page"` al destino que corresponda.
+replicá el cambio en todas las páginas y actualizá el partial. Al copiarlo, cambiá **solo** el
+`aria-current="page"`.
 
-Control rápido de que las copias siguen sincronizadas — tiene que dar **un solo hash**:
-
-```bash
-for f in home.html modulos.html modulo.html video.html tablero.html banco.html \
-         importador.html alta-videos.html alta-modulo.html alta-seccion.html \
-         cohorte.html guion.html superficies.html; do
-  sed -n '/app-shell: sincronizar/,/\/app-shell/p' $f | sed 's/ aria-current="page"//' | md5sum
-done | sort -u   # → una sola línea
-```
-
-### La escena: en qué momento de la construcción está el sistema
-
-Cada vista declara su **escena**. Es lo que corrige el problema silencioso de la tanda 1: dibujó el
-régimen sin declararlo, y eso lleva a priorizar como si el estado normal fuera el de dentro de un año.
-
-| Escena | Momento | Datos |
-|---|---|---|
-| `E1` | Día 0 | Nada cargado |
-| `E2` | Semana 1 | 55 IDs en `backlog`, 0 preguntas |
-| `E3` | Mes 1 | C01 publicado (2), C02 editado (6), C03 guionado (4), 43 en backlog |
-| `E4` | Mes 2 | Los 12 de P1 publicados, 60 preguntas, Ruta apta |
-| `E5` | Régimen | Lo que maquetó la tanda 1. **Es el default: sin `?escena=` se muestra este** |
-
-Un bloque se marca con `data-escena="E2"`, o con varias separadas por coma. `ui.js` oculta los que no
-corresponden con **`data-escena-off`** — un atributo propio, **no `hidden`**: las solapas y el
-conmutador de vista usan `hidden` y se pisarían. Así componen.
-
-**Tres reglas que no se negocian:**
-
-1. **Los datos de una escena nunca se mezclan con los de otra.** Por eso se alternan bloques enteros
-   de HTML y no celdas sueltas.
-2. **Si se pide una escena que la pantalla no maqueta, avisa.** Nunca muestra los datos de otro
-   momento con el rótulo cambiado.
-3. **Monotonía temporal: entre escenas sucesivas, el estado de un video solo puede avanzar.** Las
-   únicas excepciones son `a regrabar` y `obsoleto`, posteriores a `publicado`. Vale igual para todo
-   contador derivado: el banco de la Ruta Esencial no baja, y un módulo ya activado sigue activo.
-
-**Los estados vacíos son escenas**, no un parámetro aparte: el estado vacío de una pantalla *es* esa
-pantalla en E1 o E2. No hay `?state=empty`.
-
-**Ojo con el orden de ejecución.** El script inline de cada página corre durante el parseo, y
-`bindEscena` corre en `DOMContentLoaded`. Si un controlador de página necesita ocultar el bloque de
-la escena activa, tiene que usar `hidden` — con `data-escena-off` se lo saca `bindEscena` después.
-
-### El contrato de URL
-
-Los estados y las solapas no tienen archivo propio: se abren sobre su pantalla padre con query
-params. `index.html` tiene la tabla completa enlazada — **es el índice canónico** y hay que
-actualizarlo si se agrega una pantalla o un estado.
-
-| Param | Valores |
-|---|---|
-| `?sup=` | `BAK` (default) · `FRT` · `CRM` |
-| `?m=` | `0`, `10`, `20` … `95`, `R01` |
-| `?v=` | `BAK-M30.050` |
-| `?tab=` | `ficha` (default) · `versiones` · `guion` · `preguntas` · `ubicaciones` |
-| `?vista=` | `tabla` (default) · `kanban` — tablero |
-| `?escena=` | `E1` · `E2` · `E3` · `E4` — sin parámetro, `E5` |
-| `?modo=` | `planificacion` (default) · `sesion` — hoja de cohorte |
-| `?paso=` | `1` · `2` · `3` · `4` · `resultado` — importador |
-| `?c=` | `C03` — cohorte |
-
-`design-system.html` tiene la tabla de **decisiones abiertas**, que hay que mantener sincronizada con
-lo que el prototipo resuelve de una manera sin que esté decidido.
-
-### JS: dos archivos, sin lógica
+## Los ocho archivos de JS
 
 No hay módulos ES (romperían `file://`). Cada archivo expone un global vía IIFE.
 
 | Archivo | Global | Rol |
 |---|---|---|
 | `icons.js` | `ICONS`, `renderIcons()` | Mapa de paths SVG + hidratación de `<span class="icon" data-icon="…">` |
-| `ui.js` | `UI` | Solapas, conmutador de vista, menús, modal, orden de tabla, selección múltiple |
+| `academia-data.js` | `ACADEMIA_DATA` | **El dataset.** Superficies, planes, 13 módulos, 31 secciones, 55 videos, 20 cohortes |
+| `academia-agencias.js` | *(cuelga de `ACADEMIA_DATA`)* | 12 agencias y 56 personas, **todas ficticias** |
+| `academia-guiones.js` | *(cuelga de `ACADEMIA_DATA`)* | Los 12 guiones de P1, verbatim |
+| `academia-preguntas.js` | *(cuelga de `ACADEMIA_DATA`)* | Las 550 preguntas, en tres capas |
+| `academia-sim.js` | `SIM` | **El motor.** Escenas, overlay, todos los agregados derivados, `verificar()` |
+| `render.js` | `RENDER` | Helpers de markup. Emite el mismo HTML que antes estaba literal |
+| `ui.js` | `UI` | Solapas, conmutador de vista, menús, modal, orden de tabla, selección múltiple, **filtros, exportación a CSV y `rebind()`** |
 
-**Orden obligatorio:** `icons.js` → `ui.js` → script inline de la página.
+**Orden de carga obligatorio**, y no es negociable — cada uno necesita al anterior:
 
-`ui.js` cablea solo, sin configuración: `data-tabs` + `data-tab` + `data-panel`, `data-view-switch` +
-`data-view` + `data-view-panel`, `data-dropdown`, `data-modal-open` / `data-modal-close`,
-`data-sortable` + `data-sort-key`, `data-bulk`.
+```
+icons.js → academia-data.js → academia-agencias.js → academia-guiones.js
+        → academia-preguntas.js → academia-sim.js → render.js → ui.js
+        → script inline de la página
+```
 
-Lo que el repo hermano tiene y acá **no se copió** —guardas de módulo, sesión expirada, hidratación
-de usuario— dependía de un `mock-data.js` con reglas de negocio que este prototipo no tiene.
+**Ojo con el orden de ejecución.** Los `<script src>` van al final del `<body>`, así que el script
+inline corre durante el parseo y el `renderIcons()` de `icons.js` hidrata lo generado en el
+`DOMContentLoaded` posterior. `ui.js` cablea solapas, orden de tabla y selección múltiple sobre las
+filas ya generadas. Si un render ocurriera más tarde, hay que llamar a `renderIcons(root)` a mano —
+`RENDER.pintar()` ya lo hace.
+
+### Qué va en cada capa
+
+- **`academia-data.js` es DATO, no lógica.** Si un número está escrito ahí y también se puede
+  calcular, está de más.
+- **`academia-sim.js` es CÁLCULO, no markup.** No toca el DOM: se puede cargar en node.
+- **`render.js` es MARKUP, no cálculo.** Solo arma HTML con lo que el motor ya resolvió.
+
+## La escena: en qué momento de la construcción está el sistema
+
+| Escena | Momento | Datos |
+|---|---|---|
+| `E1` | Día 0 | Nada cargado |
+| `E2` | Semana 1 | 55 IDs en `backlog`, 0 preguntas |
+| `E3` | Mes 1 | C01 publicado (2), C02 editado (6), C03 guionado (4), 43 en backlog · 10 preguntas |
+| `E4` | Mes 2 | Los 12 de P1 publicados, 60 preguntas, Ruta apta |
+| `E5` | Régimen | Lo que maquetó la tanda 1. **Es el default: sin `?escena=` se muestra este** |
+| `E6` | En operación | La academia completa: 51 publicados, bancos de 50, **12 agencias usándola** |
+
+**El estado se modela por HITOS, no por escena.** Cada video declara la primera escena en la que
+alcanza cada estado:
+
+```js
+{ guionado: "E3", publicado: "E4" }   // en E2 está en backlog; de E4 en adelante, publicado
+```
+
+El estado en una escena es el más avanzado cuyo hito ya ocurrió. **Consecuencia: la monotonía temporal
+es imposible de violar** — no existe forma de escribir un retroceso. Modelarlo con un estado por
+escena sí lo permitía, y era el riesgo más grande del dato hecho a mano.
+
+**Tres reglas que no se negocian:**
+
+1. **Los datos de una escena nunca se mezclan con los de otra.** El overlay de `localStorage` se
+   guarda **por escena** por el mismo motivo: marcar un video como grabado mirando el Mes 1 no puede
+   ensuciar el régimen.
+2. **Si se pide una escena que la pantalla no maqueta, avisa.** Nunca muestra los datos de otro
+   momento con el rótulo cambiado.
+3. **Monotonía temporal: entre escenas sucesivas, el estado de un video solo puede avanzar.** Las
+   únicas excepciones son `a regrabar` y `obsoleto`, posteriores a `publicado`. Vale igual para todo
+   contador derivado: el banco no baja y un módulo ya activado sigue activo.
+
+**Los estados vacíos son dato, no escena.** Un módulo sin videos publicados muestra «todavía no
+corresponde escribir preguntas» en **cualquier** escena: `banco.html?m=50` en régimen y
+`banco.html?m=30&escena=E2` muestran lo mismo, porque la condición es la misma.
+
+Un bloque se marca con `data-escena="E2"`, o con varias separadas por coma. `ui.js` oculta los que no
+corresponden con **`data-escena-off`** — un atributo propio, **no `hidden`**: las solapas y el
+conmutador de vista usan `hidden` y se pisarían. Así componen.
+
+## El contrato de URL
+
+`index.html` tiene la tabla completa enlazada — **es el índice canónico** y hay que actualizarlo si se
+agrega una pantalla o un estado.
+
+| Param | Valores |
+|---|---|
+| `?sup=` | `BAK` (default) · `FRT` · `CRM` |
+| `?m=` | Cualquiera de los 13: `0`, `10`, `20` … `95`, `R01` |
+| `?v=` | Cualquiera de los 55: `BAK-M30.050` |
+| `?c=` | Cualquiera de los 20: `C01` … `C20` |
+| `?a=` | Cualquiera de las 12 agencias, por su identificador — `agencia.html` |
+| `?tab=` | `ficha` (default) · `versiones` · `guion` · `preguntas` · `ubicaciones` |
+| `?vista=` | `tabla` (default) · `kanban` — tablero |
+| `?escena=` | `E1` … `E6` — sin parámetro, `E5` |
+| `?modo=` | `planificacion` (default) · `sesion` — hoja de cohorte |
+| `?paso=` | `1` · `2` · `3` · `4` · `resultado` — importador |
+| `?sup=` | También lo lee `alta-modulo.html`, para arrancar en la superficie que se venía mirando |
+| `?m=` | También lo leen `alta-seccion.html` y `alta-videos.html`, para precargar el módulo padre |
+| `?config=1` | Abre la configuración de evaluación — `banco.html` |
+| `?reset=1` | **Borra el overlay de `localStorage`.** Vuelve al dataset limpio, en cualquier pantalla |
+
+> **Después de mutar, recargá con `UI.recargar()`, nunca con `location.reload()`.** Descarta
+> `reset=1` de la URL: recargar con ese parámetro puesto borra el cambio que se acaba de guardar, y
+> el usuario ve que no pasó nada.
+
+`design-system.html` tiene la tabla de **decisiones abiertas**, que hay que mantener sincronizada.
 
 ## Las reglas de diseño que están cableadas
 
@@ -173,130 +229,252 @@ Salieron de tres rondas de revisión del wireframe. **Romperlas es un error, no 
 
 | # | Regla |
 |---|---|
-| R1 | **No hay carga de archivos de video.** Los videos viven en YouTube: link → «Traer datos» (título y duración por API) → validación de embebido → confirmar. **Nunca un dropzone** |
+| R1 | **No hay carga de archivos de video.** Los videos viven en YouTube: link → «Traer datos» → validación de embebido → confirmar. **Nunca un dropzone** |
 | R2 | **La zona de identidad del video va deshabilitada, con candado.** ID, superficie, módulo y secuencia no se editan después del alta: el ID sobrevive al regrabado |
 | R3 | **Estado de producción y visibilidad en el Front son dos controles separados.** El interruptor se habilita solo si el estado es `publicado`. En el kanban la visibilidad viaja como chip dentro de la tarjeta, **nunca como columna** |
 | R4 | **Los contadores del banco se ven siempre**, durante toda la carga. No aparecen como error al final |
 | R5 | **Tablas antes que tarjetas.** La tabla es el default del tablero; el kanban es un conmutador |
-| R6 | **Densidad alta.** Herramienta interna de uso diario para 3 a 5 personas. Sin onboarding, sin tours, sin contenido de marketing, sin whitespace decorativo |
+| R6 | **Densidad alta.** Herramienta interna de uso diario para 3 a 5 personas. Sin onboarding, sin tours, sin whitespace decorativo |
 | R7 | **Desktop 1440 px.** No hay responsive en este alcance |
 | R8 | **La Ruta Esencial referencia videos, no los copia.** Su banco es *derivado* y se muestra etiquetado como tal |
-| R9 | **El wireframe dibuja estados rotos, no ideales.** Hay que mantenerlos: el sorteo que no se puede cumplir, el módulo no apto para activar, las preguntas a revisar. Es el estado en el que se va a vivir mientras se carga contenido |
-| R10 | **El Home mide avance de construcción, no operación.** En las etapas de arranque no hay uso: no inventar métricas de uso. Lo único de operación permitido es «módulos activos» y «agencias con acceso» |
-| R11 | **Los videos nacen en `backlog`, sin link y sin versión.** El alta **nunca** pide un link de YouTube: son IDs reservados. Es lo que permite que el mapa mire hacia adelante |
+| R9 | **El wireframe dibuja estados rotos, no ideales.** Hay que mantenerlos: el sorteo que no se puede cumplir, el módulo no apto, las preguntas a revisar |
+| R10 | **El Home mide avance de construcción, no operación** — en E1 a E5. En esas cinco escenas no hay uso, así que no hay métricas de uso: lo único de operación permitido es «módulos activos» y «agencias con acceso». **E6 queda fuera del alcance de R10**, y es la única escena donde el uso existe y se puede medir |
+| R11 | **Los videos nacen en `backlog`, sin link y sin versión.** El alta **nunca** pide un link de YouTube: son IDs reservados |
 
 Los 7 estados de producción, en orden: `backlog` → `guionado` → `grabado` → `editado` → `publicado`
 → `a regrabar` → `obsoleto`.
 
 `data-estado` lleva **el nombre exacto**, sin abreviar ni slugificar — incluido
 `data-estado="a regrabar"`, con espacio. Ese vocabulario se copia a desarrollo. Los pasos del
-importador son otro vocabulario y usan `data-paso-estado`, para no pisar el atributo.
+importador usan `data-paso-estado`, para no pisar el atributo.
+
+## Las reglas de negocio, y dónde viven
+
+Todas en `academia-sim.js`. Ninguna en el HTML.
+
+| Regla | Función |
+|---|---|
+| Estado del video en una escena | `estadoDe(video, escena)` — el hito más avanzado ya alcanzado |
+| Visibilidad en el Front (R3) | `visibleEnFront()` — solo `publicado` o `a regrabar`; el obsoleto nunca |
+| **Al pasar a `a regrabar` u `obsoleto`, las preguntas del video van a `a revisar`** | `estadoPregunta()` |
+| Sorteo de 10 **con cuota por sección** | `sortear()` — no rellena de otra sección: mostraría un banco sano donde no lo hay |
+| Banco de la Ruta, derivado (R8) | `resumenModulo()` — 5 preguntas × video publicado que referencia |
+| Aptitud para activar, 4 criterios | `aptitud()` — compuerta al activar, no condición permanente (D-4) |
+| Mínimo del banco solo si la evaluación está configurada | `resumenModulo()` — antes muestra `—`, no `0 de 50` |
+| Deuda de evaluación | `deudaDeEvaluacion()` — publicados sin ninguna pregunta |
+| Cadena de encadenamiento del cohorte | `cadenaDe()` — se deriva del orden de grabación, no se guarda |
+| Recorrido de una agencia según su plan | `recorridoDe(plan)` — el denominador de todo cálculo de avance |
+| Avance de una persona, **determinista** | `avanceDe()` — semilla estable por ID, nunca `Math.random()` |
+| Configuración de evaluación del módulo | `configEvaluacion()` — hito del dataset, o lo que guardó el overlay |
+| La prioridad la define el cohorte | `conEstado()` — al cambiar el cohorte, la prioridad lo sigue |
+
+### Mutar el overlay
+
+Cinco primitivas, todas en `academia-sim.js` y todas sobre **la escena activa**:
+
+| Función | Qué hace |
+|---|---|
+| `anotar(tipo, id, campos)` | Cambia una entidad. `tipo` ∈ `videos` · `modulos` · `preguntas` · `cohortes` |
+| `crear(tipo, entidad)` | Da de alta. `tipo` ∈ `modulos` · `secciones` · `videos` · `preguntas` · `superficies` |
+| `borrar(tipo, predicado)` | Solo borra lo creado en el overlay; el dataset no se toca |
+| `anotado(tipo, id, escena)` | Lee el parche |
+| `hayCambios(escena)` | Cuántos cambios tiene encima la escena |
+
+**Lo creado se fusiona al cargar, una sola vez** (paso de materialización), y queda marcado con
+`creadoEnOverlay`. Por eso una pantalla que da de alta **navega o recarga** en vez de re-indexar: así
+el alta se ve igual viniendo de esta sesión o de otra.
+
+Qué campos se leen del overlay, y nada más: `estado` y `visible` de un video, los cuatro de
+`EDITABLES` (título, cohorte, duración, planes), `versiones`, `guion`, el `estado` de un módulo y su
+`evaluacion`, el `estado` de una pregunta, y el `entorno` de un cohorte. **Escribir cualquier otro
+campo persiste el JSON pero ningún cálculo lo consume.**
+
+Tres cosas que no se negocian al mutar:
+
+1. **`verificar()` audita SIEMPRE el dataset limpio.** Levanta `ignorarOverlay`, así que el informe
+   sigue midiendo el compromiso del prototipo y no la sesión. Con overlay activo antepone un control
+   informativo (`ok: null`) y suma cuatro de integridad sobre lo creado.
+2. **Las reglas ganan sobre el overlay.** `visibleEnFront()` chequea `obsoleto` **antes** de leer el
+   parche: un `{visible:true}` guardado no puede devolver al Front un video dado de baja (R3).
+3. **Después de mutar hay que repintar.** No hay eventos: la pantalla llama a su función de render
+   —el patrón es `cohorte.html:395-400`— y si re-pintó un `tbody`, además a `UI.rebind()`, o la
+   selección múltiple y los filtros quedan sin cablear.
+
+**Por qué determinista:** con `Math.random()` el avance cambiaría en cada carga y el prototipo se
+leería como si el dato se moviera solo. Alguien mostrando la pantalla en una reunión vería un número
+distinto cada vez que refresca.
 
 ## La regla numérica que une todo
 
-Los datos están escritos a mano, así que **los números tienen que cerrar entre pantallas**. Si tocás
-uno, recalculá la cadena entera.
+**Cada video tiene exactamente un estado.** De ahí salen los contadores del kanban, los tiles del
+tablero y la columna «videos publicados / total» del listado de módulos. Los tres salen del mismo
+cálculo, así que **ya no pueden discrepar**.
 
-**Cada video tiene exactamente un estado.** De ahí salen los contadores del kanban, los tiles de
-métrica del tablero y la columna «videos publicados / total» del listado de módulos. Los tres tienen
-que decir lo mismo.
+Las 5 cadenas de `BAK-M30`, en régimen:
 
-Las 5 cadenas de `BAK-M30`:
-
-1. Preguntas por sección = total del módulo → `6 + 8 + 7 + 7 = 28`
-2. Total − a revisar − borradores = banco vigente → `28 − 7 − 1 = 20`
-3. Faltantes por sección = faltante del módulo → `3 + 2 + 2 + 8 = 15`
-4. Banco mínimo por sección = mínimo del módulo → `8 + 10 + 9 + 8 = 35`
-5. Mínimos por sorteo = preguntas del intento → `2 + 3 + 3 + 2 = 10`
+| Cadena | Verificación |
+|---|---|
+| 1 · Preguntas por sección = total del módulo | `6 + 8 + 7 + 7 = 28` |
+| 2 · Total − a revisar − borradores = banco vigente | `28 − 7 − 1 = 20` |
+| 3 · Faltantes por sección = faltante del módulo | `6 + 7 + 6 + 11 = 30` |
+| 4 · Banco mínimo por sección = mínimo del módulo | `11 + 15 + 13 + 11 = 50` |
+| 5 · Mínimos por sorteo = preguntas del intento | `2 + 3 + 3 + 2 = 10` |
 
 Y la regla que las une: **cuando un video pasa a `a regrabar`, todas sus preguntas vigentes pasan a
 `a revisar`.** Por eso `BAK-M30.060` deja la sección 4 en 0 vigentes de 7, y por eso el sorteo saca
-8 de 10 en vez de 10.
+**8 de 10** en vez de 10.
+
+> Las cadenas 3 y 4 cambiaron respecto de la tanda 1 (`15` y `35`): el mínimo del banco pasó de 35 a
+> **50**, que es el que manda el alcance del MVP. Consecuencia visible: en E5 **ningún** módulo de
+> biblioteca cubre su mínimo, y `BAK-M00`, `BAK-M10` y `BAK-M40` perdieron el chip `apto` — siguen
+> `activo`, que es correcto por D-4.
 
 ## Datos: qué se puede tocar y qué no
 
-**No inventar datos.** El wireframe pasó tres rondas de corrección para que sean los reales del
-proyecto.
+**No inventar datos del proyecto.**
 
-- **Los 55 videos** son los del mapa de contenido, con su ID permanente. Los títulos que el wireframe
-  nombra están copiados verbatim; el resto sale del mapa.
-- **Los 20 cohortes (C01–C20), su escenario compartido y las prioridades P1–P4** salen del
-  **Maestro de Producción**, no del wireframe: 8 de 9 cohortes del wireframe lo contradecían y se
-  alinearon (decisión B-1). Las recetas y el encadenamiento de los guiones de P1 salen de
+- **Los 55 videos** son los del mapa de contenido, con su ID permanente. Los títulos son los del
+  backoffice: 41 coinciden con el repo agencia y **14 difieren**. En `BAK-M80.020` la divergencia es
+  de tema, no de largo («Informe de ventas» vs. «Informe de vencimientos»): queda para reconciliar.
+- **Las secciones de `BAK-M30`** son las del backoffice, no las del repo agencia: son las que
+  sostienen las 5 cadenas. Las otras 27 salen del mapa de contenido.
+- **Los 20 cohortes, su escenario compartido y las prioridades P1–P4** salen del **Maestro de
+  Producción** (decisión B-1). Las recetas y el encadenamiento de P1 salen de
   `Majo_3_Cohorte_P1_guiones`, verbatim.
 - **Prioridad P1 a P4:** son tandas de grabación del Pareto, **no urgencia**. Nunca Alta/Media/Baja.
-- **`Majo_3_Cohorte_P1_guiones` escribe «SIGMA» con una sola M**, 10 veces. Al traer ese texto al
-  prototipo se escribe **SIGMMA**. El documento fuente está pendiente de corrección (B-2).
-- **«plan A» y «plan B» son un placeholder deliberado.** El diccionario real es una decisión abierta:
-  **no reemplazarlo por nombres inventados.** (El Maestro usa `P+B / B / B-nicho` y la vista agencia
-  usa Professional / Business — tres nomenclaturas para lo mismo, sin decidir.)
-- **Fechas y versiones de producto:** solo las que el wireframe especifica. Los videos que no detalla
-  las muestran vacías. **No inventar fechas.**
-- Son de muestra: los links de YouTube, los enunciados de las preguntas y la persona del sidebar.
+- **`Majo_3_Cohorte_P1_guiones` escribe «SIGMA» con una sola M**, 10 veces. Al traer ese texto se
+  escribe **SIGMMA**. El documento fuente está pendiente de corrección (B-2).
+- **Los planes son Professional · Business · Corporate**, de `web.sigmma.net/planes.html`. Cierra D-3.
+  `MD-PROYECTO-CLAUDE.md` escribe «Standard» donde va «Professional»: es un error del documento
+  fuente (B-4). La vieja asignación «plan A / plan B» por módulo **no se renombró**: era arbitraria por
+  admisión propia, así que se re-derivó del Maestro. Renombrarla habría disfrazado un dato inventado
+  de dato real.
+- **Fechas y versiones de producto:** solo las que el wireframe especifica. **No inventar fechas.**
+
+Son de muestra, y se pueden tocar: los links de YouTube, los enunciados de las preguntas, las
+duraciones de los videos, las cadenas de «última actividad», la persona del sidebar y **todo
+`academia-agencias.js`** — las 12 agencias y las 56 personas son ficticias, sin CUIT, sin documentos
+y sin credenciales.
+
+### El banco de preguntas, en tres capas
+
+550 preguntas: 50 por cada uno de los 11 módulos de biblioteca.
+
+| Capa | Cuántas | Qué es |
+|---|---|---|
+| `reutilizada` | 48 | Verbatim del repo `academia-AGENCIA`, remapeadas al video que les corresponde |
+| `escrita` | 64 | Las 9 de `banco.html` (enunciado verbatim, opciones nuevas) más las de los módulos que no tenían ninguna |
+| `estructural` | 438 | Relleno hasta llegar a 50. Preguntan por la **estructura** del módulo, nunca por cómo funciona SIGMMA |
+
+En la escena default hay **166 preguntas, 43 % escritas**. El relleno estructural va marcado y la
+interfaz lo dice: **un banco completado con relleno no es un banco terminado.** Escribir las 550 reales
+es trabajo de contenido, no de código.
+
+`creadaEn` es la escena a partir de la cual la pregunta existe, y se resuelve por **cupo** por video.
+Modelarlo así garantiza que el banco no pueda achicarse entre escenas: `0 → 10 → 60 → 166 → 550`.
 
 ## Verificación
 
-No hay tests automatizados. Esto es lo que se corre antes de dar algo por terminado.
-`design-system.html` se excluye de los greps: ahí los hex son contenido legítimo.
+### 1 · `SIM.verificar()` — 101 controles
+
+Reemplaza los greps manuales de coherencia numérica. Corre en la consola del navegador o en node:
+
+```bash
+node -e 'global.window={};
+  ["academia-data","academia-agencias","academia-guiones","academia-preguntas","academia-sim"]
+    .forEach(f => require(process.cwd()+"/assets/js/"+f+".js"));
+  const r = window.SIM.informe();
+  process.exit(r.ok ? 0 : 1)'
+```
+
+Controla: los 55 videos en las 6 escenas · el conteo por estado de cada escena · **monotonía video por
+video** · los 12 publicados de E4 y que ningún módulo de biblioteca esté completo · los mínimos de
+banco y de sorteo por módulo · las 5 cadenas de `BAK-M30` · el acumulado de preguntas por escena · que
+el banco no se achique · **que no haya operación antes de E6** · que ningún avance saltee módulos ·
+que el uso simulado sea determinista.
+
+### 2 · Disciplina del design system
+
+`design-system.html` se excluye: ahí los hex son contenido legítimo.
 
 ```bash
 PAGS=$(ls *.html | grep -v design-system.html)
 
-# Disciplina del design system
 grep -n "font-medium\|font-semibold" $PAGS                 # → vacío
 grep -nE "#[0-9a-fA-F]{6}\b" $PAGS | grep -v href=         # → vacío
+grep -nE "#[0-9a-fA-F]{6}\b" assets/js/*.js                # → vacío
 grep -noE "\b(bg|text|border)-(red|blue|green|slate|sky|amber|emerald)-[0-9]{2,3}" $PAGS  # → vacío
 
-# Nomenclatura — sobre la superficie del producto, no sobre los .md:
-# README.md y CLAUDE.md citan «SIGMA» entrecomillado para enunciar la regla.
-grep -rn "SIGMA[^M]" *.html assets/js/ src/ | grep -v SIGMMA        # → vacío
+# Nomenclatura. Cuatro archivos citan «SIGMA» ENTRECOMILLADO para enunciar la regla o para
+# documentar el error del documento fuente (B-2/B-4). Citar no es usar, así que se excluyen
+# las comillas angulares — que es justamente lo que marca la diferencia:
+grep -rn "SIGMA[^M]" *.html *.md assets/js/ src/ | grep -v SIGMMA | grep -v '«SIGMA»'   # → vacío
 
-# Que siga siendo maquetación
-grep -n "fetch(\|localStorage\|XMLHttpRequest" assets/js/*.js *.html  # → vacío
+# Sigue sin backend
+grep -n "fetch(\|XMLHttpRequest" assets/js/*.js *.html              # → vacío
+# `localStorage` SOLO en el motor
+grep -ln "localStorage" assets/js/*.js                              # → academia-sim.js
+
+# R10 · el Home no inventa métricas de uso en las escenas de construcción
+grep -inE "videos vistos|% de completitud" home.html                # → solo dentro del bloque E6
+# R11 · ninguna pantalla de alta pide un link
+grep -nE '<(input|textarea)[^>]*(type="url"|link|youtu)' alta-videos.html importador.html  # → vacío
 ```
 
-> **Cuidado con el idiom `cmd | grep -v X >/dev/null && …`.** Con entrada vacía y la salida
-> redirigida a `/dev/null`, GNU grep devuelve 0 y el condicional se invierte. Para automatizar estos
-> controles, capturá la salida y comprobá que esté vacía.
+> **Cuidado con el idiom `cmd | grep -v X >/dev/null && …`.** Con entrada vacía y la salida redirigida
+> a `/dev/null`, GNU grep devuelve 0 y el condicional se invierte. Capturá la salida y comprobá que
+> esté vacía. Y **no pases `$PAGS` sin comillas a un `bash -c`** —ni lo metas en un `eval`—: las
+> líneas se interpretan como comandos y **todos los controles dan ✓ porque el grep nunca corrió**.
+> Con `mapfile -t PAGS < <(ls *.html …)` y `"${PAGS[@]}"` no pasa.
 
-**Coherencia numérica.** Como los datos van a mano, se verifica leyendo el HTML terminado: 55 filas
-en la tabla del tablero, los 7 contadores del kanban sumando 55 y coincidiendo con las tarjetas
-reales de cada columna, el listado de módulos coincidiendo con el tablero módulo por módulo, y las
-5 cadenas de `BAK-M30` presentes en `banco.html`.
-
-**Por escena**, además:
-
-- `E2`: los 55 en `backlog`, 0 preguntas, 0 módulos activos
-- `E3`: `2 + 6 + 4 + 43 = 55`, y los 2 publicados son C01, los 6 editados C02 y los 4 guionados C03
-- `E4`: publicados por módulo `2+3+3+3+1 = 12`, banco 60, Ruta 12/12 apta, y **ningún módulo de
-  biblioteca completo** — que es el argumento de la Ruta Esencial
-- `E5`: `14 + 4 + 2 + 2 + 29 + 3 + 1 = 55`, los 12 de P1 **siguen publicados**, y la Ruta pasó de
-  apta a **activa** con 12/12 videos y banco 60/60
-- **Los mismos 55 IDs en las cuatro:** ninguno aparece ni desaparece, solo cambia el estado
-- **Monotonía: cero retrocesos.** Video por video, `E2 ≤ E3 ≤ E4 ≤ E5` según el orden de avance
+### 3 · Los 18 sidebars idénticos
 
 ```bash
-# R10 — el Home no inventa métricas de uso
-grep -inE "videos vistos|% de completitud|evaluaciones rendidas" home.html   # → vacío
-
-# R11 — ninguna pantalla de alta pide un link
-grep -nE '<(input|textarea)[^>]*(type="url"|link|youtu)' alta-videos.html importador.html  # → vacío
-
-# Los 13 sidebars idénticos
 for f in home.html modulos.html modulo.html video.html tablero.html banco.html \
          importador.html alta-videos.html alta-modulo.html alta-seccion.html \
-         cohorte.html guion.html superficies.html; do
+         cohorte.html guion.html superficies.html \
+         videos.html regrabacion.html panel.html agencias.html agencia.html; do
   sed -n '/app-shell: sincronizar/,/\/app-shell/p' $f | sed 's/ aria-current="page"//' | md5sum
 done | sort -u | wc -l   # → 1
 ```
 
-**Recorrido en el navegador** con `google-chrome --headless=new --dump-dom`, que verifica el DOM ya
-hidratado: cada URL del índice, las 5 solapas de `video.html`, el conmutador tabla↔kanban y los
-estados por `?sup=` / `?m=` / `?v=`. Conviene pasar `--virtual-time-budget=1200`: sin eso, las
-capturas agarran la transición del conmutador a mitad de camino.
+### 4 · Recorrido en el navegador
 
-**Accesibilidad estructural:** un solo `<h1>` por pantalla, jerarquía de headings sin saltos,
-`<img>` con `alt`, sin IDs duplicados, campos con label, botones y links con nombre accesible.
+`google-chrome --headless=new --dump-dom`, con `--virtual-time-budget=1500` — sin eso, las capturas
+agarran el render a mitad de camino. **Sin `.html` en la URL** (ver la nota de `serve@14`).
+
+Vale la pena barrer todo, que es rápido y encuentra caídas: los **55** `video?v=` y `guion?v=`, los
+**13** `modulo?m=` y `banco?m=`, los **20** `cohorte?c=` × 2 modos, las **12** `agencia?a=`, y las
+**6** escenas × 13 pantallas. Todas las URLs de `index.html` tienen que dar 200.
+
+**Para probar lo que se clickea**, `--dump-dom` no alcanza: hay que manejar la página. Un banco de
+pruebas de un archivo, servido desde el mismo origen, resuelve el problema sin sumar dependencias —
+carga la pantalla en un `<iframe>`, le hace clicks reales y vuelca el resultado en un `<pre>` que
+`--dump-dom` sí captura:
+
+```html
+<pre id="out"></pre><iframe id="f"></iframe>
+<script>
+  const cargar = (u) => new Promise((r) => {
+    const f = document.getElementById("f");
+    f.onload = () => setTimeout(() => r(f.contentWindow), 350);
+    f.src = u;                        /* ¡sin `.html`! si no, se pierde el query */
+  });
+</script>
+```
+
+Dos trampas que cuestan una hora cada una: **las URLs del iframe también las redirige `serve@14`**,
+así que `?v=…` se pierde y la prueba corre contra el default sin avisar; y **un `.click()` no mueve
+el foco**, así que para probar que el modal lo devuelve hay que llamar a `.focus()` antes.
+
+### 5 · Accesibilidad estructural
+
+Un solo `<h1>` por pantalla, jerarquía sin saltos, `<img>` con `alt`, sin IDs duplicados, campos con
+label, botones y links con nombre accesible.
+
+> **Al auditar el DOM volcado, sacá primero los `<script>`.** El dump incluye su texto, y los
+> templates del render se cuentan como markup real: da IDs duplicados y `<article>` de más que no
+> existen. Y contá como nombrados los botones con `aria-label` y los inputs envueltos por su `<label>`.
 
 ## Git
 

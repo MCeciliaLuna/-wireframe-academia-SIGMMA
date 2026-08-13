@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Panel macro · Backoffice Academia SIGMMA</title>
+    <meta name="description" content="Uso de la Academia SIGMMA por módulo: personas en plan, aprobaciones, intentos y tasa de reprobación." />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="stylesheet" href="assets/css/academia.css" />
+  </head>
+  <body>
+    <a href="#contenido" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[1001] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-white">Saltar al contenido</a>
+
+    <div class="app-shell">
+      <!-- app-shell: sincronizar con src/partials/app-shell.html -->
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img src="assets/img/logo.svg" alt="SIGMMA" width="96" height="16" class="w-[96px]" />
+          <span class="text-2xs font-bold text-primary">Academia</span>
+        </div>
+
+        <!-- Selector global de superficie. Todo el contenido del backoffice cuelga
+             de cuál está activa. Solo BAK tiene módulos mapeados. -->
+        <div class="relative" data-dropdown>
+          <span class="side-title mb-1 block">Superficie</span>
+          <button type="button" class="surface-picker" data-dropdown-trigger aria-expanded="false" aria-haspopup="true">
+            <span><strong>BAK</strong> · Backoffice</span>
+            <span class="icon icon-sm" data-icon="chevron-down"></span>
+          </button>
+          <div class="menu" role="menu" data-dropdown-menu hidden>
+            <a href="modulos.html?sup=BAK" class="menu-item" role="menuitem">BAK · Backoffice</a>
+            <a href="modulos.html?sup=FRT" class="menu-item" role="menuitem">FRT · Front</a>
+            <a href="modulos.html?sup=CRM" class="menu-item" role="menuitem">CRM</a>
+          </div>
+        </div>
+
+        <nav class="flex flex-col gap-4" aria-label="Secciones del backoffice">
+          <!-- Inicio va suelto, sin grupo: no es una función más sino el punto de
+               partida. En las etapas de construcción es el panel de obra. -->
+          <div class="nav-group">
+            <a href="home.html" class="nav-item" data-escena-keep>
+              <span class="icon" data-icon="activity"></span>Inicio
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Contenido</span>
+            <a href="modulos.html" class="nav-item">
+              <span class="icon" data-icon="layers"></span>Módulos
+            </a>
+            <a href="videos.html" class="nav-item">
+              <span class="icon" data-icon="film"></span>Biblioteca de videos
+            </a>
+            <a href="tablero.html" class="nav-item">
+              <span class="icon" data-icon="columns"></span>Tablero de producción
+            </a>
+            <a href="regrabacion.html" class="nav-item">
+              <span class="icon" data-icon="refresh"></span>Cola de regrabación
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Evaluación</span>
+            <a href="banco.html?m=30" class="nav-item">
+              <span class="icon" data-icon="help-circle"></span>Bancos de preguntas
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="settings"></span>Configuración
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Currícula</span>
+            <a href="modulo.html?m=R01" class="nav-item">
+              <span class="icon" data-icon="route"></span>Ruta Esencial
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Pipeline</span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="git-branch"></span>Impactos en Academia
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Seguimiento</span>
+            <a href="panel.html" class="nav-item" aria-current="page">
+              <span class="icon" data-icon="bar-chart"></span>Panel macro
+            </a>
+            <a href="agencias.html" class="nav-item">
+              <span class="icon" data-icon="users"></span>Detalle por agencia
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Administración</span>
+            <a href="superficies.html" class="nav-item">
+              <span class="icon" data-icon="target"></span>Superficies y planes
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="shield"></span>Usuarios y roles
+            </span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="activity"></span>Auditoría
+            </span>
+          </div>
+        </nav>
+
+        <div class="sidebar-foot">
+          <span class="text-2xs text-gray-700">Majo · Contenido</span>
+        </div>
+      </aside>
+      <!-- /app-shell -->
+
+      <div class="main-col">
+        <header class="page-head">
+          <div>
+            <div class="breadcrumb">Seguimiento / Panel macro</div>
+            <h1 class="page-title">
+              Panel macro
+              <span class="escena-badge" data-escena-label></span>
+            </h1>
+          </div>
+          <div class="page-actions">
+            <button type="button" class="btn btn-bordered btn-sm" data-exportar>
+              <span class="icon" data-icon="download"></span>Exportar
+            </button>
+            <a href="agencias.html" class="btn btn-bordered btn-sm">
+              <span class="icon" data-icon="users"></span>Ver por agencia
+            </a>
+          </div>
+        </header>
+
+        <main id="contenido" class="page-body">
+          <!-- ══════════════ SIN USO · E1 a E5 ══════════════
+               R10: el Home mide avance de CONSTRUCCIÓN, no operación, y esta
+               pantalla es la excepción declarada — existe solo donde hay uso.
+               Antes de E6 no hay nada que medir, y el estado vacío lo dice en
+               vez de mostrar ceros, que se leerían como «va mal». -->
+          <div data-sin-uso hidden>
+            <div class="placeholder-box !py-14">
+              <span class="placeholder-icon" data-icon="bar-chart"></span>
+              <h2 class="text-h4">Todavía no hay uso que medir</h2>
+              <p class="mt-3 max-w-[60ch] text-base text-gray-700" data-sin-uso-texto></p>
+              <div class="mt-8 flex gap-3">
+                <a href="home.html" class="btn btn-primary" data-escena-keep>
+                  <span class="icon" data-icon="activity"></span>Ver el avance de construcción
+                </a>
+                <a href="panel.html?escena=E6" class="btn btn-bordered">
+                  <span class="icon" data-icon="bar-chart"></span>Ver la Academia en operación
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══════════════ EN OPERACIÓN · E6 ══════════════ -->
+          <div class="flex flex-col gap-[18px]" data-con-uso hidden>
+            <div class="grid grid-cols-5 gap-3" data-tiles></div>
+
+            <div class="grid grid-cols-[1fr_340px] items-start gap-[18px]">
+              <section>
+                <h2 class="text-h5 mb-3">Uso por módulo</h2>
+                <div class="filter-bar" data-filtros="[data-filas]">
+                  <div class="relative" data-dropdown>
+                    <button type="button" class="filter-pill" data-dropdown-trigger aria-expanded="false" aria-haspopup="true" data-filtro-pill="plan">
+                      Plan: todos <span class="icon" data-icon="chevron-down"></span>
+                    </button>
+                    <!-- Un módulo puede estar en varios planes, así que el
+                         filtro busca por inclusión y no por igualdad. -->
+                    <div class="menu" role="menu" data-dropdown-menu hidden data-filtro-menu="plan" data-filtro-modo="incluye"></div>
+                  </div>
+                  <label class="filter-search">
+                    <span class="icon" data-icon="search"></span>
+                    <span class="sr-only">Buscar módulo por ID o nombre</span>
+                    <input type="search" placeholder="buscar por ID o nombre" data-filtro-buscar />
+                  </label>
+                  <span class="filter-count" data-conteo></span>
+                </div>
+
+                <div class="table-scroll-y">
+                  <table class="table-dense" data-sortable>
+                    <caption class="sr-only" data-caption></caption>
+                    <thead>
+                      <tr>
+                        <th scope="col" data-sort-key="id">ID</th>
+                        <th scope="col" data-sort-key="titulo">Módulo</th>
+                        <th scope="col">Personas en plan</th>
+                        <th scope="col">Aprobaron</th>
+                        <th scope="col">Intentos</th>
+                        <th scope="col" data-sort-key="tasa" data-sort-type="number">Reprobación</th>
+                        <th scope="col">Agencias completas</th>
+                        <th scope="col" data-sort-key="agencias" data-sort-type="number">% agencias</th>
+                      </tr>
+                    </thead>
+                    <tbody data-filas></tbody>
+                  </table>
+                </div>
+                <p class="foot-note mt-2">
+                  La <strong>tasa de reprobación</strong> es la única columna que señala contenido a
+                  revisar: si un módulo se reprueba mucho, el problema suele estar en el video o en
+                  las preguntas, no en la gente. Se marca a partir del
+                  <strong data-umbral></strong>.
+                </p>
+              </section>
+
+              <aside class="flex flex-col gap-[18px]">
+                <div data-carga></div>
+                <div data-atencion></div>
+              </aside>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="assets/js/icons.js"></script>
+    <script src="assets/js/academia-data.js"></script>
+    <script src="assets/js/academia-agencias.js"></script>
+    <script src="assets/js/academia-guiones.js"></script>
+    <script src="assets/js/academia-preguntas.js"></script>
+    <script src="assets/js/academia-sim.js"></script>
+    <script src="assets/js/render.js"></script>
+    <script src="assets/js/ui.js"></script>
+    <script>
+      /* Panel macro. Estrena `SIM.usoDeModulo()`, que estaba escrito y sin
+         ninguna pantalla que lo consumiera.
+
+         El Home ya resume la operación en una tarjeta; acá se abre por módulo,
+         que es el corte con el que Contenido decide qué revisar. */
+      (function () {
+        "use strict";
+        const S = window.SIM;
+        const R = window.RENDER;
+        const esc = S.escena;
+        const q = esc === "E5" ? null : esc;
+        const UMBRAL = 30;
+
+        const op = S.operacion();
+
+        /* R10 · sin uso no hay métricas de uso. La condición es el dato, no la
+           escena: si no hay agencias con acceso, no hay nada que medir. */
+        if (!op.agencias) {
+          document.querySelector("[data-sin-uso]").hidden = false;
+          const TEXTO = {
+            E1: "La Academia todavía no tiene contenido cargado, así que no hay módulos que nadie pueda cursar.",
+            E2: "Los 55 IDs están reservados pero ningún video está publicado: no hay nada que se pueda ver todavía.",
+            E3: "Los primeros videos están publicados, pero ningún módulo se activó y ninguna agencia tiene acceso.",
+            E4: "La Ruta Esencial es apta para activar. El uso empieza a existir cuando se activa y las agencias entran.",
+            E5: "La Academia está en marcha del lado de producción, pero todavía no hay agencias usándola.",
+          };
+          document.querySelector("[data-sin-uso-texto]").textContent = TEXTO[esc] ||
+            "Todavía no hay agencias con acceso a la Academia.";
+          return;
+        }
+
+        document.querySelector("[data-con-uso]").hidden = false;
+        document.querySelector("[data-umbral]").textContent = UMBRAL + " %";
+
+        R.pintar("[data-tiles]", R.tiles([
+          ["Agencias con acceso", op.agencias],
+          ["Personas en los planteles", op.personas],
+          ["Recorridos completos", op.certificadas],
+          ["Módulos aprobados", op.aprobaciones],
+          ["Tasa de reprobación", op.tasaReprobacion.toFixed(2) + " %",
+            op.tasaReprobacion >= UMBRAL ? "alerta" : null],
+        ]));
+
+        /* Solo los módulos de biblioteca activos: la Ruta no se aprueba, se
+           recorre, y un módulo sin activar no tiene a nadie cursándolo. */
+        const usos = S.modulos
+          .filter(function (m) { return m.tipo === "biblioteca"; })
+          .map(function (m) { return S.usoDeModulo(m, esc); })
+          .filter(function (u) { return u.personasEnPlan > 0; });
+
+        R.pintar("[data-filas]", usos.map(function (u) {
+          /* Los planes del módulo viajan en la fila para que el filtro los
+             pueda leer. Van todos, separados por espacio: el filtro de plan
+             está en modo «incluye» justamente por esto. */
+          const fila = R.filaUsoModulo(u, { escena: q, umbralAlerta: UMBRAL });
+          return fila.replace("<tr ", '<tr data-plan="' +
+            R.esc((u.modulo.planes || []).join(" ")) + '" ');
+        }).join(""));
+
+        document.querySelector("[data-conteo]").textContent =
+          usos.length + (usos.length === 1 ? " resultado" : " resultados");
+        document.querySelector("[data-caption]").textContent =
+          "Uso de los " + usos.length + " módulos activos: personas alcanzadas por plan, " +
+          "aprobaciones, intentos, tasa de reprobación y qué proporción de agencias los completó.";
+
+        /* El filtro de plan busca coincidencia exacta, así que no sirve para un
+           campo con varios valores. Se resuelve pintando una fila por plan
+           posible sería peor: se filtra por inclusión con un dato normalizado. */
+        window.UI.poblarFiltro("plan", S.planes.map(function (p) { return p.nombre; }), "Plan");
+
+        /* -- Aside ------------------------------------------------------- */
+        R.pintar("[data-carga]", R.sideCard({
+          id: "carga", titulo: "Carga operativa", fuerte: true,
+          cuerpo: R.medidor([
+            { dt: "Meets habilitadas", dd: op.meetsDisponibles },
+            { dt: "Intentos totales", dd: op.intentos },
+            { dt: "Aprobaciones", dd: op.aprobaciones },
+            { dt: "Corte de datos", dd: (function () {
+                /* El dataset guarda ISO; la interfaz muestra DD/MM/YYYY. */
+                const p = String(op.corte || "").split("-");
+                return p.length === 3 ? p[2] + "/" + p[1] + "/" + p[0] : "—";
+              })() },
+          ]),
+          pie: "Una Meet de 30 min por módulo y por agencia, al aprobarlo: es el <strong>techo</strong> de la carga de Soporte, no lo que ya se usó.",
+        }));
+
+        /* Los tres peores por tasa de reprobación. Tres y no todos: la pregunta
+           que responde el aside es «por dónde empiezo», y una lista de once no
+           la responde. */
+        const peores = usos.slice()
+          .filter(function (u) { return u.intentos > 0; })
+          .sort(function (a, b) { return b.tasaReprobacion - a.tasaReprobacion; })
+          .slice(0, 3);
+
+        R.pintar("[data-atencion]", R.sideCard({
+          id: "at", titulo: "Contenido a revisar",
+          cuerpo: peores.length
+            ? '<ul class="flex flex-col gap-2 text-xs">' + peores.map(function (u) {
+                return '<li class="flex items-center justify-between gap-2">' +
+                  '<a href="banco.html?m=' + u.modulo.numero + (q ? "&amp;escena=" + q : "") + '">' +
+                  R.esc(u.modulo.codigo) + " ›</a>" +
+                  '<span class="chip ' +
+                  (u.tasaReprobacion >= UMBRAL ? "chip-alerta" : "chip-meta") + '">' +
+                  u.tasaReprobacion.toFixed(2) + " %</span></li>";
+              }).join("") + "</ul>"
+            : '<p class="text-xs text-ink-soft">Sin intentos registrados.</p>',
+          pie: "Ordenado por tasa de reprobación. Es una señal, no un veredicto: hay que mirar el video y el banco antes de concluir.",
+        }));
+
+        document.querySelector("[data-exportar]").addEventListener("click", function () {
+          window.UI.exportarCSV(
+            "uso-por-modulo-" + esc + ".csv",
+            ["ID", "Módulo", "Personas en plan", "Aprobaron", "Intentos", "Reprobación",
+             "Agencias completas", "% agencias"],
+            window.UI.filasVisibles("[data-filas]")
+          );
+        });
+      })();
+    </script>
+  </body>
+</html>

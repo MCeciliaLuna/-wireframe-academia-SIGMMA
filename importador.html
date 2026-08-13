@@ -49,15 +49,15 @@
             <a href="modulos.html" class="nav-item" aria-current="page">
               <span class="icon" data-icon="layers"></span>Módulos
             </a>
-            <span class="nav-item" aria-disabled="true">
+            <a href="videos.html" class="nav-item">
               <span class="icon" data-icon="film"></span>Biblioteca de videos
-            </span>
+            </a>
             <a href="tablero.html" class="nav-item">
               <span class="icon" data-icon="columns"></span>Tablero de producción
             </a>
-            <span class="nav-item" aria-disabled="true">
+            <a href="regrabacion.html" class="nav-item">
               <span class="icon" data-icon="refresh"></span>Cola de regrabación
-            </span>
+            </a>
           </div>
 
           <div class="nav-group">
@@ -72,9 +72,9 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Currícula</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="modulo.html?m=R01" class="nav-item">
               <span class="icon" data-icon="route"></span>Ruta Esencial
-            </span>
+            </a>
             <span class="nav-item" aria-disabled="true">
               <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
             </span>
@@ -89,12 +89,12 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Seguimiento</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="panel.html" class="nav-item">
               <span class="icon" data-icon="bar-chart"></span>Panel macro
-            </span>
-            <span class="nav-item" aria-disabled="true">
+            </a>
+            <a href="agencias.html" class="nav-item">
               <span class="icon" data-icon="users"></span>Detalle por agencia
-            </span>
+            </a>
           </div>
 
           <div class="nav-group">
@@ -256,7 +256,7 @@ BAK-M00.010,BAK,M00,P+B,C01,P1,backlog,,,,"></textarea>
                 <span class="icon" data-icon="arrow-left"></span>Volver
               </a>
               <a href="importador.html?paso=3" class="btn btn-primary btn-sm">
-                Validar las 58 filas <span class="icon" data-icon="arrow-right"></span>
+                Validar las <span data-n-leidas></span> filas <span class="icon" data-icon="arrow-right"></span>
               </a>
             </div>
           </section>
@@ -266,9 +266,9 @@ BAK-M00.010,BAK,M00,P+B,C01,P1,backlog,,,,"></textarea>
                el importador no sirve. Cada error dice su motivo y su fila. -->
           <section data-panel-paso="3" aria-labelledby="p3" class="contents">
             <div>
-              <h2 class="side-title" id="p3">Validación · 58 filas leídas</h2>
+              <h2 class="side-title" id="p3">Validación · <span data-n-leidas></span> filas leídas</h2>
               <div class="flex gap-3">
-                <div class="metric-tile"><span class="metric-label">Listas para importar</span><p class="metric-value">55</p></div>
+                <div class="metric-tile"><span class="metric-label">Listas para importar</span><p class="metric-value" data-n-videos></p></div>
                 <div class="metric-tile"><span class="metric-label">Con error</span><p class="metric-value" data-tone="alerta">2</p></div>
                 <div class="metric-tile"><span class="metric-label">A saltear</span><p class="metric-value">1</p></div>
               </div>
@@ -304,7 +304,7 @@ BAK-M00.010,BAK,M00,P+B,C01,P1,backlog,,,,"></textarea>
 
             <div class="validation-group" data-tono="ok">
               <div class="validation-head">
-                <span class="icon" data-icon="check-circle"></span>55 filas listas — muestra de las primeras 4
+                <span class="icon" data-icon="check-circle"></span><span data-n-videos></span> filas listas — muestra de las primeras 4
               </div>
               <div class="validation-row">
                 <span class="validation-fila">fila 2</span><span class="font-mono">BAK-M00.010</span>
@@ -334,7 +334,7 @@ BAK-M00.010,BAK,M00,P+B,C01,P1,backlog,,,,"></textarea>
                 <span class="icon" data-icon="arrow-left"></span>Corregir el mapeo
               </a>
               <a href="importador.html?paso=4" class="btn btn-primary btn-sm">
-                Continuar con 55 filas <span class="icon" data-icon="arrow-right"></span>
+                Continuar con <span data-n-videos></span> filas <span class="icon" data-icon="arrow-right"></span>
               </a>
             </div>
           </section>
@@ -351,15 +351,15 @@ BAK-M00.010,BAK,M00,P+B,C01,P1,backlog,,,,"></textarea>
                   </thead>
                   <tbody>
                     <tr>
-                      <td><strong>Videos</strong></td><td class="cell-num">55</td>
+                      <td><strong>Videos</strong></td><td class="cell-num" data-n-videos></td>
                       <td>Todos en <span class="chip chip-backlog">backlog</span>, sin link y sin versión</td>
                     </tr>
                     <tr>
-                      <td><strong>Módulos</strong></td><td class="cell-num">11</td>
+                      <td><strong>Módulos</strong></td><td class="cell-num" data-n-modulos></td>
                       <td>M00, M10, M20, M30, M40, M50, M60, M70, M80, M90, M95 <span class="chip chip-outline">creados por importación</span></td>
                     </tr>
                     <tr>
-                      <td><strong>Cohortes</strong></td><td class="cell-num">20</td>
+                      <td><strong>Cohortes</strong></td><td class="cell-num" data-n-cohortes></td>
                       <td>C01 a C20 <span class="chip chip-outline">creados por importación</span></td>
                     </tr>
                     <tr data-reservado="true">
@@ -388,7 +388,7 @@ BAK-M00.010,BAK,M00,P+B,C01,P1,backlog,,,,"></textarea>
                 <div class="side-card side-card-strong">
                   <h2 class="side-title">Después de importar</h2>
                   <ul class="flex flex-col gap-2 text-xs text-gray-700">
-                    <li>Los 55 IDs quedan reservados en <strong>backlog</strong>.</li>
+                    <li>Los <span data-n-videos></span> IDs quedan reservados en <strong>backlog</strong>.</li>
                     <li>Nada queda publicado ni visible en el Front.</li>
                     <li>Falta crear a mano <span class="font-mono">BAK-M35</span> (reservado) y
                       <span class="font-mono">BAK-R01</span> (Ruta Esencial), que no vienen en el archivo.</li>
@@ -409,7 +409,7 @@ BAK-M00.010,BAK,M00,P+B,C01,P1,backlog,,,,"></textarea>
                 <span class="icon" data-icon="arrow-left"></span>Volver a la validación
               </a>
               <a href="importador.html?paso=resultado" class="btn btn-primary btn-sm">
-                Importar 55 videos, 11 módulos y 20 cohortes
+                Importar <span data-n-videos></span> videos, <span data-n-modulos></span> módulos y <span data-n-cohortes></span> cohortes
               </a>
             </div>
           </section>
@@ -420,14 +420,14 @@ BAK-M00.010,BAK,M00,P+B,C01,P1,backlog,,,,"></textarea>
               <span class="placeholder-icon" data-icon="check-circle"></span>
               <h2 class="text-h4" id="pr">El mapa quedó cargado</h2>
               <p class="mt-3 max-w-[56ch] text-base text-gray-700">
-                Se crearon <strong>55 videos</strong>, <strong>11 módulos</strong> y
-                <strong>20 cohortes</strong>. Los 55 IDs están reservados en backlog: ninguno tiene
+                Se crearon <strong><span data-n-videos></span> videos</strong>, <strong><span data-n-modulos></span> módulos</strong> y
+                <strong><span data-n-cohortes></span> cohortes</strong>. Los <span data-n-videos></span> IDs están reservados en backlog: ninguno tiene
                 link ni versión todavía.
               </p>
               <div class="mt-6 flex gap-2">
                 <a href="home.html?escena=E2" class="btn btn-primary btn-sm">Ir al panel de obra</a>
                 <a href="modulos.html?escena=E2" class="btn btn-bordered btn-sm">Ver los módulos</a>
-                <button type="button" class="btn btn-bordered btn-sm">
+                <button type="button" class="btn btn-bordered btn-sm" data-descargar-log>
                   <span class="icon" data-icon="download"></span>Descargar el log
                 </button>
               </div>
@@ -452,7 +452,49 @@ BAK-M00.010,BAK,M00,P+B,C01,P1,backlog,,,,"></textarea>
     </div>
 
     <script src="assets/js/icons.js"></script>
+    <script src="assets/js/academia-data.js"></script>
+    <script src="assets/js/academia-agencias.js"></script>
+    <script src="assets/js/academia-guiones.js"></script>
+    <script src="assets/js/academia-preguntas.js"></script>
+    <script src="assets/js/academia-sim.js"></script>
+    <script src="assets/js/render.js"></script>
     <script src="assets/js/ui.js"></script>
+    <script>
+      /* Importador de carga inicial. Los conteos salen del dataset: son los
+         mismos 55 videos, 13 módulos y 20 cohortes que después muestra el
+         tablero, así que no pueden discrepar.
+
+         A-1: el importador CREA las entidades que faltan y las marca «creado por
+         importación». Rechazar la fila obligaría a cargar todo a mano primero,
+         que es justo lo que el importador viene a evitar. */
+      (function () {
+        "use strict";
+        const S = window.SIM;
+        const videos = S.videos().length;
+        /* Los módulos que entran por el CSV son los de biblioteca: el reservado y
+           la Ruta Esencial se crean a mano. El archivo no tiene columna de
+           sección, así que se crean 0 secciones — y las superficies vienen como
+           semilla, no por importación. */
+        const modulos = S.modulos.filter(function (m) { return m.tipo === "biblioteca"; }).length;
+        const cohortes = S.cohortes.length;
+        /* Las filas leídas son las del archivo: los videos más las que no se
+           pueden importar. El paso 3 es el más importante de los cuatro. */
+        const conError = 2;
+        const aSaltear = 1;
+
+        const valores = {
+          "data-n-videos": videos,
+          "data-n-modulos": modulos,
+          "data-n-cohortes": cohortes,
+          "data-n-leidas": videos + conError + aSaltear,
+        };
+        Object.keys(valores).forEach(function (attr) {
+          document.querySelectorAll("[" + attr + "]").forEach(function (el) {
+            el.textContent = valores[attr];
+          });
+        });
+      })();
+    </script>
     <script>
       /* Controlador de la pantalla: solo muestra el paso pedido y marca el
          indicador. Los cuatro pasos están escritos en el HTML. */
@@ -471,6 +513,34 @@ BAK-M00.010,BAK,M00,P+B,C01,P1,backlog,,,,"></textarea>
           s.dataset.pasoEstado = estado;
           if (estado === "actual") s.setAttribute("aria-current", "step");
         });
+
+        /* El log del lote. Se arma de la tabla de validación que ya está en
+           pantalla —las filas listas y las rechazadas con su motivo—, así que
+           el archivo dice exactamente lo mismo que se vio antes de confirmar.
+           Derivarlo de otra fuente permitiría que discreparan. */
+        const btnLog = document.querySelector("[data-descargar-log]");
+        if (btnLog) {
+          btnLog.addEventListener("click", function () {
+            const filas = [];
+            document.querySelectorAll("[data-panel-paso='3'] .validation-row").forEach(function (r) {
+              const grupo = r.closest(".validation-group");
+              const estado = grupo ? (grupo.querySelector(".validation-head") || {}).textContent : "";
+              const fila = r.querySelector(".validation-fila");
+              const motivo = r.querySelector(".validation-motivo");
+              filas.push([
+                (estado || "").replace(/\s+/g, " ").trim(),
+                fila ? fila.textContent.trim() : "",
+                r.textContent.replace(/\s+/g, " ").trim(),
+                motivo ? motivo.textContent.trim() : "",
+              ]);
+            });
+            window.UI.exportarCSV(
+              "log-importacion.csv",
+              ["Resultado", "Fila del CSV", "Contenido", "Motivo"],
+              filas
+            );
+          });
+        }
       })();
     </script>
   </body>

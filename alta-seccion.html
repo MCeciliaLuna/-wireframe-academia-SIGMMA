@@ -49,15 +49,15 @@
             <a href="modulos.html" class="nav-item" aria-current="page">
               <span class="icon" data-icon="layers"></span>Módulos
             </a>
-            <span class="nav-item" aria-disabled="true">
+            <a href="videos.html" class="nav-item">
               <span class="icon" data-icon="film"></span>Biblioteca de videos
-            </span>
+            </a>
             <a href="tablero.html" class="nav-item">
               <span class="icon" data-icon="columns"></span>Tablero de producción
             </a>
-            <span class="nav-item" aria-disabled="true">
+            <a href="regrabacion.html" class="nav-item">
               <span class="icon" data-icon="refresh"></span>Cola de regrabación
-            </span>
+            </a>
           </div>
 
           <div class="nav-group">
@@ -72,9 +72,9 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Currícula</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="modulo.html?m=R01" class="nav-item">
               <span class="icon" data-icon="route"></span>Ruta Esencial
-            </span>
+            </a>
             <span class="nav-item" aria-disabled="true">
               <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
             </span>
@@ -89,12 +89,12 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Seguimiento</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="panel.html" class="nav-item">
               <span class="icon" data-icon="bar-chart"></span>Panel macro
-            </span>
-            <span class="nav-item" aria-disabled="true">
+            </a>
+            <a href="agencias.html" class="nav-item">
               <span class="icon" data-icon="users"></span>Detalle por agencia
-            </span>
+            </a>
           </div>
 
           <div class="nav-group">
@@ -122,13 +122,13 @@
           <div>
             <div class="breadcrumb">
               <a href="modulos.html">Contenido / Módulos</a> /
-              <a href="modulo.html?m=30">BAK-M30</a> / Nueva sección
+              <a href="modulo.html?m=30" data-bc-modulo>BAK-M30</a> / Nueva sección
             </div>
             <h1 class="page-title">Nueva sección</h1>
           </div>
           <div class="page-actions">
-            <a href="modulo.html?m=30" class="btn btn-bordered btn-sm">Cancelar</a>
-            <button type="button" class="btn btn-primary btn-sm">Crear sección</button>
+            <a href="modulo.html?m=30" class="btn btn-bordered btn-sm" data-cancelar>Cancelar</a>
+            <button type="button" class="btn btn-primary btn-sm" data-crear>Crear sección</button>
           </div>
         </header>
 
@@ -139,12 +139,7 @@
 
               <div class="field">
                 <label class="label" for="mod">Módulo padre</label>
-                <select class="select !h-9 !text-xs" id="mod">
-                  <option selected>BAK-M30 · Voucher / Servicios</option>
-                  <option>BAK-M00 · Fundamentos</option>
-                  <option>BAK-M10 · File</option>
-                  <option>BAK-M20 · Entidades (clientes, pasajeros, proveedores)</option>
-                </select>
+                <select class="select !h-9 !text-xs" id="mod"></select>
               </div>
 
               <div class="field">
@@ -158,12 +153,7 @@
 
               <div class="field">
                 <label class="label" for="orden">Orden dentro del módulo</label>
-                <select class="select !h-9 !text-xs" id="orden">
-                  <option>1 — antes de «Concepto»</option>
-                  <option>2 — antes de «Carga y proceso»</option>
-                  <option>3 — antes de «Plata: margen e impuestos»</option>
-                  <option selected>5 — al final</option>
-                </select>
+                <select class="select !h-9 !text-xs" id="orden"></select>
               </div>
             </form>
 
@@ -180,14 +170,12 @@
                   el resto esté completo.
                 </p>
               </div>
+              <!-- Las secciones que ya tiene el módulo elegido. Se repintan al
+                   cambiar de módulo: antes eran las de BAK-M30 escritas a mano
+                   y se quedaban ahí aunque se eligiera otro. -->
               <div class="side-card">
-                <h2 class="side-title">Secciones de BAK-M30</h2>
-                <ol class="flex flex-col gap-2 text-xs text-gray-700">
-                  <li>1 · Concepto <span class="chip chip-meta">1 video</span></li>
-                  <li>2 · Carga y proceso <span class="chip chip-meta">2 videos</span></li>
-                  <li>3 · Plata: margen e impuestos <span class="chip chip-meta">2 videos</span></li>
-                  <li>4 · Estados y plantillas <span class="chip chip-meta">2 videos</span></li>
-                </ol>
+                <h2 class="side-title" data-actuales-titulo>Secciones del módulo</h2>
+                <ol class="flex flex-col gap-2 text-xs text-gray-700" data-actuales></ol>
               </div>
             </aside>
           </div>
@@ -196,6 +184,107 @@
     </div>
 
     <script src="assets/js/icons.js"></script>
+    <script src="assets/js/academia-data.js"></script>
+    <script src="assets/js/academia-agencias.js"></script>
+    <script src="assets/js/academia-guiones.js"></script>
+    <script src="assets/js/academia-preguntas.js"></script>
+    <script src="assets/js/academia-sim.js"></script>
+    <script src="assets/js/render.js"></script>
     <script src="assets/js/ui.js"></script>
+    <script>
+      /* Alta de sección. Los dos `<select>` salen del dataset: antes listaban 4
+         de los 13 módulos y unas posiciones atadas a BAK-M30, así que elegir
+         otro módulo dejaba el orden ofreciendo secciones que no eran las suyas. */
+      (function () {
+        "use strict";
+        const S = window.SIM;
+        const R = window.RENDER;
+        const e = S.escena;
+        const q = e === "E5" ? "" : "&escena=" + e;
+
+        /* Se llega desde el detalle de un módulo, que ya sabe cuál es. */
+        const pedido = (S.param("m") || "30").toUpperCase();
+        const inicial = pedido === "R01" ? "R01" : Number(pedido);
+
+        const selMod = document.getElementById("mod");
+        const selOrden = document.getElementById("orden");
+        const inpNom = document.getElementById("nom");
+        const btn = document.querySelector("[data-crear]");
+
+        /* La Ruta no lleva secciones propias: las suyas son los cohortes que
+           referencia (R8). El reservado tampoco: no tiene contenido. */
+        const candidatos = S.modulos.filter(function (m) { return m.tipo === "biblioteca"; });
+
+        R.pintar("#mod", candidatos.map(function (m) {
+          return '<option value="' + m.numero + '"' + (m.numero === inicial ? " selected" : "") +
+            ">" + m.codigo + " · " + R.esc(m.titulo) + "</option>";
+        }).join(""));
+
+        function moduloActual() {
+          return S.modulo(Number(selMod.value)) || candidatos[0];
+        }
+
+        function pintarModulo() {
+          const m = moduloActual();
+          const secciones = m.secciones || [];
+
+          /* Las posiciones posibles son las que existen más una al final. Cada
+             opción nombra la sección que quedaría después, que es lo que deja
+             ver dónde cae sin tener que contar. */
+          R.pintar("#orden", secciones.map(function (s, i) {
+            return '<option value="' + (i + 1) + '">' + (i + 1) + " — antes de «" +
+              R.esc(s.titulo) + "»</option>";
+          }).concat([
+            '<option value="' + (secciones.length + 1) + '" selected>' +
+            (secciones.length + 1) + " — al final</option>",
+          ]).join(""));
+
+          document.querySelector("[data-actuales-titulo]").textContent =
+            "Secciones de " + m.codigo;
+          R.pintar("[data-actuales]", secciones.length
+            ? secciones.map(function (s) {
+                const n = s.videos.length;
+                return "<li>" + s.orden + " · " + R.esc(s.titulo) +
+                  ' <span class="chip chip-meta">' + n + (n === 1 ? " video" : " videos") +
+                  "</span></li>";
+              }).join("")
+            : '<li class="text-ink-soft">Todavía no tiene ninguna.</li>');
+
+          const volver = "modulo.html?m=" + m.numero + q;
+          document.querySelector("[data-cancelar]").setAttribute("href", volver);
+          const bc = document.querySelector("[data-bc-modulo]");
+          bc.setAttribute("href", volver);
+          bc.textContent = m.codigo;
+          validar();
+        }
+
+        function validar() {
+          const nombre = inpNom.value.trim();
+          const m = moduloActual();
+          const repetida = (m.secciones || []).some(function (s) {
+            return s.titulo.toLowerCase() === nombre.toLowerCase();
+          });
+          btn.disabled = !nombre || repetida;
+          btn.title = !nombre ? "Falta el nombre de la sección."
+            : repetida ? m.codigo + " ya tiene una sección con ese nombre." : "";
+          return !btn.disabled;
+        }
+
+        selMod.addEventListener("change", pintarModulo);
+        inpNom.addEventListener("input", validar);
+        pintarModulo();
+
+        btn.addEventListener("click", function () {
+          if (!validar()) return;
+          const m = moduloActual();
+          S.crear("secciones", {
+            codigoModulo: m.codigo,
+            orden: Number(selOrden.value),
+            titulo: inpNom.value.trim(),
+          });
+          window.location.href = "modulo.html?m=" + m.numero + q;
+        });
+      })();
+    </script>
   </body>
 </html>

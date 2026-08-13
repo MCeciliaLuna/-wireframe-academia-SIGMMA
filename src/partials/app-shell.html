@@ -14,10 +14,20 @@
      Al copiarlo, cambiar SOLO el `aria-current="page"` al destino que
      corresponda. Nada más.
 
-     Los destinos que esta tanda NO maqueta van como <span aria-disabled="true">,
+     Los destinos que el prototipo NO maqueta van como <span aria-disabled="true">,
      no como <a>: el wireframe dibuja el menú completo y hay que mostrarlo
      entero, pero un link que no lleva a ningún lado miente. Quedan fuera del
      orden de tabulación.
+
+     Quedan cinco, y todos por el mismo motivo: necesitan entidades que el
+     dataset no tiene. «Configuración» de evaluación se resuelve por modal
+     desde el banco, así que tampoco necesita pantalla propia.
+
+        · Configuración (Evaluación)  → se configura por modal en banco.html
+        · Matriz perfil × módulo      → no hay perfiles en el dataset
+        · Impactos en Academia        → no hay pipeline de producto
+        · Usuarios y roles            → no hay usuarios ni roles
+        · Auditoría                   → no hay log de auditoría
      ========================================================================= -->
 
 <aside class="sidebar">
@@ -55,15 +65,15 @@
       <a href="modulos.html" class="nav-item" aria-current="page">
         <span class="icon" data-icon="layers"></span>Módulos
       </a>
-      <span class="nav-item" aria-disabled="true">
+      <a href="videos.html" class="nav-item">
         <span class="icon" data-icon="film"></span>Biblioteca de videos
-      </span>
+      </a>
       <a href="tablero.html" class="nav-item">
         <span class="icon" data-icon="columns"></span>Tablero de producción
       </a>
-      <span class="nav-item" aria-disabled="true">
+      <a href="regrabacion.html" class="nav-item">
         <span class="icon" data-icon="refresh"></span>Cola de regrabación
-      </span>
+      </a>
     </div>
 
     <div class="nav-group">
@@ -78,9 +88,9 @@
 
     <div class="nav-group">
       <span class="nav-group-title">Currícula</span>
-      <span class="nav-item" aria-disabled="true">
+      <a href="modulo.html?m=R01" class="nav-item">
         <span class="icon" data-icon="route"></span>Ruta Esencial
-      </span>
+      </a>
       <span class="nav-item" aria-disabled="true">
         <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
       </span>
@@ -95,12 +105,12 @@
 
     <div class="nav-group">
       <span class="nav-group-title">Seguimiento</span>
-      <span class="nav-item" aria-disabled="true">
+      <a href="panel.html" class="nav-item">
         <span class="icon" data-icon="bar-chart"></span>Panel macro
-      </span>
-      <span class="nav-item" aria-disabled="true">
+      </a>
+      <a href="agencias.html" class="nav-item">
         <span class="icon" data-icon="users"></span>Detalle por agencia
-      </span>
+      </a>
     </div>
 
     <div class="nav-group">

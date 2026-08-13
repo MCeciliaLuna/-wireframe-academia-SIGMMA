@@ -1,13 +1,18 @@
-# Backoffice de la Academia SIGMMA — prototipo de alta fidelidad
+# Backoffice de la Academia SIGMMA — prototipo funcional
 
 Maquetación del backoffice de gestión interna de la Academia de Autocapacitación SIGMMA: donde el
 staff carga los videos, gestiona el ciclo de vida del contenido y administra los bancos de preguntas.
-La otra cara —la que usan las agencias— vive en el repo hermano **`wireframe-academia-AGENCIA`**.
+La otra cara —la que usan las agencias— vive en el repo hermano **`academia-AGENCIA`**.
 
 El lenguaje visual sale de [`ESTILOS-ACADEMIA.md`](./ESTILOS-ACADEMIA.md), extraído de sigmma.net.
 
-> **Es solo maquetación.** No hay backend, ni API, ni videos reales, ni SSO, ni persistencia. Los
-> datos están escritos a mano en el HTML.
+> **No hay backend, ni API, ni videos reales, ni SSO.** Pero sí hay una **academia completa
+> simulada**: los datos viven en una capa propia de JS, los agregados se derivan de ella y los cambios
+> persisten en `localStorage`. `?reset=1` vuelve al dataset limpio en cualquier pantalla.
+>
+> Eso revierte a propósito una decisión de la primera tanda, que tenía el dato escrito a mano en el
+> HTML. El motivo: los 55 IDs aparecían **1.320 veces** solo en `tablero.html`, y cambiar el estado de
+> un video obligaba a recalcular unos 30 números en 4 archivos. Hoy nada de eso se escribe.
 
 ---
 
@@ -23,7 +28,8 @@ eso podía llevar a desarrollo a priorizar como si el estado normal fuera el de 
 | **E2** | Semana 1 | 55 IDs reservados en `backlog`. Nada grabado, 0 preguntas |
 | **E3** | Mes 1 | C01 publicado, C02 editado, C03 guionado. El resto en backlog |
 | **E4** | Mes 2 | **El hito:** los 12 de P1 publicados, Ruta Esencial apta |
-| **E5** | Régimen | La Academia en marcha. Es lo que maquetó la primera tanda |
+| **E5** | Régimen *(default)* | La Academia en marcha. Es lo que maquetó la primera tanda |
+| **E6** | En operación | **La Academia completa, con uso:** los 11 módulos activos, bancos de 50 preguntas y 12 agencias usándola |
 
 Se recorre con **`?escena=E1..E4`**. Sin parámetro, todas las pantallas abren en **E5**.
 
@@ -62,6 +68,23 @@ npm run serve    # servidor local en http://localhost:4321 (opcional)
 ```
 
 Si tocás `src/input.css`, **recompilá y commiteá el CSS**: está versionado a propósito.
+
+> **Con `npm run serve`, usá las URLs sin `.html`.** `serve@14` redirige `/tablero.html` a `/tablero`
+> con un 301 que **descarta el query string**, así que `/tablero.html?escena=E6` renderiza E5 sin
+> avisar. Sobre `file://` no pasa: ahí el `.html` va y los parámetros llegan.
+
+**Para verificar el dataset sin navegador**, el motor corre en node:
+
+```bash
+node -e 'global.window={};
+  ["academia-data","academia-agencias","academia-guiones","academia-preguntas","academia-sim"]
+    .forEach(f => require(process.cwd()+"/assets/js/"+f+".js"));
+  process.exit(window.SIM.informe().ok ? 0 : 1)'
+```
+
+Son **101 controles**: los 55 videos en las 6 escenas, la monotonía video por video, las 5 cadenas del
+banco, el acumulado de preguntas, que no haya operación antes de E6 y que el uso simulado sea
+determinista.
 
 ---
 
@@ -105,10 +128,19 @@ Si tocás `src/input.css`, **recompilá y commiteá el CSS**: está versionado a
 | **Home — Ruta Esencial apta** | `home.html?escena=E4` |
 | **Detalle de la Ruta — apta para activar** | `modulo.html?m=R01&escena=E4` |
 
-### Régimen (E5) — la primera tanda
+### Régimen (E5)
 
 `modulos.html` · `modulo.html?m=30` · `video.html?v=BAK-M30.050` (+ `&tab=`) · `tablero.html`
-(+ `?vista=kanban`) · `banco.html?m=30` · `design-system.html#shell`
+(+ `?vista=kanban`) · `banco.html?m=30` · `videos.html` · `regrabacion.html` ·
+`design-system.html#shell`
+
+### En operación (E6)
+
+`panel.html?escena=E6` · `agencias.html?escena=E6` · `agencia.html?a=andes-receptivo&escena=E6`
+
+Son las únicas tres pantallas que miden **uso**. En E1 a E5 no hay agencias, así que muestran el
+estado vacío en vez de ceros: un cero se lee como «va mal», y lo que pasa es que todavía no hay nada
+que medir. Es **R10** aplicado al pie de la letra.
 
 ### Los cuatro flujos
 
@@ -119,19 +151,48 @@ Si tocás `src/input.css`, **recompilá y commiteá el CSS**: está versionado a
 
 **F8 es el que responde cuándo se puede lanzar la Academia**, y el más valioso para negocio.
 
+### Lo que se puede hacer, y queda guardado
+
+El prototipo dejó de ser solo navegable: **toda acción que se ofrece se puede ejecutar**, y el cambio
+persiste por escena en `localStorage`. `?reset=1` vuelve al dataset limpio.
+
+| Dónde | Qué |
+|---|---|
+| `video.html` | Cambiar el estado entre los 7 · prender o apagar la visibilidad en el Front · editar título, plan, cohorte y duración · cargar una versión nueva · duplicar |
+| `modulo.html` | **Activar y desactivar el módulo** — el final del flujo F8 |
+| `tablero.html` | Cambiar el estado, asignar cohorte o mandar a la cola **en lote**, sobre la selección |
+| `banco.html` | Configurar la evaluación · escribir una pregunta · filtrar por estado, sección y video |
+| `guion.html` | Escribir y guardar el guión, que pasa el video a `guionado` |
+| `alta-videos.html` | **Reservar IDs** de verdad — nacen en `backlog`, sin link y sin versión (R11) |
+| `alta-modulo.html` · `alta-seccion.html` | Crear módulos y secciones |
+| `superficies.html` | Dar de alta una superficie, que nace sin mapear |
+| `cohorte.html` | El checklist de «antes de apretar REC», que ahora se conserva |
+| Listados | Filtrar, buscar y **exportar a CSV lo que está filtrado** |
+
+Lo que **no** cambia nunca: el ID, la superficie, el módulo y la secuencia de un video. Es **R2** —
+el ID sobrevive al regrabado y todo cuelga de él.
+
+**Las reglas siguen mandando sobre el overlay.** Un video `obsoleto` no se puede volver visible en el
+Front aunque se guarde que sí (R3); al pasar un video a `a regrabar` sus preguntas caen solas a
+`a revisar` y el sorteo sale corto; y `SIM.verificar()` **audita siempre el dataset limpio**, así que
+sigue diciendo la verdad aunque la sesión tenga cambios encima.
+
 ### Contrato de URL
 
 | Param | Valores |
 |---|---|
-| `?escena=` | `E1` · `E2` · `E3` · `E4` — sin parámetro, E5 |
+| `?escena=` | `E1` … `E6` — sin parámetro, **E5** |
 | `?sup=` | `BAK` *(default)* · `FRT` · `CRM` |
-| `?m=` | `0`, `10`, `20` … `95`, `R01` |
-| `?v=` | `BAK-M30.050` |
+| `?m=` | **Cualquiera de los 13:** `0`, `10`, `20` … `95`, `R01` |
+| `?v=` | **Cualquiera de los 55:** `BAK-M30.050` |
 | `?tab=` | `ficha` *(default)* · `versiones` · `guion` · `preguntas` · `ubicaciones` |
 | `?vista=` | `tabla` *(default)* · `kanban` — tablero |
 | `?modo=` | `planificacion` *(default)* · `sesion` — hoja de cohorte |
 | `?paso=` | `1` · `2` · `3` · `4` · `resultado` — importador |
-| `?c=` | `C03` — cohorte |
+| `?c=` | **Cualquiera de los 20:** `C01` … `C20` — cohorte |
+| `?a=` | **Cualquiera de las 12 agencias**, por su identificador — `agencia.html` |
+| `?config=1` | Abre la configuración de evaluación — `banco.html` |
+| `?reset=1` | **Borra el overlay de `localStorage`** y vuelve al dataset limpio, en cualquier pantalla |
 
 ---
 
@@ -146,6 +207,26 @@ escenario compartido. **Las recetas y el encadenamiento de los guiones de P1** s
 
 Son de muestra: las fechas, los links de YouTube, los enunciados de las preguntas y la persona del
 sidebar.
+
+### Qué está simulado, y se puede tocar
+
+Son de muestra: los links de YouTube, los enunciados de las preguntas, las duraciones de los videos,
+las cadenas de «última actividad» y la persona del sidebar.
+
+Y **todo lo de las agencias es ficticio**: las 12 agencias y las 56 personas de
+`assets/js/academia-agencias.js` no existen. No hay CUIT, ni documentos, ni credenciales, ni correos.
+
+El banco tiene **550 preguntas** —50 por cada módulo de biblioteca— en tres capas:
+
+| Capa | Cuántas | Qué es |
+|---|---|---|
+| `reutilizada` | 48 | Verbatim del repo `academia-AGENCIA` |
+| `escrita` | 64 | Las 9 de `banco.html` más las de los módulos que no tenían ninguna |
+| `estructural` | 438 | Relleno hasta 50. Preguntan por la **estructura** del módulo, nunca por cómo funciona SIGMMA |
+
+En la escena default hay 166 preguntas, **43 % escritas**. El relleno va marcado y la interfaz lo
+dice: un banco completado con relleno no es un banco terminado. Escribir las 550 reales es trabajo de
+contenido, no de código.
 
 ### Convenciones de dato
 
@@ -172,16 +253,28 @@ sidebar.
 ├── assets/
 │   ├── css/academia.css           compilado y versionado
 │   ├── fonts/  img/logo.svg       de web-2026
-│   └── js/  icons.js  ui.js       set de iconos + comportamiento de interfaz
+│   └── js/
+│       ├── icons.js               set de iconos SVG
+│       ├── academia-data.js       EL DATASET · superficies, módulos, secciones, videos, cohortes
+│       ├── academia-agencias.js   12 agencias y 56 personas · todo ficticio
+│       ├── academia-guiones.js    los 12 guiones de P1, verbatim
+│       ├── academia-preguntas.js  las 550 preguntas, en tres capas
+│       ├── academia-sim.js        EL MOTOR · escenas, overlay, agregados, verificar()
+│       ├── render.js              helpers de markup
+│       └── ui.js                  solapas, conmutadores, menús, orden de tabla
 ├── index.html                     índice, agrupado por escena
-├── home.html                      panel de obra, en 5 escenas
+├── home.html                      panel de obra, en 6 escenas
 ├── importador.html  alta-videos.html  alta-modulo.html  alta-seccion.html
 ├── cohorte.html  guion.html  superficies.html
 ├── modulos.html  modulo.html  video.html  tablero.html  banco.html
+├── videos.html                    biblioteca de videos · cierra D-9
+├── regrabacion.html               cola de regrabación · los `a regrabar` y su deuda
+├── panel.html                     panel macro · uso por módulo, solo donde hay uso
+├── agencias.html  agencia.html    seguimiento por agencia y por persona
 └── design-system.html             catálogo, escenas y decisiones abiertas
 ```
 
-**El sidebar está duplicado en las 13 páginas de app**, a propósito: así los `.html` se abren con
+**El sidebar está duplicado en las 18 páginas de app**, a propósito: así los `.html` se abren con
 doble click. La versión canónica es `src/partials/app-shell.html`, y cada copia está delimitada por
 `<!-- app-shell: sincronizar … -->`. El control es que el bloque, sin el `aria-current`, dé el mismo
 hash en todas.
@@ -192,10 +285,11 @@ hash en todas.
 
 | Punto | Vista agencia | Backoffice | Por qué |
 |---|---|---|---|
-| **Datos** | `mock-data.js` con reglas de negocio | **Hardcodeados en el HTML** | Aquel tiene estado real; este es maquetación |
+| **Datos** | `mock-data.js` con reglas de negocio | **Capa de datos propia**, con 550 preguntas y 12 agencias | Los dos tienen estado real. El dataset es distinto: acá manda el ciclo de producción, allá el recorrido del alumno |
 | **Chrome** | Header horizontal de 72 px, 3 destinos | **Sidebar de 200 px**, 16 destinos en 6 grupos | No entran en una barra |
 | **Responsive** | 3 breakpoints | **1440 px fijo** | Fuera de alcance |
-| **JS** | 6 archivos con máquinas de estado | **2 archivos**, sin lógica de negocio | Solo escenas, solapas, conmutadores y menús |
+| **JS** | 6 archivos con máquinas de estado | **8 archivos**: dataset, motor, render y UI | El motor deriva todos los agregados; nada se escribe a mano |
+| **Planes** | Professional · Business | **Professional · Business · Corporate** | Cierra D-3 con los tres reales de `web.sigmma.net/planes.html` |
 | **Naranja `#ff6b35`** | Una aparición: el certificado | **Ninguna** | Nada acá lo justifica |
 
 El bloque `@theme` de `src/input.css` es **idéntico** al del repo hermano.
@@ -289,7 +383,8 @@ A las 9 reglas no negociables de la primera tanda se suman dos:
   acción posible.
 - **Sin `font-medium`/`font-semibold`, sin hex sueltos, sin clases de la paleta default.**
 - **Sin apariciones de «SIGMA»** en la superficie del producto.
-- **Sin `fetch`, sin `localStorage`, sin lógica de negocio** en el JS.
+- **Sin `fetch`, sin `XMLHttpRequest`, sin módulos ES.** `localStorage` se usa, y **solo** en
+  `academia-sim.js`: es el overlay de la simulación.
 - **Contraste WCAG AA** de todos los pares nuevos, incluidos los 7 segmentos del embudo.
 - Un solo `<h1>` por pantalla, jerarquía sin saltos, `<img>` con `alt`, sin IDs duplicados, campos con
   label, botones y links con nombre accesible.
@@ -301,10 +396,13 @@ Queda para probar a mano: el recorrido de teclado completo y `prefers-reduced-mo
 
 ## Fuera de alcance
 
-- Los destinos del sidebar que este bloque no cubre: **Cola de regrabación, Biblioteca de videos,
-  Matriz perfil × módulo, Impactos en Academia, Panel macro, Detalle por agencia, Usuarios y roles,
-  Auditoría**. Se listan sin ser links.
-- Backend, persistencia, y la **importación real de CSV**: el importador simula sus cuatro pasos, no
-  parsea un archivo.
+- Los **5 destinos del sidebar** que necesitan entidades que el dataset no tiene: **Configuración de
+  evaluación** *(no hace falta como pantalla: se configura por modal desde el banco)*, **Matriz
+  perfil × módulo**, **Impactos en Academia**, **Usuarios y roles** y **Auditoría**. Se listan sin
+  ser links: un link que no lleva a ningún lado miente.
+- **Reordenar por arrastre** (D-6): el asa `⠿` del árbol de secciones y las tarjetas del kanban
+  entre columnas. Sigue siendo una decisión abierta.
+- Backend, y la **importación real de CSV**: el importador simula sus cuatro pasos, no parsea un
+  archivo. Lo que sí es real es el log que baja al final, armado de la tabla de validación.
 - Responsive: 1440 px fijo.
-- La subida de archivos de video. Los videos viven en YouTube.
+- La subida de archivos de video. Los videos viven en YouTube (R1).

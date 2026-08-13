@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Módulos · Backoffice Academia SIGMMA</title>
-    <meta name="description" content="Listado de módulos de la Academia SIGMMA: orden curricular, videos publicados, banco de preguntas y estado." />
+    <title>Biblioteca de videos · Backoffice Academia SIGMMA</title>
+    <meta name="description" content="Los videos de la Academia SIGMMA por módulo y sección: duración, versión vigente, estado de producción y visibilidad en el Front." />
     <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
     <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
     <link rel="stylesheet" href="assets/css/academia.css" />
@@ -46,10 +46,10 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Contenido</span>
-            <a href="modulos.html" class="nav-item" aria-current="page">
+            <a href="modulos.html" class="nav-item">
               <span class="icon" data-icon="layers"></span>Módulos
             </a>
-            <a href="videos.html" class="nav-item">
+            <a href="videos.html" class="nav-item" aria-current="page">
               <span class="icon" data-icon="film"></span>Biblioteca de videos
             </a>
             <a href="tablero.html" class="nav-item">
@@ -120,10 +120,10 @@
       <div class="main-col">
         <header class="page-head">
           <div>
-            <div class="breadcrumb">Contenido / Módulos</div>
+            <div class="breadcrumb">Contenido / Biblioteca de videos</div>
             <h1 class="page-title">
-              Módulos
-              <span class="chip chip-meta" id="chip-total">13 en BAK</span>
+              Biblioteca de videos
+              <span class="chip chip-meta" data-chip-total></span>
               <span class="escena-badge" data-escena-label></span>
             </h1>
           </div>
@@ -131,60 +131,46 @@
             <button type="button" class="btn btn-bordered btn-sm" data-exportar>
               <span class="icon" data-icon="download"></span>Exportar
             </button>
-            <a href="alta-modulo.html" class="btn btn-primary btn-sm" data-nuevo-modulo>
-              <span class="icon" data-icon="plus"></span>Nuevo módulo
+            <a href="alta-videos.html" class="btn btn-primary btn-sm">
+              <span class="icon" data-icon="plus"></span>Reservar IDs
             </a>
           </div>
         </header>
 
         <main id="contenido" class="page-body">
-          <!-- Estado vacío: superficies FRT y CRM todavía no tienen módulos
-               mapeados. Se muestra con ?sup=FRT o ?sup=CRM. -->
-          <div id="vacio" class="placeholder-box" hidden>
-            <span class="placeholder-icon" data-icon="layers"></span>
-            <h2 class="text-h5">Esta superficie todavía no tiene módulos mapeados</h2>
-            <p class="mt-2 max-w-[46ch] text-sm text-ink-soft">
-              El mapa de contenido de <strong id="vacio-sup">FRT</strong> está sin cargar. Cuando se
-              defina la currícula, los módulos se dan de alta acá.
-            </p>
-            <a href="alta-modulo.html" class="btn btn-bordered mt-6" data-nuevo-modulo>
-              <span class="icon" data-icon="plus"></span>Crear el primer módulo
-            </a>
-          </div>
-
-          <!-- ══════════════ E1 · DÍA 0 · SISTEMA VACÍO ══════════════
-               Un solo camino posible: importar el mapa. El alta manual se
-               ofrece como alternativa secundaria, no como opción equivalente. -->
+          <!-- ══════════════ E1 · DÍA 0 ══════════════
+               Sin módulos no hay videos: el único camino es el mapa. Igual que
+               en el listado de módulos, el estado vacío ES la pantalla. -->
           <div data-escena="E1" class="contents">
             <div class="placeholder-box !py-14">
-              <span class="placeholder-icon" data-icon="layers"></span>
-              <h2 class="text-h4">La Academia no tiene contenido cargado</h2>
+              <span class="placeholder-icon" data-icon="film"></span>
+              <h2 class="text-h4">Todavía no hay videos</h2>
               <p class="mt-3 max-w-[58ch] text-base text-gray-700">
-                No hay ningún módulo en <strong>BAK</strong>. El mapa de contenido —11 módulos, 55
-                videos y 20 cohortes— vive hoy en el tablero de Google Sheets y se carga de una vez
-                desde ahí.
+                La biblioteca se llena sola a medida que se reservan los IDs. El mapa de
+                contenido —11 módulos, 55 videos y 20 cohortes— se carga de una vez desde el
+                tablero de producción.
               </p>
               <a href="importador.html" class="btn btn-primary btn-lg mt-8">
                 <span class="icon" data-icon="layers"></span>Importar el mapa de contenido
               </a>
               <p class="mt-4 text-xs text-ink-soft">
-                O <a href="alta-modulo.html">crear el primer módulo a mano</a>.
+                O <a href="alta-videos.html">reservar los primeros IDs a mano</a>.
               </p>
             </div>
           </div>
 
           <!-- ══════════════ CON EL MAPA CARGADO ══════════════
-               Un solo juego de contenedores para las cinco escenas con módulos.
-               Antes eran dos tablas de 13 filas escritas a mano, y las columnas
-               «videos publ. / total» y «banco / mínimo» podían discrepar del
-               tablero y del banco. Ahora salen del mismo cálculo. -->
-          <div id="listado" class="contents" data-escena="E2,E3,E4,E5,E6">
+               La biblioteca mira el CONTENIDO: dónde vive cada video, cuánto
+               dura, qué versión está al aire y si se ve en el Front. El tablero
+               mira lo mismo desde la producción. Son dos preguntas distintas,
+               y por eso son dos pantallas. -->
+          <div class="contents" data-escena="E2,E3,E4,E5,E6">
             <div class="filter-bar" data-filtros="[data-filas]">
               <div class="relative" data-dropdown>
-                <button type="button" class="filter-pill" data-dropdown-trigger aria-expanded="false" aria-haspopup="true" data-filtro-pill="tipo">
-                  Tipo: todos <span class="icon" data-icon="chevron-down"></span>
+                <button type="button" class="filter-pill" data-dropdown-trigger aria-expanded="false" aria-haspopup="true" data-filtro-pill="modulo">
+                  Módulo: todos <span class="icon" data-icon="chevron-down"></span>
                 </button>
-                <div class="menu" role="menu" data-dropdown-menu hidden data-filtro-menu="tipo"></div>
+                <div class="menu" role="menu" data-dropdown-menu hidden data-filtro-menu="modulo"></div>
               </div>
               <div class="relative" data-dropdown>
                 <button type="button" class="filter-pill" data-dropdown-trigger aria-expanded="false" aria-haspopup="true" data-filtro-pill="estado">
@@ -193,17 +179,15 @@
                 <div class="menu" role="menu" data-dropdown-menu hidden data-filtro-menu="estado"></div>
               </div>
               <div class="relative" data-dropdown>
-                <!-- Un módulo puede estar en varios planes: se filtra por
-                     inclusión, no por igualdad. -->
-                <button type="button" class="filter-pill" data-dropdown-trigger aria-expanded="false" aria-haspopup="true" data-filtro-pill="plan">
-                  Plan: todos <span class="icon" data-icon="chevron-down"></span>
+                <button type="button" class="filter-pill" data-dropdown-trigger aria-expanded="false" aria-haspopup="true" data-filtro-pill="visible">
+                  Front: todos <span class="icon" data-icon="chevron-down"></span>
                 </button>
-                <div class="menu" role="menu" data-dropdown-menu hidden data-filtro-menu="plan" data-filtro-modo="incluye"></div>
+                <div class="menu" role="menu" data-dropdown-menu hidden data-filtro-menu="visible"></div>
               </div>
               <label class="filter-search">
                 <span class="icon" data-icon="search"></span>
-                <span class="sr-only">Buscar módulo por ID o nombre</span>
-                <input type="search" placeholder="buscar por ID o nombre" data-filtro-buscar />
+                <span class="sr-only">Buscar video por ID o título</span>
+                <input type="search" placeholder="buscar por ID o título" data-filtro-buscar />
               </label>
               <span class="filter-count" data-conteo></span>
             </div>
@@ -213,15 +197,15 @@
                 <caption class="sr-only" data-caption></caption>
                 <thead>
                   <tr>
-                    <th scope="col" data-sort-key="orden" data-sort-type="number">Orden</th>
                     <th scope="col" data-sort-key="id">ID</th>
-                    <th scope="col" data-sort-key="nombre">Nombre</th>
-                    <th scope="col">Tipo</th>
-                    <th scope="col">Videos publ. / total</th>
-                    <th scope="col">Banco / mínimo</th>
+                    <th scope="col" data-sort-key="titulo">Título</th>
+                    <th scope="col" data-sort-key="modulo">Módulo</th>
+                    <th scope="col" data-sort-key="seccion">Sección</th>
+                    <th scope="col">Duración</th>
+                    <th scope="col" data-sort-key="estado">Estado</th>
+                    <th scope="col">Versión</th>
+                    <th scope="col" data-sort-key="visible">Front</th>
                     <th scope="col">Planes</th>
-                    <th scope="col">Estado</th>
-                    <th scope="col">Últ. actividad</th>
                   </tr>
                 </thead>
                 <tbody data-filas></tbody>
@@ -243,92 +227,69 @@
     <script src="assets/js/render.js"></script>
     <script src="assets/js/ui.js"></script>
     <script>
-      /* Listado de módulos. Las dos columnas que tenían que coincidir con el
-         tablero y con el banco —«videos publ. / total» y «banco / mínimo»—
-         ahora salen del mismo cálculo, así que no pueden discrepar. */
+      /* Biblioteca de videos. Cierra D-9: el wireframe mostraba el destino en el
+         menú y entraba al detalle desde ahí, pero nunca dibujó el listado.
+
+         Todo sale de `SIM.videos()`, así que el conteo por estado coincide con
+         el del tablero y con el del listado de módulos por construcción. */
       (function () {
         "use strict";
         const S = window.SIM;
         const R = window.RENDER;
         const esc = S.escena;
-
-        /* Solo BAK tiene módulos mapeados. FRT y CRM muestran el estado vacío,
-           que no es un error del sistema sino la gobernanza pendiente. */
-        const sup = (S.param("sup") || "BAK").toUpperCase();
-
-        /* El alta arranca en la superficie que se está mirando: llegar a ella
-           desde el vacío de FRT y tener que elegir FRT otra vez es preguntar
-           algo que la pantalla anterior ya sabía. */
-        document.querySelectorAll("[data-nuevo-modulo]").forEach(function (a) {
-          if (sup !== "BAK") a.setAttribute("href", "alta-modulo.html?sup=" + sup);
-        });
-
-        if (sup !== "BAK") {
-          document.getElementById("listado").hidden = true;
-          document.getElementById("vacio").hidden = false;
-          document.getElementById("vacio-sup").textContent = sup;
-          document.getElementById("chip-total").textContent = "0 en " + sup;
-          const picker = document.querySelector(".surface-picker span");
-          if (picker) {
-            picker.innerHTML = "<strong>" + sup + "</strong> · " + (sup === "FRT" ? "Front" : "CRM");
-          }
-          return;
-        }
-
         if (esc === "E1") return; /* El día 0 lo cubre su placeholder. */
 
-        /* En la semana 1 el origen de cada módulo todavía importa: hay que poder
-           revisar qué entró por el importador. Después deja de decir algo. */
-        const mostrarOrigen = esc === "E2";
+        const q = esc === "E5" ? null : esc;
+        const videos = S.videos();
 
-        const filas = S.modulos.map(function (m) {
-          return R.filaModulo(S.resumenModulo(m), {
-            escena: esc === "E5" ? null : esc,
-            mostrarOrigen: mostrarOrigen,
-          });
-        }).join("");
+        R.pintar("[data-filas]", videos.map(function (v) {
+          return R.filaBiblioteca(v, { escena: q });
+        }).join(""));
 
-        R.pintar("[data-filas]", filas);
+        document.querySelector("[data-chip-total]").textContent =
+          videos.length + (videos.length === 1 ? " video" : " videos");
+        document.querySelector("[data-conteo]").textContent =
+          videos.length + (videos.length === 1 ? " resultado" : " resultados");
+        document.querySelector("[data-caption]").textContent =
+          "Los " + videos.length + " videos de BAK, con su módulo y sección, la duración, " +
+          "la versión vigente, el estado de producción y si se ven en el Front.";
 
-        document.getElementById("chip-total").textContent = S.modulos.length + " en BAK";
-        document.querySelector("[data-conteo]").textContent = S.modulos.length + " resultados";
-
-        /* Las facetas salen del catálogo, no de una lista escrita a mano: si
-           mañana hay un tipo o un plan más, el filtro lo tiene solo. */
+        /* Las opciones de cada faceta salen de los datos, no de una lista
+           escrita a mano: si mañana hay un módulo más, el filtro lo tiene. */
         const unicos = function (clave) {
-          const v = {};
-          S.modulos.forEach(function (m) { if (m[clave]) v[m[clave]] = true; });
-          return Object.keys(v).sort();
+          const vistos = {};
+          videos.forEach(function (v) { vistos[v[clave]] = true; });
+          return Object.keys(vistos).sort();
         };
-        window.UI.poblarFiltro("tipo", unicos("tipo"), "Tipo");
-        window.UI.poblarFiltro("estado", ["activo", "borrador", "reservado"], "Estado");
-        window.UI.poblarFiltro("plan", S.planes.map(function (p) { return p.nombre; }), "Plan");
+        window.UI.poblarFiltro("modulo", unicos("codigoModulo"), "Módulo");
+        window.UI.poblarFiltro("estado", S.ESTADOS, "Estado");
+        window.UI.poblarFiltro("visible", [
+          { valor: "true", texto: "visible en el Front" },
+          { valor: "false", texto: "oculto" },
+        ], "Front");
 
-        /* Exportar baja lo que está filtrado, no los 13. */
+        /* La visibilidad en el Front es lo que esta pantalla aporta y el tablero
+           no: es el único lugar donde se ve, de un vistazo, qué está al aire. */
+        const enFront = videos.filter(function (v) { return v.visible; }).length;
+        const publicados = videos.filter(function (v) { return v.estado === "publicado"; }).length;
+        const NOTAS = {
+          E2: "Los 55 IDs están reservados y ninguno tiene link ni versión todavía (R11). La biblioteca existe antes que los videos: eso es lo que permite guionar y planificar el rodaje.",
+          E3: "Los primeros videos con link. La versión aparece recién cuando el video se graba; antes la columna va vacía a propósito.",
+          E4: "Los 12 de P1 publicados y visibles en el Front. Ningún módulo de biblioteca está completo — por eso la Ruta Esencial es la que se puede lanzar.",
+          E5: "En el Front se ven " + enFront + " de " + videos.length + " videos. Los publicados son " + publicados + ": la diferencia son los que están «a regrabar», que siguen al aire hasta que haya reemplazo.",
+          E6: "La biblioteca completa. En el Front se ven " + enFront + " videos; el obsoleto nunca se muestra, aunque su módulo esté activo.",
+        };
+        document.querySelector("[data-nota]").textContent = NOTAS[esc] || "";
+
+        /* Exporta lo que está filtrado, no los 55: si alguien acotó a un módulo
+           y baja el listado completo, el archivo no responde a lo que preguntó. */
         document.querySelector("[data-exportar]").addEventListener("click", function () {
           window.UI.exportarCSV(
-            "modulos-" + esc + ".csv",
-            ["Orden", "ID", "Nombre", "Tipo", "Videos publ. / total", "Banco / mínimo",
-             "Planes", "Estado", "Últ. actividad"],
+            "biblioteca-videos-" + esc + ".csv",
+            ["ID", "Título", "Módulo", "Sección", "Duración", "Estado", "Versión", "Front", "Planes"],
             window.UI.filasVisibles("[data-filas]")
           );
         });
-
-        const activos = S.modulos.filter(function (m) {
-          return m.tipo !== "reservado" && S.resumenModulo(m).estado === "activo";
-        }).length;
-
-        const NOTAS = {
-          E2: "Las 13 filas existen y ninguna es apta: 0 videos publicados y ninguna evaluación configurada. Es el estado normal de la semana 1, no una alerta.",
-          E3: "C01 publicado, C02 editado y C03 guionado. Ningún módulo llega a completarse todavía, y por eso ninguno se puede activar.",
-          E4: "El hito: los 12 de P1 publicados. Ningún módulo de biblioteca queda completo — es exactamente el argumento de la Ruta Esencial, que sí es apta para activar.",
-          E5: "La aptitud es una compuerta al momento de activar, no una condición permanente: BAK-M10 sigue activo con 5 de 6 videos porque BAK-M10.050 quedó obsoleto después de la activación.",
-          E6: "La Academia completa: " + activos + " módulos activos y los bancos en 50 preguntas cada uno. Los que muestran preguntas «a revisar» son los que tienen un video en cola de regrabación.",
-        };
-        document.querySelector("[data-nota]").textContent = NOTAS[esc] || "";
-        document.querySelector("[data-caption]").textContent =
-          "Los " + S.modulos.length + " módulos de BAK, con sus videos publicados sobre el total, " +
-          "el estado de su banco de preguntas y su aptitud para activar.";
       })();
     </script>
   </body>

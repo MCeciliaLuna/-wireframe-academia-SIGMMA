@@ -49,15 +49,15 @@
             <a href="modulos.html" class="nav-item">
               <span class="icon" data-icon="layers"></span>Módulos
             </a>
-            <span class="nav-item" aria-disabled="true">
+            <a href="videos.html" class="nav-item">
               <span class="icon" data-icon="film"></span>Biblioteca de videos
-            </span>
+            </a>
             <a href="tablero.html" class="nav-item" aria-current="page">
               <span class="icon" data-icon="columns"></span>Tablero de producción
             </a>
-            <span class="nav-item" aria-disabled="true">
+            <a href="regrabacion.html" class="nav-item">
               <span class="icon" data-icon="refresh"></span>Cola de regrabación
-            </span>
+            </a>
           </div>
 
           <div class="nav-group">
@@ -72,9 +72,9 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Currícula</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="modulo.html?m=R01" class="nav-item">
               <span class="icon" data-icon="route"></span>Ruta Esencial
-            </span>
+            </a>
             <span class="nav-item" aria-disabled="true">
               <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
             </span>
@@ -89,12 +89,12 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Seguimiento</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="panel.html" class="nav-item">
               <span class="icon" data-icon="bar-chart"></span>Panel macro
-            </span>
-            <span class="nav-item" aria-disabled="true">
+            </a>
+            <a href="agencias.html" class="nav-item">
               <span class="icon" data-icon="users"></span>Detalle por agencia
-            </span>
+            </a>
           </div>
 
           <div class="nav-group">
@@ -120,68 +120,46 @@
       <div class="main-col">
         <header class="page-head">
           <div>
-            <div class="breadcrumb"><a href="tablero.html?escena=E3">Contenido / Tablero</a> / Cohorte C03</div>
+            <div class="breadcrumb" data-breadcrumb></div>
             <h1 class="page-title">
-              <span class="id-mono">C03</span> Voucher y cobro
-              <span class="chip chip-meta">P1</span>
-              <span class="chip chip-meta">4 videos</span>
-              <span class="chip chip-outline">Viajando.com</span>
+              <span data-titulo></span>
+              <span data-chips></span>
               <span class="escena-badge" data-escena-label></span>
             </h1>
           </div>
           <div class="page-actions">
-            <!-- A3: una pantalla con dos modos, siguiendo el conmutador
-                 tabla/kanban que ya existe. Que sean dos pantallas separadas es
-                 una decisión abierta. -->
+            <!-- A-3: una pantalla con dos modos (`?modo=`), no dos pantallas.
+                 Sigue el patrón del conmutador tabla/kanban que ya existía. -->
             <div class="segmented" data-view-switch="modo">
               <button type="button" class="segmented-option" data-view="planificacion" aria-pressed="true">
                 <span class="icon" data-icon="list"></span>Planificación
               </button>
               <button type="button" class="segmented-option" data-view="sesion" aria-pressed="false">
-                <span class="icon" data-icon="play-circle"></span>Sesión de grabación
+                <span class="icon" data-icon="play-circle"></span>Modo sesión
               </button>
             </div>
           </div>
         </header>
 
         <main id="contenido" class="page-body">
-          <div id="sin-maquetar" class="placeholder-box" hidden>
+          <div id="sin-cohorte" class="placeholder-box" hidden>
             <span class="placeholder-icon" data-icon="film"></span>
-            <h2 class="text-h5">La hoja de <span id="sin-maquetar-id">este cohorte</span> no está maquetada</h2>
-            <p class="mt-2 max-w-[52ch] text-sm text-ink-soft">
-              Esta tanda maqueta <strong>C03 Voucher y cobro</strong>, que es el cohorte que sigue en
-              la escena E3. Los otros 19 usan exactamente la misma pantalla.
-            </p>
-            <a href="cohorte.html?c=C03&amp;escena=E3" class="btn btn-primary btn-sm mt-6">Ver C03</a>
+            <h2 class="text-h5" data-vacio-titulo></h2>
+            <p class="mt-2 max-w-[52ch] text-sm text-ink-soft" data-vacio-texto></p>
+            <a href="tablero.html" class="btn btn-primary btn-sm mt-6" data-vacio-cta>Ver el tablero</a>
           </div>
 
-          <div id="hoja" class="contents">
-            <!-- Encabezado del cohorte: el escenario compartido es lo que hace que
-                 grabar por cohorte tenga sentido. Se prepara una vez. -->
+          <div id="hoja" class="contents" hidden>
+            <!-- El escenario compartido es lo que hace que grabar por cohorte
+                 tenga sentido: se prepara una vez. -->
             <section class="side-card side-card-strong" aria-labelledby="esc">
               <div class="flex items-start gap-6">
                 <div class="flex-1">
                   <h2 class="side-title" id="esc">Escenario compartido</h2>
-                  <p class="text-sm text-gray-800">
-                    Se sigue con el file que quedó armado en <strong>C02</strong> (cliente + pasajero
-                    cargados). Acá le agregamos el servicio y cobramos.
-                  </p>
-                  <p class="mt-2 text-xs text-ink-soft">
-                    Se prepara una vez y se graban los 4 de corrido. Ese es el motivo de que el
-                    cohorte exista: si se grabara por módulo, habría que rearmar el escenario cuatro
-                    veces.
-                  </p>
+                  <p class="text-sm text-gray-800" data-escenario></p>
+                  <p class="mt-2 text-xs text-ink-soft" data-escenario-nota></p>
                 </div>
-                <dl class="flex gap-6 border-l border-dashed border-line-strong pl-6">
-                  <div>
-                    <dt class="side-title !mb-1">Grabados</dt>
-                    <dd class="metric-value !text-2xl" data-tone="alerta">0 / 4</dd>
-                  </div>
-                  <div>
-                    <dt class="side-title !mb-1">Con guión</dt>
-                    <dd class="metric-value !text-2xl">4 / 4</dd>
-                  </div>
-                </dl>
+                <dl class="flex gap-6 border-l border-dashed border-line-strong pl-6" data-avance></dl>
               </div>
             </section>
 
@@ -190,65 +168,14 @@
               <section aria-labelledby="prep">
                 <h2 class="side-title" id="prep">Receta de preparación del cohorte</h2>
                 <div class="recipe-box">
-                  <ol class="flex flex-col gap-2 text-xs text-gray-800">
-                    <li><strong>1.</strong> Tener el file de C02 abierto, con el cliente demo y el pasajero ya cargados.</li>
-                    <li><strong>2.</strong> Un proveedor demo disponible para poder cargarle el servicio.</li>
-                    <li><strong>3.</strong> No procesar el voucher antes de grabar: <span class="font-mono">M30.050</span> lo muestra en cámara.</li>
-                  </ol>
-                  <p class="foot-note !border-none">
-                    Entorno: <strong>Viajando.com</strong>. Datos demo sugeridos: pasajero «Juan Demo»,
-                    destino Madrid, salida a 30 días.
-                  </p>
+                  <ol class="flex flex-col gap-2 text-xs text-gray-800" data-receta></ol>
+                  <p class="foot-note !border-none" data-receta-pie></p>
                 </div>
               </section>
 
               <section aria-labelledby="orden">
-                <h2 class="side-title" id="orden">Los 4 videos, en orden de grabación</h2>
-                <div class="flex flex-col gap-2">
-                  <article class="side-card">
-                    <div class="flex items-center gap-3">
-                      <span class="row-id">BAK-M30.010</span>
-                      <strong class="flex-1 text-xs">Qué es el voucher</strong>
-                      <span class="chip chip-guionado">guionado</span>
-                      <span class="chip chip-meta">3 min</span>
-                      <a href="guion.html?v=BAK-M30.010&amp;escena=E3" class="text-xs">ver guión ›</a>
-                    </div>
-                    <p class="chain-link"><span class="icon" data-icon="git-branch"></span>Arranca del <strong>file de C02</strong>.</p>
-                  </article>
-
-                  <article class="side-card">
-                    <div class="flex items-center gap-3">
-                      <span class="row-id">BAK-M30.020</span>
-                      <strong class="flex-1 text-xs">Cargar voucher</strong>
-                      <span class="chip chip-guionado">guionado</span>
-                      <span class="chip chip-meta">4-5 min</span>
-                      <a href="guion.html?v=BAK-M30.020&amp;escena=E3" class="text-xs">ver guión ›</a>
-                    </div>
-                    <p class="chain-link"><span class="icon" data-icon="git-branch"></span>El file de C02, <strong>con un proveedor demo disponible</strong>.</p>
-                  </article>
-
-                  <article class="side-card">
-                    <div class="flex items-center gap-3">
-                      <span class="row-id">BAK-M30.050</span>
-                      <strong class="flex-1 text-xs">Procesar el voucher</strong>
-                      <span class="chip chip-guionado">guionado</span>
-                      <span class="chip chip-meta">2-3 min</span>
-                      <a href="guion.html?v=BAK-M30.050&amp;escena=E3" class="text-xs">ver guión ›</a>
-                    </div>
-                    <p class="chain-link"><span class="icon" data-icon="git-branch"></span>Viene del <strong>voucher recién cargado en M30.020</strong>.</p>
-                  </article>
-
-                  <article class="side-card">
-                    <div class="flex items-center gap-3">
-                      <span class="row-id">BAK-M40.010</span>
-                      <strong class="flex-1 text-xs">Recibos de cobranza</strong>
-                      <span class="chip chip-guionado">guionado</span>
-                      <span class="chip chip-meta">4-5 min</span>
-                      <a href="guion.html?v=BAK-M40.010&amp;escena=E3" class="text-xs">ver guión ›</a>
-                    </div>
-                    <p class="chain-link"><span class="icon" data-icon="git-branch"></span>Viene del <strong>file con voucher procesado</strong>.</p>
-                  </article>
-                </div>
+                <h2 class="side-title" id="orden" data-lbl-orden></h2>
+                <div class="flex flex-col gap-2" data-videos-plan></div>
                 <p class="mt-3 max-w-[80ch] text-xs text-ink-soft">
                   <strong>El encadenamiento es el dato que justifica el cohorte.</strong> Cada video
                   arranca donde terminó el anterior: si se graban desordenados, hay que rearmar el
@@ -262,75 +189,16 @@
               <div class="grid grid-cols-[1fr_340px] items-start gap-[18px]">
                 <div class="flex flex-col gap-3">
                   <section class="side-card side-card-strong" aria-labelledby="check">
-                    <h2 class="side-title" id="check">Antes de apretar REC</h2>
-                    <ul class="checklist-live">
-                      <li>
-                        <label class="choice !py-2">
-                          <input type="checkbox" />
-                          <span class="choice-text">El file de C02 está abierto, con cliente y pasajero cargados</span>
-                        </label>
-                      </li>
-                      <li>
-                        <label class="choice !py-2">
-                          <input type="checkbox" />
-                          <span class="choice-text">Hay un proveedor demo disponible</span>
-                        </label>
-                      </li>
-                      <li>
-                        <label class="choice !py-2">
-                          <input type="checkbox" />
-                          <span class="choice-text">El voucher todavía NO está procesado</span>
-                        </label>
-                      </li>
-                      <li>
-                        <label class="choice !py-2">
-                          <input type="checkbox" />
-                          <span class="choice-text">Micrófono y pantalla en 1080p, sin notificaciones</span>
-                        </label>
-                      </li>
-                    </ul>
+                    <h2 class="side-title flex items-center justify-between gap-2" id="check">
+                      Antes de apretar REC
+                      <span class="font-normal normal-case tracking-normal" data-entorno-avance></span>
+                    </h2>
+                    <ul class="checklist-live" data-check-entorno></ul>
                   </section>
 
                   <section aria-labelledby="rec">
-                    <h2 class="side-title" id="rec">Los 4, uno debajo del otro</h2>
-                    <div class="flex flex-col gap-2">
-                      <article class="side-card">
-                        <div class="flex items-center gap-3">
-                          <span class="row-id">BAK-M30.010</span>
-                          <strong class="flex-1 text-xs">Qué es el voucher</strong>
-                          <span class="chip chip-meta">3 min</span>
-                          <button type="button" class="btn btn-bordered btn-sm">Marcar grabado</button>
-                        </div>
-                        <p class="chain-link"><span class="icon" data-icon="grid"></span>Receta: el file de C02.</p>
-                      </article>
-                      <article class="side-card">
-                        <div class="flex items-center gap-3">
-                          <span class="row-id">BAK-M30.020</span>
-                          <strong class="flex-1 text-xs">Cargar voucher</strong>
-                          <span class="chip chip-meta">4-5 min</span>
-                          <button type="button" class="btn btn-bordered btn-sm">Marcar grabado</button>
-                        </div>
-                        <p class="chain-link"><span class="icon" data-icon="grid"></span>Receta: el file de C02, con un proveedor demo disponible.</p>
-                      </article>
-                      <article class="side-card">
-                        <div class="flex items-center gap-3">
-                          <span class="row-id">BAK-M30.050</span>
-                          <strong class="flex-1 text-xs">Procesar el voucher</strong>
-                          <span class="chip chip-meta">2-3 min</span>
-                          <button type="button" class="btn btn-bordered btn-sm">Marcar grabado</button>
-                        </div>
-                        <p class="chain-link"><span class="icon" data-icon="grid"></span>Receta: el voucher recién cargado en M30.020.</p>
-                      </article>
-                      <article class="side-card">
-                        <div class="flex items-center gap-3">
-                          <span class="row-id">BAK-M40.010</span>
-                          <strong class="flex-1 text-xs">Recibos de cobranza</strong>
-                          <span class="chip chip-meta">4-5 min</span>
-                          <button type="button" class="btn btn-bordered btn-sm">Marcar grabado</button>
-                        </div>
-                        <p class="chain-link"><span class="icon" data-icon="grid"></span>Receta: el file con voucher procesado.</p>
-                      </article>
-                    </div>
+                    <h2 class="side-title" id="rec" data-lbl-rec></h2>
+                    <div class="flex flex-col gap-2" data-videos-sesion></div>
                   </section>
                 </div>
 
@@ -339,33 +207,20 @@
                        lo que hay que tener a la vista mientras se graba. -->
                   <div class="side-card side-card-strong">
                     <h2 class="side-title text-error-dark">Qué NO mostrar</h2>
-                    <ul class="flex flex-col gap-2 text-xs text-gray-800">
-                      <li>Datos sensibles reales: CUIT o documentos de personas.</li>
-                      <li>Precios comerciales reales.</li>
-                      <li>Credenciales y contraseñas.</li>
-                      <li>Nada que exponga a un cliente real.</li>
-                    </ul>
-                    <p class="foot-note">Siempre con datos de <strong>Viajando.com</strong>.</p>
+                    <ul class="flex flex-col gap-2 text-xs text-gray-800" data-no-mostrar></ul>
+                    <p class="foot-note" data-entorno-pie></p>
                   </div>
 
                   <div class="side-card">
                     <h2 class="side-title">Estándar de grabación</h2>
-                    <ul class="flex flex-col gap-2 text-xs text-gray-700">
-                      <li>Intro y cierre <strong>a cámara</strong>; cuerpo con voz sobre pantalla.</li>
-                      <li>Entre <strong>2 y 5 minutos</strong>. Si se pasa, probablemente sean dos videos.</li>
-                      <li>Un solo concepto por video.</li>
-                      <li>Cierre invitando a la evaluación del módulo.</li>
-                    </ul>
+                    <ul class="flex flex-col gap-2 text-xs text-gray-700" data-estandar></ul>
                   </div>
 
                   <div class="side-card">
                     <h2 class="side-title">Avance de la sesión</h2>
-                    <div class="meter-row"><span>Grabados</span><b class="meter-value" data-ok="false">0 / 4</b></div>
-                    <div class="progress progress-sm my-2"><span style="width: 0%"></span></div>
-                    <p class="foot-note">
-                      Al marcar los 4, el cohorte pasa a <span class="chip chip-grabado">grabado</span>
-                      y sale de la cola de rodaje.
-                    </p>
+                    <div class="meter-row"><span>Grabados</span><b class="meter-value" data-sesion-valor></b></div>
+                    <div class="progress progress-sm my-2"><span data-sesion-barra></span></div>
+                    <p class="foot-note" data-sesion-pie></p>
                   </div>
                 </aside>
               </div>
@@ -376,17 +231,237 @@
     </div>
 
     <script src="assets/js/icons.js"></script>
+    <script src="assets/js/academia-data.js"></script>
+    <script src="assets/js/academia-agencias.js"></script>
+    <script src="assets/js/academia-guiones.js"></script>
+    <script src="assets/js/academia-preguntas.js"></script>
+    <script src="assets/js/academia-sim.js"></script>
+    <script src="assets/js/render.js"></script>
     <script src="assets/js/ui.js"></script>
     <script>
-      /* Controlador de la pantalla. El conmutador de modo lo maneja ui.js
-         (`?vista=`); acá solo se avisa si se pide otro cohorte. */
+      /* Hoja de cohorte. Sirve los 20, no solo C03. «Marcar grabado» cambia el
+         estado de verdad: lo guarda en el overlay de la escena activa, así que
+         el avance persiste y se ve reflejado en el tablero. */
       (function () {
         "use strict";
-        const c = UI.param("c");
-        if (c === null || c === "C03") return;
-        document.getElementById("hoja").hidden = true;
-        document.getElementById("sin-maquetar").hidden = false;
-        document.getElementById("sin-maquetar-id").textContent = "cohorte " + c;
+        const S = window.SIM;
+        const R = window.RENDER;
+        const e = S.escena;
+        const amp = e === "E5" ? "" : "&amp;escena=" + e;
+        const q = e === "E5" ? "" : "?escena=" + e;
+
+        const pedido = (S.param("c") || "C03").toUpperCase();
+        const cohortes = S.cohortesConAvance();
+        const c = cohortes.filter(function (x) { return x.id === pedido; })[0];
+
+        if (!c) {
+          const el = document.getElementById("sin-cohorte");
+          el.hidden = false;
+          el.querySelector("[data-vacio-titulo]").textContent = "Ese cohorte no existe";
+          R.pintar("[data-vacio-texto]",
+            "El plan de rodaje tiene 20 cohortes, de <span class=\"font-mono\">C01</span> a " +
+            "<span class=\"font-mono\">C20</span>. <span class=\"font-mono\">" + R.esc(pedido) +
+            "</span> no es ninguno.");
+          document.querySelector("[data-vacio-cta]").setAttribute("href", "tablero.html" + q);
+          document.querySelector("[data-breadcrumb]").textContent = "Pipeline / Cohortes";
+          return;
+        }
+
+        document.getElementById("hoja").hidden = false;
+
+        /* ── Encabezado ─────────────────────────────────────────────────── */
+        R.pintar("[data-breadcrumb]", "Pipeline / Cohortes / " + c.id);
+        R.pintar("[data-titulo]",
+          '<span class="id-mono">' + c.id + "</span> " + R.esc(c.nombre));
+        R.pintar("[data-chips]",
+          '<span class="chip chip-meta">' + c.prioridad + "</span>" +
+          '<span class="chip chip-meta">' + c.total + (c.total === 1 ? " video" : " videos") + "</span>" +
+          '<span class="chip chip-outline">' + R.esc(S.estandarGrabacion.entorno) + "</span>");
+
+        /* ── El escenario compartido ────────────────────────────────────── */
+        R.pintar("[data-escenario]", c.escenario
+          ? R.esc(c.escenario) + (c.nota ? " " + R.esc(c.nota) + "." : "")
+          : (c.nota
+              ? R.esc(c.nota) + "."
+              : "Este cohorte todavía no tiene escenario compartido declarado. Se define al " +
+                "guionarlo: el Maestro solo especifica los de P1 y P2, «para no escribir de más " +
+                "sobre un producto que cambia»."));
+        R.pintar("[data-escenario-nota]",
+          "Se prepara una vez y se graban los " + c.total + " de corrido. Ese es el motivo de que el " +
+          "cohorte exista: si se grabara por módulo, habría que rearmar el escenario " + c.total +
+          " veces.");
+
+        const grabados = c.grabados;
+        R.pintar("[data-avance]",
+          '<div><dt class="side-title !mb-1">Grabados</dt>' +
+          '<dd class="metric-value !text-2xl"' + (grabados < c.total ? ' data-tone="alerta"' : "") + ">" +
+          grabados + " / " + c.total + "</dd></div>" +
+          '<div><dt class="side-title !mb-1">Con guión</dt>' +
+          '<dd class="metric-value !text-2xl">' + c.conGuion + " / " + c.total + "</dd></div>");
+
+        /* ── Receta de preparación ──────────────────────────────────────── */
+        /* Sale de las recetas de sus videos: la del cohorte es la del primero,
+           más lo que cada uno necesita que NO esté hecho todavía. */
+        const pasos = [];
+        if (c.escenario) pasos.push(c.escenario + ".");
+        c.videos.forEach(function (v) {
+          const g = S.guionDe(v);
+          if (g && g.receta && pasos.indexOf(g.receta) === -1) pasos.push(g.receta);
+        });
+        if (!pasos.length) {
+          pasos.push("Sin receta declarada: se define al guionar el cohorte.");
+        }
+        R.pintar("[data-receta]", pasos.map(function (p, i) {
+          return "<li><strong>" + (i + 1) + ".</strong> " + R.esc(p) + "</li>";
+        }).join(""));
+        R.pintar("[data-receta-pie]",
+          "Entorno: <strong>" + R.esc(S.estandarGrabacion.entorno) + "</strong>." +
+          (c.prioridad === "P1" && window.ACADEMIA_DATA.preparacionP1
+            ? " " + R.esc(window.ACADEMIA_DATA.preparacionP1)
+            : ""));
+
+        /* ── Los videos, en orden de grabación ──────────────────────────── */
+        document.querySelector("[data-lbl-orden]").textContent =
+          "Los " + c.total + (c.total === 1 ? " video" : " videos") + ", en orden de grabación";
+        document.querySelector("[data-lbl-rec]").textContent =
+          "Los " + c.total + ", uno debajo del otro";
+
+        function duracion(v, g) {
+          return g ? g.duracionObjetivo : (v.duracion || "—");
+        }
+
+        function tarjeta(v, i, modo) {
+          const g = S.guionDe(v);
+          const cadena = S.cadenaDe(v);
+          const grabado = S.rango(v.estado) >= S.rango("grabado");
+          const enlace = modo === "plan"
+            ? (g
+                ? '<a href="guion.html?v=' + v.id + amp + '" class="text-xs">ver guión ›</a>'
+                : '<a href="guion.html?v=' + v.id + amp + '" class="text-xs">escribir guión ›</a>')
+            : (grabado
+                ? '<span class="chip chip-grabado">grabado</span>'
+                : '<button type="button" class="btn btn-bordered btn-sm" data-grabar="' + v.id +
+                  '">Marcar grabado</button>');
+          /* El eslabón: de dónde arranca este video. En planificación se nombra
+             el video anterior; en sesión, la receta concreta. */
+          const eslabon = modo === "plan"
+            ? (cadena.anterior
+                ? "Viene de <strong>" + cadena.anterior.id + "</strong>" +
+                  (g && g.receta ? ": " + R.esc(g.receta.replace(/\.$/, "")) : "") + "."
+                : "Arranca del escenario recién preparado" +
+                  (g && g.receta ? ": " + R.esc(g.receta.replace(/\.$/, "")) : "") + ".")
+            : "Receta: " + R.esc(g && g.receta ? g.receta : "sin receta declarada.");
+          return (
+            '<article class="side-card">' +
+            '<div class="flex items-center gap-3">' +
+            '<span class="row-id">' + v.id + "</span>" +
+            '<strong class="flex-1 text-xs">' + R.esc(v.titulo) + "</strong>" +
+            (modo === "plan" ? R.chipEstado(v.estado) : "") +
+            '<span class="chip chip-meta">' + R.esc(duracion(v, g)) + "</span>" +
+            enlace +
+            "</div>" +
+            '<p class="chain-link"><span class="icon" data-icon="' +
+              (modo === "plan" ? "git-branch" : "grid") + '"></span>' + eslabon + "</p>" +
+            "</article>"
+          );
+        }
+
+        function pintarVideos() {
+          const frescos = S.cohortesConAvance().filter(function (x) { return x.id === c.id; })[0];
+          R.pintar("[data-videos-plan]", frescos.videos.map(function (v, i) {
+            return tarjeta(v, i, "plan");
+          }).join(""));
+          R.pintar("[data-videos-sesion]", frescos.videos.map(function (v, i) {
+            return tarjeta(v, i, "sesion");
+          }).join(""));
+
+          /* Avance de la sesión */
+          const g2 = frescos.grabados;
+          const pct = frescos.total ? Math.round((g2 / frescos.total) * 100) : 0;
+          const valor = document.querySelector("[data-sesion-valor]");
+          valor.textContent = g2 + " / " + frescos.total;
+          valor.setAttribute("data-ok", String(g2 === frescos.total));
+          document.querySelector("[data-sesion-barra]").setAttribute("style", "width: " + pct + "%");
+          R.pintar("[data-sesion-pie]", g2 === frescos.total
+            ? "Los " + frescos.total + ' están grabados: el cohorte salió de la cola de rodaje.'
+            : "Al marcar los " + frescos.total + ", el cohorte pasa a " +
+              '<span class="chip chip-grabado">grabado</span> y sale de la cola de rodaje.');
+          R.pintar("[data-avance]",
+            '<div><dt class="side-title !mb-1">Grabados</dt>' +
+            '<dd class="metric-value !text-2xl"' + (g2 < frescos.total ? ' data-tone="alerta"' : "") + ">" +
+            g2 + " / " + frescos.total + "</dd></div>" +
+            '<div><dt class="side-title !mb-1">Con guión</dt>' +
+            '<dd class="metric-value !text-2xl">' + frescos.conGuion + " / " + frescos.total + "</dd></div>");
+
+          /* «Marcar grabado» escribe en el overlay de la escena activa. Es un
+             cambio real: el tablero y el Home lo ven. */
+          document.querySelectorAll("[data-grabar]").forEach(function (b) {
+            b.addEventListener("click", function () {
+              S.anotar("videos", b.getAttribute("data-grabar"), { estado: "grabado" });
+              pintarVideos();
+            });
+          });
+        }
+        pintarVideos();
+
+        /* ── Checklist de entorno ───────────────────────────────────────── */
+        const checks = [];
+        if (c.escenario) checks.push(c.escenario + " — verificado en " + S.estandarGrabacion.entorno);
+        checks.push("El entorno es " + S.estandarGrabacion.entorno + ", no un cliente real");
+        checks.push("Sin datos sensibles a la vista: CUIT, documentos, credenciales");
+        checks.push("Audio probado y pantalla en la resolución del estándar");
+        /* El checklist se guarda POR COHORTE en el overlay de la escena. Antes
+           se tildaba y se perdía al recargar o al cambiar de modo, que es justo
+           lo que no puede pasar en una checklist previa a grabar: se completa
+           mientras se prepara la sala, no de un tirón.
+
+           El `<label>` envuelve al input, así que no necesita `for` ni `id`:
+           la asociación es implícita y agregar un id sería ruido. */
+        function tildados() {
+          return (S.anotado("cohortes", c.id) || {}).entorno || {};
+        }
+
+        const marcados = tildados();
+        R.pintar("[data-check-entorno]", checks.map(function (x, i) {
+          return '<li><label class="choice !py-2"><input type="checkbox" data-check="' + i + '"' +
+            (marcados[i] ? " checked" : "") + " />" +
+            '<span class="choice-text">' + R.esc(x) + "</span></label></li>";
+        }).join(""));
+
+        /* Al tildar se actualiza SOLO el contador, no la lista entera: repintar
+           los `<input>` en cada click los reemplaza por nodos nuevos y el foco
+           se pierde a mitad del checklist. El checkbox ya sabe mostrarse
+           tildado solo; lo único que hay que derivar es cuántos van. */
+        function pintarAvance() {
+          const m = tildados();
+          const listos = checks.filter(function (x, i) { return m[i]; }).length;
+          R.pintar("[data-entorno-avance]", listos === checks.length
+            ? '<span class="chip chip-publicado">entorno listo</span>'
+            : '<span class="chip chip-outline">' + listos + " de " + checks.length + "</span>");
+        }
+        pintarAvance();
+
+        document.querySelectorAll("[data-check]").forEach(function (input) {
+          input.addEventListener("change", function () {
+            const estado = Object.assign({}, tildados());
+            estado[input.dataset.check] = input.checked;
+            S.anotar("cohortes", c.id, { entorno: estado });
+            pintarAvance();
+          });
+        });
+
+        /* ── Aside ──────────────────────────────────────────────────────── */
+        R.pintar("[data-no-mostrar]", S.estandarGrabacion.noMostrar.map(function (x) {
+          return "<li>" + R.esc(x) + "</li>";
+        }).join(""));
+        R.pintar("[data-entorno-pie]",
+          "Siempre con datos de <strong>" + R.esc(S.estandarGrabacion.entorno) + "</strong>.");
+        R.pintar("[data-estandar]", [
+          S.estandarGrabacion.formato,
+          S.estandarGrabacion.duracion,
+          "Un solo concepto por video.",
+          S.estandarGrabacion.cierre,
+        ].map(function (x) { return "<li>" + R.esc(x) + "</li>"; }).join(""));
       })();
     </script>
   </body>

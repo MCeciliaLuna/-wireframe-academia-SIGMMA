@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Agencias · Backoffice Academia SIGMMA</title>
+    <meta name="description" content="Las agencias con acceso a la Academia SIGMMA: plan, tamaño del plantel, recorrido asignado y avance." />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="stylesheet" href="assets/css/academia.css" />
+  </head>
+  <body>
+    <a href="#contenido" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[1001] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-white">Saltar al contenido</a>
+
+    <div class="app-shell">
+      <!-- app-shell: sincronizar con src/partials/app-shell.html -->
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img src="assets/img/logo.svg" alt="SIGMMA" width="96" height="16" class="w-[96px]" />
+          <span class="text-2xs font-bold text-primary">Academia</span>
+        </div>
+
+        <!-- Selector global de superficie. Todo el contenido del backoffice cuelga
+             de cuál está activa. Solo BAK tiene módulos mapeados. -->
+        <div class="relative" data-dropdown>
+          <span class="side-title mb-1 block">Superficie</span>
+          <button type="button" class="surface-picker" data-dropdown-trigger aria-expanded="false" aria-haspopup="true">
+            <span><strong>BAK</strong> · Backoffice</span>
+            <span class="icon icon-sm" data-icon="chevron-down"></span>
+          </button>
+          <div class="menu" role="menu" data-dropdown-menu hidden>
+            <a href="modulos.html?sup=BAK" class="menu-item" role="menuitem">BAK · Backoffice</a>
+            <a href="modulos.html?sup=FRT" class="menu-item" role="menuitem">FRT · Front</a>
+            <a href="modulos.html?sup=CRM" class="menu-item" role="menuitem">CRM</a>
+          </div>
+        </div>
+
+        <nav class="flex flex-col gap-4" aria-label="Secciones del backoffice">
+          <!-- Inicio va suelto, sin grupo: no es una función más sino el punto de
+               partida. En las etapas de construcción es el panel de obra. -->
+          <div class="nav-group">
+            <a href="home.html" class="nav-item" data-escena-keep>
+              <span class="icon" data-icon="activity"></span>Inicio
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Contenido</span>
+            <a href="modulos.html" class="nav-item">
+              <span class="icon" data-icon="layers"></span>Módulos
+            </a>
+            <a href="videos.html" class="nav-item">
+              <span class="icon" data-icon="film"></span>Biblioteca de videos
+            </a>
+            <a href="tablero.html" class="nav-item">
+              <span class="icon" data-icon="columns"></span>Tablero de producción
+            </a>
+            <a href="regrabacion.html" class="nav-item">
+              <span class="icon" data-icon="refresh"></span>Cola de regrabación
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Evaluación</span>
+            <a href="banco.html?m=30" class="nav-item">
+              <span class="icon" data-icon="help-circle"></span>Bancos de preguntas
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="settings"></span>Configuración
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Currícula</span>
+            <a href="modulo.html?m=R01" class="nav-item">
+              <span class="icon" data-icon="route"></span>Ruta Esencial
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Pipeline</span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="git-branch"></span>Impactos en Academia
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Seguimiento</span>
+            <a href="panel.html" class="nav-item">
+              <span class="icon" data-icon="bar-chart"></span>Panel macro
+            </a>
+            <a href="agencias.html" class="nav-item" aria-current="page">
+              <span class="icon" data-icon="users"></span>Detalle por agencia
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Administración</span>
+            <a href="superficies.html" class="nav-item">
+              <span class="icon" data-icon="target"></span>Superficies y planes
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="shield"></span>Usuarios y roles
+            </span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="activity"></span>Auditoría
+            </span>
+          </div>
+        </nav>
+
+        <div class="sidebar-foot">
+          <span class="text-2xs text-gray-700">Majo · Contenido</span>
+        </div>
+      </aside>
+      <!-- /app-shell -->
+
+      <div class="main-col">
+        <header class="page-head">
+          <div>
+            <div class="breadcrumb">Seguimiento / Agencias</div>
+            <h1 class="page-title">
+              Agencias
+              <span class="chip chip-meta" data-chip-total></span>
+              <span class="escena-badge" data-escena-label></span>
+            </h1>
+          </div>
+          <div class="page-actions">
+            <button type="button" class="btn btn-bordered btn-sm" data-exportar>
+              <span class="icon" data-icon="download"></span>Exportar
+            </button>
+            <a href="panel.html" class="btn btn-bordered btn-sm">
+              <span class="icon" data-icon="bar-chart"></span>Ver por módulo
+            </a>
+          </div>
+        </header>
+
+        <main id="contenido" class="page-body">
+          <!-- Sin agencias no hay nada que seguir. Igual que el panel macro,
+               la condición es el dato y no la escena. -->
+          <div data-sin-agencias hidden>
+            <div class="placeholder-box !py-14">
+              <span class="placeholder-icon" data-icon="users"></span>
+              <h2 class="text-h4">Todavía no hay agencias con acceso</h2>
+              <p class="mt-3 max-w-[60ch] text-base text-gray-700" data-sin-texto></p>
+              <a href="agencias.html?escena=E6" class="btn btn-bordered mt-8">
+                <span class="icon" data-icon="users"></span>Ver la Academia en operación
+              </a>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-[18px]" data-con-agencias hidden>
+            <div class="grid grid-cols-[1fr_340px] items-start gap-[18px]">
+              <section>
+                <div class="filter-bar" data-filtros="[data-filas]">
+                  <div class="relative" data-dropdown>
+                    <button type="button" class="filter-pill" data-dropdown-trigger aria-expanded="false" aria-haspopup="true" data-filtro-pill="plan">
+                      Plan: todos <span class="icon" data-icon="chevron-down"></span>
+                    </button>
+                    <div class="menu" role="menu" data-dropdown-menu hidden data-filtro-menu="plan"></div>
+                  </div>
+                  <label class="filter-search">
+                    <span class="icon" data-icon="search"></span>
+                    <span class="sr-only">Buscar agencia por nombre</span>
+                    <input type="search" placeholder="buscar por nombre" data-filtro-buscar />
+                  </label>
+                  <span class="filter-count" data-conteo></span>
+                </div>
+
+                <div class="table-scroll-y">
+                  <table class="table-dense" data-sortable>
+                    <caption class="sr-only" data-caption></caption>
+                    <thead>
+                      <tr>
+                        <th scope="col" data-sort-key="titulo">Agencia</th>
+                        <th scope="col" data-sort-key="plan">Plan</th>
+                        <th scope="col">Plantel</th>
+                        <th scope="col">Módulos del recorrido</th>
+                        <th scope="col">Recorridos completos</th>
+                        <th scope="col" data-sort-key="avance" data-sort-type="number">Avance</th>
+                      </tr>
+                    </thead>
+                    <tbody data-filas></tbody>
+                  </table>
+                </div>
+                <p class="foot-note mt-2">
+                  El avance se mide sobre el <strong>recorrido del plan</strong>, no sobre los 11
+                  módulos: un módulo fuera de plan no entra al denominador. Una Professional que
+                  terminó su recorrido está al 100 %, aunque existan módulos que no le tocan.
+                </p>
+              </section>
+
+              <aside class="flex flex-col gap-[18px]">
+                <div data-planes></div>
+                <div data-aviso></div>
+              </aside>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="assets/js/icons.js"></script>
+    <script src="assets/js/academia-data.js"></script>
+    <script src="assets/js/academia-agencias.js"></script>
+    <script src="assets/js/academia-guiones.js"></script>
+    <script src="assets/js/academia-preguntas.js"></script>
+    <script src="assets/js/academia-sim.js"></script>
+    <script src="assets/js/render.js"></script>
+    <script src="assets/js/ui.js"></script>
+    <script>
+      /* Listado de agencias. Junto con `agencia.html` estrena `SIM.avanceDe()`,
+         que estaba escrito y sin consumidor.
+
+         Las 12 agencias y las 56 personas son FICTICIAS: no hay CUIT, ni
+         documentos, ni credenciales, ni correos. */
+      (function () {
+        "use strict";
+        const S = window.SIM;
+        const R = window.RENDER;
+        const esc = S.escena;
+        const q = esc === "E5" ? null : esc;
+
+        const agencias = S.agencias();
+
+        if (!agencias.length) {
+          document.querySelector("[data-sin-agencias]").hidden = false;
+          document.querySelector("[data-sin-texto]").textContent =
+            "Las agencias entran a la Academia cuando hay al menos un módulo activo en su plan. " +
+            "En este momento de la construcción todavía no hay ninguna dada de alta.";
+          document.querySelector("[data-chip-total]").textContent = "0 agencias";
+          return;
+        }
+
+        document.querySelector("[data-con-agencias]").hidden = false;
+
+        /* Cada fila necesita el recorrido de su plan —que es el denominador— y
+           cuántas personas lo completaron. Todo derivado, nada guardado. */
+        const filas = agencias.map(function (a) {
+          const recorrido = S.recorridoDe(a.plan, esc);
+          let certificadas = 0, aprobaciones = 0;
+          a.plantel.forEach(function (p) {
+            const av = S.avanceDe(p, esc);
+            if (av.certificada) certificadas++;
+            aprobaciones += av.aprobados.length;
+          });
+          return {
+            id: a.id, nombre: a.nombre, plan: a.plan,
+            plantel: a.plantel.length,
+            totalRecorrido: recorrido.length,
+            certificadas: certificadas,
+            aprobacionesTotales: aprobaciones,
+          };
+        });
+
+        R.pintar("[data-filas]", filas.map(function (a) {
+          return R.filaAgencia(a, { escena: q });
+        }).join(""));
+
+        document.querySelector("[data-chip-total]").textContent =
+          agencias.length + (agencias.length === 1 ? " agencia" : " agencias");
+        document.querySelector("[data-conteo]").textContent =
+          filas.length + (filas.length === 1 ? " resultado" : " resultados");
+        document.querySelector("[data-caption]").textContent =
+          "Las " + agencias.length + " agencias con acceso, con su plan, el tamaño del plantel, " +
+          "los módulos que le tocan por plan y cuánto avanzaron.";
+
+        window.UI.poblarFiltro("plan", S.planes.map(function (p) { return p.nombre; }), "Plan");
+
+        /* -- Aside ------------------------------------------------------- */
+        /* El recorrido por plan es la explicación del denominador: sin esto, dos
+           agencias con el mismo avance porcentual parecen comparables cuando
+           una cursó el doble de módulos. */
+        R.pintar("[data-planes]", R.sideCard({
+          id: "planes", titulo: "Recorrido por plan", fuerte: true,
+          cuerpo: R.medidor(S.planes.map(function (p) {
+            const n = S.recorridoDe(p.nombre, esc).length;
+            const cuantas = filas.filter(function (a) { return a.plan === p.nombre; }).length;
+            return {
+              dt: p.nombre,
+              dd: n + (n === 1 ? " módulo" : " módulos") + " · " + cuantas +
+                (cuantas === 1 ? " agencia" : " agencias"),
+            };
+          })),
+          pie: "El recorrido son los <strong>módulos activos</strong> que el plan habilita, en orden curricular. Un módulo que todavía no se activó no le cuenta a nadie.",
+        }));
+
+        const personas = filas.reduce(function (a, x) { return a + x.plantel; }, 0);
+        const completos = filas.reduce(function (a, x) { return a + x.certificadas; }, 0);
+
+        R.pintar("[data-aviso]", R.sideCard({
+          id: "av", titulo: "Plantel total",
+          cuerpo: R.medidor([
+            { dt: "Personas", dd: personas },
+            { dt: "Recorridos completos", dd: completos, ok: completos > 0 },
+            { dt: "Coordinadoras", dd: agencias.length },
+          ]),
+          pie: "Datos <strong>ficticios</strong>: las agencias y las personas de este prototipo no existen. No hay CUIT, documentos, correos ni credenciales.",
+        }));
+
+        document.querySelector("[data-exportar]").addEventListener("click", function () {
+          window.UI.exportarCSV(
+            "agencias-" + esc + ".csv",
+            ["Agencia", "Plan", "Plantel", "Módulos del recorrido", "Recorridos completos", "Avance"],
+            window.UI.filasVisibles("[data-filas]")
+          );
+        });
+      })();
+    </script>
+  </body>
+</html>

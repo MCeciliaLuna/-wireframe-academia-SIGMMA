@@ -25,7 +25,7 @@
           qué hubo que extender.
         </p>
         <nav class="mt-6 flex flex-wrap gap-2 text-sm" aria-label="Secciones">
-          <a href="index.html" class="btn btn-primary btn-sm">Índice de las 8 vistas</a>
+          <a href="index.html" class="btn btn-primary btn-sm">Índice de pantallas</a>
           <a href="#escenas" class="btn btn-bordered btn-sm">Escenas</a>
           <a href="#shell" class="btn btn-bordered btn-sm">Layout maestro</a>
           <a href="#estados" class="btn btn-bordered btn-sm">Los 7 estados</a>
@@ -103,20 +103,23 @@
           <span class="escena-badge">E4 · Mes 2 — hito de lanzamiento</span>
           <span class="text-gray-600" aria-hidden="true">→</span>
           <span class="escena-badge">E5 · Régimen</span>
+          <span class="text-gray-600" aria-hidden="true">→</span>
+          <span class="escena-badge">E6 · En operación</span>
         </div>
 
         <p class="alert alert-warning mt-6">
           <span class="icon" data-icon="alert-triangle"></span>
           <span>
-            <strong>Los datos de una escena nunca se mezclan con los de otra.</strong> Por eso el
-            mecanismo alterna bloques enteros de HTML y no celdas sueltas: no hay forma de que una
-            tabla quede con la mitad de los números de un momento y la mitad de otro.
+            <strong>Los datos de una escena nunca se mezclan con los de otra.</strong> Cada pantalla
+            se pinta para la escena activa, y el overlay de cambios de <code class="font-mono text-xs">localStorage</code>
+            se guarda <strong>por escena</strong>: marcar un video como grabado mirando el Mes 1 no
+            puede ensuciar el régimen.
           </span>
         </p>
 
         <h3 class="text-h5 mt-8">Monotonía temporal</h3>
         <p class="mt-2 max-w-[72ch] text-gray-700">
-          Las cinco escenas son una <strong>línea de tiempo</strong>, no cinco variantes sueltas. De
+          Las seis escenas son una <strong>línea de tiempo</strong>, no seis variantes sueltas. De
           ahí sale la regla que las mantiene consistentes:
         </p>
         <p class="alert alert-warning mt-3">
@@ -193,7 +196,11 @@
         <p class="mt-2 max-w-[72ch] text-gray-700">
           El contenedor de todas las demás pantallas. Es la extensión más grande respecto de la vista
           agencia, que usa un header horizontal de 72 px con tres destinos: el backoffice tiene
-          <strong>16 destinos agrupados en 6 funciones</strong> y no entran en una barra.
+          <strong>15 destinos en 6 grupos</strong> —más Inicio, que va suelto— y no entran en una
+          barra. Diez llevan a una pantalla; los <strong>cinco</strong> restantes van como
+          <code class="font-mono text-xs">&lt;span aria-disabled&gt;</code> porque necesitan
+          entidades que el dataset no tiene: perfiles, roles, log de auditoría y pipeline de
+          producto. Un link que no lleva a ningún lado miente, así que no son links.
         </p>
 
         <div class="mt-6 overflow-hidden rounded-xl border border-line">
@@ -232,7 +239,8 @@
         <p class="mt-4 text-sm text-ink-soft">
           Verlo en vivo: <a href="modulos.html">modulos.html</a> · <a href="tablero.html">tablero.html</a>.
           La fuente canónica del sidebar es <code class="font-mono text-xs">src/partials/app-shell.html</code>,
-          copiada literal en las 5 páginas. Al copiarla se cambia <strong>solo</strong> el
+          copiada literal en las <strong>18 páginas de app</strong>. Al copiarla se cambia
+          <strong>solo</strong> el
           <code class="font-mono text-xs">aria-current="page"</code>.
         </p>
       </section>
@@ -317,6 +325,21 @@
           <span class="chip chip-outline">faltan 15</span>
           <span class="chip chip-alerta">7 preg. a revisar</span>
         </div>
+        <p class="alert alert-warning mt-3">
+          <span class="icon" data-icon="alert-triangle"></span>
+          <span>
+            <strong>Las cadenas 3 y 4 cambiaron respecto de la primera tanda</strong> (eran
+            <code class="font-mono text-xs">15</code> y <code class="font-mono text-xs">35</code>). El
+            mínimo del banco pasó de 35 a <strong>50</strong>, que es el que manda el alcance del MVP:
+            50 preguntas por módulo, etiquetadas por sub-tema. Consecuencia visible: en régimen
+            <strong>ningún</strong> módulo de biblioteca cubre su mínimo, y
+            <code class="font-mono text-xs">BAK-M00</code>,
+            <code class="font-mono text-xs">BAK-M10</code> y
+            <code class="font-mono text-xs">BAK-M40</code> perdieron el chip
+            <span class="chip chip-publicado">apto</span> — siguen
+            <span class="chip chip-publicado">activo</span>, que es correcto por D-4.
+          </span>
+        </p>
         <p class="mt-3 text-sm text-ink-soft">
           El punteado de <code class="font-mono text-xs">.chip-outline</code> comunica «todavía no»,
           no «error». Es el mismo recurso que usa <code class="font-mono text-xs">.card-locked</code>
@@ -533,13 +556,18 @@
               </tr>
               <tr>
                 <td class="font-mono text-xs">D-2</td>
-                <td><strong>Modal o drawer para el alta</strong></td>
-                <td>Sin resolver. El design system tiene un solo patrón de modal, bien resuelto, y <strong>no tiene drawer</strong>. El wireframe de esta tanda no dibuja ninguno de los dos, así que «Agregar sección», «Agregar video» y «Escribir pregunta» no abren nada.</td>
+                <td><strong>Modal o drawer para el alta</strong> <span class="chip chip-publicado">cerrada</span></td>
+                <td><strong>Modal.</strong> El design system tiene un solo patrón de modal, bien resuelto, y <strong>no tiene drawer</strong>: agregar uno significaba diseñar un componente nuevo para no ganar nada. Además <code class="font-mono text-xs">ui.js</code> ya cableaba el modal entero —foco atrapado, Esc, overlay, foco devuelto al cerrar— y <strong>ninguna pantalla lo usaba</strong>: era infraestructura pagada y nunca cobrada. Hoy la usan «Configurar evaluación», «Escribir pregunta», «Cargar versión» y «Nueva superficie».</td>
               </tr>
               <tr>
                 <td class="font-mono text-xs">D-3</td>
-                <td><strong>El diccionario real de planes</strong></td>
-                <td>Se mantiene «plan A · plan B» verbatim: es un placeholder deliberado del proyecto. El Maestro de Producción usa <code class="font-mono text-xs">P+B / B / B-nicho</code> y la vista agencia usa Professional / Business. Son tres nomenclaturas para lo mismo.</td>
+                <td><strong>El diccionario real de planes</strong> <span class="chip chip-publicado">cerrada</span></td>
+                <td><strong>Professional · Business · Corporate</strong>, tomados de <code class="font-mono text-xs">web.sigmma.net/planes.html</code>, que es la fuente comercial del producto. Convivían <strong>cuatro</strong> nomenclaturas, no tres: el placeholder «plan A · plan B» de este prototipo, <code class="font-mono text-xs">P+B / B / B-nicho</code> del Maestro, Professional / Business de la vista agencia y Corporate / Business / Standard del alcance del MVP. La asignación vieja por módulo <strong>no se renombró</strong>: era arbitraria por admisión propia, así que se re-derivó del Maestro. Renombrarla habría disfrazado un dato inventado de dato real.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">B-4</td>
+                <td><strong>El alcance del MVP escribe «Standard» donde va «Professional»</strong></td>
+                <td>Error del documento fuente, análogo al de «SIGMA» en <code class="font-mono text-xs">Majo_3</code> (B-2). Los planes reales del producto son Professional, Business y Corporate. El prototipo escribe los correctos; <code class="font-mono text-xs">MD-PROYECTO-CLAUDE.md</code> queda pendiente de corrección.</td>
               </tr>
               <tr>
                 <td class="font-mono text-xs">D-4</td>
@@ -593,8 +621,8 @@
               </tr>
               <tr>
                 <td class="font-mono text-xs">D-9</td>
-                <td><strong>Biblioteca de videos no tiene listado propio</strong></td>
-                <td>El wireframe muestra el destino en el menú y entra al detalle de un video desde ahí, pero no dibuja el listado. Queda para la tanda 2.</td>
+                <td><strong>Biblioteca de videos no tiene listado propio</strong> <span class="chip chip-publicado">cerrada</span></td>
+                <td>Se maquetó: <code class="font-mono text-xs">videos.html</code>. Su eje es el <strong>contenido</strong> —módulo, sección, duración, versión vigente y visibilidad en el Front—, no el rodaje: el tablero ya mira los mismos 55 videos desde la producción, con cohorte, prioridad y fecha. Son dos preguntas distintas sobre el mismo conjunto, y por eso son dos pantallas y no dos filtros de la misma.</td>
               </tr>
             </tbody>
           </table>
@@ -605,9 +633,11 @@
       <section class="mb-14" id="numeros">
         <h2 class="text-h3">Coherencia numérica</h2>
         <p class="mt-2 max-w-[72ch] text-gray-700">
-          Los datos están escritos a mano en el HTML, así que los números tienen que cerrar entre
-          pantallas. Estas son las cadenas que se verificaron, y los tres lugares donde el wireframe
-          no cerraba consigo mismo.
+          Los números ya no se escriben: se <strong>derivan</strong> del dataset, así que no pueden
+          discrepar entre pantallas. Los contadores del kanban, los tiles del tablero y la columna
+          «videos publicados / total» del listado salen del mismo cálculo. Estas son las cadenas que el
+          motor verifica —<code class="font-mono text-xs">SIM.verificar()</code>, 101 controles— y los
+          tres lugares donde el wireframe no cerraba consigo mismo.
         </p>
 
         <h3 class="text-h5 mt-6">Las 5 cadenas de BAK-M30</h3>
@@ -617,8 +647,8 @@
             <tbody>
               <tr><td>Preguntas por sección = total del módulo</td><td class="font-mono text-xs">6 + 8 + 7 + 7 = 28</td></tr>
               <tr><td>Total − a revisar − borradores = banco vigente</td><td class="font-mono text-xs">28 − 7 − 1 = 20</td></tr>
-              <tr><td>Faltantes por sección = faltante del módulo</td><td class="font-mono text-xs">3 + 2 + 2 + 8 = 15</td></tr>
-              <tr><td>Banco mínimo por sección = mínimo del módulo</td><td class="font-mono text-xs">8 + 10 + 9 + 8 = 35</td></tr>
+              <tr><td>Faltantes por sección = faltante del módulo</td><td class="font-mono text-xs">6 + 7 + 6 + 11 = 30</td></tr>
+              <tr><td>Banco mínimo por sección = mínimo del módulo</td><td class="font-mono text-xs">11 + 15 + 13 + 11 = 50</td></tr>
               <tr><td>Mínimos por sorteo = preguntas del intento</td><td class="font-mono text-xs">2 + 3 + 3 + 2 = 10</td></tr>
             </tbody>
           </table>
@@ -670,7 +700,7 @@
       </section>
 
       <p class="border-t border-line pt-6 text-xs text-ink-soft">
-        El índice de las 8 vistas vive en <a href="index.html">index.html</a>, para no mantener dos
+        El índice de pantallas vive en <a href="index.html">index.html</a>, para no mantener dos
         copias de la misma tabla. Repo hermano: <strong>wireframe-academia-AGENCIA</strong>.
       </p>
     </div>

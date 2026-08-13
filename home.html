@@ -49,15 +49,15 @@
             <a href="modulos.html" class="nav-item">
               <span class="icon" data-icon="layers"></span>Módulos
             </a>
-            <span class="nav-item" aria-disabled="true">
+            <a href="videos.html" class="nav-item">
               <span class="icon" data-icon="film"></span>Biblioteca de videos
-            </span>
+            </a>
             <a href="tablero.html" class="nav-item">
               <span class="icon" data-icon="columns"></span>Tablero de producción
             </a>
-            <span class="nav-item" aria-disabled="true">
+            <a href="regrabacion.html" class="nav-item">
               <span class="icon" data-icon="refresh"></span>Cola de regrabación
-            </span>
+            </a>
           </div>
 
           <div class="nav-group">
@@ -72,9 +72,9 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Currícula</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="modulo.html?m=R01" class="nav-item">
               <span class="icon" data-icon="route"></span>Ruta Esencial
-            </span>
+            </a>
             <span class="nav-item" aria-disabled="true">
               <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
             </span>
@@ -89,12 +89,12 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Seguimiento</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="panel.html" class="nav-item">
               <span class="icon" data-icon="bar-chart"></span>Panel macro
-            </span>
-            <span class="nav-item" aria-disabled="true">
+            </a>
+            <a href="agencias.html" class="nav-item">
               <span class="icon" data-icon="users"></span>Detalle por agencia
-            </span>
+            </a>
           </div>
 
           <div class="nav-group">
@@ -166,303 +166,336 @@
             </div>
           </div>
 
-          <!-- ══════════════════ E2 · SEMANA 1 · MAPA CARGADO ══════════════════ -->
-          <div data-escena="E2" class="contents">
-            <section class="hito-card" aria-labelledby="hito-e2">
-              <p class="side-title !mb-2">Próximo hito</p>
-              <h2 class="hito-titulo" id="hito-e2">
-                Ruta Esencial: faltan 12 videos publicados y 60 preguntas para poder activarla
-              </h2>
-              <p class="mt-2 max-w-[74ch] text-sm text-primary-dark">
-                Es el único objetivo que importa ahora. Los 11 módulos de biblioteca están en 0, pero
-                eso no es una alerta: es el punto de partida. <strong>La Academia se lanza con la
-                Ruta Esencial</strong>, no con la biblioteca completa.
-              </p>
-              <a href="cohorte.html?c=C01&amp;escena=E2" class="btn btn-primary btn-sm mt-4">
-                Empezar por el cohorte C01
-              </a>
+          <!-- ══════════════════ CON EL MAPA CARGADO ══════════════════
+               R10: el Home mide AVANCE DE CONSTRUCCIÓN, no operación. En las
+               etapas de arranque no hay uso, así que no hay métricas de uso que
+               mostrar. La única excepción es E6, la Academia en operación, que
+               es la primera escena donde el uso existe.
+
+               Antes eran cinco bloques con los porcentajes del embudo escritos
+               a mano. Ahora los pinta `academia-sim.js`. -->
+          <div data-escena="E2,E3,E4,E5,E6" class="contents">
+            <div data-hito></div>
+
+            <section aria-labelledby="prog">
+              <h2 class="side-title" id="prog">Progreso del contenido · <span data-total-videos></span> videos</h2>
+              <div class="funnel" data-embudo></div>
+              <p class="funnel-legend" data-leyenda hidden></p>
+              <p class="mt-2 text-xs text-ink-soft" data-nota-progreso></p>
             </section>
 
-            <section aria-labelledby="prog-e2">
-              <h2 class="side-title" id="prog-e2">Progreso del contenido · 55 videos</h2>
-              <div class="funnel">
-                <span data-estado="backlog" style="width: 100%">55 en backlog</span>
-              </div>
-              <p class="mt-2 text-xs text-ink-soft">
-                Los 55 IDs están reservados y ninguno se grabó todavía. Es exactamente lo que se
-                espera de la semana 1: el mapa mira hacia adelante.
-              </p>
-            </section>
-
-            <div class="grid grid-cols-3 gap-4">
-              <section class="side-card" aria-labelledby="trab-e2">
-                <h2 class="side-title" id="trab-e2">Trabajo inmediato</h2>
-                <dl class="flex flex-col gap-3 text-xs">
-                  <div class="meter-row">
-                    <dt>Cohorte activo</dt>
-                    <dd class="meter-value"><a href="cohorte.html?c=C01&amp;escena=E2">C01 Arranque</a></dd>
-                  </div>
-                  <div class="meter-row"><dt>Guionados del cohorte</dt><dd class="meter-value" data-ok="false">0 / 2</dd></div>
-                  <div class="meter-row"><dt>Videos a guionar</dt><dd class="meter-value">55</dd></div>
-                  <div class="meter-row"><dt>Publicados sin pregunta</dt><dd class="meter-value">0</dd></div>
-                </dl>
-              </section>
-
-              <section class="side-card" aria-labelledby="acad-e2">
-                <h2 class="side-title" id="acad-e2">Estado de la Academia</h2>
-                <dl class="flex flex-col gap-3 text-xs">
-                  <div class="meter-row"><dt>Módulos mapeados</dt><dd class="meter-value">13</dd></div>
-                  <div class="meter-row"><dt>Videos reservados</dt><dd class="meter-value">55</dd></div>
-                  <div class="meter-row"><dt>Preguntas escritas</dt><dd class="meter-value">0</dd></div>
-                  <div class="meter-row"><dt>Módulos activos</dt><dd class="meter-value" data-ok="false">0</dd></div>
-                  <div class="meter-row"><dt>Agencias con acceso</dt><dd class="meter-value">0</dd></div>
-                </dl>
-              </section>
-
-              <section class="side-card" aria-labelledby="sig-e2">
-                <h2 class="side-title" id="sig-e2">Lo que sigue</h2>
-                <ul class="flex flex-col gap-2 text-xs">
-                  <li><a href="cohorte.html?c=C01&amp;escena=E2">Planificar el cohorte C01 ›</a></li>
-                  <li><a href="tablero.html?escena=E2">Ver los 55 en el tablero ›</a></li>
-                  <li><a href="modulos.html?escena=E2">Revisar el mapa de módulos ›</a></li>
-                  <li><a href="alta-videos.html">Reservar más IDs ›</a></li>
-                </ul>
-              </section>
-            </div>
-          </div>
-
-          <!-- ══════════════════ E3 · MES 1 · P1 EN PRODUCCIÓN ══════════════════ -->
-          <div data-escena="E3" class="contents">
-            <section class="hito-card" aria-labelledby="hito-e3">
-              <p class="side-title !mb-2">Próximo hito</p>
-              <h2 class="hito-titulo" id="hito-e3">
-                Ruta Esencial: faltan 10 videos publicados y 50 preguntas para poder activarla
-              </h2>
-              <p class="mt-2 max-w-[74ch] text-sm text-primary-dark">
-                C01 está publicado. C02 quedó editado y espera link; C03 está guionado y espera
-                grabación. <strong>Un solo objetivo, no once módulos en alerta.</strong>
-              </p>
-              <a href="cohorte.html?c=C02&amp;escena=E3&amp;modo=sesion" class="btn btn-primary btn-sm mt-4">
-                Seguir con el cohorte C02
-              </a>
-            </section>
-
-            <section aria-labelledby="prog-e3">
-              <h2 class="side-title" id="prog-e3">Progreso del contenido · 55 videos</h2>
-              <div class="funnel">
-                <span data-estado="backlog" style="width: 78.18%">43</span>
-                <span data-estado="guionado" style="width: 7.27%">4</span>
-                <span data-estado="editado" style="width: 10.91%">6</span>
-                <span data-estado="publicado" style="width: 3.64%">2</span>
-              </div>
-              <p class="funnel-legend">
-                <span><i style="background: var(--color-gray-500)"></i>43 en backlog</span>
-                <span><i style="background: var(--color-gray-600)"></i>4 guionados · C03</span>
-                <span><i style="background: var(--color-warning-dark)"></i>6 editados · C02</span>
-                <span><i style="background: var(--color-success-dark)"></i>2 publicados · C01</span>
-              </p>
-            </section>
-
-            <div class="grid grid-cols-3 gap-4">
-              <section class="side-card" aria-labelledby="trab-e3">
-                <h2 class="side-title" id="trab-e3">Trabajo inmediato</h2>
-                <dl class="flex flex-col gap-3 text-xs">
-                  <div class="meter-row">
-                    <dt>Cohorte activo</dt>
-                    <dd class="meter-value"><a href="cohorte.html?c=C02&amp;escena=E3">C02 Alta de file</a></dd>
-                  </div>
-                  <div class="meter-row"><dt>Editados, esperando link</dt><dd class="meter-value" data-ok="false">6 / 6</dd></div>
-                  <div class="meter-row"><dt>Videos a guionar</dt><dd class="meter-value">43</dd></div>
-                  <div class="meter-row"><dt>Publicados sin pregunta</dt><dd class="meter-value" data-ok="true">0</dd></div>
-                </dl>
-              </section>
-
-              <section class="side-card" aria-labelledby="acad-e3">
-                <h2 class="side-title" id="acad-e3">Estado de la Academia</h2>
-                <dl class="flex flex-col gap-3 text-xs">
-                  <div class="meter-row"><dt>Módulos mapeados</dt><dd class="meter-value">13</dd></div>
-                  <div class="meter-row"><dt>Videos publicados</dt><dd class="meter-value">2 / 55</dd></div>
-                  <div class="meter-row"><dt>Preguntas escritas</dt><dd class="meter-value">10</dd></div>
-                  <div class="meter-row"><dt>Módulos activos</dt><dd class="meter-value" data-ok="false">0</dd></div>
-                  <div class="meter-row"><dt>Agencias con acceso</dt><dd class="meter-value">0</dd></div>
-                </dl>
-              </section>
-
-              <section class="side-card" aria-labelledby="ruta-e3">
-                <h2 class="side-title" id="ruta-e3">Ruta Esencial</h2>
-                <div class="meter-row"><span>Videos publicados</span><b class="meter-value" data-ok="false">2 / 12</b></div>
-                <div class="progress progress-sm my-2"><span style="width: 17%"></span></div>
-                <div class="meter-row"><span>Banco heredado</span><b class="meter-value" data-ok="false">10 / 60</b></div>
-                <div class="progress progress-sm my-2"><span style="width: 17%"></span></div>
-                <p class="foot-note">
-                  Su banco es <strong>derivado</strong>: hereda las preguntas de los videos que
-                  referencia. Por eso sube solo cuando se publica un video de P1.
-                </p>
-              </section>
-            </div>
-          </div>
-
-          <!-- ══════════════════ E4 · MES 2 · HITO DE LANZAMIENTO ══════════════════ -->
-          <div data-escena="E4" class="contents">
-            <section class="hito-card" data-cumplido="true" aria-labelledby="hito-e4">
-              <p class="side-title !mb-2">Hito alcanzado</p>
-              <h2 class="hito-titulo" id="hito-e4">
-                La Ruta Esencial está lista para activar: 12 de 12 videos y 60 de 60 preguntas
-              </h2>
-              <p class="mt-2 max-w-[74ch] text-sm text-success-dark">
-                Con el Pareto grabado, <strong>ningún módulo de biblioteca quedó completo</strong> — y
-                aun así la Academia se puede lanzar. Eso es exactamente para lo que existe la Ruta
-                Esencial.
-              </p>
-              <a href="modulo.html?m=R01&amp;escena=E4" class="btn btn-primary btn-sm mt-4">
-                Activar la Ruta Esencial
-              </a>
-            </section>
-
-            <section aria-labelledby="prog-e4">
-              <h2 class="side-title" id="prog-e4">Progreso del contenido · 55 videos</h2>
-              <div class="funnel">
-                <span data-estado="backlog" style="width: 78.18%">43 en backlog</span>
-                <span data-estado="publicado" style="width: 21.82%">12</span>
-              </div>
-              <p class="mt-2 text-xs text-ink-soft">
-                Los 12 de P1 publicados. Los 43 restantes siguen en backlog y eso está bien: son P2,
-                P3 y P4, y se graban después del lanzamiento.
-              </p>
-            </section>
-
-            <div class="grid grid-cols-[1fr_1fr] gap-4">
-              <section class="side-card side-card-strong" aria-labelledby="bib-e4">
-                <h2 class="side-title" id="bib-e4">Ningún módulo de biblioteca está completo</h2>
-                <table class="table-dense">
-                  <caption class="sr-only">
-                    Videos publicados sobre el total de cada módulo de biblioteca en el hito de
-                    lanzamiento. Ninguno llega a completarse.
-                  </caption>
-                  <thead>
-                    <tr><th scope="col">Módulo</th><th scope="col">Publicados / total</th><th scope="col">Estado</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr><td class="cell-mono">BAK-M00</td><td class="cell-num">2 / 4</td><td><span class="chip chip-outline">incompleto</span></td></tr>
-                    <tr><td class="cell-mono">BAK-M10</td><td class="cell-num">3 / 6</td><td><span class="chip chip-outline">incompleto</span></td></tr>
-                    <tr><td class="cell-mono">BAK-M20</td><td class="cell-num">3 / 6</td><td><span class="chip chip-outline">incompleto</span></td></tr>
-                    <tr><td class="cell-mono">BAK-M30</td><td class="cell-num">3 / 7</td><td><span class="chip chip-outline">incompleto</span></td></tr>
-                    <tr><td class="cell-mono">BAK-M40</td><td class="cell-num">1 / 5</td><td><span class="chip chip-outline">incompleto</span></td></tr>
-                    <tr data-reservado="true"><td class="cell-mono">M50 a M95</td><td class="cell-num">0 / 32</td><td><span class="chip chip-outline">sin empezar</span></td></tr>
-                  </tbody>
-                </table>
-                <p class="foot-note">
-                  Suma de publicados: <strong>2+3+3+3+1 = 12</strong>. Sin la Ruta Esencial, la
-                  Academia no se podría lanzar hasta terminar un módulo entero.
-                </p>
-              </section>
-
-              <div class="flex flex-col gap-4">
-                <section class="side-card" aria-labelledby="ruta-e4">
-                  <h2 class="side-title" id="ruta-e4">Ruta Esencial</h2>
-                  <div class="meter-row"><span>Videos publicados</span><b class="meter-value" data-ok="true">12 / 12</b></div>
-                  <div class="progress progress-sm my-2 progress-complete"><span style="width: 100%"></span></div>
-                  <div class="meter-row"><span>Banco heredado</span><b class="meter-value" data-ok="true">60 / 60</b></div>
-                  <div class="progress progress-sm my-2 progress-complete"><span style="width: 100%"></span></div>
-                  <p class="foot-note">Cumple los dos criterios. La acción de activar está habilitada.</p>
-                </section>
-
-                <section class="side-card" aria-labelledby="acad-e4">
-                  <h2 class="side-title" id="acad-e4">Estado de la Academia</h2>
-                  <dl class="flex flex-col gap-3 text-xs">
-                    <div class="meter-row"><dt>Videos publicados</dt><dd class="meter-value">12 / 55</dd></div>
-                    <div class="meter-row"><dt>Preguntas escritas</dt><dd class="meter-value">60</dd></div>
-                    <div class="meter-row"><dt>Módulos activos</dt><dd class="meter-value" data-ok="false">0</dd></div>
-                    <div class="meter-row"><dt>Agencias con acceso</dt><dd class="meter-value">0</dd></div>
-                  </dl>
-                  <p class="foot-note">
-                    Sigue en 0 hasta que se active la Ruta. Ese es el clic que lanza la Academia.
-                  </p>
-                </section>
-              </div>
-            </div>
-          </div>
-
-          <!-- ══════════════════ E5 · RÉGIMEN ══════════════════
-               La Ruta Esencial ya se activó en E4: acá no vuelve a ser el hito.
-               El panel sigue midiendo construcción — quedan 14 videos por grabar y
-               ningún módulo de biblioteca nuevo llegó todavía a su banco mínimo. -->
-          <div data-escena="E5" class="contents">
-            <section class="hito-card" aria-labelledby="hito-e5">
-              <p class="side-title !mb-2">Próximo hito</p>
-              <h2 class="hito-titulo" id="hito-e5">
-                BAK-M20: faltan 18 preguntas para poder activarlo
-              </h2>
-              <p class="mt-2 max-w-[74ch] text-sm text-primary-dark">
-                Es el módulo de biblioteca más cerca de activarse: sus <strong>6 videos ya están
-                publicados</strong> y lo único que falta es banco — tiene 22 de las 40 preguntas
-                mínimas. La Ruta Esencial ya está activa desde el hito de lanzamiento.
-              </p>
-              <a href="banco.html?m=30" class="btn btn-primary btn-sm mt-4">Ir a los bancos de preguntas</a>
-            </section>
-
-            <section aria-labelledby="prog-e5">
-              <h2 class="side-title" id="prog-e5">Progreso del contenido · 55 videos</h2>
-              <div class="funnel">
-                <span data-estado="backlog" style="width: 25.45%">14</span>
-                <span data-estado="guionado" style="width: 7.27%">4</span>
-                <span data-estado="grabado" style="width: 3.64%">2</span>
-                <span data-estado="editado" style="width: 3.64%">2</span>
-                <span data-estado="publicado" style="width: 52.73%">29 publicados</span>
-                <span data-estado="a regrabar" style="width: 5.45%">3</span>
-                <span data-estado="obsoleto" style="width: 1.82%">1</span>
-              </div>
-              <p class="funnel-legend">
-                <span><i style="background: var(--color-gray-500)"></i>14 en backlog</span>
-                <span><i style="background: var(--color-gray-600)"></i>4 guionados</span>
-                <span><i style="background: var(--color-primary-light)"></i>2 grabados</span>
-                <span><i style="background: var(--color-warning-dark)"></i>2 editados</span>
-                <span><i style="background: var(--color-success-dark)"></i>29 publicados</span>
-                <span><i style="background: var(--color-error)"></i>3 a regrabar</span>
-                <span><i style="background: var(--color-gray-700)"></i>1 obsoleto</span>
-              </p>
-            </section>
-
-            <div class="grid grid-cols-3 gap-4">
-              <section class="side-card" aria-labelledby="trab-e5">
-                <h2 class="side-title" id="trab-e5">Trabajo inmediato</h2>
-                <dl class="flex flex-col gap-3 text-xs">
-                  <div class="meter-row">
-                    <dt>Cohorte activo</dt>
-                    <dd class="meter-value"><a href="cohorte.html?c=C07">C07</a></dd>
-                  </div>
-                  <div class="meter-row"><dt>Publicados del cohorte</dt><dd class="meter-value" data-ok="false">1 / 2</dd></div>
-                  <div class="meter-row"><dt>Videos a guionar</dt><dd class="meter-value">14</dd></div>
-                  <div class="meter-row"><dt>Publicados sin pregunta</dt><dd class="meter-value" data-ok="false">9</dd></div>
-                  <div class="meter-row"><dt>En cola de regrabación</dt><dd class="meter-value" data-ok="false">3</dd></div>
-                </dl>
-              </section>
-
-              <section class="side-card" aria-labelledby="acad-e5">
-                <h2 class="side-title" id="acad-e5">Estado de la Academia</h2>
-                <dl class="flex flex-col gap-3 text-xs">
-                  <div class="meter-row"><dt>Módulos mapeados</dt><dd class="meter-value">13</dd></div>
-                  <div class="meter-row"><dt>Videos publicados</dt><dd class="meter-value">29 / 55</dd></div>
-                  <div class="meter-row"><dt>Módulos activos</dt><dd class="meter-value">4</dd></div>
-                  <div class="meter-row"><dt>Agencias con acceso</dt><dd class="meter-value">0</dd></div>
-                </dl>
-              </section>
-
-              <section class="side-card" aria-labelledby="sig-e5">
-                <h2 class="side-title" id="sig-e5">Lo que sigue</h2>
-                <ul class="flex flex-col gap-2 text-xs">
-                  <li><a href="tablero.html">Ver el tablero de producción ›</a></li>
-                  <li><a href="modulos.html">Revisar los módulos ›</a></li>
-                  <li><a href="banco.html?m=30">Banco de BAK-M30 ›</a></li>
-                </ul>
-              </section>
-            </div>
+            <div data-paneles></div>
           </div>
         </main>
       </div>
     </div>
 
     <script src="assets/js/icons.js"></script>
+    <script src="assets/js/academia-data.js"></script>
+    <script src="assets/js/academia-agencias.js"></script>
+    <script src="assets/js/academia-guiones.js"></script>
+    <script src="assets/js/academia-preguntas.js"></script>
+    <script src="assets/js/academia-sim.js"></script>
+    <script src="assets/js/render.js"></script>
     <script src="assets/js/ui.js"></script>
+    <script>
+      /* Panel de obra. Todos los números se derivan; lo que está escrito acá es
+         el TEXTO de cada momento, que es lo único que no se puede calcular:
+         qué hay que mirar y por qué. */
+      (function () {
+        "use strict";
+        const S = window.SIM;
+        const R = window.RENDER;
+        const e = S.escena;
+        if (e === "E1") return;
+
+        const q = e === "E5" ? "" : "?escena=" + e;
+        const amp = e === "E5" ? "?" : "&amp;escena=" + e + "&amp;";
+        const conteo = S.conteoPorEstado();
+        const videos = S.videos();
+        const tramos = S.embudo();
+        const ruta = S.aptitud(S.modulo("R01"));
+        const rutaResumen = ruta.resumen;
+        const deuda = S.deudaDeEvaluacion();
+        const preguntas = S.modulos.reduce(function (a, m) {
+          return a + (m.tipo === "biblioteca" ? S.bancoDe(m.numero).length : 0);
+        }, 0);
+        const activos = S.modulos.filter(function (m) {
+          return m.tipo !== "reservado" && S.resumenModulo(m).estado === "activo";
+        }).length;
+        const aGuionar = videos.filter(function (v) { return v.estado === "backlog"; }).length;
+
+        /* El cohorte activo: el primero que tenga algo empezado y sin terminar.
+           Si no hay ninguno a medias, el primero sin empezar. */
+        const cohortes = S.cohortesConAvance();
+        const enVuelo = cohortes.filter(function (c) {
+          return c.videos.some(function (v) {
+            const r = S.rango(v.estado);
+            return r > S.rango("backlog") && r < S.rango("publicado");
+          });
+        })[0];
+        const sinEmpezar = cohortes.filter(function (c) { return c.conGuion === 0; })[0];
+        const cohorte = enVuelo || sinEmpezar || null;
+
+        /* ── El hito ─────────────────────────────────────────────────────────
+           Uno solo. Mientras la Ruta Esencial no esté activa, el hito ES la
+           Ruta: es lo que responde cuándo se puede lanzar la Academia. Una vez
+           activa, pasa a ser el módulo de biblioteca más cerca de activarse. */
+        const rutaActiva = rutaResumen.estado === "activo";
+        /* El objetivo del banco de la Ruta NO depende de que su evaluación esté
+           configurada: son 5 preguntas por cada video que referencia, y eso se
+           sabe desde que el mapa está cargado. Si se usara el mínimo
+           configurado, en la semana 1 el hito diría «faltan 12 videos» y se
+           comería las 60 preguntas, que son la mitad del objetivo. */
+        const objetivoRuta = rutaResumen.totalVideos * S.evaluacion.preguntasHeredadasPorVideo;
+        const faltanPregRuta = Math.max(0, objetivoRuta - rutaResumen.banco.vigentes);
+        const cerca = S.moduloMasCerca();
+        let hito;
+
+        if (!rutaActiva) {
+          const faltanVideos = rutaResumen.totalVideos - rutaResumen.publicados;
+          const faltanPreg = faltanPregRuta;
+          if (ruta.apto) {
+            hito = {
+              escena: e,
+              cumplido: true,
+              titulo: "La Ruta Esencial está lista para activar: " +
+                rutaResumen.publicados + " de " + rutaResumen.totalVideos +
+                " videos publicados y " + rutaResumen.banco.vigentes + " de " +
+                rutaResumen.banco.minimo + " preguntas",
+              texto: "Es el momento del lanzamiento. <strong>Ningún módulo de biblioteca está " +
+                "completo</strong> y aun así la Academia se puede lanzar: para eso existe la Ruta " +
+                "Esencial, que referencia los videos del Pareto en lugar de esperar a que un " +
+                "módulo entero termine.",
+              cta: { href: "modulo.html?m=R01" + (e === "E5" ? "" : "&amp;escena=" + e),
+                     texto: "Ver la Ruta Esencial" },
+            };
+          } else {
+            hito = {
+              escena: e,
+              titulo: "Ruta Esencial: faltan " + faltanVideos +
+                (faltanVideos === 1 ? " video publicado" : " videos publicados") +
+                (faltanPreg ? " y " + faltanPreg + " preguntas" : "") + " para poder activarla",
+              texto: "Es el único objetivo que importa ahora. Los módulos de biblioteca están lejos, " +
+                "pero eso no es una alerta: es el punto de partida. <strong>La Academia se lanza con " +
+                "la Ruta Esencial</strong>, no con la biblioteca completa.",
+              cta: cohorte
+                ? { href: "cohorte.html?c=" + cohorte.id + (e === "E5" ? "" : "&amp;escena=" + e),
+                    texto: "Empezar por el cohorte " + cohorte.id }
+                : null,
+            };
+          }
+        } else if (cerca) {
+          const faltanVideos = cerca.totalVideos - cerca.publicados;
+          const partes = [];
+          if (faltanVideos) partes.push(faltanVideos + (faltanVideos === 1 ? " video" : " videos"));
+          if (cerca.banco.faltan) partes.push(cerca.banco.faltan + " preguntas");
+          hito = {
+            escena: e,
+            titulo: cerca.modulo.codigo + ": faltan " + partes.join(" y ") + " para poder activarlo",
+            texto: "Es el módulo de biblioteca más cerca de activarse: " +
+              (faltanVideos === 0
+                ? "sus <strong>" + cerca.totalVideos + " videos ya están publicados</strong> y lo " +
+                  "único que falta es banco"
+                : "le faltan " + faltanVideos + " videos por publicar") +
+              " — tiene " + cerca.banco.vigentes + " de las " + cerca.banco.minimo +
+              " preguntas mínimas. La Ruta Esencial ya está activa desde el hito de lanzamiento.",
+            cta: { href: "banco.html?m=" + cerca.modulo.numero + (e === "E5" ? "" : "&amp;escena=" + e),
+                   texto: "Ir a los bancos de preguntas" },
+          };
+        } else {
+          const opHito = S.operacion();
+          hito = {
+            escena: e,
+            cumplido: true,
+            titulo: opHito.agencias
+              ? "La Academia está en operación: " + opHito.agencias + " agencias y " +
+                opHito.personas + " personas la están usando"
+              : "Los " + activos + " módulos están activos y sus bancos completos",
+            texto: "Lo que queda es mantenimiento: " + conteo["a regrabar"] +
+              " videos en cola de regrabación porque el producto cambió, y el banco de los módulos " +
+              "afectados con preguntas a revisar." +
+              (opHito.agencias
+                ? " El panel de obra ya no es lo que importa — de acá en adelante la pregunta es " +
+                  "cuánto se usa y qué contenido hay que revisar."
+                : ""),
+            cta: { href: "tablero.html" + q, texto: "Ver la cola de regrabación" },
+          };
+        }
+
+        R.pintar("[data-hito]", R.hitoCard(hito));
+        R.pintar("[data-embudo]", R.embudo(tramos));
+        document.querySelector("[data-total-videos]").textContent = videos.length;
+
+        /* La leyenda solo aparece cuando el embudo tiene más de dos tramos: con
+           uno o dos, el propio tramo ya dice qué es. */
+        if (tramos.length > 2) {
+          const ley = document.querySelector("[data-leyenda]");
+          ley.hidden = false;
+          ley.innerHTML = R.leyendaEmbudo(tramos);
+        }
+
+        const NOTA_PROGRESO = {
+          E2: "Los " + videos.length + " IDs están reservados y ninguno se grabó todavía. Es exactamente lo que se espera de la semana 1: el mapa mira hacia adelante.",
+          E3: "",
+          E4: "",
+          E5: "",
+          E6: "",
+        };
+        document.querySelector("[data-nota-progreso]").textContent = NOTA_PROGRESO[e] || "";
+
+        /* ── Los paneles ─────────────────────────────────────────────────────
+           «Trabajo inmediato» y «Estado de la Academia» están en las cinco
+           escenas. El tercer panel cambia: en el hito de lanzamiento es la tabla
+           que demuestra que ningún módulo está completo, y en el resto es la
+           Ruta Esencial o los accesos rápidos. */
+        const trabajo = R.sideCard({
+          id: "trab", titulo: "Trabajo inmediato",
+          cuerpo: R.medidor([
+            { dt: "Cohorte activo",
+              html: cohorte
+                ? '<a href="cohorte.html?c=' + cohorte.id +
+                  (e === "E5" ? "" : "&amp;escena=" + e) + '">' + cohorte.id + " " +
+                  R.esc(cohorte.nombre) + "</a>"
+                : '<span class="text-gray-600">ninguno en curso</span>' },
+            { dt: "Grabados del cohorte",
+              dd: cohorte ? cohorte.grabados + " / " + cohorte.total : "—",
+              ok: cohorte ? cohorte.grabados === cohorte.total : undefined },
+            { dt: "Videos a guionar", dd: aGuionar },
+            { dt: "Publicados sin pregunta", dd: deuda.length, ok: deuda.length === 0 },
+            { dt: "En cola de regrabación", dd: conteo["a regrabar"],
+              ok: conteo["a regrabar"] === 0 },
+          ]),
+        });
+
+        /* R10: en las etapas de construcción, «módulos activos» y «agencias con
+           acceso» son lo ÚNICO de operación que el panel de obra admite. Y el de
+           agencias da 0 hasta que la Academia se abre — no porque esté escrito,
+           sino porque no hay ninguna con acceso todavía. */
+        const op = S.operacion();
+        const estado = R.sideCard({
+          id: "acad", titulo: "Estado de la Academia",
+          cuerpo: R.medidor([
+            { dt: "Módulos mapeados", dd: S.modulos.length },
+            { dt: "Videos publicados", dd: conteo.publicado + " / " + videos.length },
+            { dt: "Preguntas escritas", dd: preguntas },
+            { dt: "Módulos activos", dd: activos, ok: activos > 0 },
+            { dt: "Agencias con acceso", dd: op.agencias, ok: op.agencias > 0 },
+          ]),
+        });
+
+        /* El panel de operación existe SOLO donde hay uso. Es lo que separa a E6
+           de las escenas de construcción: no es un adorno, es el primer momento
+           en que estas métricas tienen algo que medir. Inventarlas antes sería
+           exactamente lo que R10 prohíbe. */
+        const operacion = op.agencias
+          ? R.sideCard({
+              id: "oper", titulo: "Uso de la Academia",
+              cuerpo: R.medidor([
+                /* «Agencias con acceso» no se repite: ya está en «Estado de la
+                   Academia», que es donde R10 lo admite. Acá va el techo de
+                   Meets, que es la métrica de CARGA OPERATIVA de Soporte. */
+                { dt: "Personas en los planteles", dd: op.personas },
+                { dt: "Recorridos completos", dd: op.certificadas, ok: op.certificadas > 0 },
+                { dt: "Módulos aprobados", dd: op.aprobaciones },
+                { dt: "Tasa de reprobación", dd: op.tasaReprobacion.toFixed(2) + " %",
+                  ok: op.tasaReprobacion < 30 },
+                { dt: "Meets habilitadas", dd: op.meetsDisponibles },
+              ]),
+              pie: "Sobre <strong>" + op.intentos + " intentos</strong>. La tasa de reprobación es " +
+                "la señal de <strong>contenido a revisar</strong>: si un módulo se reprueba mucho, " +
+                "el problema suele estar en el video o en las preguntas.",
+            })
+          : null;
+
+        const rutaCard = R.sideCard({
+          id: "ruta", titulo: "Ruta Esencial",
+          cuerpo:
+            '<div class="meter-row"><span>Videos publicados</span><b class="meter-value" data-ok="' +
+              (rutaResumen.publicados === rutaResumen.totalVideos) + '">' +
+              rutaResumen.publicados + " / " + rutaResumen.totalVideos + "</b></div>" +
+            barra(rutaResumen.publicados, rutaResumen.totalVideos) +
+            '<div class="meter-row"><span>Banco heredado</span><b class="meter-value" data-ok="' +
+              (rutaResumen.banco.minimo > 0 && rutaResumen.banco.faltan === 0) + '">' +
+              rutaResumen.banco.vigentes + " / " +
+              (rutaResumen.banco.minimo || "—") + "</b></div>" +
+            barra(rutaResumen.banco.vigentes, rutaResumen.banco.minimo),
+          pie: ruta.apto
+            ? "Cumple los criterios. La acción de activar está habilitada."
+            : (rutaActiva
+                ? "Activa desde el hito de lanzamiento."
+                : "Faltan " + ruta.faltan.join(" y ") + "."),
+        });
+
+        const siguiente = R.sideCard({
+          id: "sig", titulo: "Lo que sigue",
+          cuerpo: '<ul class="flex flex-col gap-2 text-xs">' +
+            '<li><a href="tablero.html' + q + '">Ver el tablero de producción ›</a></li>' +
+            '<li><a href="modulos.html' + q + '">Revisar los módulos ›</a></li>' +
+            '<li><a href="banco.html?m=30' + (e === "E5" ? "" : "&amp;escena=" + e) +
+              '">Banco de BAK-M30 ›</a></li>' +
+            "</ul>",
+        });
+
+        function barra(hecho, total) {
+          const pct = total ? Math.round((hecho / total) * 100) : 0;
+          return '<div class="progress progress-sm my-2' + (pct === 100 ? " progress-complete" : "") +
+            '"><span style="width: ' + pct + '%"></span></div>';
+        }
+
+        let paneles;
+        if (e === "E4") {
+          /* La tabla que demuestra el conflicto que resuelve la Ruta Esencial:
+             con el Pareto grabado, ningún módulo de biblioteca queda completo.
+             Los módulos sin empezar se agrupan en una fila: listarlos uno por
+             uno diría que hay once problemas, y hay uno. */
+          const bib = S.modulos.filter(function (m) { return m.tipo === "biblioteca"; })
+            .map(function (m) { return S.resumenModulo(m); });
+          const empezados = bib.filter(function (r) { return r.publicados > 0; });
+          const sinEmpezar2 = bib.filter(function (r) { return r.publicados === 0; });
+          const totalSin = sinEmpezar2.reduce(function (a, r) { return a + r.totalVideos; }, 0);
+          const rango = sinEmpezar2.length
+            ? sinEmpezar2[0].modulo.codigo.replace("BAK-", "") + " a " +
+              sinEmpezar2[sinEmpezar2.length - 1].modulo.codigo.replace("BAK-", "")
+            : "";
+
+          const filas = empezados.map(function (r) {
+            return '<tr><td class="cell-mono">' + r.modulo.codigo + '</td><td class="cell-num">' +
+              r.publicados + " / " + r.totalVideos +
+              '</td><td><span class="chip chip-outline">incompleto</span></td></tr>';
+          }).join("") + (sinEmpezar2.length
+            ? '<tr data-reservado="true"><td class="cell-mono">' + rango +
+              '</td><td class="cell-num">0 / ' + totalSin +
+              '</td><td><span class="chip chip-outline">sin empezar</span></td></tr>'
+            : "");
+
+          const tabla = R.sideCard({
+            id: "bib", titulo: "Ningún módulo de biblioteca está completo", fuerte: true,
+            cuerpo:
+              '<table class="table-dense"><caption class="sr-only">Videos publicados sobre el ' +
+              'total de cada módulo de biblioteca en el hito de lanzamiento. Ninguno llega a ' +
+              'completarse.</caption><thead><tr><th scope="col">Módulo</th>' +
+              '<th scope="col">Publicados / total</th><th scope="col">Estado</th></tr></thead>' +
+              "<tbody>" + filas + "</tbody></table>",
+            pie: "Suma de publicados: <strong>" +
+              empezados.map(function (r) { return r.publicados; }).join("+") + " = " +
+              empezados.reduce(function (a, r) { return a + r.publicados; }, 0) +
+              "</strong>. Sin la Ruta Esencial, la Academia no se podría lanzar hasta terminar un " +
+              "módulo entero.",
+          });
+
+          paneles = '<div class="grid grid-cols-[1.2fr_1fr] gap-4">' + tabla +
+            '<div class="flex flex-col gap-4">' + rutaCard + estado + "</div></div>";
+        } else if (operacion) {
+          paneles = '<div class="grid grid-cols-3 gap-4">' + trabajo + estado + operacion + "</div>";
+        } else if (rutaActiva || rutaResumen.publicados === 0) {
+          paneles = '<div class="grid grid-cols-3 gap-4">' + trabajo + estado + siguiente + "</div>";
+        } else {
+          paneles = '<div class="grid grid-cols-3 gap-4">' + trabajo + estado + rutaCard + "</div>";
+        }
+
+        R.pintar("[data-paneles]", paneles);
+      })();
+    </script>
   </body>
 </html>

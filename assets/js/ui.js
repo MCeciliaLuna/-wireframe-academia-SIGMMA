@@ -203,11 +203,22 @@ window.UI = (function () {
   }
 
   /* -- Orden de tablas ----------------------------------------------------- */
+  /* Marca un elemento como ya cableado y avisa si lo estaba. Es lo que permite
+     volver a llamar a los `bind*` después de re-pintar una tabla sin duplicar
+     listeners — un segundo listener de orden ordenaría dos veces por click. */
+  function yaCableado(el, marca) {
+    const clave = "bound" + marca;
+    if (el.dataset[clave]) return true;
+    el.dataset[clave] = "1";
+    return false;
+  }
+
   function bindSortableTables() {
     document.querySelectorAll("table[data-sortable]").forEach(function (table) {
       const body = table.querySelector("tbody");
       table.querySelectorAll("th[data-sort-key]").forEach(function (th) {
         const button = th.querySelector(".th-sort") || th;
+        if (yaCableado(button, "Sort")) return;
         button.addEventListener("click", function () {
           const key = th.dataset.sortKey;
           const numeric = th.dataset.sortType === "number";
@@ -236,11 +247,138 @@ window.UI = (function () {
     });
   }
 
+  /* -- Filtros de listado ---------------------------------------------------
+     Hasta acá los filtros no filtraban: el contador de al lado sí era real, así
+     que las dos cosas se contradecían apenas alguien tocaba una pill. El patrón
+     se repite en seis pantallas, así que vive acá y no en seis scripts.
+
+     Monta sobre:
+       [data-filtros="<selector del tbody>"]   el contenedor de la barra
+       [data-filtro-pill="clave"]              la pill que abre el menú
+       [data-filtro-menu="clave"]              el menú de opciones
+       [data-filtro-buscar]                    el campo de búsqueda
+       [data-conteo]                           el contador
+     Y filtra por los `data-<clave>` que las filas ya traen del render.
+
+     `data-filtros-extra` suma otro contenedor a filtrar con el mismo criterio:
+     es lo que permite que el tablero filtre la tabla Y el kanban a la vez. */
+  const filtrosActivos = {};
+
+  function bindFilters() {
+    document.querySelectorAll("[data-filtros]").forEach(function (barra) {
+      const destino = barra.dataset.filtros;
+      const extra = barra.dataset.filtrosExtra || null;
+      const buscar = barra.querySelector("[data-filtro-buscar]");
+      const conteo = barra.querySelector("[data-conteo]");
+      const estado = {};
+      const modos = {};
+
+      function candidatos() {
+        const sel = [destino + " > tr"];
+        /* En el kanban la unidad es la tarjeta, no la fila; las dos llevan los
+           mismos `data-*`, así que el mismo criterio sirve para las dos. */
+        if (extra) sel.push(extra + " [data-id]");
+        return Array.prototype.slice.call(document.querySelectorAll(sel.join(", ")));
+      }
+
+      function aplicar() {
+        const texto = (buscar && buscar.value || "").trim().toLowerCase();
+        /* El contador cuenta ELEMENTOS, no nodos filtrados: cuando la tabla y
+           el kanban muestran el mismo conjunto, sumar los dos daría el doble.
+           Se cuenta solo el destino principal. */
+        let visibles = 0;
+        candidatos().forEach(function (el) {
+          let pasa = true;
+          Object.keys(estado).forEach(function (clave) {
+            if (!estado[clave]) return;
+            const valor = el.dataset[clave] || "";
+            /* Un campo puede tener varios valores —un módulo está en más de un
+               plan—, y ahí la comparación exacta no sirve. `modo="incluye"`
+               busca el valor entre los de la celda, separados por espacio. */
+            const ok = modos[clave] === "incluye"
+              ? (" " + valor + " ").indexOf(" " + estado[clave] + " ") !== -1
+              : valor === estado[clave];
+            if (!ok) pasa = false;
+          });
+          if (pasa && texto) {
+            const heno = ((el.dataset.id || "") + " " + (el.dataset.titulo || "")).toLowerCase();
+            if (heno.indexOf(texto) === -1) pasa = false;
+          }
+          /* `data-filtro-off` y no `hidden`: `hidden` ya lo usan las solapas y
+             el conmutador de vista, y se pisarían. Es la misma razón por la que
+             la escena usa `data-escena-off`. */
+          if (pasa) {
+            el.removeAttribute("data-filtro-off");
+            if (el.matches(destino + " > *")) visibles++;
+          } else {
+            el.setAttribute("data-filtro-off", "");
+          }
+        });
+        if (conteo) {
+          conteo.textContent = visibles + (visibles === 1 ? " resultado" : " resultados");
+        }
+        const vacio = document.querySelector("[data-filtro-vacio]");
+        if (vacio) vacio.hidden = visibles !== 0;
+      }
+
+      barra.querySelectorAll("[data-filtro-menu]").forEach(function (menu) {
+        const clave = menu.dataset.filtroMenu;
+        estado[clave] = "";
+        modos[clave] = menu.dataset.filtroModo || "exacto";
+        menu.addEventListener("click", function (event) {
+          const opcion = event.target.closest("[data-filtro-valor]");
+          if (!opcion) return;
+          event.preventDefault();
+          estado[clave] = opcion.dataset.filtroValor;
+          const pill = barra.querySelector('[data-filtro-pill="' + clave + '"]');
+          if (pill) {
+            const etiqueta = pill.dataset.filtroEtiqueta || clave;
+            pill.firstChild.textContent = etiqueta + ": " + opcion.textContent.trim() + " ";
+            pill.dataset.active = estado[clave] ? "true" : "false";
+          }
+          menu.hidden = true;
+          const trigger = menu.parentNode.querySelector("[data-dropdown-trigger]");
+          if (trigger) { trigger.setAttribute("aria-expanded", "false"); trigger.focus(); }
+          aplicar();
+        });
+      });
+
+      if (buscar) buscar.addEventListener("input", aplicar);
+      filtrosActivos[destino] = aplicar;
+      aplicar();
+    });
+  }
+
+  /* Puebla el menú de una faceta. Las opciones salen de los datos, no de una
+     lista escrita a mano: así un módulo nuevo aparece en el filtro solo. */
+  function poblarFiltro(clave, opciones, etiqueta) {
+    const menu = document.querySelector('[data-filtro-menu="' + clave + '"]');
+    const pill = document.querySelector('[data-filtro-pill="' + clave + '"]');
+    if (!menu) return;
+    if (pill && etiqueta) pill.dataset.filtroEtiqueta = etiqueta;
+    const items = [{ valor: "", texto: "todos" }].concat(
+      opciones.map(function (o) {
+        return typeof o === "string" ? { valor: o, texto: o } : o;
+      })
+    );
+    menu.innerHTML = items.map(function (o) {
+      return '<button type="button" class="menu-item" role="menuitem" data-filtro-valor="' +
+        o.valor.replace(/"/g, "&quot;") + '">' + o.texto + "</button>";
+    }).join("");
+  }
+
+  /* Re-aplica los filtros de un listado. La usan las pantallas que re-pintan la
+     tabla después de una mutación: sin esto la fila nueva ignora el filtro. */
+  function refiltrar(destino) {
+    if (destino && filtrosActivos[destino]) return filtrosActivos[destino]();
+    Object.keys(filtrosActivos).forEach(function (k) { filtrosActivos[k](); });
+  }
+
   /* -- Contador de caracteres ---------------------------------------------- */
   function bindCounters() {
     document.querySelectorAll("[data-counter-for]").forEach(function (out) {
       const field = document.getElementById(out.dataset.counterFor);
-      if (!field) return;
+      if (!field || yaCableado(field, "Counter")) return;
       const max = field.getAttribute("maxlength") || 500;
       const update = function () {
         out.textContent = field.value.length + " / " + max;
@@ -348,22 +486,29 @@ window.UI = (function () {
   }
 
   /* -- Selección múltiple de tabla ------------------------------------------
-     Visual: marca las filas y muestra la barra de acciones en lote con el
-     conteo. No ejecuta ninguna acción — es maquetación. */
+     Marca las filas y muestra la barra de acciones en lote con el conteo. La
+     acción en sí la ejecuta la pantalla, leyendo `UI.seleccionados()`.
+
+     Las filas se consultan en vivo y no se guardan en un array: la tabla se
+     re-pinta después de cada mutación, y una lista capturada dejaría a «marcar
+     todas» operando sobre checkboxes que ya no están en el documento. */
   function bindBulkSelect() {
     const tabla = document.querySelector("table[data-bulk]");
     if (!tabla) return;
     const barra = document.getElementById(tabla.dataset.bulk);
     const todos = tabla.querySelector("thead input[type=checkbox]");
-    const filas = Array.prototype.slice.call(
-      tabla.querySelectorAll("tbody input[type=checkbox]")
-    );
+    const filas = function () {
+      return Array.prototype.slice.call(
+        tabla.querySelectorAll("tbody input[type=checkbox]")
+      );
+    };
 
     function pintar() {
-      const marcados = filas.filter(function (c) {
+      const actuales = filas();
+      const marcados = actuales.filter(function (c) {
         return c.checked;
       });
-      filas.forEach(function (c) {
+      actuales.forEach(function (c) {
         c.closest("tr").dataset.selected = c.checked ? "true" : "false";
       });
       if (barra) {
@@ -375,32 +520,49 @@ window.UI = (function () {
         }
       }
       if (todos) {
-        todos.checked = marcados.length === filas.length && filas.length > 0;
-        todos.indeterminate = marcados.length > 0 && marcados.length < filas.length;
+        todos.checked = marcados.length === actuales.length && actuales.length > 0;
+        todos.indeterminate = marcados.length > 0 && marcados.length < actuales.length;
       }
     }
 
-    filas.forEach(function (c) {
-      c.addEventListener("change", pintar);
+    /* Los checkboxes de fila son nuevos en cada pintado: van siempre. El de
+       `thead` y el de limpiar sobreviven, así que van una sola vez. */
+    filas().forEach(function (c) {
+      if (!yaCableado(c, "Bulk")) c.addEventListener("change", pintar);
     });
-    if (todos) {
+    if (todos && !yaCableado(todos, "Bulk")) {
       todos.addEventListener("change", function () {
-        filas.forEach(function (c) {
+        filas().forEach(function (c) {
           c.checked = todos.checked;
         });
         pintar();
       });
     }
     const limpiar = barra && barra.querySelector("[data-bulk-clear]");
-    if (limpiar) {
+    if (limpiar && !yaCableado(limpiar, "Bulk")) {
       limpiar.addEventListener("click", function () {
-        filas.forEach(function (c) {
+        filas().forEach(function (c) {
           c.checked = false;
         });
         pintar();
       });
     }
     pintar();
+  }
+
+  /* Los IDs de las filas marcadas. Es lo que le permite a una pantalla ejecutar
+     una acción en lote sin volver a recorrer el DOM a mano. */
+  function seleccionados() {
+    const tabla = document.querySelector("table[data-bulk]");
+    if (!tabla) return [];
+    return Array.prototype.slice
+      .call(tabla.querySelectorAll("tbody input[type=checkbox]"))
+      .filter(function (c) { return c.checked; })
+      .map(function (c) {
+        const tr = c.closest("tr");
+        return tr && tr.dataset.id;
+      })
+      .filter(Boolean);
   }
 
   /* -- Escena ---------------------------------------------------------------
@@ -414,17 +576,34 @@ window.UI = (function () {
 
      Los datos de una escena NUNCA se mezclan con los de otra: por eso esto
      alterna bloques enteros y no celdas sueltas. */
-  const ESCENAS = {
-    E1: { orden: 1, titulo: "Día 0", detalle: "sistema vacío" },
-    E2: { orden: 2, titulo: "Semana 1", detalle: "mapa cargado" },
-    E3: { orden: 3, titulo: "Mes 1", detalle: "P1 en producción" },
-    E4: { orden: 4, titulo: "Mes 2", detalle: "hito de lanzamiento" },
-    E5: { orden: 5, titulo: "Régimen", detalle: "la Academia en marcha" },
-  };
+  /* Las escenas salen del dataset, que es donde están declaradas: tener el
+     diccionario dos veces fue lo que hizo que E6 se rotulara como E5 cuando se
+     agregó. El literal de acá es solo el respaldo para una página que cargue
+     `ui.js` sin el dataset. */
+  const ESCENAS = (function () {
+    if (window.ACADEMIA_DATA && window.ACADEMIA_DATA.ESCENAS) {
+      const mapa = {};
+      window.ACADEMIA_DATA.ESCENAS.forEach(function (e) {
+        mapa[e.id] = { orden: e.orden, titulo: e.titulo, detalle: e.detalle };
+      });
+      return mapa;
+    }
+    return {
+      E1: { orden: 1, titulo: "Día 0", detalle: "sistema vacío" },
+      E2: { orden: 2, titulo: "Semana 1", detalle: "mapa cargado" },
+      E3: { orden: 3, titulo: "Mes 1", detalle: "P1 en producción" },
+      E4: { orden: 4, titulo: "Mes 2", detalle: "hito de lanzamiento" },
+      E5: { orden: 5, titulo: "Régimen", detalle: "la Academia en marcha" },
+      E6: { orden: 6, titulo: "En operación", detalle: "la Academia completa, con uso" },
+    };
+  })();
+
+  const ESCENA_DEFAULT =
+    (window.ACADEMIA_DATA && window.ACADEMIA_DATA.ESCENA_DEFAULT) || "E5";
 
   function escenaActiva() {
-    const pedida = (param("escena") || "E5").toUpperCase();
-    return ESCENAS[pedida] ? pedida : "E5";
+    const pedida = (param("escena") || ESCENA_DEFAULT).toUpperCase();
+    return ESCENAS[pedida] ? pedida : ESCENA_DEFAULT;
   }
 
   function bindEscena() {
@@ -474,7 +653,7 @@ window.UI = (function () {
     });
 
     /* Los links que quieran conservar la escena la llevan sola. */
-    if (actual !== "E5") {
+    if (actual !== ESCENA_DEFAULT) {
       document.querySelectorAll("[data-escena-keep]").forEach(function (a) {
         const href = a.getAttribute("href");
         if (!href || href.indexOf("escena=") >= 0) return;
@@ -495,6 +674,80 @@ window.UI = (function () {
     bindTabs();
     bindViewSwitch();
     bindBulkSelect();
+    bindFilters();
+  }
+
+  /* Volver a cablear lo que depende de las FILAS y no de la tabla.
+     `bindSortableTables` engancha en el `th`, así que sobrevive a un re-pintado;
+     `bindBulkSelect` captura los checkboxes una sola vez y no. Toda pantalla que
+     re-pinte un `tbody` después de una mutación tiene que llamar a esto, o la
+     selección múltiple deja de responder sin decir por qué. */
+  function rebind() {
+    bindSortableTables();
+    bindBulkSelect();
+    bindCounters();
+    refiltrar();
+  }
+
+  /* Recargar la pantalla después de una mutación que la cambia entera.
+
+     Descarta `reset=1` de la URL, y no es un detalle: ese parámetro borra el
+     overlay al cargar, así que recargar con él puesto borraría el cambio que
+     se acaba de guardar. Quien llegó con `?reset=1` y después configuró algo
+     vería que no pasó nada. */
+  function recargar() {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("reset");
+    window.location.replace(url.toString());
+  }
+
+  /* -- Exportar a CSV --------------------------------------------------------
+     Arma el archivo en memoria y lo baja con un `Blob`. No es `fetch` ni
+     backend: anda igual sobre `file://`.
+
+     Exporta lo que está EN PANTALLA, no el total: si el usuario filtró, exportar
+     el listado completo sería una respuesta a una pregunta que no hizo. */
+  function exportarCSV(nombre, encabezados, filas) {
+    const escapar = function (v) {
+      const s = v === null || v === undefined ? "" : String(v);
+      return /[";\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    };
+    /* Separador `;` y BOM: es lo que hace que Excel en español abra el archivo
+       en columnas en vez de meter todo en la primera. */
+    const cuerpo = [encabezados].concat(filas)
+      .map(function (f) { return f.map(escapar).join(";"); })
+      .join("\r\n");
+    const blob = new Blob(["﻿" + cuerpo], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = nombre;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  /* Las filas visibles de una tabla, como matriz de texto. Es la entrada
+     natural de `exportarCSV`: lo que se ve es lo que se baja.
+
+     Dos cosas de la tabla no son dato y se descartan: la celda del checkbox de
+     selección —cuyo único texto es el rótulo para lectores de pantalla— y el
+     guion largo con que la interfaz dibuja un valor vacío. En una planilla, «—»
+     no es un valor: es ruido que rompe cualquier fórmula. */
+  function filasVisibles(selector) {
+    return Array.prototype.slice.call(document.querySelectorAll(selector + " > tr"))
+      .filter(function (tr) {
+        return !tr.hasAttribute("data-filtro-off") && !tr.hasAttribute("data-escena-off");
+      })
+      .map(function (tr) {
+        return Array.prototype.slice.call(tr.querySelectorAll("td"))
+          .filter(function (td) { return !td.querySelector('input[type="checkbox"]'); })
+          .map(function (td) {
+            const t = td.textContent.trim().replace(/\s+/g, " ");
+            return t === "—" ? "" : t;
+          });
+      });
   }
 
   if (document.readyState === "loading") {
@@ -510,5 +763,12 @@ window.UI = (function () {
     showModal: showModal,
     closeModal: closeModal,
     loading: loading,
+    rebind: rebind,
+    recargar: recargar,
+    poblarFiltro: poblarFiltro,
+    refiltrar: refiltrar,
+    seleccionados: seleccionados,
+    exportarCSV: exportarCSV,
+    filasVisibles: filasVisibles,
   };
 })();

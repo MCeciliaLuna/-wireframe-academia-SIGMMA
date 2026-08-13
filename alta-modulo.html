@@ -49,15 +49,15 @@
             <a href="modulos.html" class="nav-item" aria-current="page">
               <span class="icon" data-icon="layers"></span>Módulos
             </a>
-            <span class="nav-item" aria-disabled="true">
+            <a href="videos.html" class="nav-item">
               <span class="icon" data-icon="film"></span>Biblioteca de videos
-            </span>
+            </a>
             <a href="tablero.html" class="nav-item">
               <span class="icon" data-icon="columns"></span>Tablero de producción
             </a>
-            <span class="nav-item" aria-disabled="true">
+            <a href="regrabacion.html" class="nav-item">
               <span class="icon" data-icon="refresh"></span>Cola de regrabación
-            </span>
+            </a>
           </div>
 
           <div class="nav-group">
@@ -72,9 +72,9 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Currícula</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="modulo.html?m=R01" class="nav-item">
               <span class="icon" data-icon="route"></span>Ruta Esencial
-            </span>
+            </a>
             <span class="nav-item" aria-disabled="true">
               <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
             </span>
@@ -89,12 +89,12 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Seguimiento</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="panel.html" class="nav-item">
               <span class="icon" data-icon="bar-chart"></span>Panel macro
-            </span>
-            <span class="nav-item" aria-disabled="true">
+            </a>
+            <a href="agencias.html" class="nav-item">
               <span class="icon" data-icon="users"></span>Detalle por agencia
-            </span>
+            </a>
           </div>
 
           <div class="nav-group">
@@ -125,7 +125,7 @@
           </div>
           <div class="page-actions">
             <a href="modulos.html" class="btn btn-bordered btn-sm">Cancelar</a>
-            <button type="button" class="btn btn-primary btn-sm">Crear módulo</button>
+            <button type="button" class="btn btn-primary btn-sm" data-crear>Crear módulo</button>
           </div>
         </header>
 
@@ -137,23 +137,21 @@
                 <div class="grid grid-cols-2 gap-3">
                   <div class="field">
                     <label class="label" for="sup">Superficie</label>
-                    <select class="select !h-9 !text-xs" id="sup">
-                      <option selected>BAK · Backoffice</option>
-                      <option>FRT · Front</option>
-                      <option>CRM</option>
-                    </select>
+                    <select class="select !h-9 !text-xs" id="sup"></select>
                   </div>
                   <div class="field">
                     <label class="label" for="num">Número de módulo</label>
                     <input class="input !h-9 font-mono !text-xs" id="num" type="text" value="M35" />
                     <p class="hint">De 10 en 10. Se puede saltear para reservar espacio.</p>
+                    <p class="error-text" data-error-num hidden></p>
                   </div>
                 </div>
                 <p class="alert alert-warning mt-3 !text-2xs">
                   <span class="icon" data-icon="lock"></span>
                   <span>
-                    El ID queda <strong>BAK-M35</strong> y <strong>no se va a poder cambiar</strong>:
-                    los videos cuelgan de él y el ID sobrevive a cualquier regrabado.
+                    El ID queda <strong data-id-previo>BAK-M35</strong> y
+                    <strong>no se va a poder cambiar</strong>: los videos cuelgan de él y el ID
+                    sobrevive a cualquier regrabado.
                   </span>
                 </p>
               </section>
@@ -181,16 +179,16 @@
                       <p class="hint">Es la secuencia de desbloqueo.</p>
                     </div>
                   </div>
+                  <!-- D-3 cerrada: los planes son los tres reales del producto,
+                       tomados de web.sigmma.net/planes.html. Esta pantalla era
+                       la última que quedaba ofreciendo el placeholder «plan A ·
+                       plan B», y contradecía a superficies.html y a video.html. -->
                   <div class="field">
                     <label class="label" for="planes">Planes</label>
-                    <select class="select !h-9 !text-xs" id="planes">
-                      <option selected>plan A · plan B</option>
-                      <option>plan A</option>
-                      <option>plan B</option>
-                    </select>
+                    <select class="select !h-9 !text-xs" id="planes"></select>
                     <p class="hint">
-                      El diccionario real de planes es una decisión abierta del proyecto: «plan A» y
-                      «plan B» son un placeholder.
+                      Un módulo puede estar en más de un plan. El plan define el recorrido de la
+                      agencia, y es el denominador de todo cálculo de avance.
                     </p>
                   </div>
                 </div>
@@ -224,6 +222,115 @@
     </div>
 
     <script src="assets/js/icons.js"></script>
+    <script src="assets/js/academia-data.js"></script>
+    <script src="assets/js/academia-agencias.js"></script>
+    <script src="assets/js/academia-guiones.js"></script>
+    <script src="assets/js/academia-preguntas.js"></script>
+    <script src="assets/js/academia-sim.js"></script>
+    <script src="assets/js/render.js"></script>
     <script src="assets/js/ui.js"></script>
+    <script>
+      /* Alta de módulo. Antes esta pantalla era la única del set —junto con el
+         alta de sección— que no cargaba el dataset: sus `<select>` tenían las
+         opciones escritas a mano y podían divergir del resto sin que nada lo
+         detectara. De hecho divergían: ofrecían «plan A · plan B», el
+         placeholder que D-3 ya cerró a favor de los tres planes reales. */
+      (function () {
+        "use strict";
+        const S = window.SIM;
+        const R = window.RENDER;
+        const e = S.escena;
+        const q = e === "E5" ? "" : "?escena=" + e;
+
+        /* La superficie llega desde el listado, que ya sabía cuál se miraba. */
+        const supPedida = (S.param("sup") || "BAK").toUpperCase();
+        const selSup = document.getElementById("sup");
+        R.pintar("#sup", S.superficies.map(function (x) {
+          return '<option value="' + x.codigo + '"' + (x.codigo === supPedida ? " selected" : "") +
+            ">" + x.codigo + (x.nombre ? " · " + R.esc(x.nombre) : "") + "</option>";
+        }).join(""));
+
+        R.pintar("#planes", [
+          { v: S.planes.map(function (p) { return p.nombre; }).join(" · "), t: "todos los planes" },
+        ].concat(S.planes.map(function (p) { return { v: p.nombre, t: p.nombre }; }))
+          .map(function (o, i) {
+            return '<option value="' + R.esc(o.v) + '"' + (i === 0 ? " selected" : "") + ">" +
+              R.esc(o.t) + "</option>";
+          }).join(""));
+
+        const inpNum = document.getElementById("num");
+        const inpNom = document.getElementById("nom");
+        const selTipo = document.getElementById("tipo");
+        const inpOrden = document.getElementById("orden");
+        const selPlanes = document.getElementById("planes");
+        const btn = document.querySelector("[data-crear]");
+        const errNum = document.querySelector("[data-error-num]");
+
+        /* «M35» en el campo, «BAK-M35» como ID. El número se escribe con o sin
+           la M: exigir el formato exacto sería pedirle al usuario que adivine. */
+        function numeroDe() {
+          const m = /(\d+)/.exec(inpNum.value || "");
+          return m ? Number(m[1]) : NaN;
+        }
+        function codigoDe() {
+          const n = numeroDe();
+          return isNaN(n) ? null : selSup.value + "-M" + String(n).padStart(2, "0");
+        }
+
+        function validar() {
+          const n = numeroDe();
+          const codigo = codigoDe();
+          let error = null;
+          if (isNaN(n)) error = "Escribí el número del módulo, por ejemplo M35.";
+          else if (S.modulos.some(function (m) { return m.codigo === codigo; })) {
+            const ya = S.modulos.filter(function (m) { return m.codigo === codigo; })[0];
+            error = codigo + " ya existe: es «" + ya.titulo + "». El ID es permanente.";
+          }
+
+          document.querySelector("[data-id-previo]").textContent = codigo || "—";
+          errNum.hidden = !error;
+          errNum.textContent = error || "";
+          inpNum.setAttribute("aria-invalid", error ? "true" : "false");
+
+          /* El tipo «reservado» aparta el ID sin contenido: no lleva orden
+             curricular ni planes, porque todavía no hay nada que ordenar ni
+             que habilitar. Deshabilitarlos dice eso mejor que un texto. */
+          const reservado = selTipo.value === "reservado";
+          inpOrden.disabled = reservado;
+          selPlanes.disabled = reservado;
+          if (reservado) inpOrden.value = "—";
+
+          btn.disabled = !!error || !inpNom.value.trim();
+          btn.title = error ? "Corregí el número del módulo."
+            : !inpNom.value.trim() ? "Falta el nombre del módulo." : "";
+          return !btn.disabled;
+        }
+
+        [inpNum, inpNom].forEach(function (el) { el.addEventListener("input", validar); });
+        selTipo.addEventListener("change", validar);
+        selSup.addEventListener("change", validar);
+        validar();
+
+        btn.addEventListener("click", function () {
+          if (!validar()) return;
+          const n = numeroDe();
+          const reservado = selTipo.value === "reservado";
+          const orden = parseInt(inpOrden.value, 10);
+          S.crear("modulos", {
+            numero: n,
+            codigo: codigoDe(),
+            titulo: inpNom.value.trim(),
+            tipo: selTipo.value,
+            orden: reservado || isNaN(orden) ? null : orden,
+            planes: reservado ? null : selPlanes.value.split("·").map(function (x) { return x.trim(); }),
+            activadoEn: null,
+            secciones: [],
+          });
+          /* Al detalle del módulo recién creado: es donde sigue el trabajo
+             —armar la primera sección— y la prueba de que quedó creado. */
+          window.location.href = "modulo.html?m=" + n + (q ? "&" + q.slice(1) : "");
+        });
+      })();
+    </script>
   </body>
 </html>

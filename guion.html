@@ -49,15 +49,15 @@
             <a href="modulos.html" class="nav-item">
               <span class="icon" data-icon="layers"></span>Módulos
             </a>
-            <span class="nav-item" aria-disabled="true" aria-current="page">
+            <a href="videos.html" class="nav-item" aria-current="page">
               <span class="icon" data-icon="film"></span>Biblioteca de videos
-            </span>
+            </a>
             <a href="tablero.html" class="nav-item">
               <span class="icon" data-icon="columns"></span>Tablero de producción
             </a>
-            <span class="nav-item" aria-disabled="true">
+            <a href="regrabacion.html" class="nav-item">
               <span class="icon" data-icon="refresh"></span>Cola de regrabación
-            </span>
+            </a>
           </div>
 
           <div class="nav-group">
@@ -72,9 +72,9 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Currícula</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="modulo.html?m=R01" class="nav-item">
               <span class="icon" data-icon="route"></span>Ruta Esencial
-            </span>
+            </a>
             <span class="nav-item" aria-disabled="true">
               <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
             </span>
@@ -89,12 +89,12 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Seguimiento</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="panel.html" class="nav-item">
               <span class="icon" data-icon="bar-chart"></span>Panel macro
-            </span>
-            <span class="nav-item" aria-disabled="true">
+            </a>
+            <a href="agencias.html" class="nav-item">
               <span class="icon" data-icon="users"></span>Detalle por agencia
-            </span>
+            </a>
           </div>
 
           <div class="nav-group">
@@ -120,173 +120,100 @@
       <div class="main-col">
         <header class="page-head">
           <div>
-            <div class="breadcrumb">
-              <a href="cohorte.html?c=C03&amp;escena=E3">Cohorte C03</a> /
-              <a href="video.html?v=BAK-M30.050&amp;escena=E3">BAK-M30.050</a> / Guión
-            </div>
+            <div class="breadcrumb" data-breadcrumb></div>
             <h1 class="page-title">
-              <span class="id-mono">BAK-M30.050</span> Procesar el voucher
-              <span class="chip chip-guionado">guionado</span>
-              <span class="chip chip-meta">2-3 min</span>
+              <span data-titulo></span>
+              <span data-chips></span>
               <span class="escena-badge" data-escena-label></span>
             </h1>
           </div>
-          <div class="page-actions">
-            <button type="button" class="btn btn-bordered btn-sm">Vista de rodaje</button>
-            <button type="button" class="btn btn-primary btn-sm">Guardar guión</button>
-          </div>
+          <div class="page-actions" data-acciones></div>
         </header>
 
         <main id="contenido" class="page-body">
-          <!-- Pantalla partida: contexto a la izquierda, plantilla a la derecha.
-               El guión no se escribe aislado — se escribe sabiendo de dónde viene
-               el escenario y en qué estado lo deja para el video siguiente. -->
-          <div class="split-editor">
+          <div id="sin-video" class="placeholder-box" hidden>
+            <span class="placeholder-icon" data-icon="edit"></span>
+            <h2 class="text-h5" data-vacio-titulo></h2>
+            <p class="mt-2 max-w-[54ch] text-sm text-ink-soft" data-vacio-texto></p>
+            <a href="tablero.html" class="btn btn-primary btn-sm mt-6" data-vacio-cta>Ver el tablero</a>
+          </div>
+
+          <div id="editor" class="grid grid-cols-[320px_1fr] items-start gap-[18px]" hidden>
+            <!-- Panel izquierdo · CONTEXTO. El guión no se escribe aislado: se
+                 escribe sabiendo de dónde viene el file y qué sigue después. Es
+                 lo que hace que el cohorte funcione. -->
             <aside class="flex flex-col gap-3" aria-labelledby="ctx">
               <h2 class="side-title !mb-0" id="ctx">Contexto de la cadena</h2>
-
               <div class="side-card side-card-strong">
-                <h3 class="side-title">Receta del cohorte C03</h3>
-                <p class="text-xs text-gray-800">
-                  Se sigue con el file que quedó armado en <strong>C02</strong> (cliente + pasajero
-                  cargados). Acá le agregamos el servicio y cobramos.
-                </p>
-                <p class="foot-note !border-none !pt-2">
-                  Entorno: <strong>Viajando.com</strong> · 4 videos de corrido.
-                </p>
+                <h3 class="side-title" data-lbl-receta></h3>
+                <p class="text-xs text-gray-800" data-receta-cohorte></p>
               </div>
-
               <div class="side-card">
                 <h3 class="side-title">Viene de</h3>
-                <p class="flex items-center gap-2 text-xs">
-                  <span class="row-id">BAK-M30.020</span>
-                  <span class="flex-1">Cargar voucher</span>
-                  <span class="chip chip-guionado">guionado</span>
-                </p>
-                <p class="chain-link">
-                  <span class="icon" data-icon="git-branch"></span>
-                  Estado en que lo deja: <strong>el voucher recién cargado, sin procesar</strong>.
-                  Es exactamente la receta de este video.
-                </p>
+                <div data-viene></div>
               </div>
-
               <div class="side-card">
                 <h3 class="side-title">Sigue</h3>
-                <p class="flex items-center gap-2 text-xs">
-                  <span class="row-id">BAK-M40.010</span>
-                  <span class="flex-1">Recibos de cobranza</span>
-                  <span class="chip chip-guionado">guionado</span>
-                </p>
-                <p class="chain-link">
-                  <span class="icon" data-icon="git-branch"></span>
-                  Necesita <strong>el file con el voucher procesado</strong>: este video se lo tiene
-                  que dejar así.
-                </p>
+                <div data-sigue></div>
               </div>
-
               <div class="side-card">
                 <h3 class="side-title text-error-dark">Qué NO mostrar</h3>
-                <ul class="flex flex-col gap-1 text-xs text-gray-800">
-                  <li>CUIT o documentos de personas reales</li>
-                  <li>Precios comerciales reales</li>
-                  <li>Credenciales</li>
-                </ul>
+                <ul class="flex flex-col gap-2 text-xs" data-no-mostrar></ul>
               </div>
             </aside>
 
-            <!-- La plantilla NO es texto libre: es la estructura del documento de
-                 Plantilla de Guión, que existe para que los 55 videos queden
-                 parejos aunque se graben con meses de diferencia. -->
+            <!-- Panel derecho · LA PLANTILLA. No es texto libre: es la estructura
+                 del documento de Plantilla de Guión, para que los videos queden
+                 parejos aunque se graben en meses distintos. -->
             <form class="flex flex-col gap-4" onsubmit="return false" aria-labelledby="plantilla">
               <h2 class="side-title !mb-0" id="plantilla">Plantilla de guión</h2>
-
-              <section class="recipe-box">
+              <section class="side-card">
                 <label class="label" for="receta">Receta de preparación de este video</label>
-                <p class="hint !mt-0 mb-2">Qué tiene que estar cargado antes de apretar REC.</p>
-                <textarea class="textarea !text-xs" id="receta" rows="2">El voucher recién cargado en M30.020.</textarea>
+                <textarea class="textarea !text-xs" id="receta" rows="2" data-campo-receta></textarea>
+                <p class="hint">El estado del sistema ANTES de apretar REC.</p>
               </section>
 
               <section class="side-card">
-                <div class="mb-2 flex items-baseline gap-2">
+                <div class="mb-1 flex items-baseline justify-between">
                   <h3 class="side-title !mb-0">Intro</h3>
-                  <span class="chip chip-meta">a cámara</span>
-                  <span class="chip chip-outline">~15 seg</span>
+                  <span class="text-2xs text-gray-600">a cámara · ~15 seg</span>
                 </div>
                 <label class="sr-only" for="intro">Texto de la intro</label>
-                <textarea class="textarea !text-xs" id="intro" rows="2">El paso que hace que todo impacte donde tiene que impactar.</textarea>
+                <textarea class="textarea !text-xs" id="intro" rows="2" data-campo-intro></textarea>
                 <p class="hint">Gancho breve + qué vas a aprender, en una frase.</p>
               </section>
 
               <section class="side-card">
-                <div class="mb-2 flex items-baseline gap-2">
+                <div class="mb-1 flex items-baseline justify-between">
                   <h3 class="side-title !mb-0">Cuerpo</h3>
-                  <span class="chip chip-meta">voz sobre pantalla</span>
-                  <span class="chip chip-outline">el grueso</span>
+                  <span class="text-2xs text-gray-600">voz sobre pantalla</span>
                 </div>
-                <p class="hint !mt-0 mb-2">
-                  Pasos numerados. Cada paso, <strong>una acción visible</strong>. Entre corchetes,
-                  qué mostrar o resaltar.
-                </p>
-                <ol class="flex flex-col gap-2">
-                  <li class="flex items-start gap-2">
-                    <span class="wizard-num mt-1">1</span>
-                    <span class="flex-1">
-                      <label class="sr-only" for="paso1">Paso 1</label>
-                      <textarea class="textarea !text-xs" id="paso1" rows="2">Qué significa procesar el voucher. [mostrar botón]</textarea>
-                    </span>
-                  </li>
-                  <li class="flex items-start gap-2">
-                    <span class="wizard-num mt-1">2</span>
-                    <span class="flex-1">
-                      <label class="sr-only" for="paso2">Paso 2</label>
-                      <textarea class="textarea !text-xs" id="paso2" rows="3">Al procesar, impacta en la cuenta del proveedor y aparece en los informes. Sin procesar, no existe para la administración. [mostrar el antes y después]</textarea>
-                    </span>
-                  </li>
-                </ol>
-                <button type="button" class="btn btn-bordered btn-sm mt-3">
-                  <span class="icon" data-icon="plus"></span>Agregar paso
+                <ol class="flex flex-col gap-2" data-pasos></ol>
+                <button type="button" class="placeholder-box !py-2 mt-2 text-xs" data-agregar-paso>
+                  <span class="icon icon-sm" data-icon="plus"></span> agregar paso
                 </button>
+                <p class="hint">Un paso, una acción visible. Las acotaciones van entre corchetes.</p>
               </section>
 
               <section class="side-card">
-                <div class="mb-2 flex items-baseline gap-2">
+                <div class="mb-1 flex items-baseline justify-between">
                   <h3 class="side-title !mb-0">Cierre</h3>
-                  <span class="chip chip-meta">a cámara</span>
-                  <span class="chip chip-outline">~10 seg</span>
+                  <span class="text-2xs text-gray-600">a cámara · ~10 seg</span>
                 </div>
                 <label class="sr-only" for="cierre">Texto del cierre</label>
-                <textarea class="textarea !text-xs" id="cierre" rows="2">Regla de oro: voucher que no se procesa, es plata que no se ve. Ahora cobramos.</textarea>
-                <p class="hint">
-                  Todos los cierres invitan a la evaluación del módulo. El de este encadena con
-                  <span class="font-mono">M40.010</span>.
-                </p>
+                <textarea class="textarea !text-xs" id="cierre" rows="2" data-campo-cierre></textarea>
+                <p class="hint" data-hint-cierre></p>
               </section>
 
               <section class="side-card">
                 <label class="label" for="notas">Notas de producción</label>
-                <textarea class="textarea !text-xs" id="notas" rows="2" placeholder="Detalles de pantalla a cuidar, zooms, qué resaltar…"></textarea>
+                <textarea class="textarea !text-xs" id="notas" rows="2" data-campo-notas
+                  placeholder="Detalles de pantalla a cuidar, zooms, qué resaltar…"></textarea>
               </section>
 
               <section class="side-card">
                 <h3 class="side-title">Checklist de la plantilla</h3>
-                <ul class="checklist">
-                  <li class="checklist-item" data-done="true">
-                    <span class="icon" data-icon="check-circle"></span>Un solo concepto
-                  </li>
-                  <li class="checklist-item" data-done="true">
-                    <span class="icon" data-icon="check-circle"></span>Dura menos de 5 minutos
-                  </li>
-                  <li class="checklist-item" data-done="true">
-                    <span class="icon" data-icon="check-circle"></span>Intro y cierre a cámara, cuerpo con voz sobre pantalla
-                  </li>
-                  <li class="checklist-item" data-done="false">
-                    <span class="icon" data-icon="alert-circle"></span>Notas de producción sin completar
-                  </li>
-                </ul>
-                <p class="foot-note">
-                  <strong>La evaluación se diseña después de grabar</strong>, para que la pregunta use
-                  el mismo lenguaje y el mismo ejemplo que el video.
-                </p>
+                <ul class="checklist" data-checklist></ul>
               </section>
             </form>
           </div>
@@ -295,6 +222,248 @@
     </div>
 
     <script src="assets/js/icons.js"></script>
+    <script src="assets/js/academia-data.js"></script>
+    <script src="assets/js/academia-agencias.js"></script>
+    <script src="assets/js/academia-guiones.js"></script>
+    <script src="assets/js/academia-preguntas.js"></script>
+    <script src="assets/js/academia-sim.js"></script>
+    <script src="assets/js/render.js"></script>
     <script src="assets/js/ui.js"></script>
+    <script>
+      /* Editor de guión y receta. Sirve cualquier `?v=`. Los 12 de P1 traen su
+         guión escrito verbatim del documento de cohorte; el resto abre la
+         plantilla vacía con el contexto de su cadena ya resuelto. */
+      (function () {
+        "use strict";
+        const S = window.SIM;
+        const R = window.RENDER;
+        const e = S.escena;
+        const amp = e === "E5" ? "" : "&amp;escena=" + e;
+        const q = e === "E5" ? "" : "?escena=" + e;
+
+        const id = (S.param("v") || "BAK-M30.050").toUpperCase();
+        const v = S.video(id);
+
+        if (!v) {
+          const el = document.getElementById("sin-video");
+          el.hidden = false;
+          el.querySelector("[data-vacio-titulo]").textContent = "Ese video no existe";
+          R.pintar("[data-vacio-texto]",
+            "El mapa tiene 55 videos con ID permanente. <span class=\"font-mono\">" + R.esc(id) +
+            "</span> no es ninguno de ellos.");
+          document.querySelector("[data-vacio-cta]").setAttribute("href", "tablero.html" + q);
+          document.querySelector("[data-breadcrumb]").textContent = "Contenido / Guión";
+          return;
+        }
+
+        document.getElementById("editor").hidden = false;
+
+        const modulo = S.modulo(v.modulo);
+        const guion = S.guionDe(v);
+        const cadena = S.cadenaDe(v);
+        const cohorte = cadena.cohorte;
+
+        /* ── Encabezado ─────────────────────────────────────────────────── */
+        R.pintar("[data-breadcrumb]",
+          '<a href="cohorte.html?c=' + cohorte.id + amp + '">Pipeline / Cohorte ' + cohorte.id +
+          "</a> / Guión de " + v.id);
+        R.pintar("[data-titulo]",
+          "Guión · " + '<span class="id-mono">' + v.id + "</span> " + R.esc(v.titulo));
+        R.pintar("[data-chips]",
+          R.chipEstado(v.estado) +
+          '<span class="chip chip-outline">' + cohorte.id + " · " + R.esc(cohorte.nombre) + "</span>" +
+          '<span class="chip chip-meta">' + (guion ? guion.duracionObjetivo : v.duracion) + "</span>" +
+          (guion ? "" : '<span class="chip chip-alerta">sin guión escrito</span>'));
+
+        /* A-4: el guión queda CONGELADO con la versión. Coherente con «el ID
+           sobrevive al regrabado» y con las versiones archivadas. */
+        const congelado = S.rango(v.estado) >= S.rango("publicado");
+        R.pintar("[data-acciones]",
+          '<a href="video.html?v=' + v.id + "&amp;tab=guion" + amp +
+            '" class="btn btn-bordered btn-sm">Ver la ficha</a>' +
+          (congelado
+            ? '<span class="chip chip-meta">congelado con ' + (v.version || "la versión") + "</span>"
+            : '<button type="button" class="btn btn-primary btn-sm" data-guardar-guion>' +
+              "Guardar guión</button>"));
+
+        /* ── Contexto de la cadena ──────────────────────────────────────── */
+        document.querySelector("[data-lbl-receta]").textContent = "Receta del cohorte " + cohorte.id;
+        R.pintar("[data-receta-cohorte]",
+          R.esc(cohorte.escenario || "Este cohorte todavía no tiene escenario compartido declarado.") +
+          (cohorte.nota ? " " + R.esc(cohorte.nota) + "." : ""));
+
+        function eslabon(otro, rotulo) {
+          if (!otro) {
+            return '<p class="text-xs text-gray-600">' + rotulo + "</p>";
+          }
+          const g = S.guionDe(otro);
+          return '<p class="text-xs"><span class="row-id">' + otro.id + "</span> " +
+            '<a href="guion.html?v=' + otro.id + amp + '">' + R.esc(otro.titulo) + "</a></p>" +
+            '<p class="mt-1 flex items-center gap-1">' + R.chipEstado(otro.estado) + "</p>" +
+            (g ? '<p class="foot-note">' + R.esc(g.cierre) + "</p>" : "");
+        }
+        R.pintar("[data-viene]", eslabon(cadena.anterior,
+          "Es el primer video del cohorte: se graba sobre el escenario recién preparado."));
+        R.pintar("[data-sigue]", eslabon(cadena.siguiente,
+          "Es el último video del cohorte: acá se cierra la sesión de grabación."));
+
+        /* Lo que no se muestra: el estándar del proyecto más lo propio del video. */
+        const noMostrar = S.estandarGrabacion.noMostrar.slice();
+        if (guion && guion.noMostrar) noMostrar.unshift(guion.noMostrar);
+        R.pintar("[data-no-mostrar]", noMostrar.map(function (x) {
+          return "<li>" + R.esc(x) + "</li>";
+        }).join(""));
+
+        /* ── La plantilla ───────────────────────────────────────────────── */
+        /* Se escribe el CONTENIDO del textarea, no su `.value`: así el texto
+           queda en el DOM y se puede inspeccionar y copiar. Con `.value` el
+           campo se ve lleno pero el documento sale vacío. */
+        function poner(sel, valor) {
+          const el = document.querySelector(sel);
+          if (el) el.textContent = valor || "";
+        }
+        poner("[data-campo-receta]", guion ? guion.receta : "");
+        poner("[data-campo-intro]", guion ? guion.intro : "");
+        poner("[data-campo-cierre]", guion ? guion.cierre : "");
+        poner("[data-campo-notas]", guion ? guion.notas : "");
+
+        let pasos = guion ? guion.cuerpo.slice() : [""];
+
+        function pintarPasos() {
+          R.pintar("[data-pasos]", pasos.map(function (texto, i) {
+            const idc = "paso" + (i + 1);
+            return '<li class="flex items-start gap-2">' +
+              '<span class="step-num">' + (i + 1) + "</span>" +
+              '<span class="flex-1"><label class="sr-only" for="' + idc + '">Paso ' + (i + 1) + "</label>" +
+              '<textarea class="textarea !text-xs" id="' + idc + '" data-paso="' + i + '" rows="' +
+                (texto.length > 90 ? 3 : 2) + '">' + R.esc(texto) + "</textarea></span>" +
+              /* Sin borrar, agregar pasos es una calle de una sola mano. */
+              (pasos.length > 1
+                ? '<button type="button" class="link-quiet mt-1" data-quitar-paso="' + i +
+                  '" aria-label="Quitar el paso ' + (i + 1) + '">' +
+                  '<span class="icon icon-sm" data-icon="x"></span></button>'
+                : "") +
+              "</li>";
+          }).join(""));
+
+          document.querySelectorAll("[data-paso]").forEach(function (t) {
+            t.addEventListener("input", function () {
+              pasos[Number(t.dataset.paso)] = t.value;
+              pintarChecklist();
+            });
+          });
+          document.querySelectorAll("[data-quitar-paso]").forEach(function (b) {
+            b.addEventListener("click", function () {
+              pasos.splice(Number(b.dataset.quitarPaso), 1);
+              pintarPasos();
+              pintarChecklist();
+            });
+          });
+        }
+        pintarPasos();
+
+        const btnPaso = document.querySelector("[data-agregar-paso]");
+        if (btnPaso) {
+          btnPaso.addEventListener("click", function () {
+            pasos.push("");
+            pintarPasos();
+            const ultimo = document.querySelector("[data-paso='" + (pasos.length - 1) + "']");
+            if (ultimo) ultimo.focus();
+          });
+        }
+
+        R.pintar("[data-hint-cierre]",
+          "Todos los cierres invitan a la evaluación del módulo." +
+          (cadena.siguiente
+            ? " El de este encadena con <span class=\"font-mono\">" + cadena.siguiente.id + "</span>."
+            : ""));
+
+        /* La checklist de la plantilla: un solo concepto, menos de 5 minutos, sin
+           datos sensibles. Reacciona a lo que se escribe: antes se derivaba del
+           dataset, así que se podía llenar el guión entero y seguir mostrando
+           «Receta de preparación declarada» en rojo. */
+        const minutos = guion
+          ? Number(String(guion.duracionObjetivo).match(/\d+/g).pop())
+          : Number(String(v.duracion || "0:00").split(":")[0]);
+
+        /* De «4:40» a «4-5 min»: el minuto en que cae y el siguiente. Sin
+           duración cargada, el rango del estándar de grabación. */
+        function objetivoDe(duracion) {
+          const m = /^(\d+):/.exec(String(duracion || ""));
+          if (!m) return "2-5 min";
+          const n = Number(m[1]);
+          return n + "-" + (n + 1) + " min";
+        }
+
+        function leerGuion() {
+          const val = function (sel) {
+            const el = document.querySelector(sel);
+            return el ? el.value.trim() : "";
+          };
+          return {
+            video: v.id,
+            /* «3-4 min» es un RANGO objetivo, no la duración real del video:
+               guardar acá el `M:SS` de la ficha haría que «4:40» se leyera como
+               40 minutos y el ítem «menos de 5 minutos» pasara a rojo solo. */
+            duracionObjetivo: guion ? guion.duracionObjetivo : objetivoDe(v.duracion),
+            receta: val("[data-campo-receta]"),
+            intro: val("[data-campo-intro]"),
+            cuerpo: pasos.map(function (x) { return x.trim(); }).filter(Boolean),
+            cierre: val("[data-campo-cierre]"),
+            notas: val("[data-campo-notas]"),
+            noMostrar: guion ? guion.noMostrar : null,
+            evaluacion: guion ? guion.evaluacion : null,
+          };
+        }
+
+        function pintarChecklist() {
+          const g = leerGuion();
+          const escrito = !!(g.intro || g.cuerpo.length || g.cierre);
+          const checklist = [
+            { texto: "Un solo concepto por video", hecho: escrito && g.cuerpo.length > 0 },
+            { texto: "Menos de 5 minutos", hecho: minutos <= 5 },
+            { texto: "Sin datos sensibles ni precios reales", hecho: escrito },
+            { texto: "Receta de preparación declarada", hecho: !!g.receta },
+            { texto: "Evaluación diseñada", hecho: S.bancoDe(v.modulo).some(function (p) {
+                return p.videoOrigen === v.id;
+              }) },
+          ];
+          R.pintar("[data-checklist]", checklist.map(function (c) {
+            return '<li class="checklist-item" data-done="' + c.hecho + '">' +
+              '<span class="icon" data-icon="' + (c.hecho ? "check-circle" : "alert-circle") + '"></span>' +
+              R.esc(c.texto) + "</li>";
+          }).join(""));
+
+          const guardar = document.querySelector("[data-guardar-guion]");
+          if (guardar) {
+            /* Un guión sin cuerpo no es un guión: es una plantilla vacía. */
+            guardar.disabled = !g.cuerpo.length;
+            guardar.title = g.cuerpo.length ? "" : "Escribí al menos un paso del cuerpo.";
+          }
+        }
+
+        ["receta", "intro", "cierre", "notas"].forEach(function (campo) {
+          const el = document.querySelector("[data-campo-" + campo + "]");
+          if (el) el.addEventListener("input", pintarChecklist);
+        });
+        pintarChecklist();
+
+        /* ── Guardar ────────────────────────────────────────────────────────
+           Además de persistir el guión, pasa el video a `guionado`: escribir el
+           guión ES el hito que ese estado nombra. Dejarlo en backlog obligaría
+           a marcarlo aparte, y el tablero mostraría un cohorte sin guionar que
+           en realidad ya tiene los guiones escritos. */
+        const btnGuardar = document.querySelector("[data-guardar-guion]");
+        if (btnGuardar) {
+          btnGuardar.addEventListener("click", function () {
+            if (btnGuardar.disabled) return;
+            const cambios = { guion: leerGuion() };
+            if (S.rango(v.estado) < S.rango("guionado")) cambios.estado = "guionado";
+            S.anotar("videos", v.id, cambios);
+            window.UI.recargar();
+          });
+        }
+      })();
+    </script>
   </body>
 </html>

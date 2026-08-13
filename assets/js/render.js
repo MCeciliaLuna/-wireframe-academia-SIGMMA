@@ -1,0 +1,795 @@
+/* ============================================================================
+   Academia SIGMMA · Backoffice — helpers de markup
+   ----------------------------------------------------------------------------
+   Emite el MISMO markup que antes estaba escrito a mano en los `.html`: las
+   mismas clases, los mismos atributos, la misma estructura. Esto no rediseña
+   nada — mueve el markup de literal a generado, para que los datos vivan en un
+   solo lugar y los agregados se puedan derivar.
+
+   No tiene reglas de negocio: todo lo que es cálculo está en `academia-sim.js`.
+   Acá solo se arma HTML a partir de lo que el motor ya resolvió.
+
+   Cada página lo usa desde su script inline, que corre durante el parseo. El
+   `renderIcons()` de `icons.js` hidrata los iconos generados en el
+   `DOMContentLoaded` posterior, y `ui.js` cablea las solapas, el orden de tabla
+   y la selección múltiple sobre las filas ya generadas.
+   ========================================================================== */
+
+window.RENDER = (function () {
+  "use strict";
+
+  /* -- Utilidades ---------------------------------------------------------- */
+
+  /* Los títulos y enunciados son dato, no markup: se escapan siempre. Los
+     enunciados de las preguntas llevan comillas angulares y ampersands. */
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  /* El guion largo con el que el prototipo marca «este dato no existe». No es
+     un cero: un video en backlog no tiene versión, no tiene versión 0. */
+  const VACIO = '<span class="text-gray-600">—</span>';
+
+  function oVacio(valor) {
+    return valor ? esc(valor) : VACIO;
+  }
+
+  /* `a regrabar` es el único estado con espacio: su clase es `chip-regrabar`.
+     El atributo `data-estado` conserva el nombre exacto, sin slugificar,
+     porque ese vocabulario se copia a desarrollo. */
+  function claseEstado(estado) {
+    return "chip-" + (estado === "a regrabar" ? "regrabar" : estado);
+  }
+
+  function chipEstado(estado) {
+    return '<span class="chip ' + claseEstado(estado) + '">' + esc(estado) + "</span>";
+  }
+
+  /* El id de checkbox y de columna sale del ID del video sin puntuación:
+     `BAK-M00.010` → `M00010`. */
+  function slug(id) {
+    return String(id).replace(/^BAK-/, "").replace(/\./g, "");
+  }
+
+  /* La fecha se muestra DD/MM y se ordena MMDD. Ordenar por el texto visible
+     pondría el 02/02 después del 30/07, porque compararía el día primero. */
+  function fechaOrdenable(fecha) {
+    const p = String(fecha || "").split("/");
+    return p.length === 2 ? p[1] + p[0] : "";
+  }
+
+  /* -- Tablero · vista tabla ------------------------------------------------
+     Los datos viajan duplicados a propósito: en `data-*` para que `ui.js`
+     pueda ordenar sin volver a parsear el texto de la celda, y en el texto
+     para el render. */
+  function filaTablero(v, opciones) {
+    const o = opciones || {};
+    const s = slug(v.id);
+    return (
+      '<tr data-id="' + esc(v.id) + '" data-titulo="' + esc(v.titulo) +
+        '" data-estado="' + esc(v.estado) + '" data-cohorte="' + esc(v.cohorte) +
+        '" data-prioridad="' + esc(v.prioridad) + '" data-modulo="' + esc(v.codigoModulo) +
+        '" data-version="' + esc(v.version || "") +
+        /* La fecha viaja como AAAAMMDD para que ordene cronológicamente: el
+           DD/MM que se muestra ordenaría por día del mes. */
+        '" data-fecha="' + esc(fechaOrdenable(v.fecha)) +
+        '" data-afectado="' + esc(v.afectadoPor || "") + '"' +
+        (o.seleccionado ? ' data-selected="true"' : "") + ">" +
+      '<td><input type="checkbox" id="sel-' + s + '"' + (o.seleccionado ? " checked" : "") +
+        ' /><label class="sr-only" for="sel-' + s + '">Seleccionar ' + esc(v.id) + "</label></td>" +
+      '<td class="cell-mono">' + esc(v.id) + "</td>" +
+      '<td><a href="video.html?v=' + esc(v.id) + (o.escena ? "&amp;escena=" + esc(o.escena) : "") +
+        '">' + esc(v.titulo) + "</a></td>" +
+      '<td class="cell-mono">' + esc(v.cohorte) + "</td>" +
+      '<td class="cell-mono">' + esc(v.prioridad) + "</td>" +
+      "<td>" + chipEstado(v.estado) + "</td>" +
+      '<td class="cell-mono">' + oVacio(v.version) + "</td>" +
+      '<td class="cell-num">' + oVacio(v.fecha) + "</td>" +
+      '<td class="cell-mono">' + oVacio(v.afectadoPor) + "</td>" +
+      "</tr>"
+    );
+  }
+
+  function cuerpoTablero(videos, opciones) {
+    return videos.map(function (v) { return filaTablero(v, opciones); }).join("");
+  }
+
+  /* -- Tablero · vista kanban ----------------------------------------------
+     R3: el estado lo determina la columna, y la visibilidad en el Front viaja
+     como CHIP dentro de la tarjeta — nunca como columna. Son dos ejes
+     independientes y colapsarlos es el error que la regla evita. */
+  function tarjetaKanban(v, opciones) {
+    const o = opciones || {};
+    let chips = "";
+    if (v.estado === "publicado") {
+      chips += '<span class="chip chip-publicado">front: ' + (v.visible ? "on" : "off") + "</span>";
+    }
+    chips += '<span class="chip chip-meta">' + esc(v.cohorte) + "</span>";
+    chips += '<span class="chip chip-outline">' + esc(v.prioridad) + "</span>";
+    if (v.afectadoPor) {
+      chips += '<span class="chip chip-meta is-mono">' + esc(v.afectadoPor) + "</span>";
+    }
+    let nota = "";
+    if (o.nota) {
+      nota = '<p class="mt-[5px] text-2xs text-error-dark">' + esc(o.nota) + "</p>";
+    }
+    /* Los mismos `data-*` que la fila de la tabla: es lo que permite que un
+       filtro acote las dos vistas a la vez con un solo criterio. */
+    return (
+      '<li class="kanban-card" data-id="' + esc(v.id) + '" data-titulo="' + esc(v.titulo) +
+        '" data-estado="' + esc(v.estado) + '" data-cohorte="' + esc(v.cohorte) +
+        '" data-prioridad="' + esc(v.prioridad) + '" data-modulo="' + esc(v.codigoModulo) + '">' +
+      '<a href="video.html?v=' + esc(v.id) + (o.escena ? "&amp;escena=" + esc(o.escena) : "") +
+        '" class="text-ink hover:text-primary-light">' +
+      '<span class="card-id">' + esc(v.id) + "</span>" + esc(v.titulo) + "</a>" +
+      '<p class="kanban-card-tags">' + chips + "</p>" +
+      nota +
+      "</li>"
+    );
+  }
+
+  /* Los rótulos de columna del wireframe. `backlog` es el único que no se
+     nombra igual que el estado: la columna dice «En backlog». */
+  const ROTULO_COLUMNA = {
+    "backlog": "En backlog",
+    "guionado": "Guionado",
+    "grabado": "Grabado",
+    "editado": "Editado",
+    "publicado": "Publicado",
+    "a regrabar": "A regrabar",
+    "obsoleto": "Obsoleto",
+  };
+
+  function columnaKanban(estado, videos, opciones) {
+    const o = opciones || {};
+    const id = "col-" + (estado === "a regrabar" ? "regrabar" : estado);
+    const cuerpo = videos.length
+      ? videos.map(function (v) {
+          return tarjetaKanban(v, {
+            escena: o.escena,
+            nota: o.notas ? o.notas[v.id] : null,
+          });
+        }).join("")
+      : '<li class="px-2 py-4 text-center text-2xs text-gray-600">sin videos</li>';
+    return (
+      '<section class="kanban-col" aria-labelledby="' + id + '">' +
+      '<h2 class="kanban-head" id="' + id + '">' + esc(ROTULO_COLUMNA[estado] || estado) +
+        '<span class="kanban-count">' + videos.length + "</span></h2>" +
+      '<ul class="kanban-body">' + cuerpo + "</ul>" +
+      "</section>"
+    );
+  }
+
+  /* El tablero completo: una columna por estado, en el orden de la máquina de
+     estados. El conteo de cada columna sale de sus tarjetas, no de un número
+     escrito aparte — que era la fuente de deriva del prototipo anterior. */
+  function kanban(videos, estados, opciones) {
+    const porEstado = {};
+    estados.forEach(function (e) { porEstado[e] = []; });
+    videos.forEach(function (v) { (porEstado[v.estado] || []).push(v); });
+    return estados.map(function (e) {
+      return columnaKanban(e, porEstado[e], opciones);
+    }).join("");
+  }
+
+  /* -- Tiles de métrica ---------------------------------------------------- */
+  function tile(etiqueta, valor, tono) {
+    return (
+      '<div class="metric-tile">' +
+      '<span class="metric-label">' + esc(etiqueta) + "</span>" +
+      '<p class="metric-value"' + (tono ? ' data-tone="' + esc(tono) + '"' : "") + ">" +
+        esc(valor) + "</p>" +
+      "</div>"
+    );
+  }
+
+  /* `tiles` recibe `[etiqueta, valor, tono]`. El tono `alerta` se pasa solo
+     cuando el número es el que hay que mirar: si todo está en alerta, nada lo
+     está. */
+  function tiles(defs) {
+    return defs.map(function (d) { return tile(d[0], d[1], d[2]); }).join("");
+  }
+
+  /* -- Embudo del Home -----------------------------------------------------
+     Los anchos se calculan. Escribirlos a mano era lo que obligaba a recalcular
+     treinta porcentajes cada vez que un video cambiaba de estado. */
+  /* El tramo lleva el nombre del estado solo si es lo bastante ancho para que
+     entre. Los angostos muestran el número solo y se explican en la leyenda:
+     un rótulo que se corta a la mitad no informa, ensucia. */
+  const ANCHO_MINIMO_ROTULO = 40;
+
+  function embudo(tramos) {
+    return tramos.map(function (t) {
+      const rotulo = t.porcentaje >= ANCHO_MINIMO_ROTULO
+        ? t.cantidad + " " + esc(nombreEstado(t.estado, t.cantidad))
+        : String(t.cantidad);
+      return '<span data-estado="' + esc(t.estado) + '" style="width: ' + t.porcentaje + '%">' +
+        rotulo + "</span>";
+    }).join("");
+  }
+
+  /* La leyenda del embudo. Los colores son los tokens del design system, uno
+     por estado de producción: los mismos que pinta `.funnel > span`. */
+  const COLOR_ESTADO = {
+    "backlog": "--color-gray-500",
+    "guionado": "--color-gray-600",
+    "grabado": "--color-primary-light",
+    "editado": "--color-warning-dark",
+    "publicado": "--color-success-dark",
+    "a regrabar": "--color-error",
+    "obsoleto": "--color-gray-700",
+  };
+
+  /* El participio del estado, con su singular: la leyenda tiene que decir
+     «4 guionados» pero «1 obsoleto». `backlog` y `a regrabar` no concuerdan en
+     número, así que llevan la misma forma en los dos casos. */
+  const NOMBRE_ESTADO = {
+    "backlog": ["en backlog", "en backlog"],
+    "guionado": ["guionado", "guionados"],
+    "grabado": ["grabado", "grabados"],
+    "editado": ["editado", "editados"],
+    "publicado": ["publicado", "publicados"],
+    "a regrabar": ["a regrabar", "a regrabar"],
+    "obsoleto": ["obsoleto", "obsoletos"],
+  };
+
+  function nombreEstado(estado, cantidad) {
+    const par = NOMBRE_ESTADO[estado];
+    if (!par) return estado;
+    return cantidad === 1 ? par[0] : par[1];
+  }
+
+  function leyendaEmbudo(tramos) {
+    return tramos.map(function (t) {
+      return "<span><i style=\"background: var(" + COLOR_ESTADO[t.estado] + ")\"></i>" +
+        t.cantidad + " " + esc(nombreEstado(t.estado, t.cantidad)) + "</span>";
+    }).join("");
+  }
+
+  /* -- Tarjeta de hito -----------------------------------------------------
+     El Home muestra UN hito, no una lista: en lugar de once módulos en alerta,
+     un objetivo. `cumplido` cambia el rótulo y el tono cuando ya se alcanzó. */
+  function hitoCard(h) {
+    const id = "hito-" + (h.escena || "x").toLowerCase();
+    const cta = h.cta
+      ? '<a href="' + h.cta.href + '" class="btn btn-primary btn-sm mt-4">' + esc(h.cta.texto) + "</a>"
+      : "";
+    return (
+      '<section class="hito-card"' + (h.cumplido ? ' data-cumplido="true"' : "") +
+        ' aria-labelledby="' + id + '">' +
+      '<p class="side-title !mb-2">' + esc(h.cumplido ? "Hito alcanzado" : "Próximo hito") + "</p>" +
+      '<h2 class="hito-titulo" id="' + id + '">' + esc(h.titulo) + "</h2>" +
+      '<p class="mt-2 max-w-[74ch] text-sm text-primary-dark">' + h.texto + "</p>" +
+      cta +
+      "</section>"
+    );
+  }
+
+  /* -- Medidores -----------------------------------------------------------
+     `data-ok` pinta el valor: `false` es lo que falta, `true` lo que ya está.
+     Se omite cuando el número no es una meta —«13 módulos mapeados» no está
+     bien ni mal— porque si todo estuviera marcado, la marca no diría nada. */
+  function medidor(filas) {
+    return '<dl class="flex flex-col gap-3 text-xs">' + filas.map(function (f) {
+      const ok = typeof f.ok === "boolean" ? ' data-ok="' + f.ok + '"' : "";
+      return '<div class="meter-row"><dt>' + esc(f.dt) + '</dt><dd class="meter-value"' + ok + ">" +
+        (f.html || esc(f.dd)) + "</dd></div>";
+    }).join("") + "</dl>";
+  }
+
+  function sideCard(c) {
+    const pie = c.pie ? '<p class="foot-note">' + c.pie + "</p>" : "";
+    return (
+      '<section class="side-card' + (c.fuerte ? " side-card-strong" : "") +
+        '" aria-labelledby="' + c.id + '">' +
+      '<h2 class="side-title" id="' + c.id + '">' + esc(c.titulo) + "</h2>" +
+      c.cuerpo + pie +
+      "</section>"
+    );
+  }
+
+  /* La barra de filtros dejó de armarse acá: las pills viven en el HTML de cada
+     pantalla y `UI.bindFilters()` las hace filtrar de verdad. Antes esta función
+     emitía pills decorativas al lado de un contador que sí era real, y las dos
+     cosas se contradecían apenas alguien tocaba una.
+*/
+
+  /* -- Listado de módulos --------------------------------------------------
+     `publicados / total` y `banco / mínimo` salen del motor: son las dos
+     columnas que tenían que decir lo mismo que el tablero y que el banco, y
+     ahora no pueden discrepar porque salen del mismo cálculo. */
+  function filaModulo(r, opciones) {
+    const o = opciones || {};
+    const m = r.modulo;
+    const esReservado = m.tipo === "reservado";
+    const q = o.escena ? "&amp;escena=" + esc(o.escena) : "";
+    const destino = m.tipo === "ruta"
+      ? "modulo.html?m=R01" + q
+      : "modulo.html?m=" + m.numero + q;
+
+    /* El módulo reservado no tiene nada que contar: ni videos, ni banco, ni
+       plan. Mostrar ceros diría que está vacío; el guion dice que todavía no
+       existe. */
+    /* El chip de origen solo se muestra cuando el dato es reciente y relevante:
+       recién importado el mapa importa saber qué entró por el importador y qué
+       se creó a mano, para poder revisarlo. Un mes después ya no dice nada. */
+    const chipOrigen = o.mostrarOrigen && r.creadoPor
+      ? ' <span class="chip ' + (r.creadoPor === "mano" ? "chip-meta" : "chip-outline") +
+        '">creado ' + (r.creadoPor === "mano" ? "a mano" : "por importación") + "</span>"
+      : "";
+
+    /* `data-orden` es lo que ordena la columna, y no es lo que se muestra: la
+       Ruta va primera con «R» y el reservado último sin número. */
+    const ordenSort = m.tipo === "ruta" ? 0 : m.tipo === "reservado" ? 99 : m.orden;
+    /* `data-nombre` es la clave de ORDEN de la columna Nombre; `data-titulo` es
+       la que busca el filtro, que usa el mismo par (id, título) en todas las
+       tablas. Son el mismo valor con dos consumidores distintos. */
+    const attrs = '<tr' + (esReservado ? ' data-reservado="true"' : "") +
+      ' data-orden="' + ordenSort + '" data-id="' + esc(m.codigo) +
+      '" data-nombre="' + esc(m.titulo) + '" data-titulo="' + esc(m.titulo) +
+      '" data-tipo="' + esc(m.tipo) + '" data-estado="' + esc(r.estado) +
+      '" data-plan="' + esc((m.planes || []).join(" ")) + '">';
+
+    if (esReservado) {
+      return (
+        attrs +
+        '<td class="cell-mono">' + VACIO + "</td>" +
+        '<td class="cell-mono">' + esc(m.codigo) + "</td>" +
+        "<td>" + esc(m.titulo) + chipOrigen + "</td>" +
+        "<td>" + VACIO + "</td>" +
+        '<td class="cell-num">' + VACIO + "</td>" +
+        '<td class="cell-num">' + VACIO + "</td>" +
+        "<td>" + VACIO + "</td>" +
+        '<td><span class="chip chip-outline">reservado</span></td>' +
+        '<td class="text-gray-600">' + oVacio(r.actividad) + "</td>" +
+        "</tr>"
+      );
+    }
+
+    const b = r.banco;
+    const minimo = b.configurada ? String(b.minimo) : "—";
+    const celdaBanco = b.derivado
+      ? "<strong>" + b.vigentes + "</strong> heredadas / " + minimo + " mín. " + estadoBanco(b)
+      : "<strong>" + b.vigentes + "</strong> / " + minimo + " " + estadoBanco(b);
+
+    const claseEstadoModulo = r.estado === "activo" ? "chip-publicado" : "chip-backlog";
+    return (
+      attrs +
+      '<td class="cell-mono">' + esc(m.orden) + "</td>" +
+      '<td class="cell-mono">' + esc(m.codigo) + "</td>" +
+      '<td><a href="' + destino + '">' + esc(m.titulo) + "</a>" + chipOrigen + "</td>" +
+      "<td>" + esc(m.tipo) + "</td>" +
+      '<td class="cell-num">' + r.publicados + " / " + r.totalVideos + "</td>" +
+      '<td class="cell-num">' + (b.derivado ? '<span class="chip chip-meta">derivado</span> ' : "") +
+        celdaBanco + "</td>" +
+      "<td>" + esc((m.planes || []).join(" · ") || "—") + "</td>" +
+      '<td><span class="chip ' + claseEstadoModulo + '">' + esc(r.estado) + "</span></td>" +
+      '<td class="text-gray-600">' + oVacio(r.actividad) + "</td>" +
+      "</tr>"
+    );
+  }
+
+  /* El rótulo del banco: «apto», «faltan N» o «sin banco». Son tres mensajes
+     distintos y el del medio es el único que dice cuánto. */
+  function estadoBanco(b) {
+    if (!b.configurada) return '<span class="chip chip-outline">sin configurar</span>';
+    if (b.vigentes === 0) return '<span class="chip chip-alerta">sin banco</span>';
+    if (b.faltan > 0) return '<span class="chip chip-alerta">faltan ' + b.faltan + "</span>";
+    return '<span class="chip chip-publicado">apto</span>';
+  }
+
+  /* -- Árbol de secciones · detalle de módulo ------------------------------ */
+  function filaVideoArbol(v, opciones) {
+    const o = opciones || {};
+    const q = o.escena ? "&amp;escena=" + esc(o.escena) : "";
+    const cant = o.preguntas || 0;
+    let chipPreg;
+    if (o.aRevisar) {
+      chipPreg = '<span class="chip chip-alerta">' + o.aRevisar + " preg. a revisar</span>";
+    } else if (cant) {
+      chipPreg = '<span class="chip chip-meta">' + cant + " preg.</span>";
+    } else {
+      chipPreg = '<span class="chip chip-outline">0 preg.</span>';
+    }
+    return (
+      '<div class="tree-row"' + (o.actual ? ' aria-current="true"' : "") + ">" +
+      '<span class="grip" aria-hidden="true">⠿</span>' +
+      '<span class="row-id">' + (o.actual ? "<strong>" + esc(v.id) + "</strong>" : esc(v.id)) + "</span>" +
+      '<span class="row-title"><a href="video.html?v=' + esc(v.id) + q + '">' +
+        esc(v.titulo) + "</a></span>" +
+      chipEstado(v.estado) +
+      chipPreg +
+      "</div>"
+    );
+  }
+
+  function seccionArbol(s, indice, opciones) {
+    const o = opciones || {};
+    const id = "sec-" + (indice + 1);
+    const chipPreg = s.aRevisar && s.vigentes === 0
+      ? '<span class="chip chip-alerta">' + s.total + " preguntas · todas a revisar</span>"
+      : '<span class="chip chip-outline">' + s.total + " preguntas</span>";
+    const filas = s.videos.map(function (v) {
+      const suyas = s.preguntas.filter(function (p) { return p.videoOrigen === v.id; });
+      return filaVideoArbol(v, {
+        escena: o.escena,
+        actual: o.actual === v.id,
+        preguntas: suyas.length,
+        aRevisar: suyas.filter(function (p) { return p.estado === "a revisar"; }).length,
+      });
+    }).join("");
+    return (
+      '<section class="tree-section" aria-labelledby="' + id + '">' +
+      '<div class="tree-head">' +
+      '<span class="grip" aria-hidden="true">⠿</span>' +
+      '<span id="' + id + '">' + s.orden + " · " + esc(s.titulo) + "</span>" +
+      '<span class="chip chip-meta">' + s.videos.length +
+        (s.videos.length === 1 ? " video" : " videos") + "</span>" +
+      chipPreg +
+      "</div>" + filas +
+      "</section>"
+    );
+  }
+
+  /* -- Ruta Esencial · una sección por cohorte -----------------------------
+     R8: la Ruta REFERENCIA videos, no los copia. Cada fila dice en qué módulo
+     vive su copia canónica, porque un video vive UNA sola vez en la biblioteca
+     y la Ruta solo lo apunta. */
+  function seccionRuta(c, indice, opciones) {
+    const o = opciones || {};
+    const id = "ruta-s" + c.id;
+    const preguntas = o.preguntasPorVideo || {};
+    const total = c.videos.reduce(function (a, v) { return a + (preguntas[v.id] || 0); }, 0);
+    const filas = c.videos.map(function (v) {
+      const n = preguntas[v.id] || 0;
+      return (
+        '<div class="tree-row">' +
+        '<span class="row-id">' + esc(v.id) + "</span>" +
+        '<span class="row-title"><a href="video.html?v=' + esc(v.id) +
+          (o.escena ? "&amp;escena=" + esc(o.escena) : "") + '">' + esc(v.titulo) + "</a></span>" +
+        chipEstado(v.estado) +
+        (n
+          ? '<span class="chip chip-meta">' + n + " preg.</span>"
+          : '<span class="chip chip-outline">0 preg.</span>') +
+        '<span class="chip chip-outline">canónico en ' + esc(v.codigoModulo) + "</span>" +
+        "</div>"
+      );
+    }).join("");
+    return (
+      '<section class="tree-section" aria-labelledby="' + id + '">' +
+      '<div class="tree-head">' +
+      '<span id="' + id + '">' + (indice + 1) + " · " + esc(c.nombre) + "</span>" +
+      '<span class="chip chip-meta">' + c.videos.length +
+        (c.videos.length === 1 ? " video" : " videos") + "</span>" +
+      '<span class="chip chip-meta">' + total +
+        (total === 1 ? " pregunta" : " preguntas") + "</span>" +
+      (c.escenario
+        ? '<span class="ml-auto text-2xs font-normal text-gray-600">cohorte ' + esc(c.id) +
+          " · " + esc(c.escenario) + "</span>"
+        : '<span class="ml-auto text-2xs font-normal text-gray-600">cohorte ' + esc(c.id) + "</span>") +
+      "</div>" + filas +
+      "</section>"
+    );
+  }
+
+  /* -- Tarjeta de aptitud para activar -------------------------------------
+     Contesta «¿por qué no puedo activar el módulo?» sin que haya que ir a
+     buscarlo a otra pantalla. Los dos primeros criterios llevan barra porque
+     son proporciones; los otros dos son sí o no.
+
+     Es una compuerta AL MOMENTO de activar, no una condición permanente (D-4):
+     un módulo ya activo puede dejar de cumplirla sin desactivarse. */
+  function aptitudCard(ap, opciones) {
+    const o = opciones || {};
+    const r = ap.resumen;
+    const filas = ap.criterios.map(function (c, i) {
+      const fila = '<div class="meter-row"><span>' + esc(c.nombre) +
+        '</span><b class="meter-value" data-ok="' + c.cumple + '">' + esc(c.valor) + "</b></div>";
+      if (i > 1) return fila;
+      const hecho = i === 0 ? r.publicados : r.banco.vigentes;
+      const total = i === 0 ? r.totalVideos : r.banco.minimo;
+      const pct = total ? Math.min(100, Math.round((hecho / total) * 100)) : 0;
+      return fila + '<div class="progress progress-sm' + (pct === 100 ? " progress-complete" : "") +
+        '"><span style="width: ' + pct + '%"></span></div>';
+    }).join("");
+
+    /* Enumeración en español: comas y una «y» al final. */
+    function enumerar(xs) {
+      const m = xs.map(function (x) { return "<strong>" + x + "</strong>"; });
+      if (m.length <= 1) return m.join("");
+      return m.slice(0, -1).join(", ") + " y " + m[m.length - 1];
+    }
+
+    let motivo;
+    if (ap.apto) {
+      motivo = o.motivoApto || "Cumple los criterios. La acción de activar está habilitada.";
+    } else if (ap.faltan.length) {
+      motivo = "Faltan " + enumerar(ap.faltan) + ".";
+    } else if (ap.aRevisar) {
+      /* Puede no faltar nada cuantitativo y aun así no ser apto: la deuda de
+         revisión sola bloquea la activación. */
+      motivo = "No falta cargar nada, pero hay <strong>" + ap.aRevisar +
+        (ap.aRevisar === 1 ? " pregunta</strong> a revisar" : " preguntas</strong> a revisar") + ".";
+    } else {
+      motivo = "";
+    }
+
+    return (
+      '<div class="side-card side-card-strong">' +
+      '<h2 class="side-title">Aptitud para activar</h2>' +
+      '<div class="flex flex-col gap-[9px]">' + filas + "</div>" +
+      '<p class="foot-note" id="aptitud-motivo">' + motivo + (o.extra || "") + "</p>" +
+      /* Con el módulo YA activo la compuerta no aplica: ofrecer «Activar» sería
+         una acción sin sentido, y ofrecerla deshabilitada sugiere que se perdió
+         algo. La aptitud se sigue mostrando —es información útil— pero sin
+         botón, porque activar/desactivar vive en el encabezado (D-4). */
+      (o.sinBoton
+        ? ""
+        : '<button type="button" class="btn btn-primary btn-sm btn-block mt-3"' +
+          (ap.apto ? "" : " disabled") + ">" + esc(o.accion || "Activar módulo") + "</button>") +
+      "</div>"
+    );
+  }
+
+  /* -- Banco de preguntas --------------------------------------------------
+     Una sección del banco, con sus dos indicadores: banco mínimo y mínimo por
+     sorteo. Los dos se ven SIEMPRE (R4), no aparecen como error al final.
+
+     Las preguntas se truncan: un banco de 50 no se lee en pantalla y la
+     pantalla no es para leerlas una por una, es para saber cuánto falta. Las
+     que están `a revisar` se muestran todas y primero, porque son las que
+     reclaman una decisión. */
+  function seccionBanco(s, indice, opciones) {
+    const o = opciones || {};
+    const tope = o.tope || 6;
+    const id = "b-sec-" + (indice + 1);
+
+    const aRevisar = s.preguntas.filter(function (p) { return p.estado === "a revisar"; });
+    const resto = s.preguntas.filter(function (p) { return p.estado !== "a revisar"; });
+    const visibles = aRevisar.concat(resto).slice(0, Math.max(tope, aRevisar.length));
+    const ocultas = s.preguntas.length - visibles.length;
+
+    const faltan = s.faltan
+      ? ' <span class="text-error-dark">· faltan ' + s.faltan + "</span>"
+      : "";
+    const indicadores = s.minimoBanco
+      ? "banco mínimo " + s.minimoBanco + faltan + " · mínimo por sorteo " + s.minimoSorteo
+      : "sin mínimo configurado";
+
+    const filas = visibles.map(function (p) {
+      return filaPregunta(p, { resaltar: p.estado === "a revisar" });
+    }).join("");
+
+    const cola = ocultas > 0
+      ? '<p class="px-[11px] py-2 text-2xs text-gray-600">+ ' + ocultas +
+        (ocultas === 1 ? " pregunta más" : " preguntas más") + "</p>"
+      : "";
+
+    return (
+      '<section class="tree-section" aria-labelledby="' + id + '">' +
+      '<div class="tree-head">' +
+      '<span id="' + id + '">Sección ' + s.orden + " · " + esc(s.titulo) + "</span>" +
+      '<span class="chip chip-meta">' + s.vigentes + " vigentes de " + s.total + "</span>" +
+      '<span class="text-2xs text-gray-600">' + indicadores + "</span>" +
+      "</div>" + filas + cola +
+      "</section>"
+    );
+  }
+
+  function filaPregunta(p, opciones) {
+    const o = opciones || {};
+    const clase = p.estado === "a revisar" ? "chip-alerta"
+      : p.estado === "borrador" ? "chip-meta" : "chip-publicado";
+    /* El relleno estructural se marca: un banco completado con relleno no es un
+       banco terminado, y la pantalla lo tiene que decir. */
+    const marca = p.origen === "estructural"
+      ? ' <span class="chip chip-outline">estructural</span>' : "";
+    return (
+      '<div class="tree-row !pl-[11px]' + (o.resaltar ? " bg-error-bg" : "") + '">' +
+      '<span class="row-id w-[76px]">' + esc(p.id) + "</span>" +
+      '<span class="row-title">' + esc(p.texto) + marca + "</span>" +
+      '<span class="row-id w-[110px]">' + esc(p.videoOrigen) + "</span>" +
+      '<span class="chip ' + clase + '">' + esc(p.estado) + "</span>" +
+      "</div>"
+    );
+  }
+
+  /* -- Biblioteca de videos -------------------------------------------------
+     El eje es el CONTENIDO, no el rodaje: dónde vive el video, cuánto dura, qué
+     versión está al aire y si se ve en el Front. El tablero mira lo mismo desde
+     la producción —cohorte, prioridad, fecha— y por eso son dos pantallas y no
+     dos filtros de la misma. */
+  function filaBiblioteca(v, opciones) {
+    const o = opciones || {};
+    const q = o.escena ? "&amp;escena=" + esc(o.escena) : "";
+    /* La visibilidad en el Front viaja como chip, nunca como columna de estado
+       (R3): son dos ejes distintos y mezclarlos los confunde. */
+    const front = v.visible
+      ? '<span class="chip chip-publicado">visible</span>'
+      : '<span class="chip chip-outline">oculto</span>';
+    return (
+      '<tr data-id="' + esc(v.id) + '" data-titulo="' + esc(v.titulo) +
+        '" data-estado="' + esc(v.estado) + '" data-modulo="' + esc(v.codigoModulo) +
+        '" data-seccion="' + esc(v.seccion) + '" data-visible="' + v.visible + '">' +
+      '<td class="cell-mono">' + esc(v.id) + "</td>" +
+      '<td><a href="video.html?v=' + esc(v.id) + q + '">' + esc(v.titulo) + "</a></td>" +
+      '<td><a href="modulo.html?m=' + esc(v.modulo) + q + '" class="link-quiet">' +
+        esc(v.codigoModulo) + "</a></td>" +
+      "<td>" + esc(v.seccion) + "</td>" +
+      '<td class="cell-num">' + oVacio(v.duracion) + "</td>" +
+      "<td>" + chipEstado(v.estado) + "</td>" +
+      '<td class="cell-mono">' + oVacio(v.version) + "</td>" +
+      "<td>" + front + "</td>" +
+      '<td class="cell-mono">' + oVacio((v.planes || []).join(" · ")) + "</td>" +
+      "</tr>"
+    );
+  }
+
+  /* -- Cola de regrabación --------------------------------------------------
+     Un video a regrabar no es solo un video: arrastra las preguntas que dejó
+     inválidas. Mostrar las dos cosas juntas es todo el punto de la pantalla. */
+  function filaRegrabacion(x, opciones) {
+    const o = opciones || {};
+    const q = o.escena ? "&amp;escena=" + esc(o.escena) : "";
+    const v = x.video;
+    const deuda = x.aRevisar
+      ? '<span class="chip chip-alerta">' + x.aRevisar +
+        (x.aRevisar === 1 ? " pregunta" : " preguntas") + "</span>"
+      : '<span class="text-gray-600">—</span>';
+    return (
+      '<tr data-id="' + esc(v.id) + '" data-titulo="' + esc(v.titulo) +
+        '" data-estado="' + esc(v.estado) + '" data-modulo="' + esc(v.codigoModulo) +
+        '" data-revisar="' + x.aRevisar + '">' +
+      '<td class="cell-mono">' + esc(v.id) + "</td>" +
+      '<td><a href="video.html?v=' + esc(v.id) + q + '">' + esc(v.titulo) + "</a></td>" +
+      '<td><a href="modulo.html?m=' + esc(v.modulo) + q + '" class="link-quiet">' +
+        esc(v.codigoModulo) + "</a></td>" +
+      "<td>" + chipEstado(v.estado) + "</td>" +
+      '<td class="cell-mono">' + oVacio(v.version) + "</td>" +
+      '<td class="cell-mono">' + oVacio(v.afectadoPor) + "</td>" +
+      "<td>" + deuda + "</td>" +
+      '<td class="cell-mono">' + esc(x.ubicaciones) + "</td>" +
+      "</tr>"
+    );
+  }
+
+  /* -- Panel macro · uso por módulo ---------------------------------------
+     La tasa de reprobación es la única columna que señala CONTENIDO a revisar:
+     si un módulo se reprueba mucho, el problema está en el video o en las
+     preguntas, no en la gente. Por eso lleva tono de alerta y las demás no. */
+  function filaUsoModulo(u, opciones) {
+    const o = opciones || {};
+    const q = o.escena ? "&amp;escena=" + esc(o.escena) : "";
+    const m = u.modulo;
+    /* El chip de alerta es el vocabulario que el resto del backoffice ya usa
+       para «esto necesita una decisión». Un color suelto en la celda diría lo
+       mismo peor y sumaría un token que el design system no tiene. */
+    const tasa = u.tasaReprobacion.toFixed(2) + " %";
+    const celdaTasa = u.tasaReprobacion >= (o.umbralAlerta || 30)
+      ? '<span class="chip chip-alerta">' + tasa + "</span>"
+      : tasa;
+    return (
+      '<tr data-id="' + esc(m.codigo) + '" data-titulo="' + esc(m.titulo) +
+        '" data-tasa="' + u.tasaReprobacion + '" data-agencias="' + u.pctAgencias + '">' +
+      '<td class="cell-mono">' + esc(m.codigo) + "</td>" +
+      '<td><a href="modulo.html?m=' + esc(m.numero) + q + '">' + esc(m.titulo) + "</a></td>" +
+      '<td class="cell-num">' + u.personasEnPlan + "</td>" +
+      '<td class="cell-num">' + u.aprobaron + "</td>" +
+      '<td class="cell-num">' + u.intentos + "</td>" +
+      '<td class="cell-num">' + celdaTasa + "</td>" +
+      '<td class="cell-num">' + u.agenciasCompletas + " / " + u.agenciasEnPlan + "</td>" +
+      '<td class="cell-num">' + u.pctAgencias.toFixed(2) + " %</td>" +
+      "</tr>"
+    );
+  }
+
+  /* -- Agencias -------------------------------------------------------------
+     El denominador es el RECORRIDO DEL PLAN, no los 11 módulos: un módulo fuera
+     de plan no entra al cálculo, así que mostrar «3 de 11» para una Professional
+     diría que va atrasada cuando en realidad terminó. */
+  function filaAgencia(a, opciones) {
+    const o = opciones || {};
+    const q = o.escena ? "&amp;escena=" + esc(o.escena) : "";
+    const pct = a.totalRecorrido && a.plantel
+      ? (a.aprobacionesTotales / (a.plantel * a.totalRecorrido)) * 100 : 0;
+    return (
+      '<tr data-id="' + esc(a.id) + '" data-titulo="' + esc(a.nombre) +
+        '" data-plan="' + esc(a.plan) + '" data-avance="' + pct.toFixed(2) + '">' +
+      '<td><a href="agencia.html?a=' + esc(a.id) + q + '">' + esc(a.nombre) + "</a></td>" +
+      '<td><span class="chip chip-meta">' + esc(a.plan) + "</span></td>" +
+      '<td class="cell-num">' + a.plantel + "</td>" +
+      '<td class="cell-num">' + a.totalRecorrido + "</td>" +
+      '<td class="cell-num">' + a.certificadas + "</td>" +
+      '<td class="cell-num">' + barraPct(pct) + "</td>" +
+      "</tr>"
+    );
+  }
+
+  /* -- Personas de una agencia --------------------------------------------- */
+  function filaPersona(p, opciones) {
+    const o = opciones || {};
+    const q = o.escena ? "&amp;escena=" + esc(o.escena) : "";
+    const av = p.avance;
+    const total = av.recorrido.length;
+    const enCurso = av.enCurso
+      ? '<a href="modulo.html?m=' + esc(av.enCurso.modulo.numero) + q + '" class="link-quiet">' +
+        esc(av.enCurso.modulo.codigo) + "</a> · " + av.enCurso.vistos + " de " +
+        av.enCurso.videos + " videos"
+      : VACIO;
+    const estado = av.certificada
+      ? '<span class="chip chip-publicado">recorrido completo</span>'
+      : '<span class="chip chip-outline">en curso</span>';
+    return (
+      '<tr data-id="' + esc(p.id) + '" data-titulo="' + esc(p.nombre) +
+        '" data-aprobados="' + av.aprobados.length + '">' +
+      "<td>" + esc(p.nombre) +
+        (p.coordinadora ? ' <span class="chip chip-meta">coordinadora</span>' : "") + "</td>" +
+      '<td class="cell-num">' + av.aprobados.length + " / " + total + "</td>" +
+      '<td class="cell-num">' + barraPct(total ? (av.aprobados.length / total) * 100 : 0) + "</td>" +
+      "<td>" + enCurso + "</td>" +
+      "<td>" + estado + "</td>" +
+      "</tr>"
+    );
+  }
+
+  /* Barra de avance con su valor al lado. Se repite en tres pantallas. */
+  function barraPct(pct) {
+    const v = Math.max(0, Math.min(100, pct || 0));
+    return (
+      '<span class="inline-flex items-center gap-2">' +
+      '<span class="progress progress-sm w-[72px]"><span style="width: ' + v.toFixed(2) + '%"></span></span>' +
+      "<b>" + v.toFixed(0) + " %</b></span>"
+    );
+  }
+
+  /* -- Pintar --------------------------------------------------------------
+     Escribe el HTML y hidrata los iconos que haya dentro. `renderIcons` marca
+     lo que ya pintó, así que volver a llamarlo no duplica nada. */
+  function pintar(selector, html) {
+    const el = typeof selector === "string" ? document.querySelector(selector) : selector;
+    if (!el) return null;
+    el.innerHTML = html;
+    if (window.renderIcons) window.renderIcons(el);
+    return el;
+  }
+
+  return {
+    esc: esc,
+    VACIO: VACIO,
+    oVacio: oVacio,
+    chipEstado: chipEstado,
+    claseEstado: claseEstado,
+    slug: slug,
+    filaTablero: filaTablero,
+    cuerpoTablero: cuerpoTablero,
+    tarjetaKanban: tarjetaKanban,
+    columnaKanban: columnaKanban,
+    kanban: kanban,
+    tile: tile,
+    tiles: tiles,
+    embudo: embudo,
+    leyendaEmbudo: leyendaEmbudo,
+    hitoCard: hitoCard,
+    medidor: medidor,
+    sideCard: sideCard,
+    filaModulo: filaModulo,
+    estadoBanco: estadoBanco,
+    filaVideoArbol: filaVideoArbol,
+    seccionArbol: seccionArbol,
+    seccionRuta: seccionRuta,
+    aptitudCard: aptitudCard,
+    filaPregunta: filaPregunta,
+    seccionBanco: seccionBanco,
+    filaBiblioteca: filaBiblioteca,
+    filaRegrabacion: filaRegrabacion,
+    filaUsoModulo: filaUsoModulo,
+    filaAgencia: filaAgencia,
+    filaPersona: filaPersona,
+    barraPct: barraPct,
+    pintar: pintar,
+  };
+})();

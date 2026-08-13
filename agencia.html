@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Detalle de agencia · Backoffice Academia SIGMMA</title>
+    <meta name="description" content="Avance del plantel de una agencia en la Academia SIGMMA: módulos aprobados, módulo en curso y recorrido completo." />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="stylesheet" href="assets/css/academia.css" />
+  </head>
+  <body>
+    <a href="#contenido" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[1001] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-white">Saltar al contenido</a>
+
+    <div class="app-shell">
+      <!-- app-shell: sincronizar con src/partials/app-shell.html -->
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img src="assets/img/logo.svg" alt="SIGMMA" width="96" height="16" class="w-[96px]" />
+          <span class="text-2xs font-bold text-primary">Academia</span>
+        </div>
+
+        <!-- Selector global de superficie. Todo el contenido del backoffice cuelga
+             de cuál está activa. Solo BAK tiene módulos mapeados. -->
+        <div class="relative" data-dropdown>
+          <span class="side-title mb-1 block">Superficie</span>
+          <button type="button" class="surface-picker" data-dropdown-trigger aria-expanded="false" aria-haspopup="true">
+            <span><strong>BAK</strong> · Backoffice</span>
+            <span class="icon icon-sm" data-icon="chevron-down"></span>
+          </button>
+          <div class="menu" role="menu" data-dropdown-menu hidden>
+            <a href="modulos.html?sup=BAK" class="menu-item" role="menuitem">BAK · Backoffice</a>
+            <a href="modulos.html?sup=FRT" class="menu-item" role="menuitem">FRT · Front</a>
+            <a href="modulos.html?sup=CRM" class="menu-item" role="menuitem">CRM</a>
+          </div>
+        </div>
+
+        <nav class="flex flex-col gap-4" aria-label="Secciones del backoffice">
+          <!-- Inicio va suelto, sin grupo: no es una función más sino el punto de
+               partida. En las etapas de construcción es el panel de obra. -->
+          <div class="nav-group">
+            <a href="home.html" class="nav-item" data-escena-keep>
+              <span class="icon" data-icon="activity"></span>Inicio
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Contenido</span>
+            <a href="modulos.html" class="nav-item">
+              <span class="icon" data-icon="layers"></span>Módulos
+            </a>
+            <a href="videos.html" class="nav-item">
+              <span class="icon" data-icon="film"></span>Biblioteca de videos
+            </a>
+            <a href="tablero.html" class="nav-item">
+              <span class="icon" data-icon="columns"></span>Tablero de producción
+            </a>
+            <a href="regrabacion.html" class="nav-item">
+              <span class="icon" data-icon="refresh"></span>Cola de regrabación
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Evaluación</span>
+            <a href="banco.html?m=30" class="nav-item">
+              <span class="icon" data-icon="help-circle"></span>Bancos de preguntas
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="settings"></span>Configuración
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Currícula</span>
+            <a href="modulo.html?m=R01" class="nav-item">
+              <span class="icon" data-icon="route"></span>Ruta Esencial
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Pipeline</span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="git-branch"></span>Impactos en Academia
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Seguimiento</span>
+            <a href="panel.html" class="nav-item">
+              <span class="icon" data-icon="bar-chart"></span>Panel macro
+            </a>
+            <a href="agencias.html" class="nav-item" aria-current="page">
+              <span class="icon" data-icon="users"></span>Detalle por agencia
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Administración</span>
+            <a href="superficies.html" class="nav-item">
+              <span class="icon" data-icon="target"></span>Superficies y planes
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="shield"></span>Usuarios y roles
+            </span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="activity"></span>Auditoría
+            </span>
+          </div>
+        </nav>
+
+        <div class="sidebar-foot">
+          <span class="text-2xs text-gray-700">Majo · Contenido</span>
+        </div>
+      </aside>
+      <!-- /app-shell -->
+
+      <div class="main-col">
+        <header class="page-head">
+          <div>
+            <div class="breadcrumb">
+              Seguimiento / <a href="agencias.html" data-escena-keep>Agencias</a> / <span data-bc-nombre></span>
+            </div>
+            <h1 class="page-title">
+              <span data-titulo></span>
+              <span class="chip chip-meta" data-chip-plan></span>
+              <span class="escena-badge" data-escena-label></span>
+            </h1>
+          </div>
+          <div class="page-actions">
+            <button type="button" class="btn btn-bordered btn-sm" data-exportar>
+              <span class="icon" data-icon="download"></span>Exportar
+            </button>
+            <a href="agencias.html" class="btn btn-bordered btn-sm" data-escena-keep>
+              <span class="icon" data-icon="users"></span>Todas las agencias
+            </a>
+          </div>
+        </header>
+
+        <main id="contenido" class="page-body">
+          <!-- La agencia no existe, o la escena todavía no tiene agencias. Son
+               dos motivos distintos y el mensaje lo dice: mostrar el mismo
+               texto para los dos manda a buscar el error donde no está. -->
+          <div data-sin hidden>
+            <div class="placeholder-box !py-14">
+              <span class="placeholder-icon" data-icon="users"></span>
+              <h2 class="text-h4" data-sin-titulo></h2>
+              <p class="mt-3 max-w-[60ch] text-base text-gray-700" data-sin-texto></p>
+              <a href="agencias.html?escena=E6" class="btn btn-bordered mt-8">
+                <span class="icon" data-icon="users"></span>Ver las agencias
+              </a>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-[18px]" data-detalle hidden>
+            <div class="grid grid-cols-4 gap-3" data-tiles></div>
+
+            <div class="grid grid-cols-[1fr_340px] items-start gap-[18px]">
+              <section>
+                <h2 class="text-h5 mb-3">Plantel</h2>
+                <div class="table-scroll-y">
+                  <table class="table-dense" data-sortable>
+                    <caption class="sr-only" data-caption></caption>
+                    <thead>
+                      <tr>
+                        <th scope="col" data-sort-key="titulo">Persona</th>
+                        <th scope="col" data-sort-key="aprobados" data-sort-type="number">Módulos aprobados</th>
+                        <th scope="col">Avance</th>
+                        <th scope="col">En curso</th>
+                        <th scope="col">Estado</th>
+                      </tr>
+                    </thead>
+                    <tbody data-filas></tbody>
+                  </table>
+                </div>
+                <p class="foot-note mt-2">
+                  El desbloqueo es <strong>secuencial</strong>: se aprueba un módulo y se habilita el
+                  siguiente. Por eso el avance de una persona es siempre un tramo inicial del
+                  recorrido y no un conjunto salteado.
+                </p>
+              </section>
+
+              <aside class="flex flex-col gap-[18px]">
+                <div data-recorrido></div>
+                <div data-ficticio></div>
+              </aside>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="assets/js/icons.js"></script>
+    <script src="assets/js/academia-data.js"></script>
+    <script src="assets/js/academia-agencias.js"></script>
+    <script src="assets/js/academia-guiones.js"></script>
+    <script src="assets/js/academia-preguntas.js"></script>
+    <script src="assets/js/academia-sim.js"></script>
+    <script src="assets/js/render.js"></script>
+    <script src="assets/js/ui.js"></script>
+    <script>
+      /* Detalle por agencia. Estrena `SIM.avanceDe()` persona por persona.
+
+         Sigue el par `modulos.html` / `modulo.html`: el listado es una pantalla
+         y el detalle es otra, con `?a=` como parámetro. */
+      (function () {
+        "use strict";
+        const S = window.SIM;
+        const R = window.RENDER;
+        const esc = S.escena;
+        const q = esc === "E5" ? null : esc;
+
+        const agencias = S.agencias();
+        const pedida = S.param("a");
+        const ag = pedida
+          ? agencias.filter(function (a) { return a.id === pedida; })[0]
+          : agencias[0];
+
+        if (!ag) {
+          document.querySelector("[data-sin]").hidden = false;
+          const sinNinguna = !agencias.length;
+          document.querySelector("[data-sin-titulo]").textContent = sinNinguna
+            ? "Todavía no hay agencias con acceso"
+            : "No existe esa agencia";
+          document.querySelector("[data-sin-texto]").textContent = sinNinguna
+            ? "Las agencias entran a la Academia cuando hay al menos un módulo activo en su plan. En este momento de la construcción no hay ninguna dada de alta."
+            : "El identificador «" + pedida + "» no corresponde a ninguna de las " +
+              agencias.length + " agencias con acceso.";
+          document.querySelector("[data-titulo]").textContent = "Agencia";
+          document.querySelector("[data-bc-nombre]").textContent = "—";
+          return;
+        }
+
+        document.querySelector("[data-detalle]").hidden = false;
+        document.querySelector("[data-titulo]").textContent = ag.nombre;
+        document.querySelector("[data-bc-nombre]").textContent = ag.nombre;
+        document.querySelector("[data-chip-plan]").textContent = ag.plan;
+        document.title = ag.nombre + " · Backoffice Academia SIGMMA";
+
+        const recorrido = S.recorridoDe(ag.plan, esc);
+        const personas = ag.plantel.map(function (p) {
+          return { id: p.id, nombre: p.nombre, coordinadora: p.coordinadora,
+                   avance: S.avanceDe(p, esc) };
+        });
+
+        const certificadas = personas.filter(function (p) { return p.avance.certificada; }).length;
+        const aprobaciones = personas.reduce(function (a, p) { return a + p.avance.aprobados.length; }, 0);
+
+        R.pintar("[data-tiles]", R.tiles([
+          ["Plantel", personas.length],
+          ["Módulos del recorrido", recorrido.length],
+          ["Recorridos completos", certificadas, certificadas === personas.length ? null : "alerta"],
+          ["Módulos aprobados", aprobaciones + " / " + (personas.length * recorrido.length)],
+        ]));
+
+        R.pintar("[data-filas]", personas.map(function (p) {
+          return R.filaPersona(p, { escena: q });
+        }).join(""));
+
+        document.querySelector("[data-caption]").textContent =
+          "Las " + personas.length + " personas del plantel de " + ag.nombre + ", con los módulos " +
+          "que aprobaron sobre los " + recorrido.length + " de su recorrido y el que tienen en curso.";
+
+        /* -- Aside ------------------------------------------------------- */
+        /* El recorrido en orden, con cuántas personas aprobaron cada módulo.
+           Es lo que muestra dónde se traba el plantel: si todas frenan en el
+           mismo módulo, el problema es del módulo. */
+        R.pintar("[data-recorrido]", R.sideCard({
+          id: "rec", titulo: "Recorrido de " + ag.plan, fuerte: true,
+          cuerpo: recorrido.length
+            ? '<ul class="flex flex-col gap-2 text-xs">' + recorrido.map(function (m, i) {
+                const n = personas.filter(function (p) {
+                  return p.avance.aprobados.some(function (x) { return x.modulo === m; });
+                }).length;
+                return '<li class="flex items-center justify-between gap-2">' +
+                  '<a href="modulo.html?m=' + m.numero + (q ? "&amp;escena=" + q : "") +
+                  '" class="link-quiet">' + (i + 1) + ". " + R.esc(m.codigo) + " ›</a>" +
+                  "<span>" + n + " de " + personas.length + "</span></li>";
+              }).join("") + "</ul>"
+            : '<p class="text-xs text-ink-soft">El plan todavía no tiene módulos activos.</p>',
+          pie: "En orden curricular. Cuántas personas del plantel aprobaron cada uno.",
+        }));
+
+        R.pintar("[data-ficticio]", R.sideCard({
+          id: "fic", titulo: "Sobre estos datos",
+          cuerpo: '<p class="text-xs text-ink-soft">Las 12 agencias y las 56 personas del ' +
+            "prototipo son <strong>ficticias</strong>. No hay CUIT, documentos, correos ni " +
+            "credenciales, y el avance se genera con una semilla estable por identificador.</p>",
+          pie: "Por eso los números no cambian entre refrescos: si se generaran al azar, el prototipo se leería como si el dato se moviera solo.",
+        }));
+
+        document.querySelector("[data-exportar]").addEventListener("click", function () {
+          window.UI.exportarCSV(
+            "plantel-" + ag.id + "-" + esc + ".csv",
+            ["Persona", "Módulos aprobados", "Avance", "En curso", "Estado"],
+            window.UI.filasVisibles("[data-filas]")
+          );
+        });
+      })();
+    </script>
+  </body>
+</html>

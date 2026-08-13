@@ -49,15 +49,15 @@
             <a href="modulos.html" class="nav-item">
               <span class="icon" data-icon="layers"></span>Módulos
             </a>
-            <span class="nav-item" aria-disabled="true">
+            <a href="videos.html" class="nav-item">
               <span class="icon" data-icon="film"></span>Biblioteca de videos
-            </span>
+            </a>
             <a href="tablero.html" class="nav-item">
               <span class="icon" data-icon="columns"></span>Tablero de producción
             </a>
-            <span class="nav-item" aria-disabled="true">
+            <a href="regrabacion.html" class="nav-item">
               <span class="icon" data-icon="refresh"></span>Cola de regrabación
-            </span>
+            </a>
           </div>
 
           <div class="nav-group">
@@ -72,9 +72,9 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Currícula</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="modulo.html?m=R01" class="nav-item">
               <span class="icon" data-icon="route"></span>Ruta Esencial
-            </span>
+            </a>
             <span class="nav-item" aria-disabled="true">
               <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
             </span>
@@ -89,12 +89,12 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Seguimiento</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="panel.html" class="nav-item">
               <span class="icon" data-icon="bar-chart"></span>Panel macro
-            </span>
-            <span class="nav-item" aria-disabled="true">
+            </a>
+            <a href="agencias.html" class="nav-item">
               <span class="icon" data-icon="users"></span>Detalle por agencia
-            </span>
+            </a>
           </div>
 
           <div class="nav-group">
@@ -128,301 +128,731 @@
             </h1>
           </div>
           <div class="page-actions">
-            <button type="button" class="btn btn-bordered btn-sm">Vista previa del sorteo</button>
-            <button type="button" class="btn btn-bordered btn-sm">Configurar evaluación</button>
-            <button type="button" class="btn btn-primary btn-sm">
+            <button type="button" class="btn btn-bordered btn-sm" data-ver-sorteo>Vista previa del sorteo</button>
+            <button type="button" class="btn btn-bordered btn-sm" data-modal-open="m-config">Configurar evaluación</button>
+            <button type="button" class="btn btn-primary btn-sm" data-modal-open="m-pregunta">
               <span class="icon" data-icon="plus"></span>Escribir pregunta
             </button>
           </div>
         </header>
 
         <main id="contenido" class="page-body">
-          <div id="sin-maquetar" class="placeholder-box" hidden>
+          <!-- ══════════════ MÓDULO SIN VIDEOS PUBLICADOS ══════════════
+               El estado vacío más importante de todos: sin esta explicación, un
+               módulo con 0 preguntas y 0 videos publicados parece un error del
+               sistema, cuando es exactamente lo que corresponde.
+
+               Ya no depende de la escena sino del DATO: cualquier módulo sin
+               videos publicados lo muestra, en cualquier momento. En régimen,
+               `banco.html?m=50` lo muestra igual que `?escena=E2` en BAK-M30. -->
+          <div id="sin-publicar" class="placeholder-box !py-14" hidden>
             <span class="placeholder-icon" data-icon="help-circle"></span>
-            <h2 class="text-h5">El banco de <span id="sin-maquetar-id">este módulo</span> no está maquetado</h2>
-            <p class="mt-2 max-w-[52ch] text-sm text-ink-soft">
-              Esta tanda maqueta el banco de <strong>BAK-M30</strong>, que es el que el wireframe
-              dibuja. Los demás módulos usan exactamente la misma pantalla.
+            <h2 class="text-h4">Todavía no corresponde escribir preguntas</h2>
+            <p class="mt-3 max-w-[62ch] text-base text-gray-700">
+              <span class="font-mono" data-modulo-id></span> no tiene ningún video publicado, así que
+              su banco está en <strong>0</strong>. <strong>No es un error ni un pendiente
+              atrasado:</strong> la pregunta se escribe <em>después</em> de grabar el video, para que
+              use el mismo lenguaje y el mismo ejemplo que se ve en pantalla.
             </p>
-            <a href="banco.html?m=30" class="btn btn-primary btn-sm mt-6">Ver el banco de BAK-M30</a>
+            <p class="mt-4 max-w-[62ch] text-sm text-ink-soft">
+              Escribir la pregunta antes obliga a reescribirla cuando el video queda distinto de lo
+              imaginado. Por eso el banco de un módulo arranca vacío y se llena a medida que se
+              publica.
+            </p>
+            <div class="mt-8 flex gap-2">
+              <a href="#" class="btn btn-primary btn-sm" data-ir-modulo>Ver el módulo</a>
+              <a href="#" class="btn btn-bordered btn-sm" data-ir-tablero>Ver qué falta grabar</a>
+            </div>
           </div>
 
-          <div id="banco" class="grid grid-cols-[1fr_340px] items-start gap-[18px]" data-escena="E5">
+          <div id="banco" class="grid grid-cols-[1fr_340px] items-start gap-[18px]" hidden>
             <div class="flex flex-col gap-[14px]">
               <!-- R4: el contador vive arriba durante TODA la carga. Nunca
                    aparece como error al final. -->
               <section class="side-card side-card-strong flex items-center gap-6" aria-labelledby="lbl-contador">
                 <div>
                   <h2 class="side-title" id="lbl-contador">Banco vigente / mínimo exigido</h2>
-                  <p class="counter-big"><b>20</b><span>/ 35</span></p>
+                  <p class="counter-big" data-contador></p>
                 </div>
                 <div class="flex-1">
-                  <div class="progress"><span style="width: 57%"></span></div>
-                  <p class="mt-[6px] text-2xs text-gray-600">
-                    Faltan <strong class="text-error-dark">15 preguntas vigentes</strong> para poder
-                    activar el módulo · 28 preguntas en total.<br />
-                    Banco mínimo por sección: 8 + 10 + 9 + 8 = <strong>35</strong> · mínimos por
-                    sorteo: 2 + 3 + 3 + 2 = <strong>10</strong>.
-                  </p>
+                  <div class="progress"><span data-progreso></span></div>
+                  <p class="mt-[6px] text-2xs text-gray-600" data-cadenas></p>
                 </div>
                 <dl class="flex gap-5 border-l border-dashed border-line-strong pl-5">
                   <div>
                     <dt class="side-title !mb-1">A revisar</dt>
-                    <dd class="metric-value !text-2xl text-error-dark">7</dd>
+                    <dd class="metric-value !text-2xl text-error-dark" data-a-revisar></dd>
                   </div>
                   <div>
                     <dt class="side-title !mb-1">Borradores</dt>
-                    <dd class="metric-value !text-2xl">1</dd>
+                    <dd class="metric-value !text-2xl" data-borradores></dd>
                   </div>
                 </dl>
               </section>
 
               <!-- R9: el estado roto se mantiene. Es el estado real mientras se
                    carga contenido, no un caso de borde. -->
-              <div class="alert alert-error items-center">
+              <div class="alert alert-error items-center" data-alerta hidden>
                 <span class="icon" data-icon="alert-triangle"></span>
-                <span>
-                  <strong>7 preguntas quedaron «a revisar».</strong>
-                  Son las 7 de <span class="font-mono">BAK-M30.060</span>, que pasó a «a regrabar»
-                  por la versión <span class="font-mono">sgm2026.03</span>.
-                </span>
-                <button type="button" class="btn btn-bordered btn-sm ml-auto shrink-0">Revisarlas</button>
+                <span data-alerta-texto></span>
+                <button type="button" class="btn btn-bordered btn-sm ml-auto shrink-0" data-revisarlas>Revisarlas</button>
               </div>
 
-              <div class="filter-bar">
-                <button type="button" class="filter-pill">
-                  Estado: todos <span class="icon" data-icon="chevron-down"></span>
-                </button>
-                <button type="button" class="filter-pill">
-                  Sección: todas <span class="icon" data-icon="chevron-down"></span>
-                </button>
-                <button type="button" class="filter-pill">
-                  Video de origen: todos <span class="icon" data-icon="chevron-down"></span>
-                </button>
+              <!-- El banco trunca cada sección, así que estos filtros no pueden
+                   limitarse a ocultar filas: re-arman el listado. Por eso son
+                   propios de la pantalla y no el `bindFilters` genérico. -->
+              <div class="filter-bar" data-filtros-banco>
+                <div class="relative" data-dropdown>
+                  <button type="button" class="filter-pill" data-dropdown-trigger aria-expanded="false" aria-haspopup="true" data-filtro-pill="estado">
+                    Estado: todos <span class="icon" data-icon="chevron-down"></span>
+                  </button>
+                  <div class="menu" role="menu" data-dropdown-menu hidden data-filtro-menu="estado"></div>
+                </div>
+                <div class="relative" data-dropdown>
+                  <button type="button" class="filter-pill" data-dropdown-trigger aria-expanded="false" aria-haspopup="true" data-filtro-pill="seccion">
+                    Sección: todas <span class="icon" data-icon="chevron-down"></span>
+                  </button>
+                  <div class="menu" role="menu" data-dropdown-menu hidden data-filtro-menu="seccion"></div>
+                </div>
+                <div class="relative" data-dropdown>
+                  <button type="button" class="filter-pill" data-dropdown-trigger aria-expanded="false" aria-haspopup="true" data-filtro-pill="origen">
+                    Video de origen: todos <span class="icon" data-icon="chevron-down"></span>
+                  </button>
+                  <div class="menu max-h-[280px] overflow-y-auto" role="menu" data-dropdown-menu hidden data-filtro-menu="origen"></div>
+                </div>
                 <label class="filter-search">
                   <span class="icon" data-icon="search"></span>
                   <span class="sr-only">Buscar pregunta</span>
-                  <input type="search" placeholder="buscar" />
+                  <input type="search" placeholder="buscar" data-buscar-pregunta />
                 </label>
-                <span class="filter-count">28 preguntas</span>
+                <span class="filter-count" data-conteo></span>
               </div>
 
-              <!-- ===================== SECCIÓN 1 ===================== -->
-              <section class="tree-section" aria-labelledby="b-sec-1">
-                <div class="tree-head">
-                  <span id="b-sec-1">Sección 1 · Concepto</span>
-                  <span class="chip chip-meta">5 vigentes de 6</span>
-                  <span class="text-2xs text-gray-600">
-                    banco mínimo 8 <span class="text-error-dark">· faltan 3</span> · mínimo por sorteo 2
-                  </span>
-                </div>
-                <div class="tree-row !pl-[11px]">
-                  <span class="row-id w-[60px]">P-1002</span>
-                  <span class="row-title">¿Qué documenta un voucher?</span>
-                  <span class="row-id w-[110px]">BAK-M30.010</span>
-                  <span class="chip chip-publicado">vigente</span>
-                </div>
-                <div class="tree-row !pl-[11px]">
-                  <span class="row-id w-[60px]">P-1003</span>
-                  <span class="row-title">El voucher se emite a nombre de…</span>
-                  <span class="row-id w-[110px]">BAK-M30.010</span>
-                  <span class="chip chip-meta">borrador</span>
-                </div>
-                <p class="px-[11px] py-2 text-2xs text-gray-600">+ 4 preguntas más</p>
-              </section>
-
-              <!-- ===================== SECCIÓN 2 ===================== -->
-              <section class="tree-section" aria-labelledby="b-sec-2">
-                <div class="tree-head">
-                  <span id="b-sec-2">Sección 2 · Carga y proceso</span>
-                  <span class="chip chip-meta">8 vigentes de 8</span>
-                  <span class="text-2xs text-gray-600">
-                    banco mínimo 10 <span class="text-error-dark">· faltan 2</span> · mínimo por sorteo 3
-                  </span>
-                </div>
-                <div class="tree-row !pl-[11px]">
-                  <span class="row-id w-[60px]">P-1021</span>
-                  <span class="row-title">Los servicios se cargan al voucher desde…</span>
-                  <span class="row-id w-[110px]">BAK-M30.020</span>
-                  <span class="chip chip-publicado">vigente</span>
-                </div>
-                <div class="tree-row !pl-[11px]">
-                  <span class="row-id w-[60px]">P-1022</span>
-                  <span class="row-title">¿Qué dato es obligatorio para cargar el voucher?</span>
-                  <span class="row-id w-[110px]">BAK-M30.020</span>
-                  <span class="chip chip-publicado">vigente</span>
-                </div>
-                <p class="px-[11px] py-2 text-2xs text-gray-600">
-                  + 6 preguntas más · <span class="font-mono">BAK-M30.050</span> todavía no tiene preguntas
-                </p>
-              </section>
-
-              <!-- ===================== SECCIÓN 3 ===================== -->
-              <section class="tree-section" aria-labelledby="b-sec-3">
-                <div class="tree-head">
-                  <span id="b-sec-3">Sección 3 · Plata: margen e impuestos</span>
-                  <span class="chip chip-meta">7 vigentes de 7</span>
-                  <span class="text-2xs text-gray-600">
-                    banco mínimo 9 <span class="text-error-dark">· faltan 2</span> · mínimo por sorteo 3
-                  </span>
-                </div>
-                <div class="tree-row !pl-[11px]">
-                  <span class="row-id w-[60px]">P-1035</span>
-                  <span class="row-title">¿Sobre qué base se calcula el IVA del servicio?</span>
-                  <span class="row-id w-[110px]">BAK-M30.040</span>
-                  <span class="chip chip-publicado">vigente</span>
-                </div>
-                <div class="tree-row !pl-[11px]">
-                  <span class="row-id w-[60px]">P-1036</span>
-                  <span class="row-title">El impuesto país se imputa como…</span>
-                  <span class="row-id w-[110px]">BAK-M30.040</span>
-                  <span class="chip chip-publicado">vigente</span>
-                </div>
-                <p class="px-[11px] py-2 text-2xs text-gray-600">
-                  + 5 preguntas más · <span class="font-mono">BAK-M30.030</span> todavía no tiene preguntas
-                </p>
-              </section>
-
-              <!-- ===================== SECCIÓN 4 ===================== -->
-              <section class="tree-section" aria-labelledby="b-sec-4">
-                <div class="tree-head">
-                  <span id="b-sec-4">Sección 4 · Estados y plantillas</span>
-                  <span class="chip chip-outline">0 vigentes de 7</span>
-                  <span class="text-2xs text-error-dark">
-                    banco mínimo 8 · faltan 8 (las 7 están «a revisar») · mínimo por sorteo 2
-                  </span>
-                </div>
-                <div class="tree-row !pl-[11px] bg-error-bg">
-                  <span class="row-id w-[60px]">P-1061</span>
-                  <span class="row-title">¿Qué estado impide modificar el voucher?</span>
-                  <span class="row-id w-[110px]">BAK-M30.060</span>
-                  <span class="chip chip-regrabar">a revisar</span>
-                </div>
-                <div class="tree-row !pl-[11px] bg-error-bg">
-                  <span class="row-id w-[60px]">P-1063</span>
-                  <span class="row-title">Anular un voucher procesado implica…</span>
-                  <span class="row-id w-[110px]">BAK-M30.060</span>
-                  <span class="chip chip-regrabar">a revisar</span>
-                </div>
-                <div class="tree-row !pl-[11px] bg-error-bg">
-                  <span class="row-id w-[60px]">P-1064</span>
-                  <span class="row-title">¿Desde qué estado se puede reimprimir el voucher?</span>
-                  <span class="row-id w-[110px]">BAK-M30.060</span>
-                  <span class="chip chip-regrabar">a revisar</span>
-                </div>
-                <p class="px-[11px] py-2 text-2xs text-gray-600">
-                  + 4 preguntas más, todas de <span class="font-mono">BAK-M30.060</span> y todas «a revisar»
-                </p>
-              </section>
+              <div data-secciones></div>
+              <div class="placeholder-box !py-10" data-sin-resultados hidden>
+                <span class="placeholder-icon" data-icon="search"></span>
+                <p class="text-sm text-gray-800">Ninguna pregunta coincide con el filtro</p>
+                <button type="button" class="btn btn-bordered btn-sm mt-4" data-limpiar-filtros>
+                  Limpiar los filtros
+                </button>
+              </div>
             </div>
 
             <aside class="flex flex-col gap-3">
               <section class="side-card" aria-labelledby="lbl-deuda">
                 <h2 class="side-title" id="lbl-deuda">Deuda de evaluación</h2>
-                <p class="mb-[9px] text-xs">
-                  Videos publicados sin ninguna pregunta: <strong>1 de 4</strong>
-                </p>
-                <ul class="flex flex-col gap-2 text-xs">
-                  <li class="flex items-center gap-2">
-                    <span class="row-id">BAK-M30.050</span>
-                    <span class="flex-1">Procesar el voucher</span>
-                    <a href="video.html?v=BAK-M30.050&amp;tab=preguntas">escribir ›</a>
-                  </li>
-                </ul>
-                <p class="foot-note">
-                  <span class="font-mono">BAK-M30.030</span> (editado) y
-                  <span class="font-mono">BAK-M30.070</span> (en backlog) tampoco tienen preguntas,
-                  pero todavía no están publicados.
-                </p>
+                <p class="mb-[9px] text-xs" data-deuda-resumen></p>
+                <ul class="flex flex-col gap-2 text-xs" data-deuda-lista></ul>
+                <p class="foot-note" data-deuda-nota></p>
               </section>
 
               <!-- R9: el sorteo que no se puede cumplir se muestra tal cual. -->
               <section class="side-card" aria-labelledby="lbl-sorteo">
-                <h2 class="side-title" id="lbl-sorteo">Vista previa · sorteo de 10</h2>
+                <h2 class="side-title" id="lbl-sorteo">Vista previa · sorteo de <span data-sorteo-pide></span></h2>
                 <p class="mb-[7px] text-2xs text-gray-600">
-                  sale / mínimo por sorteo · los mínimos suman 10
+                  sale / mínimo por sorteo · los mínimos suman <span data-sorteo-pide></span>
                 </p>
-                <div class="flex flex-col gap-[7px]">
-                  <div class="meter-row">
-                    <span>1 · Concepto</span><b class="meter-value" data-ok="true">2 / 2</b>
-                  </div>
-                  <div class="progress progress-sm"><span style="width: 20%"></span></div>
-                  <div class="meter-row">
-                    <span>2 · Carga y proceso</span><b class="meter-value" data-ok="true">3 / 3</b>
-                  </div>
-                  <div class="progress progress-sm"><span style="width: 30%"></span></div>
-                  <div class="meter-row">
-                    <span>3 · Plata: margen e impuestos</span><b class="meter-value" data-ok="true">3 / 3</b>
-                  </div>
-                  <div class="progress progress-sm"><span style="width: 30%"></span></div>
-                  <div class="meter-row">
-                    <span class="text-error-dark">4 · Estados y plantillas</span>
-                    <b class="meter-value" data-ok="false">0 / 2</b>
-                  </div>
-                  <div class="progress progress-sm"><span style="width: 0%"></span></div>
-                </div>
-                <p class="foot-note text-error-dark">
-                  <strong>Salen 8 de 10:</strong> la sección 4 no cubre su mínimo por sorteo (2)
-                  porque no tiene preguntas vigentes.
-                </p>
-                <button type="button" class="btn btn-bordered btn-sm btn-block mt-[9px]">
+                <div class="flex flex-col gap-[7px]" data-sorteo></div>
+                <p class="foot-note" data-sorteo-nota></p>
+                <button type="button" class="btn btn-bordered btn-sm btn-block mt-[9px]" data-resimular>
                   <span class="icon" data-icon="refresh"></span>Volver a simular
                 </button>
               </section>
             </aside>
           </div>
-
-          <!-- ══════════════ E2 · MÓDULO SIN VIDEOS PUBLICADOS ══════════════
-               Es el estado vacío más importante de todos: sin esta explicación,
-               un módulo con 0 preguntas y 0 videos publicados parece un error del
-               sistema, cuando es exactamente lo que corresponde. -->
-          <div data-escena="E2" class="contents">
-            <div class="placeholder-box !py-14">
-              <span class="placeholder-icon" data-icon="help-circle"></span>
-              <h2 class="text-h4">Todavía no corresponde escribir preguntas</h2>
-              <p class="mt-3 max-w-[62ch] text-base text-gray-700">
-                <span class="font-mono">BAK-M30</span> no tiene ningún video publicado, así que su
-                banco está en <strong>0</strong>. <strong>No es un error ni un pendiente
-                atrasado:</strong> la pregunta se escribe <em>después</em> de grabar el video, para
-                que use el mismo lenguaje y el mismo ejemplo que se ve en pantalla.
-              </p>
-              <p class="mt-4 max-w-[62ch] text-sm text-ink-soft">
-                Escribir la pregunta antes obliga a reescribirla cuando el video queda distinto de lo
-                imaginado. Por eso el banco de un módulo arranca vacío y se llena a medida que se
-                publica.
-              </p>
-              <div class="mt-8 flex gap-2">
-                <a href="modulo.html?m=30&amp;escena=E2" class="btn btn-primary btn-sm">Ver el módulo</a>
-                <a href="tablero.html?escena=E2" class="btn btn-bordered btn-sm">Ver qué falta grabar</a>
-              </div>
-            </div>
-          </div>
         </main>
       </div>
     </div>
 
+    <!-- ══════════════ MODALES ══════════════
+         D-2 cerrada a favor de MODAL. El design system tiene un solo patrón de
+         modal, bien resuelto, y no tiene drawer; `ui.js` ya lo cablea entero
+         —foco atrapado, Esc, overlay, foco devuelto al cerrar— y hasta acá no
+         lo usaba ninguna pantalla. -->
+
+    <div class="modal" id="m-config" hidden>
+      <div class="modal-overlay"></div>
+      <div class="modal-panel modal-panel-dismissible" role="dialog" aria-modal="true"
+           aria-labelledby="m-config-t">
+        <button type="button" class="modal-close" data-modal-close aria-label="Cerrar">
+          <span class="icon" data-icon="x"></span>
+        </button>
+        <h2 class="text-h5" id="m-config-t">Configuración de evaluación</h2>
+        <p class="mt-2 text-sm text-ink-soft">
+          Hasta que el módulo la declare, el banco muestra <strong>—</strong> en vez de un mínimo:
+          un banco vacío es trabajo pendiente, un mínimo sin definir es una decisión pendiente.
+        </p>
+
+        <div class="mt-5 flex flex-col gap-4">
+          <div class="field">
+            <label class="label" for="cfg-banco">Banco mínimo del módulo</label>
+            <input class="input !h-9 !text-xs" id="cfg-banco" type="number" min="1" max="500"
+                   data-autofocus />
+            <p class="hint">
+              Se reparte entre las secciones: 60 % parejo y 40 % a prorrata de sus videos.
+            </p>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="field">
+              <label class="label" for="cfg-intento">Preguntas por intento</label>
+              <input class="input !h-9 !text-xs" id="cfg-intento" type="number" min="1" max="100" />
+              <p class="hint">Con cuota por sección.</p>
+            </div>
+            <div class="field">
+              <label class="label" for="cfg-umbral">Nota de corte</label>
+              <input class="input !h-9 !text-xs" id="cfg-umbral" type="number" min="1" max="100" />
+              <p class="hint">Sobre las preguntas del intento.</p>
+            </div>
+          </div>
+          <p class="error-text" data-cfg-error hidden></p>
+          <p class="alert alert-info !text-2xs">
+            <span class="icon" data-icon="alert-circle"></span>
+            <span data-cfg-impacto></span>
+          </p>
+        </div>
+
+        <div class="mt-6 flex justify-end gap-2">
+          <button type="button" class="btn btn-bordered btn-sm" data-modal-close>Cancelar</button>
+          <button type="button" class="btn btn-primary btn-sm" data-cfg-guardar>Guardar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="m-pregunta" hidden>
+      <div class="modal-overlay"></div>
+      <div class="modal-panel modal-panel-wide modal-panel-dismissible" role="dialog"
+           aria-modal="true" aria-labelledby="m-pregunta-t">
+        <button type="button" class="modal-close" data-modal-close aria-label="Cerrar">
+          <span class="icon" data-icon="x"></span>
+        </button>
+        <h2 class="text-h5" id="m-pregunta-t">Escribir pregunta</h2>
+        <p class="mt-2 text-sm text-ink-soft">
+          La pregunta se escribe <strong>después de publicar el video</strong>, para que use el
+          mismo lenguaje y el mismo ejemplo que se ve en pantalla.
+        </p>
+
+        <div class="mt-5 flex flex-col gap-4">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="field">
+              <label class="label" for="pg-video">Video de origen</label>
+              <select class="select !h-9 !text-xs" id="pg-video"></select>
+              <p class="hint">
+                Es lo que permite invalidarla sola si el video se regraba.
+              </p>
+            </div>
+            <div class="field">
+              <label class="label" for="pg-seccion">Sección</label>
+              <select class="select !h-9 !text-xs" id="pg-seccion"></select>
+              <p class="hint">El sub-tema con el que entra a la cuota del sorteo.</p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="pg-texto">Enunciado</label>
+            <textarea class="textarea !min-h-[72px] !text-xs" id="pg-texto" maxlength="300"
+                      data-autofocus placeholder="¿…?"></textarea>
+            <p class="hint"><span data-counter-for="pg-texto"></span></p>
+          </div>
+
+          <fieldset class="field">
+            <legend class="label">Opciones — marcá la correcta</legend>
+            <div class="flex flex-col gap-2" data-pg-opciones></div>
+          </fieldset>
+
+          <p class="error-text" data-pg-error hidden></p>
+        </div>
+
+        <div class="mt-6 flex justify-end gap-2">
+          <button type="button" class="btn btn-bordered btn-sm" data-modal-close>Cancelar</button>
+          <button type="button" class="btn btn-primary btn-sm" data-pg-guardar>
+            Guardar la pregunta
+          </button>
+        </div>
+      </div>
+    </div>
+
     <script src="assets/js/icons.js"></script>
+    <script src="assets/js/academia-data.js"></script>
+    <script src="assets/js/academia-agencias.js"></script>
+    <script src="assets/js/academia-guiones.js"></script>
+    <script src="assets/js/academia-preguntas.js"></script>
+    <script src="assets/js/academia-sim.js"></script>
+    <script src="assets/js/render.js"></script>
     <script src="assets/js/ui.js"></script>
     <script>
-      /* Controlador de la pantalla. Cada escena maqueta el banco que le da
-         sentido; si la escena no declara ninguno, no se interviene y el aviso
-         genérico de `bindEscena` explica por qué. */
+      /* Banco de preguntas del módulo. Los contadores, las cinco cadenas y el
+         sorteo se derivan; el botón «Volver a simular» sortea de verdad. */
       (function () {
         "use strict";
-        const MAQUETADO = { E5: "30", E2: "30" };
-        const esperado = MAQUETADO[UI.escena()];
-        const m = UI.param("m");
-        if (esperado === undefined || m === null || m === esperado) return;
+        const S = window.SIM;
+        const R = window.RENDER;
+        const e = S.escena;
+        const q = e === "E5" ? "" : "&escena=" + e;
 
-        document.querySelectorAll("#contenido > [data-escena]").forEach(function (el) {
-          el.hidden = true;
+        const pedido = (S.param("m") || "30").toUpperCase();
+        const modulo = S.modulo(pedido === "R01" ? "R01" : Number(pedido));
+        const titulo = document.querySelector(".page-title");
+
+        if (!modulo || modulo.tipo !== "biblioteca") {
+          /* La Ruta Esencial no tiene banco propio: lo hereda. El reservado no
+             tiene videos. Ni uno ni otro tienen esta pantalla. */
+          const aviso = document.getElementById("sin-publicar");
+          aviso.hidden = false;
+          aviso.querySelector("h2").textContent = "Este módulo no tiene banco propio";
+          aviso.querySelectorAll("p")[0].innerHTML =
+            (modulo
+              ? '<span class="font-mono">' + modulo.codigo + "</span> es de tipo <strong>" +
+                modulo.tipo + "</strong>."
+              : "El módulo pedido no existe.") +
+            " El banco de preguntas vive en los módulos de biblioteca; la Ruta Esencial " +
+            "<strong>hereda</strong> el de los videos que referencia, y un ID reservado todavía no " +
+            "tiene contenido.";
+          aviso.querySelectorAll("p")[1].remove();
+          aviso.querySelector("[data-ir-modulo]").setAttribute("href",
+            "modulo.html?m=" + (modulo ? modulo.numero : 30) + q);
+          aviso.querySelector("[data-ir-tablero]").setAttribute("href", "tablero.html" + (q ? "?" + q.slice(1) : ""));
+          return;
+        }
+
+        const r = S.resumenModulo(modulo);
+        const secciones = S.seccionesDe(modulo);
+        const b = r.banco;
+
+        /* El breadcrumb y el título nombran el módulo que se está mirando. */
+        document.querySelector(".breadcrumb").textContent =
+          "Evaluación / Bancos de preguntas / " + modulo.codigo;
+        titulo.childNodes[0].nodeValue = "Banco de " + modulo.codigo + " ";
+        const chip = titulo.querySelector(".chip");
+        if (chip) chip.textContent = modulo.titulo;
+
+        /* Sin videos publicados no corresponde escribir preguntas. Es dato, no
+           escena: cualquier módulo en esa situación muestra la explicación. */
+        if (r.publicados === 0) {
+          const aviso = document.getElementById("sin-publicar");
+          aviso.hidden = false;
+          aviso.querySelector("[data-modulo-id]").textContent = modulo.codigo;
+          aviso.querySelector("[data-ir-modulo]").setAttribute("href", "modulo.html?m=" + modulo.numero + q);
+          aviso.querySelector("[data-ir-tablero]").setAttribute("href", "tablero.html" + (q ? "?" + q.slice(1) : ""));
+          return;
+        }
+
+        document.getElementById("banco").hidden = false;
+
+        /* ── El contador y las cinco cadenas ─────────────────────────────── */
+        const minimo = b.configurada ? b.minimo : null;
+        R.pintar("[data-contador]", "<b>" + b.vigentes + "</b><span>/ " + (minimo || "—") + "</span>");
+        const pct = minimo ? Math.round((b.vigentes / minimo) * 100) : 0;
+        document.querySelector("[data-progreso]").setAttribute("style", "width: " + Math.min(100, pct) + "%");
+        document.querySelector("[data-a-revisar]").textContent = b.aRevisar;
+        document.querySelector("[data-borradores]").textContent = b.borradores;
+
+        const sumaBanco = secciones.map(function (s) { return s.minimoBanco; });
+        const sumaSorteo = secciones.map(function (s) { return s.minimoSorteo; });
+        R.pintar("[data-cadenas]",
+          (b.faltan
+            ? "Faltan <strong class=\"text-error-dark\">" + b.faltan + " preguntas vigentes</strong> " +
+              "para poder activar el módulo · " + b.total + " preguntas en total."
+            : "El banco cubre el mínimo · " + b.total + " preguntas en total.") +
+          "<br />" +
+          (minimo
+            ? "Banco mínimo por sección: " + sumaBanco.join(" + ") + " = <strong>" + minimo +
+              "</strong> · mínimos por sorteo: " + sumaSorteo.join(" + ") + " = <strong>" +
+              sumaSorteo.reduce(function (a, x) { return a + x; }, 0) + "</strong>."
+            : "La evaluación de este módulo todavía no está configurada: no tiene mínimo definido."));
+
+        /* ── La alerta de «a revisar» ────────────────────────────────────── */
+        if (b.aRevisar > 0) {
+          /* Se agrupa por el video que las invalidó: es el dato que explica por
+             qué pasó, y sin él la alerta es un número sin causa. */
+          const porVideo = {};
+          S.bancoDe(modulo.numero).forEach(function (p) {
+            if (p.estado === "a revisar") (porVideo[p.videoOrigen] = porVideo[p.videoOrigen] || []).push(p);
+          });
+          const detalle = Object.keys(porVideo).sort().map(function (id) {
+            const v = S.video(id);
+            return porVideo[id].length + " de <span class=\"font-mono\">" + id + "</span>, que pasó a «" +
+              v.estado + "»" + (v.afectadoPor
+                ? " por la versión <span class=\"font-mono\">" + v.afectadoPor + "</span>"
+                : "");
+          }).join("; ");
+          const al = document.querySelector("[data-alerta]");
+          al.hidden = false;
+          R.pintar("[data-alerta-texto]",
+            "<strong>" + b.aRevisar + " preguntas quedaron «a revisar».</strong> Son " + detalle + ".");
+        }
+
+        /* ── Las secciones, con filtro ──────────────────────────────────── */
+        const FILTRO = { estado: "", seccion: "", origen: "", texto: "" };
+
+        function pintarSecciones() {
+          const hayFiltro = !!(FILTRO.estado || FILTRO.seccion || FILTRO.origen || FILTRO.texto);
+          const texto = FILTRO.texto.toLowerCase();
+
+          /* Se recalculan los contadores de cada sección sobre el subconjunto:
+             dejar «20 vigentes de 28» arriba de 3 preguntas filtradas sería un
+             encabezado que describe otra cosa que la que se está mirando. */
+          const secs = secciones
+            .filter(function (s) { return !FILTRO.seccion || s.titulo === FILTRO.seccion; })
+            .map(function (s) {
+              const ps = s.preguntas.filter(function (p) {
+                if (FILTRO.estado && p.estado !== FILTRO.estado) return false;
+                if (FILTRO.origen && p.videoOrigen !== FILTRO.origen) return false;
+                if (texto && (p.texto + " " + p.id).toLowerCase().indexOf(texto) === -1) return false;
+                return true;
+              });
+              return Object.assign({}, s, {
+                preguntas: ps,
+                total: ps.length,
+                vigentes: ps.filter(function (p) { return p.estado === "vigente"; }).length,
+              });
+            })
+            /* Con filtro puesto, una sección sin coincidencias no aporta: se
+               esconde. Sin filtro se muestran todas, incluso las vacías, porque
+               ahí la ausencia de preguntas ES la información. */
+            .filter(function (s) { return !hayFiltro || s.preguntas.length; });
+
+          const total = secs.reduce(function (a, s) { return a + s.preguntas.length; }, 0);
+
+          /* Con filtro no se trunca: el usuario pidió ver ese subconjunto, y
+             esconderle la mitad detrás de «+ N preguntas más» sería contestar a
+             medias. */
+          R.pintar("[data-secciones]", secs.map(function (s, i) {
+            return R.seccionBanco(s, i, hayFiltro ? { tope: s.preguntas.length } : null);
+          }).join(""));
+
+          document.querySelector("[data-conteo]").textContent =
+            total + (total === 1 ? " pregunta" : " preguntas") +
+            (hayFiltro ? " de " + b.total : "");
+          document.querySelector("[data-sin-resultados]").hidden = total !== 0;
+        }
+
+        pintarSecciones();
+
+        /* Las facetas salen del banco real del módulo, no de una lista fija. */
+        const UI = window.UI;
+        UI.poblarFiltro("estado", ["vigente", "a revisar", "borrador"], "Estado");
+        UI.poblarFiltro("seccion", secciones.map(function (s) { return s.titulo; }), "Sección");
+        UI.poblarFiltro("origen", (function () {
+          const v = {};
+          secciones.forEach(function (s) {
+            s.preguntas.forEach(function (p) { if (p.videoOrigen) v[p.videoOrigen] = true; });
+          });
+          return Object.keys(v).sort();
+        })(), "Video de origen");
+
+        /* Etiqueta de la pill: el filtro puesto se tiene que ver sin abrir el
+           menú, o no hay forma de saber por qué la lista está corta. */
+        function rotular(clave, valor, etiqueta) {
+          const pill = document.querySelector('[data-filtro-pill="' + clave + '"]');
+          if (!pill) return;
+          pill.firstChild.textContent = etiqueta + ": " + (valor || "todos") + " ";
+          pill.dataset.active = valor ? "true" : "false";
+        }
+
+        const ETIQUETAS = { estado: "Estado", seccion: "Sección", origen: "Video de origen" };
+        Object.keys(ETIQUETAS).forEach(function (clave) {
+          const menu = document.querySelector('[data-filtro-menu="' + clave + '"]');
+          menu.addEventListener("click", function (ev) {
+            const op = ev.target.closest("[data-filtro-valor]");
+            if (!op) return;
+            FILTRO[clave] = op.dataset.filtroValor;
+            rotular(clave, FILTRO[clave], ETIQUETAS[clave]);
+            menu.hidden = true;
+            const t = menu.parentNode.querySelector("[data-dropdown-trigger]");
+            if (t) { t.setAttribute("aria-expanded", "false"); t.focus(); }
+            pintarSecciones();
+          });
         });
-        document.getElementById("sin-maquetar").hidden = false;
-        document.getElementById("sin-maquetar-id").textContent =
-          "BAK-M" + String(m).padStart(2, "0");
-        document.querySelectorAll(".page-actions button").forEach(function (b) {
-          b.disabled = true;
+
+        const campoBuscar = document.querySelector("[data-buscar-pregunta]");
+        campoBuscar.addEventListener("input", function () {
+          FILTRO.texto = campoBuscar.value.trim();
+          pintarSecciones();
         });
+
+        function limpiarFiltros() {
+          Object.keys(FILTRO).forEach(function (k) { FILTRO[k] = ""; });
+          campoBuscar.value = "";
+          Object.keys(ETIQUETAS).forEach(function (k) { rotular(k, "", ETIQUETAS[k]); });
+          pintarSecciones();
+        }
+        document.querySelector("[data-limpiar-filtros]").addEventListener("click", limpiarFiltros);
+
+        /* «Revisarlas» es el CTA de la única alerta roja de la pantalla: acota
+           el listado a las preguntas que quedaron inválidas. Es un filtro, no
+           una mutación — decidir qué hacer con cada una es trabajo de contenido. */
+        document.querySelector("[data-revisarlas]").addEventListener("click", function () {
+          limpiarFiltros();
+          FILTRO.estado = "a revisar";
+          rotular("estado", "a revisar", "Estado");
+          pintarSecciones();
+          document.querySelector("[data-secciones]").scrollIntoView({ block: "start" });
+        });
+
+        /* «Vista previa del sorteo» lleva el foco al panel del aside, que ya
+           simula un intento real. Abrirlo en un modal aparte duplicaría el
+           mismo contenido en dos lugares. */
+        document.querySelector("[data-ver-sorteo]").addEventListener("click", function () {
+          const panel = document.querySelector("[data-sorteo]").closest("section");
+          panel.scrollIntoView({ block: "center" });
+          const btn = panel.querySelector("[data-resimular]");
+          if (btn) btn.focus();
+        });
+
+        /* ── Modal · configurar la evaluación ─────────────────────────────
+           Sin esto el módulo no puede declarar su mínimo, y sin mínimo no puede
+           ser apto: era un estado al que la interfaz no dejaba llegar. */
+        const cfg = S.configEvaluacion(modulo);
+        const inpBanco = document.getElementById("cfg-banco");
+        const inpIntento = document.getElementById("cfg-intento");
+        const inpUmbral = document.getElementById("cfg-umbral");
+        const errCfg = document.querySelector("[data-cfg-error]");
+
+        function cargarConfig() {
+          const c = S.configEvaluacion(modulo);
+          inpBanco.value = c.bancoMinimo;
+          inpIntento.value = c.porIntento;
+          inpUmbral.value = c.umbral;
+          validarConfig();
+        }
+
+        function validarConfig() {
+          const banco = Number(inpBanco.value);
+          const intento = Number(inpIntento.value);
+          const umbral = Number(inpUmbral.value);
+          let error = null;
+          if (!(banco > 0)) error = "El banco mínimo tiene que ser mayor que cero.";
+          else if (!(intento > 0)) error = "Las preguntas por intento tienen que ser más de una.";
+          else if (intento > banco) {
+            error = "No se pueden sortear " + intento + " preguntas de un banco de " + banco + ".";
+          } else if (umbral > intento) {
+            error = "La nota de corte no puede pedir más aciertos que preguntas del intento.";
+          }
+          errCfg.hidden = !error;
+          errCfg.textContent = error || "";
+          document.querySelector("[data-cfg-guardar]").disabled = !!error;
+
+          /* Qué le pasa a ESTE módulo con esos números. Un formulario de
+             configuración que no dice su consecuencia obliga a guardar para
+             enterarse. */
+          const vigentes = b.vigentes;
+          document.querySelector("[data-cfg-impacto]").innerHTML = error
+            ? "Corregí los valores para ver el impacto."
+            : modulo.codigo + " tiene <strong>" + vigentes + " preguntas vigentes</strong>: " +
+              (vigentes >= banco
+                ? "con este mínimo <strong>cumple</strong> el criterio de banco."
+                : "le <strong>faltarían " + (banco - vigentes) + "</strong> para poder activarse.");
+          return !error;
+        }
+
+        [inpBanco, inpIntento, inpUmbral].forEach(function (el) {
+          el.addEventListener("input", validarConfig);
+        });
+        cargarConfig();
+
+        document.querySelector("[data-cfg-guardar]").addEventListener("click", function () {
+          if (!validarConfig()) return;
+          S.anotar("modulos", modulo.codigo, {
+            evaluacion: {
+              bancoMinimo: Number(inpBanco.value),
+              porIntento: Number(inpIntento.value),
+              umbral: Number(inpUmbral.value),
+            },
+          });
+          window.UI.closeModal();
+          /* Recarga: configurar la evaluación mueve los mínimos de cada sección,
+             el sorteo, la aptitud y los medidores del aside a la vez. Re-derivar
+             la pantalla entera es más honesto que repintar tres pedazos. */
+          window.UI.recargar();
+        });
+
+        /* Se puede llegar directo desde el atajo del detalle del módulo. */
+        if (S.param("config") === "1") window.UI.showModal("m-config");
+
+        /* ── Modal · escribir pregunta ────────────────────────────────────
+           El video de origen y la sección son obligatorios: son lo que permite
+           invalidar la pregunta cuando el video se regraba y lo que la hace
+           entrar en la cuota del sorteo. */
+        const selVideo = document.getElementById("pg-video");
+        const selSeccion = document.getElementById("pg-seccion");
+        const txtPregunta = document.getElementById("pg-texto");
+        const errPg = document.querySelector("[data-pg-error]");
+
+        /* Solo videos publicados: escribir la pregunta antes de tener el video
+           al aire es escribir sobre algo que todavía puede cambiar. */
+        const publicables = r.videos.filter(function (v) { return v.estado === "publicado"; });
+
+        R.pintar("#pg-video", publicables.length
+          ? publicables.map(function (v) {
+              return '<option value="' + v.id + '" data-seccion="' + R.esc(v.seccion) + '">' +
+                v.id + " · " + R.esc(v.titulo) + "</option>";
+            }).join("")
+          : '<option value="">— no hay videos publicados —</option>');
+
+        R.pintar("#pg-seccion", secciones.map(function (s) {
+          return '<option value="' + R.esc(s.titulo) + '">' + s.orden + " · " +
+            R.esc(s.titulo) + "</option>";
+        }).join(""));
+
+        /* La sección se sincroniza con el video, que es lo normal: una pregunta
+           sobre un video pertenece a la sección de ese video. Se puede cambiar,
+           porque un concepto puede cruzarse. */
+        function sincronizarSeccion() {
+          const op = selVideo.selectedOptions[0];
+          if (op && op.dataset.seccion) selSeccion.value = op.dataset.seccion;
+        }
+        selVideo.addEventListener("change", sincronizarSeccion);
+        sincronizarSeccion();
+
+        const LETRAS = ["A", "B", "C", "D"];
+        R.pintar("[data-pg-opciones]", LETRAS.map(function (l, i) {
+          return '<label class="choice !py-2">' +
+            '<input type="radio" name="pg-correcta" value="' + i + '"' +
+            (i === 0 ? " checked" : "") + ' />' +
+            '<span class="choice-text flex-1">' +
+            '<span class="sr-only">Opción ' + l + ", marcarla como correcta</span>" +
+            '<input class="input !h-8 !text-xs" data-pg-opcion="' + i +
+            '" type="text" placeholder="opción ' + l + '" aria-label="Texto de la opción ' + l +
+            '" /></span></label>';
+        }).join(""));
+
+        function validarPregunta() {
+          const texto = txtPregunta.value.trim();
+          const opciones = Array.prototype.map.call(
+            document.querySelectorAll("[data-pg-opcion]"),
+            function (i) { return i.value.trim(); }
+          );
+          let error = null;
+          if (!publicables.length) error = "Este módulo todavía no tiene ningún video publicado.";
+          else if (!texto) error = "Falta el enunciado.";
+          else if (opciones.filter(Boolean).length < 2) error = "Escribí al menos dos opciones.";
+          else {
+            const correcta = document.querySelector('[name="pg-correcta"]:checked');
+            if (!correcta || !opciones[Number(correcta.value)]) {
+              error = "La opción marcada como correcta está vacía.";
+            }
+          }
+          errPg.hidden = !error;
+          errPg.textContent = error || "";
+          document.querySelector("[data-pg-guardar]").disabled = !!error;
+          return !error;
+        }
+
+        txtPregunta.addEventListener("input", validarPregunta);
+        document.querySelectorAll("[data-pg-opcion]").forEach(function (i) {
+          i.addEventListener("input", validarPregunta);
+        });
+        document.querySelectorAll('[name="pg-correcta"]').forEach(function (i) {
+          i.addEventListener("change", validarPregunta);
+        });
+        validarPregunta();
+
+        document.querySelector("[data-pg-guardar]").addEventListener("click", function () {
+          if (!validarPregunta()) return;
+
+          /* Las opciones vacías se descartan, así que el índice de la correcta
+             hay que recalcularlo sobre la lista ya filtrada: tomar el índice
+             del formulario apuntaría a otra opción. */
+          const crudas = Array.prototype.map.call(
+            document.querySelectorAll("[data-pg-opcion]"),
+            function (i) { return i.value.trim(); }
+          );
+          const marcada = Number(document.querySelector('[name="pg-correcta"]:checked').value);
+          const opciones = crudas.filter(Boolean);
+          const correcta = opciones.indexOf(crudas[marcada]);
+
+          /* El ID se deriva del banco, no del reloj: sigue el formato `P-NNNNN`
+             del dataset y no depende de cuándo se apretó el botón. */
+          const usados = S.bancoDe(modulo.numero).map(function (p) {
+            return parseInt(String(p.id).replace(/\D/g, ""), 10) || 0;
+          });
+          const siguiente = (usados.length ? Math.max.apply(null, usados) : modulo.numero * 1000) + 1;
+
+          S.crear("preguntas", {
+            id: "P-" + siguiente,
+            modulo: modulo.numero,
+            codigoModulo: modulo.codigo,
+            videoOrigen: selVideo.value,
+            subtema: selSeccion.value,
+            texto: txtPregunta.value.trim(),
+            opciones: opciones,
+            correcta: correcta,
+            origen: "escrita",
+            borrador: false,
+          });
+          window.UI.closeModal();
+          window.UI.recargar();
+        });
+
+        /* ── Deuda de evaluación ────────────────────────────────────────── */
+        const conPregunta = {};
+        S.bancoDe(modulo.numero).forEach(function (p) { conPregunta[p.videoOrigen] = true; });
+        const publicados = r.videos.filter(function (v) { return v.estado === "publicado"; });
+        const debiendo = publicados.filter(function (v) { return !conPregunta[v.id]; });
+        const sinPublicar = r.videos.filter(function (v) {
+          return v.estado !== "publicado" && !conPregunta[v.id];
+        });
+
+        R.pintar("[data-deuda-resumen]",
+          "Videos publicados sin ninguna pregunta: <strong>" + debiendo.length + " de " +
+          publicados.length + "</strong>");
+        R.pintar("[data-deuda-lista]", debiendo.length
+          ? debiendo.map(function (v) {
+              return '<li class="flex items-center gap-2"><span class="row-id">' + v.id +
+                '</span><span class="flex-1">' + R.esc(v.titulo) +
+                '</span><a href="video.html?v=' + v.id + "&amp;tab=preguntas" +
+                (q ? "&amp;escena=" + e : "") + '">escribir ›</a></li>';
+            }).join("")
+          : '<li class="text-gray-600">Ninguno: todos los videos publicados tienen al menos una pregunta.</li>');
+        R.pintar("[data-deuda-nota]", sinPublicar.length
+          ? sinPublicar.map(function (v) {
+              return '<span class="font-mono">' + v.id + "</span> (" + v.estado + ")";
+            }).join(" y ") + (sinPublicar.length === 1 ? " tampoco tiene" : " tampoco tienen") +
+            " preguntas, pero todavía no " + (sinPublicar.length === 1 ? "está" : "están") + " publicados."
+          : "");
+
+        /* ── Vista previa del sorteo ─────────────────────────────────────
+           R9: el sorteo que no se puede cumplir se muestra tal cual. No se
+           rellena con preguntas de otra sección, porque eso taparía el
+           problema en lugar de mostrarlo. */
+        document.querySelectorAll("[data-sorteo-pide]").forEach(function (el) {
+          el.textContent = S.evaluacion.preguntasPorIntento;
+        });
+
+        function pintarSorteo() {
+          const so = S.sortear(modulo.numero);
+          const porSeccion = {};
+          so.preguntas.forEach(function (p) {
+            porSeccion[p.subtema] = (porSeccion[p.subtema] || 0) + 1;
+          });
+          R.pintar("[data-sorteo]", secciones.map(function (s) {
+            const sale = porSeccion[s.titulo] || 0;
+            const ok = sale >= s.minimoSorteo;
+            const ancho = so.pedidas ? Math.round((sale / so.pedidas) * 100) : 0;
+            return '<div class="meter-row"><span' + (ok ? "" : ' class="text-error-dark"') + ">" +
+              s.orden + " · " + R.esc(s.titulo) + '</span><b class="meter-value" data-ok="' + ok + '">' +
+              sale + " / " + s.minimoSorteo + "</b></div>" +
+              '<div class="progress progress-sm"><span style="width: ' + ancho + '%"></span></div>';
+          }).join(""));
+
+          const nota = document.querySelector("[data-sorteo-nota]");
+          if (so.completo) {
+            nota.className = "foot-note";
+            nota.innerHTML = "<strong>Salen las " + so.salen + ":</strong> todas las secciones cubren " +
+              "su mínimo por sorteo.";
+          } else {
+            nota.className = "foot-note text-error-dark";
+            nota.innerHTML = "<strong>Salen " + so.salen + " de " + so.pedidas + ":</strong> " +
+              so.cortas.map(function (c) {
+                const s = secciones.filter(function (x) { return x.titulo === c.seccion; })[0];
+                return "la sección " + (s ? s.orden : "?") + " no cubre su mínimo por sorteo (" +
+                  c.pide + ")" + (c.tiene === 0 ? " porque no tiene preguntas vigentes" : "");
+              }).join("; ") + ".";
+          }
+        }
+
+        pintarSorteo();
+        document.querySelector("[data-resimular]").addEventListener("click", pintarSorteo);
       })();
     </script>
   </body>

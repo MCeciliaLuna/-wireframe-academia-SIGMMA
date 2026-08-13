@@ -49,15 +49,15 @@
             <a href="modulos.html" class="nav-item">
               <span class="icon" data-icon="layers"></span>Módulos
             </a>
-            <span class="nav-item" aria-disabled="true">
+            <a href="videos.html" class="nav-item">
               <span class="icon" data-icon="film"></span>Biblioteca de videos
-            </span>
+            </a>
             <a href="tablero.html" class="nav-item">
               <span class="icon" data-icon="columns"></span>Tablero de producción
             </a>
-            <span class="nav-item" aria-disabled="true">
+            <a href="regrabacion.html" class="nav-item">
               <span class="icon" data-icon="refresh"></span>Cola de regrabación
-            </span>
+            </a>
           </div>
 
           <div class="nav-group">
@@ -72,9 +72,9 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Currícula</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="modulo.html?m=R01" class="nav-item">
               <span class="icon" data-icon="route"></span>Ruta Esencial
-            </span>
+            </a>
             <span class="nav-item" aria-disabled="true">
               <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
             </span>
@@ -89,12 +89,12 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Seguimiento</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="panel.html" class="nav-item">
               <span class="icon" data-icon="bar-chart"></span>Panel macro
-            </span>
-            <span class="nav-item" aria-disabled="true">
+            </a>
+            <a href="agencias.html" class="nav-item">
               <span class="icon" data-icon="users"></span>Detalle por agencia
-            </span>
+            </a>
           </div>
 
           <div class="nav-group">
@@ -127,7 +127,7 @@
             </h1>
           </div>
           <div class="page-actions">
-            <button type="button" class="btn btn-primary btn-sm">
+            <button type="button" class="btn btn-primary btn-sm" data-modal-open="m-superficie">
               <span class="icon" data-icon="plus"></span>Nueva superficie
             </button>
           </div>
@@ -150,32 +150,7 @@
                   <th scope="col" class="w-[120px]">Gobernanza</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td class="cell-mono"><strong>BAK</strong></td>
-                  <td>Backoffice</td>
-                  <td class="cell-num">13</td>
-                  <td class="cell-num">55</td>
-                  <td><span class="chip chip-publicado">mapeada</span></td>
-                  <td>Soporte y Capacitación</td>
-                </tr>
-                <tr data-reservado="true">
-                  <td class="cell-mono">FRT</td>
-                  <td>Front</td>
-                  <td class="cell-num">0</td>
-                  <td class="cell-num">0</td>
-                  <td><span class="chip chip-outline">sin mapear</span></td>
-                  <td>—</td>
-                </tr>
-                <tr data-reservado="true">
-                  <td class="cell-mono">CRM</td>
-                  <td>CRM</td>
-                  <td class="cell-num">0</td>
-                  <td class="cell-num">0</td>
-                  <td><span class="chip chip-outline">sin mapear</span></td>
-                  <td>—</td>
-                </tr>
-              </tbody>
+              <tbody data-superficies></tbody>
             </table>
             <p class="mt-3 max-w-[80ch] text-xs text-ink-soft">
               Las tres superficies vienen precargadas como semilla: el selector global del sidebar
@@ -190,61 +165,260 @@
             <div class="grid grid-cols-[1fr_400px] items-start gap-[18px]">
               <table class="table-dense">
                 <caption class="sr-only">
-                  Planes comerciales con los que se etiquetan los módulos y los videos.
+                  Planes comerciales con los que se etiquetan los módulos y los videos, y cuántos
+                  módulos y videos habilita cada uno.
                 </caption>
                 <thead>
                   <tr>
-                    <th scope="col" class="w-[130px]">Etiqueta</th>
-                    <th scope="col" class="w-[110px]">Módulos</th>
-                    <th scope="col" class="w-[110px]">Videos</th>
-                    <th scope="col">Nombre comercial</th>
+                    <th scope="col" class="w-[130px]">Plan</th>
+                    <th scope="col" class="w-[100px]">Módulos</th>
+                    <th scope="col" class="w-[90px]">Videos</th>
+                    <th scope="col" class="w-[100px]">Agencias</th>
+                    <th scope="col">Para qué es</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
-                    <td><span class="chip chip-meta">plan A</span></td>
-                    <td class="cell-num">6</td>
-                    <td class="cell-num">—</td>
-                    <td class="text-gray-600">sin definir</td>
-                  </tr>
-                  <tr>
-                    <td><span class="chip chip-meta">plan B</span></td>
-                    <td class="cell-num">4</td>
-                    <td class="cell-num">—</td>
-                    <td class="text-gray-600">sin definir</td>
-                  </tr>
-                  <tr>
-                    <td><span class="chip chip-meta">plan A · plan B</span></td>
-                    <td class="cell-num">3</td>
-                    <td class="cell-num">—</td>
-                    <td class="text-gray-600">sin definir</td>
-                  </tr>
-                </tbody>
+                <tbody data-planes></tbody>
               </table>
 
               <aside class="side-card side-card-strong">
-                <h2 class="side-title">Decisión abierta</h2>
-                <p class="text-xs text-gray-700">
-                  <strong>«plan A» y «plan B» son un placeholder deliberado.</strong> Hoy conviven
-                  tres nomenclaturas para lo mismo y ninguna está confirmada:
-                </p>
-                <ul class="mt-3 flex flex-col gap-2 text-xs text-gray-700">
-                  <li><span class="chip chip-outline">Maestro de Producción</span> P+B · B · B-nicho</li>
-                  <li><span class="chip chip-outline">Vista agencia</span> Professional · Business</li>
-                  <li><span class="chip chip-outline">Alcance del MVP</span> Corporate · Business · Standard</li>
-                </ul>
-                <p class="foot-note">
-                  Hasta que se cierre, el backoffice no inventa nombres: los muestra como etiquetas
-                  neutras. Cambiar el diccionario después es renombrar, no remapear.
-                </p>
+                <h2 class="side-title">Decisión cerrada · D-3</h2>
+                <p class="text-xs text-gray-700" data-d3></p>
+                <ul class="mt-3 flex flex-col gap-2 text-xs text-gray-700" data-nomenclaturas></ul>
+                <p class="foot-note" data-d3-pie></p>
               </aside>
             </div>
+          </section>
+
+          <!-- La matriz plan × módulo. El destino del sidebar sigue
+               deshabilitado —es una pantalla propia y está fuera de este
+               alcance—, pero la relación ya existe en el dato y se puede leer
+               acá sin inventar nada. -->
+          <section aria-labelledby="matriz">
+            <h2 class="side-title" id="matriz">Qué módulo entra en qué plan</h2>
+            <div class="table-scroll-y">
+              <table class="table-dense" data-sortable>
+                <caption class="sr-only">
+                  Matriz de planes por módulo: qué módulos habilita cada plan comercial.
+                </caption>
+                <thead data-matriz-head></thead>
+                <tbody data-matriz></tbody>
+              </table>
+            </div>
+            <p class="mt-3 max-w-[80ch] text-xs text-ink-soft" data-matriz-nota></p>
           </section>
         </main>
       </div>
     </div>
 
     <script src="assets/js/icons.js"></script>
+    <script src="assets/js/academia-data.js"></script>
+    <script src="assets/js/academia-agencias.js"></script>
+    <script src="assets/js/academia-guiones.js"></script>
+    <script src="assets/js/academia-preguntas.js"></script>
+    <script src="assets/js/academia-sim.js"></script>
+    <script src="assets/js/render.js"></script>
     <script src="assets/js/ui.js"></script>
+    <script>
+      /* Superficies y planes. Los conteos de módulos y videos por plan se
+         derivan: escritos a mano eran los que no cerraban con el listado de
+         módulos, que es donde el chip de planes se ve. */
+      (function () {
+        "use strict";
+        const S = window.SIM;
+        const R = window.RENDER;
+        const e = S.escena;
+        const q = e === "E5" ? "" : "?escena=" + e;
+
+        const videos = S.videos();
+
+        /* ── Superficies ────────────────────────────────────────────────── */
+        R.pintar("[data-superficies]", S.superficies.map(function (sup) {
+          /* Solo BAK tiene contenido mapeado: los módulos del dataset son todos
+             suyos. FRT y CRM van en cero, que no es un error sino la gobernanza
+             pendiente. */
+          const mods = sup.codigo === "BAK" ? S.modulos.length : 0;
+          const vids = sup.codigo === "BAK" ? videos.length : 0;
+          return "<tr" + (sup.mapeada ? "" : ' data-reservado="true"') + ">" +
+            '<td class="cell-mono">' + (sup.mapeada ? "<strong>" + sup.codigo + "</strong>" : sup.codigo) + "</td>" +
+            "<td>" + R.esc(sup.nombre) + "</td>" +
+            '<td class="cell-num">' + mods + "</td>" +
+            '<td class="cell-num">' + vids + "</td>" +
+            "<td>" + (sup.mapeada
+              ? '<span class="chip chip-publicado">mapeada</span>'
+              : '<span class="chip chip-outline">sin mapear</span>') + "</td>" +
+            "<td>" + R.oVacio(sup.gobernanza) + "</td>" +
+            "</tr>";
+        }).join(""));
+
+        /* ── Diccionario de planes ──────────────────────────────────────── */
+        const agencias = S.agencias();
+        R.pintar("[data-planes]", S.planes.map(function (p) {
+          const mods = S.modulos.filter(function (m) {
+            return (m.planes || []).indexOf(p.nombre) !== -1;
+          });
+          const vids = videos.filter(function (v) {
+            return (v.planes || []).indexOf(p.nombre) !== -1;
+          });
+          const ags = agencias.filter(function (a) { return a.plan === p.nombre; }).length;
+          return "<tr>" +
+            '<td><span class="chip chip-meta">' + R.esc(p.nombre) + "</span></td>" +
+            '<td class="cell-num">' + mods.length + "</td>" +
+            '<td class="cell-num">' + vids.length + "</td>" +
+            '<td class="cell-num">' + (agencias.length ? ags : R.VACIO) + "</td>" +
+            '<td class="text-xs text-gray-700">' + R.esc(p.resumen) + "</td>" +
+            "</tr>";
+        }).join(""));
+
+        R.pintar("[data-d3]",
+          "<strong>Los planes son los tres reales del producto.</strong> D-3 se cerró tomándolos de " +
+          "<span class=\"font-mono\">web.sigmma.net/planes.html</span>, que es la fuente comercial. " +
+          "Antes convivían cuatro nomenclaturas para lo mismo y ninguna estaba confirmada:");
+        R.pintar("[data-nomenclaturas]", [
+          ["Este prototipo, antes", "plan A · plan B <em>(placeholder)</em>"],
+          ["Maestro de Producción", "P+B · B · B-nicho"],
+          ["Vista agencia", "Professional · Business"],
+          ["Alcance del MVP", "Corporate · Business · <strong>Standard</strong>"],
+        ].map(function (x) {
+          return '<li><span class="chip chip-outline">' + R.esc(x[0]) + "</span> " + x[1] + "</li>";
+        }).join(""));
+        R.pintar("[data-d3-pie]",
+          "El alcance del MVP escribe <strong>Standard</strong> donde va <strong>Professional</strong>: " +
+          "es un error del documento fuente, anotado como <strong>B-4</strong>. Y la asignación vieja de " +
+          "«plan A / plan B» por módulo no se renombró — era arbitraria por admisión propia, así que " +
+          "se re-derivó del Maestro. Renombrarla habría disfrazado un dato inventado de dato real.");
+
+        /* ── Matriz plan × módulo ───────────────────────────────────────── */
+        R.pintar("[data-matriz-head]",
+          '<tr><th scope="col" class="w-[110px]" data-sort-key="id">Módulo</th>' +
+          '<th scope="col">Nombre</th>' +
+          S.planes.map(function (p) {
+            return '<th scope="col" class="w-[130px]">' + R.esc(p.nombre) + "</th>";
+          }).join("") + "</tr>");
+
+        R.pintar("[data-matriz]", S.modulos.map(function (m) {
+          const celdas = S.planes.map(function (p) {
+            if (!m.planes) return '<td class="cell-num">' + R.VACIO + "</td>";
+            const dentro = m.planes.indexOf(p.nombre) !== -1;
+            return '<td class="cell-num">' + (dentro
+              ? '<span class="chip chip-publicado">incluido</span>'
+              : '<span class="text-gray-600">—</span>') + "</td>";
+          }).join("");
+          return '<tr data-id="' + m.codigo + '"' +
+            (m.tipo === "reservado" ? ' data-reservado="true"' : "") + ">" +
+            '<td class="cell-mono">' + m.codigo + "</td>" +
+            "<td>" + (m.tipo === "reservado"
+              ? R.esc(m.titulo)
+              : '<a href="modulo.html?m=' + m.numero + (e === "E5" ? "" : "&amp;escena=" + e) +
+                '">' + R.esc(m.titulo) + "</a>") + "</td>" +
+            celdas + "</tr>";
+        }).join(""));
+
+        const soloCorporate = S.modulos.filter(function (m) {
+          return m.planes && m.planes.length === 1;
+        });
+        R.pintar("[data-matriz-nota]",
+          "La asignación sale del Maestro de Producción: el núcleo es «P+B» y entra en los tres " +
+          "planes; <span class=\"font-mono\">BAK-M90</span> está marcado «(Business)» y " +
+          "<span class=\"font-mono\">BAK-M95</span> «(nicho)»." +
+          (soloCorporate.length
+            ? " Hay " + soloCorporate.length + " módulo" + (soloCorporate.length === 1 ? "" : "s") +
+              " en un solo plan, y eso cambia el denominador de todo cálculo de avance: el " +
+              "recorrido de Professional tiene " + S.recorridoDe("Professional", "E6").length +
+              " módulos activos y el de Corporate, " + S.recorridoDe("Corporate", "E6").length + "."
+            : "") +
+          " <strong>La matriz Perfil × Módulo completa sigue siendo una decisión abierta</strong>: el " +
+          "alcance del MVP la deja fuera de los ABMs iniciales, pero pide que el modelo de datos la " +
+          "contemple desde el día uno. Esto es esa contemplación, no la pantalla de administración.");
+      })();
+    </script>
+
+    <div class="modal" id="m-superficie" hidden>
+      <div class="modal-overlay"></div>
+      <div class="modal-panel modal-panel-dismissible" role="dialog" aria-modal="true"
+           aria-labelledby="m-superficie-t">
+        <button type="button" class="modal-close" data-modal-close aria-label="Cerrar">
+          <span class="icon" data-icon="x"></span>
+        </button>
+        <h2 class="text-h5" id="m-superficie-t">Nueva superficie</h2>
+        <p class="mt-2 text-sm text-ink-soft">
+          Una superficie es un producto con currícula propia. Nace <strong>sin mapear</strong>: los
+          módulos se cargan después, y hasta entonces su listado muestra el estado vacío.
+        </p>
+
+        <div class="mt-5 flex flex-col gap-4">
+          <div class="grid grid-cols-[110px_1fr] gap-3">
+            <div class="field">
+              <label class="label" for="sf-codigo">Código</label>
+              <input class="input !h-9 font-mono !text-xs" id="sf-codigo" type="text" maxlength="3"
+                     placeholder="TRF" data-autofocus />
+            </div>
+            <div class="field">
+              <label class="label" for="sf-nombre">Nombre</label>
+              <input class="input !h-9 !text-xs" id="sf-nombre" type="text" placeholder="Tráfico" />
+            </div>
+          </div>
+          <div class="field">
+            <label class="label" for="sf-gobernanza">
+              Gobernanza <span class="label-optional">· opcional</span>
+            </label>
+            <input class="input !h-9 !text-xs" id="sf-gobernanza" type="text"
+                   placeholder="quién define la currícula" />
+            <p class="hint">Sin gobernanza definida, la currícula queda sin dueño.</p>
+          </div>
+          <p class="error-text" data-sf-error hidden></p>
+        </div>
+
+        <div class="mt-6 flex justify-end gap-2">
+          <button type="button" class="btn btn-bordered btn-sm" data-modal-close>Cancelar</button>
+          <button type="button" class="btn btn-primary btn-sm" data-sf-guardar>Crear superficie</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* Alta de superficie. A-2: las tres vienen PRECARGADAS como semilla —el
+         selector global del sidebar cuelga de ellas y sin al menos una el
+         backoffice no tiene contexto—, pero se pueden sumar más. */
+      (function () {
+        "use strict";
+        const S = window.SIM;
+        const inpCod = document.getElementById("sf-codigo");
+        const inpNom = document.getElementById("sf-nombre");
+        const inpGob = document.getElementById("sf-gobernanza");
+        const btn = document.querySelector("[data-sf-guardar]");
+        const err = document.querySelector("[data-sf-error]");
+
+        function validar() {
+          const cod = inpCod.value.trim().toUpperCase();
+          let error = null;
+          if (!/^[A-Z]{3}$/.test(cod)) error = "El código son tres letras, como BAK o FRT.";
+          else if (S.superficies.some(function (x) { return x.codigo === cod; })) {
+            error = cod + " ya existe.";
+          } else if (!inpNom.value.trim()) error = "Falta el nombre.";
+          err.hidden = !error;
+          err.textContent = error || "";
+          btn.disabled = !!error;
+          return !error;
+        }
+
+        [inpCod, inpNom].forEach(function (el) { el.addEventListener("input", validar); });
+        validar();
+
+        btn.addEventListener("click", function () {
+          if (!validar()) return;
+          S.crear("superficies", {
+            codigo: inpCod.value.trim().toUpperCase(),
+            nombre: inpNom.value.trim(),
+            /* Nace SIN mapear: una superficie recién creada no tiene currícula,
+               y decir lo contrario haría que el listado de módulos prometa un
+               contenido que no existe. */
+            mapeada: false,
+            gobernanza: inpGob.value.trim() || null,
+          });
+          window.UI.closeModal();
+          window.UI.recargar();
+        });
+      })();
+    </script>
   </body>
 </html>

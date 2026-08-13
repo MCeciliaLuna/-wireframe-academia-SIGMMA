@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cola de regrabación · Backoffice Academia SIGMMA</title>
+    <meta name="description" content="Los videos de la Academia SIGMMA marcados para regrabar, con las preguntas que dejaron a revisar y la versión de producto que los afectó." />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="stylesheet" href="assets/css/academia.css" />
+  </head>
+  <body>
+    <a href="#contenido" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[1001] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-white">Saltar al contenido</a>
+
+    <div class="app-shell">
+      <!-- app-shell: sincronizar con src/partials/app-shell.html -->
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img src="assets/img/logo.svg" alt="SIGMMA" width="96" height="16" class="w-[96px]" />
+          <span class="text-2xs font-bold text-primary">Academia</span>
+        </div>
+
+        <!-- Selector global de superficie. Todo el contenido del backoffice cuelga
+             de cuál está activa. Solo BAK tiene módulos mapeados. -->
+        <div class="relative" data-dropdown>
+          <span class="side-title mb-1 block">Superficie</span>
+          <button type="button" class="surface-picker" data-dropdown-trigger aria-expanded="false" aria-haspopup="true">
+            <span><strong>BAK</strong> · Backoffice</span>
+            <span class="icon icon-sm" data-icon="chevron-down"></span>
+          </button>
+          <div class="menu" role="menu" data-dropdown-menu hidden>
+            <a href="modulos.html?sup=BAK" class="menu-item" role="menuitem">BAK · Backoffice</a>
+            <a href="modulos.html?sup=FRT" class="menu-item" role="menuitem">FRT · Front</a>
+            <a href="modulos.html?sup=CRM" class="menu-item" role="menuitem">CRM</a>
+          </div>
+        </div>
+
+        <nav class="flex flex-col gap-4" aria-label="Secciones del backoffice">
+          <!-- Inicio va suelto, sin grupo: no es una función más sino el punto de
+               partida. En las etapas de construcción es el panel de obra. -->
+          <div class="nav-group">
+            <a href="home.html" class="nav-item" data-escena-keep>
+              <span class="icon" data-icon="activity"></span>Inicio
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Contenido</span>
+            <a href="modulos.html" class="nav-item">
+              <span class="icon" data-icon="layers"></span>Módulos
+            </a>
+            <a href="videos.html" class="nav-item">
+              <span class="icon" data-icon="film"></span>Biblioteca de videos
+            </a>
+            <a href="tablero.html" class="nav-item">
+              <span class="icon" data-icon="columns"></span>Tablero de producción
+            </a>
+            <a href="regrabacion.html" class="nav-item" aria-current="page">
+              <span class="icon" data-icon="refresh"></span>Cola de regrabación
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Evaluación</span>
+            <a href="banco.html?m=30" class="nav-item">
+              <span class="icon" data-icon="help-circle"></span>Bancos de preguntas
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="settings"></span>Configuración
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Currícula</span>
+            <a href="modulo.html?m=R01" class="nav-item">
+              <span class="icon" data-icon="route"></span>Ruta Esencial
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Pipeline</span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="git-branch"></span>Impactos en Academia
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Seguimiento</span>
+            <a href="panel.html" class="nav-item">
+              <span class="icon" data-icon="bar-chart"></span>Panel macro
+            </a>
+            <a href="agencias.html" class="nav-item">
+              <span class="icon" data-icon="users"></span>Detalle por agencia
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Administración</span>
+            <a href="superficies.html" class="nav-item">
+              <span class="icon" data-icon="target"></span>Superficies y planes
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="shield"></span>Usuarios y roles
+            </span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="activity"></span>Auditoría
+            </span>
+          </div>
+        </nav>
+
+        <div class="sidebar-foot">
+          <span class="text-2xs text-gray-700">Majo · Contenido</span>
+        </div>
+      </aside>
+      <!-- /app-shell -->
+
+      <div class="main-col">
+        <header class="page-head">
+          <div>
+            <div class="breadcrumb">Contenido / Cola de regrabación</div>
+            <h1 class="page-title">
+              Cola de regrabación
+              <span class="chip chip-meta" data-chip-total></span>
+              <span class="escena-badge" data-escena-label></span>
+            </h1>
+          </div>
+          <div class="page-actions">
+            <button type="button" class="btn btn-bordered btn-sm" data-exportar>
+              <span class="icon" data-icon="download"></span>Exportar
+            </button>
+            <a href="tablero.html" class="btn btn-bordered btn-sm">
+              <span class="icon" data-icon="columns"></span>Ver el tablero
+            </a>
+          </div>
+        </header>
+
+        <main id="contenido" class="page-body">
+          <div class="grid grid-cols-[1fr_340px] items-start gap-[18px]">
+            <div class="flex flex-col gap-[18px]">
+              <!-- Cola vacía. NO es un estado de escena: es dato. En E1 a E4
+                   ningún video llegó a `a regrabar` todavía, y en cualquier
+                   escena la cola puede quedar en cero. La condición es la
+                   misma, así que el mensaje también. -->
+              <div class="placeholder-box !py-12" data-vacio hidden>
+                <span class="placeholder-icon" data-icon="refresh"></span>
+                <h2 class="text-h5">No hay nada para regrabar</h2>
+                <p class="mt-2 max-w-[52ch] text-sm text-ink-soft" data-vacio-texto></p>
+              </div>
+
+              <section data-cola hidden>
+                <h2 class="text-h5 mb-3">A regrabar</h2>
+                <div class="table-scroll-y">
+                  <table class="table-dense" data-sortable>
+                    <caption class="sr-only" data-caption></caption>
+                    <thead>
+                      <tr>
+                        <th scope="col" data-sort-key="id">ID</th>
+                        <th scope="col" data-sort-key="titulo">Título</th>
+                        <th scope="col" data-sort-key="modulo">Módulo</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Versión al aire</th>
+                        <th scope="col">Afectado por</th>
+                        <th scope="col" data-sort-key="revisar" data-sort-type="number">Preguntas a revisar</th>
+                        <th scope="col">Ubicaciones</th>
+                      </tr>
+                    </thead>
+                    <tbody data-filas></tbody>
+                  </table>
+                </div>
+                <p class="foot-note mt-2">
+                  Un video <span class="chip chip-regrabar">a regrabar</span> <strong>sigue visible
+                  en el Front</strong>: se saca cuando hay reemplazo, no cuando se detecta que quedó
+                  viejo. Lo que sí se invalida son sus preguntas, que pasan a
+                  <span class="chip chip-alerta">a revisar</span> y dejan de entrar al sorteo.
+                </p>
+              </section>
+
+              <!-- Los obsoletos van aparte y no se cuentan en la cola: sus
+                   preguntas también quedaron a revisar, pero el video no se
+                   regraba. Meterlos en la misma tabla haría que el contador de
+                   trabajo de rodaje diga más de lo que hay que grabar. -->
+              <section data-obsoletos hidden>
+                <h2 class="text-h5 mb-3">
+                  Dados de baja
+                  <span class="chip chip-meta" data-chip-obsoletos></span>
+                </h2>
+                <div class="table-scroll-y">
+                  <table class="table-dense">
+                    <caption class="sr-only">
+                      Videos obsoletos: sus preguntas también quedaron a revisar, pero el video no
+                      se regraba.
+                    </caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Título</th>
+                        <th scope="col">Módulo</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Versión al aire</th>
+                        <th scope="col">Afectado por</th>
+                        <th scope="col">Preguntas a revisar</th>
+                        <th scope="col">Ubicaciones</th>
+                      </tr>
+                    </thead>
+                    <tbody data-filas-obsoletos></tbody>
+                  </table>
+                </div>
+                <p class="foot-note mt-2">
+                  El obsoleto <strong>nunca se ve en el Front</strong>, aunque su módulo esté activo.
+                  Qué hacer con sus preguntas es la decisión <strong>D-5</strong>, todavía abierta:
+                  el vocabulario de estados no tiene «retirada», así que caen en «a revisar» y
+                  alguien tiene que decidir.
+                </p>
+              </section>
+            </div>
+
+            <aside class="flex flex-col gap-[18px]">
+              <div data-resumen></div>
+              <div data-impacto></div>
+            </aside>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="assets/js/icons.js"></script>
+    <script src="assets/js/academia-data.js"></script>
+    <script src="assets/js/academia-agencias.js"></script>
+    <script src="assets/js/academia-guiones.js"></script>
+    <script src="assets/js/academia-preguntas.js"></script>
+    <script src="assets/js/academia-sim.js"></script>
+    <script src="assets/js/render.js"></script>
+    <script src="assets/js/ui.js"></script>
+    <script>
+      /* Cola de regrabación.
+
+         No hay una lista de «videos en cola» en ningún lado: la cola ES el
+         conjunto de videos en estado `a regrabar`, derivado como todo lo demás.
+         Modelarla como una lista aparte habría permitido que un video esté en
+         la cola y publicado a la vez, que es justo lo que no puede pasar. */
+      (function () {
+        "use strict";
+        const S = window.SIM;
+        const R = window.RENDER;
+        const esc = S.escena;
+        const q = esc === "E5" ? null : esc;
+
+        /* Cuántas preguntas dejó a revisar cada video, y dónde vive. */
+        const conDeuda = function (v) {
+          const banco = S.bancoDe(v.modulo, esc);
+          return {
+            video: v,
+            aRevisar: banco.filter(function (p) {
+              return p.videoOrigen === v.id && p.estado === "a revisar";
+            }).length,
+            ubicaciones: S.ubicacionesDe(v, esc).map(function (u) {
+              return u.canonica ? u.orden : "Ruta " + u.orden;
+            }).join(" · ") || "—",
+          };
+        };
+
+        const videos = S.videos();
+        const cola = videos.filter(function (v) { return v.estado === "a regrabar"; }).map(conDeuda);
+        const bajas = videos.filter(function (v) { return v.estado === "obsoleto"; }).map(conDeuda);
+
+        document.querySelector("[data-chip-total]").textContent =
+          cola.length + (cola.length === 1 ? " video" : " videos");
+
+        if (cola.length) {
+          document.querySelector("[data-cola]").hidden = false;
+          R.pintar("[data-filas]", cola.map(function (x) {
+            return R.filaRegrabacion(x, { escena: q });
+          }).join(""));
+          document.querySelector("[data-caption]").textContent =
+            "Los " + cola.length + " videos marcados para regrabar, con la versión que sigue al " +
+            "aire, la versión de producto que los dejó viejos y las preguntas que invalidaron.";
+        } else {
+          const vacio = document.querySelector("[data-vacio]");
+          vacio.hidden = false;
+          /* El motivo importa: en las escenas tempranas no hay nada publicado
+             que se pueda haber quedado viejo, y decir «todo al día» ahí sería
+             una felicitación por trabajo que todavía no se hizo. */
+          const publicados = videos.filter(function (v) { return v.estado === "publicado"; }).length;
+          document.querySelector("[data-vacio-texto]").textContent = publicados
+            ? "Ningún video publicado quedó desactualizado por una versión de producto. Los videos entran acá cuando alguien los marca «a regrabar», desde su ficha o desde el tablero."
+            : "Todavía no hay videos publicados, así que no hay nada que pueda haber quedado viejo. La cola se llena cuando una versión de producto desactualiza un video que ya está al aire.";
+        }
+
+        if (bajas.length) {
+          document.querySelector("[data-obsoletos]").hidden = false;
+          document.querySelector("[data-chip-obsoletos]").textContent =
+            bajas.length + (bajas.length === 1 ? " video" : " videos");
+          R.pintar("[data-filas-obsoletos]", bajas.map(function (x) {
+            return R.filaRegrabacion(x, { escena: q });
+          }).join(""));
+        }
+
+        /* -- Aside ------------------------------------------------------- */
+        const deudaCola = cola.reduce(function (a, x) { return a + x.aRevisar; }, 0);
+        const deudaBajas = bajas.reduce(function (a, x) { return a + x.aRevisar; }, 0);
+
+        R.pintar("[data-resumen]", R.sideCard({
+          id: "res", titulo: "Trabajo en cola", fuerte: true,
+          cuerpo: R.medidor([
+            { dt: "Videos a regrabar", dd: cola.length, ok: cola.length === 0 },
+            { dt: "Preguntas invalidadas", dd: deudaCola, ok: deudaCola === 0 },
+            { dt: "Videos dados de baja", dd: bajas.length },
+            { dt: "Preguntas de los dados de baja", dd: deudaBajas },
+          ]),
+          pie: cola.length
+            ? "Regrabar un video <strong>no le cambia el ID</strong>: la versión nueva se archiva sobre la misma ficha (R2). Las preguntas vuelven a «vigente» cuando alguien las revisa."
+            : "Sin trabajo de regrabación pendiente.",
+        }));
+
+        /* Los módulos afectados son los que no pueden volver a ser aptos hasta
+           que alguien resuelva la deuda de revisión: es el vínculo entre esta
+           pantalla y la activación. */
+        const porModulo = {};
+        cola.concat(bajas).forEach(function (x) {
+          if (!x.aRevisar) return;
+          const c = x.video.codigoModulo;
+          porModulo[c] = (porModulo[c] || 0) + x.aRevisar;
+        });
+        const afectados = Object.keys(porModulo).sort();
+
+        R.pintar("[data-impacto]", R.sideCard({
+          id: "imp", titulo: "Módulos afectados",
+          cuerpo: afectados.length
+            ? '<ul class="flex flex-col gap-2 text-xs">' + afectados.map(function (c) {
+                const m = S.modulos.filter(function (x) { return x.codigo === c; })[0];
+                return '<li class="flex items-center justify-between gap-2">' +
+                  '<a href="banco.html?m=' + m.numero + (q ? "&amp;escena=" + q : "") + '">' +
+                  R.esc(c) + " ›</a>" +
+                  '<span class="chip chip-alerta">' + porModulo[c] + " a revisar</span></li>";
+              }).join("") + "</ul>"
+            : '<p class="text-xs text-ink-soft">Ninguno.</p>',
+          pie: afectados.length
+            ? "Un módulo con preguntas a revisar <strong>no cumple el cuarto criterio de aptitud</strong>. Si ya estaba activo sigue activo (D-4), pero no se puede volver a activar hasta resolverlas."
+            : null,
+        }));
+
+        const btn = document.querySelector("[data-exportar]");
+        btn.disabled = !cola.length;
+        btn.addEventListener("click", function () {
+          window.UI.exportarCSV(
+            "cola-regrabacion-" + esc + ".csv",
+            ["ID", "Título", "Módulo", "Estado", "Versión al aire", "Afectado por",
+             "Preguntas a revisar", "Ubicaciones"],
+            window.UI.filasVisibles("[data-filas]")
+          );
+        });
+      })();
+    </script>
+  </body>
+</html>

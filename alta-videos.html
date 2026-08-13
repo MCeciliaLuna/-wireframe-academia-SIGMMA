@@ -49,15 +49,15 @@
             <a href="modulos.html" class="nav-item">
               <span class="icon" data-icon="layers"></span>Módulos
             </a>
-            <span class="nav-item" aria-disabled="true" aria-current="page">
+            <a href="videos.html" class="nav-item" aria-current="page">
               <span class="icon" data-icon="film"></span>Biblioteca de videos
-            </span>
+            </a>
             <a href="tablero.html" class="nav-item">
               <span class="icon" data-icon="columns"></span>Tablero de producción
             </a>
-            <span class="nav-item" aria-disabled="true">
+            <a href="regrabacion.html" class="nav-item">
               <span class="icon" data-icon="refresh"></span>Cola de regrabación
-            </span>
+            </a>
           </div>
 
           <div class="nav-group">
@@ -72,9 +72,9 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Currícula</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="modulo.html?m=R01" class="nav-item">
               <span class="icon" data-icon="route"></span>Ruta Esencial
-            </span>
+            </a>
             <span class="nav-item" aria-disabled="true">
               <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
             </span>
@@ -89,12 +89,12 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Seguimiento</span>
-            <span class="nav-item" aria-disabled="true">
+            <a href="panel.html" class="nav-item">
               <span class="icon" data-icon="bar-chart"></span>Panel macro
-            </span>
-            <span class="nav-item" aria-disabled="true">
+            </a>
+            <a href="agencias.html" class="nav-item">
               <span class="icon" data-icon="users"></span>Detalle por agencia
-            </span>
+            </a>
           </div>
 
           <div class="nav-group">
@@ -128,7 +128,7 @@
           </div>
           <div class="page-actions">
             <a href="modulos.html?escena=E2" class="btn btn-bordered btn-sm">Cancelar</a>
-            <button type="button" class="btn btn-primary btn-sm">Reservar 4 IDs</button>
+            <button type="button" class="btn btn-primary btn-sm" data-reservar>Reservar IDs</button>
           </div>
         </header>
 
@@ -139,27 +139,29 @@
                    que hace que cargar 6 videos no sea cargar 6 formularios. -->
               <section class="side-card" aria-labelledby="destino">
                 <h2 class="side-title" id="destino">Destino del lote</h2>
+                <!-- Solo BAK tiene módulos mapeados. Elegir otra superficie no
+                     es un error, pero tampoco puede reservar: no hay dónde. -->
+                <div class="alert alert-warning items-center mb-3" data-sup-aviso hidden>
+                  <span class="icon" data-icon="alert-triangle"></span>
+                  <span>
+                    <strong data-sup-codigo>FRT</strong> todavía no tiene módulos mapeados, así que
+                    no hay dónde reservar IDs. La currícula de esa superficie se define primero en
+                    <a href="superficies.html">Superficies y planes</a>.
+                  </span>
+                </div>
                 <div class="grid grid-cols-3 gap-3">
                   <div class="field">
                     <label class="label" for="sup">Superficie</label>
-                    <select class="select !h-9 !text-xs" id="sup">
-                      <option selected>BAK · Backoffice</option>
-                      <option>FRT · Front</option>
-                      <option>CRM</option>
-                    </select>
+                    <select class="select !h-9 !text-xs" id="sup" data-sup></select>
                   </div>
                   <div class="field">
                     <label class="label" for="mod">Módulo</label>
-                    <select class="select !h-9 !text-xs" id="mod">
-                      <option selected>BAK-M95 · Receptivo operador</option>
-                      <option>BAK-M35 · reservado (Tráfico)</option>
-                      <option>BAK-M90 · Contable</option>
-                    </select>
+                    <select class="select !h-9 !text-xs" id="mod" data-mod></select>
                   </div>
                   <div class="field">
                     <label class="label" for="desde">Secuencia desde</label>
-                    <input class="input !h-9 font-mono !text-xs" id="desde" type="text" value="010" />
-                    <p class="hint">Se sugiere de 10 en 10.</p>
+                    <input class="input !h-9 font-mono !text-xs" id="desde" type="text" data-desde />
+                    <p class="hint">Se sugiere de 10 en 10, desde la primera libre.</p>
                   </div>
                 </div>
               </section>
@@ -167,7 +169,7 @@
               <section aria-labelledby="filas">
                 <div class="mb-2 flex items-center justify-between">
                   <h2 class="side-title !mb-0" id="filas">Videos del lote</h2>
-                  <button type="button" class="btn btn-bordered btn-sm">
+                  <button type="button" class="btn btn-bordered btn-sm" data-agregar-fila>
                     <span class="icon" data-icon="plus"></span>Agregar fila
                   </button>
                 </div>
@@ -188,55 +190,7 @@
                       <th scope="col" class="w-[40px]"><span class="sr-only">Quitar</span></th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <tr>
-                      <td><label class="sr-only" for="s1">Secuencia fila 1</label><input class="cell-input is-mono" id="s1" value="010" /></td>
-                      <td class="cell-mono">BAK-M95.010</td>
-                      <td><label class="sr-only" for="t1">Título fila 1</label><input class="cell-input" id="t1" value="Tarifario por proveedor: tipo, categoría, vigencia y temporada" /></td>
-                      <td><label class="sr-only" for="p1">Plan fila 1</label><input class="cell-input" id="p1" value="plan B" /></td>
-                      <td><label class="sr-only" for="c1">Cohorte fila 1</label><input class="cell-input is-mono" id="c1" value="C20" /></td>
-                      <td><label class="sr-only" for="r1">Prioridad fila 1</label><input class="cell-input is-mono" id="r1" value="P4" /></td>
-                      <td><button type="button" class="link-quiet" aria-label="Quitar la fila 1"><span class="icon icon-sm" data-icon="x"></span></button></td>
-                    </tr>
-                    <tr>
-                      <td><label class="sr-only" for="s2">Secuencia fila 2</label><input class="cell-input is-mono" id="s2" value="020" /></td>
-                      <td class="cell-mono">BAK-M95.020</td>
-                      <td><label class="sr-only" for="t2">Título fila 2</label><input class="cell-input" id="t2" value="Armar el itinerario con el tarifario" /></td>
-                      <td><label class="sr-only" for="p2">Plan fila 2</label><input class="cell-input" id="p2" value="plan B" /></td>
-                      <td><label class="sr-only" for="c2">Cohorte fila 2</label><input class="cell-input is-mono" id="c2" value="C20" /></td>
-                      <td><label class="sr-only" for="r2">Prioridad fila 2</label><input class="cell-input is-mono" id="r2" value="P4" /></td>
-                      <td><button type="button" class="link-quiet" aria-label="Quitar la fila 2"><span class="icon icon-sm" data-icon="x"></span></button></td>
-                    </tr>
-                    <!-- Validación de secuencia duplicada, en vivo. El motivo va
-                         debajo de la fila, no en un tooltip. -->
-                    <tr data-error="true">
-                      <td><label class="sr-only" for="s3">Secuencia fila 3</label><input class="cell-input is-mono" id="s3" value="020" aria-invalid="true" aria-describedby="err3" /></td>
-                      <td class="cell-mono">BAK-M95.020</td>
-                      <td><label class="sr-only" for="t3">Título fila 3</label><input class="cell-input" id="t3" value="Modelos multidestino: paquetes" /></td>
-                      <td><label class="sr-only" for="p3">Plan fila 3</label><input class="cell-input" id="p3" value="plan B" /></td>
-                      <td><label class="sr-only" for="c3">Cohorte fila 3</label><input class="cell-input is-mono" id="c3" value="C20" /></td>
-                      <td><label class="sr-only" for="r3">Prioridad fila 3</label><input class="cell-input is-mono" id="r3" value="P4" /></td>
-                      <td><button type="button" class="link-quiet" aria-label="Quitar la fila 3"><span class="icon icon-sm" data-icon="x"></span></button></td>
-                    </tr>
-                    <tr data-error="true">
-                      <td colspan="7">
-                        <p class="grid-error" id="err3">
-                          <span class="icon" data-icon="alert-circle"></span>
-                          La secuencia <strong>020</strong> ya está en la fila 2. La sugerencia libre
-                          más cercana es <strong>030</strong>.
-                        </p>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><label class="sr-only" for="s4">Secuencia fila 4</label><input class="cell-input is-mono" id="s4" value="040" /></td>
-                      <td class="cell-mono">BAK-M95.040</td>
-                      <td><label class="sr-only" for="t4">Título fila 4</label><input class="cell-input" id="t4" value="Prestador nacional vs. internacional e impacto impositivo" /></td>
-                      <td><label class="sr-only" for="p4">Plan fila 4</label><input class="cell-input" id="p4" value="plan B" /></td>
-                      <td><label class="sr-only" for="c4">Cohorte fila 4</label><input class="cell-input is-mono" id="c4" value="C20" /></td>
-                      <td><label class="sr-only" for="r4">Prioridad fila 4</label><input class="cell-input is-mono" id="r4" value="P4" /></td>
-                      <td><button type="button" class="link-quiet" aria-label="Quitar la fila 4"><span class="icon icon-sm" data-icon="x"></span></button></td>
-                    </tr>
-                  </tbody>
+                  <tbody data-filas></tbody>
                 </table>
               </section>
             </div>
@@ -247,7 +201,7 @@
               <div class="side-card side-card-strong">
                 <h2 class="side-title">Qué se crea</h2>
                 <ul class="flex flex-col gap-2 text-xs text-gray-700">
-                  <li><strong>4 IDs permanentes</strong>, todos en <span class="chip chip-backlog">backlog</span>.</li>
+                  <li><strong data-resumen>IDs permanentes</strong>, todos en <span class="chip chip-backlog">backlog</span>.</li>
                   <li><strong>Sin link y sin versión.</strong> El link de YouTube se carga recién al publicar: acá se reserva el lugar, no se sube nada.</li>
                   <li>El ID queda fijo para siempre, aunque el video se regrabe.</li>
                 </ul>
@@ -267,13 +221,12 @@
                 </p>
               </div>
 
+              <!-- Los tres números se derivan de las filas. Antes estaban
+                   escritos a mano y podían contradecir a «Qué se crea», que sí
+                   se calculaba. -->
               <div class="side-card">
                 <h2 class="side-title">Estado del lote</h2>
-                <dl class="flex flex-col gap-2 text-xs">
-                  <div class="meter-row"><dt>Filas</dt><dd class="meter-value">4</dd></div>
-                  <div class="meter-row"><dt>Listas</dt><dd class="meter-value" data-ok="true">3</dd></div>
-                  <div class="meter-row"><dt>Con error</dt><dd class="meter-value" data-ok="false">1</dd></div>
-                </dl>
+                <dl class="flex flex-col gap-2 text-xs" data-lote></dl>
               </div>
             </aside>
           </div>
@@ -282,6 +235,333 @@
     </div>
 
     <script src="assets/js/icons.js"></script>
+    <script src="assets/js/academia-data.js"></script>
+    <script src="assets/js/academia-agencias.js"></script>
+    <script src="assets/js/academia-guiones.js"></script>
+    <script src="assets/js/academia-preguntas.js"></script>
+    <script src="assets/js/academia-sim.js"></script>
+    <script src="assets/js/render.js"></script>
     <script src="assets/js/ui.js"></script>
+    <script>
+      /* Alta masiva · reserva de IDs. R11: los videos nacen en `backlog`, SIN
+         link y sin versión. Son IDs reservados, y es el mecanismo que permite
+         que el mapa mire hacia adelante — incluidos los módulos cuyo producto
+         todavía está en desarrollo.
+
+         La secuencia sugerida y la validación de duplicado salen del dataset.
+         Antes estaban escritas a mano y proponían `010` para BAK-M95, cuando ese
+         ID ya existe: el formulario ofrecía reservar algo que estaba tomado. */
+      (function () {
+        "use strict";
+        const S = window.SIM;
+        const R = window.RENDER;
+        const PASO = 10;
+        const FILAS = 4;
+
+        R.pintar("[data-sup]", S.superficies.map(function (x, i) {
+          return "<option" + (i === 0 ? " selected" : "") + ">" + x.codigo + " · " +
+            R.esc(x.nombre) + "</option>";
+        }).join(""));
+
+        /* Se puede llegar desde el detalle de un módulo, que ya sabe cuál es.
+           La Ruta no lleva videos propios: los referencia (R8). */
+        const mPedido = (S.param("m") || "").toUpperCase();
+        const candidatos = S.modulos.filter(function (m) { return m.tipo !== "ruta"; });
+        const inicial = candidatos.some(function (m) { return String(m.numero) === mPedido; })
+          ? mPedido : String(candidatos[0].numero);
+
+        R.pintar("[data-mod]", candidatos.map(function (m) {
+          return '<option value="' + m.numero + '"' +
+            (String(m.numero) === inicial ? " selected" : "") + ">" +
+            m.codigo + " · " + R.esc(m.titulo) + "</option>";
+        }).join(""));
+
+        const selSup = document.querySelector("[data-sup]");
+        const selMod = document.querySelector("[data-mod]");
+        const inpDesde = document.querySelector("[data-desde]");
+        function tres(n) { return String(n).padStart(3, "0"); }
+        function numero() { return selMod.value === "R01" ? "R01" : Number(selMod.value); }
+
+        /* Las secuencias ya tomadas del módulo. Es lo que hace real la
+           validación: `020` es duplicado porque BAK-M95.020 existe, no porque
+           esté escrito que lo sea. */
+        function ocupadas(n) {
+          return S.videosDe(n).map(function (v) { return v.secuencia; }).sort(function (a, b) { return a - b; });
+        }
+        function primeraLibre(n) {
+          const usadas = ocupadas(n);
+          let x = PASO;
+          while (usadas.indexOf(x) !== -1) x += PASO;
+          return x;
+        }
+
+        /* El lote es un ARRAY, no cuatro filas dibujadas. Es lo que permite
+           agregar, quitar y editar sin que los números del aside dejen de
+           corresponder: todos se derivan de acá. */
+        let lote = [];
+
+        function semilla() {
+          const n = numero();
+          const desde = Number(inpDesde.value) || primeraLibre(n);
+          const usadas = ocupadas(n);
+          /* La última fila propone a propósito una secuencia YA OCUPADA, para que
+             el error de duplicado se vea sin tener que provocarlo. Un módulo sin
+             ninguna ocupada no tiene error que mostrar. */
+          const choque = usadas.length ? usadas[usadas.length - 1] : null;
+          lote = [];
+          for (let i = 0; i < FILAS; i++) {
+            const ultima = i === FILAS - 1;
+            lote.push(fila(ultima && choque ? choque : desde + i * PASO));
+          }
+        }
+
+        function fila(seq) {
+          const modulo = S.modulo(numero());
+          return {
+            secuencia: seq,
+            titulo: "",
+            planes: (modulo.planes || []).join(" · "),
+            cohorte: "",
+            prioridad: "",
+          };
+        }
+
+        /* El estado de una fila, derivado. `duplicada` es un error duro —el ID
+           es permanente y no se puede reasignar—; `sinTitulo` es una fila que
+           todavía no se terminó de cargar. Son cosas distintas y se cuentan
+           aparte: mezclarlas diría que falta corregir algo cuando falta escribir. */
+        function estadoFila(f, n, usadas) {
+          const dup = usadas.indexOf(f.secuencia) !== -1;
+          /* Dos filas del mismo lote tampoco pueden pedir la misma secuencia. */
+          const repetidaEnLote = lote.filter(function (x) {
+            return x.secuencia === f.secuencia;
+          }).length > 1;
+          return {
+            duplicada: dup || repetidaEnLote,
+            enElLote: !dup && repetidaEnLote,
+            sinTitulo: !f.titulo.trim(),
+          };
+        }
+
+        function pintar() {
+          const n = numero();
+          const modulo = S.modulo(n);
+          if (!modulo) return;
+          const usadas = ocupadas(n);
+
+          const filas = [];
+          let listas = 0, conError = 0, sinTitulo = 0;
+
+          lote.forEach(function (f, i) {
+            const st = estadoFila(f, n, usadas);
+            if (st.duplicada) conError++;
+            else if (st.sinTitulo) sinTitulo++;
+            else listas++;
+
+            const idx = i + 1;
+            const id = modulo.codigo + "." + tres(f.secuencia);
+            filas.push(
+              '<tr data-fila="' + i + '"' + (st.duplicada ? ' data-error="true"' : "") + ">" +
+              '<td><label class="sr-only" for="s' + idx + '">Secuencia fila ' + idx + "</label>" +
+              '<input class="cell-input is-mono" id="s' + idx + '" data-campo="secuencia" value="' +
+                tres(f.secuencia) + '"' +
+              (st.duplicada ? ' aria-invalid="true" aria-describedby="err' + idx + '"' : "") + " /></td>" +
+              '<td class="cell-mono">' + id + "</td>" +
+              '<td><label class="sr-only" for="t' + idx + '">Título fila ' + idx + "</label>" +
+              '<input class="cell-input" id="t' + idx + '" data-campo="titulo" value="' +
+                R.esc(f.titulo) + '" placeholder="título del video" /></td>' +
+              '<td><label class="sr-only" for="p' + idx + '">Plan fila ' + idx + "</label>" +
+              '<input class="cell-input" id="p' + idx + '" data-campo="planes" value="' +
+                R.esc(f.planes) + '" /></td>' +
+              '<td><label class="sr-only" for="c' + idx + '">Cohorte fila ' + idx + "</label>" +
+              '<input class="cell-input is-mono" id="c' + idx + '" data-campo="cohorte" value="' +
+                R.esc(f.cohorte) + '" placeholder="C__" /></td>' +
+              '<td><label class="sr-only" for="r' + idx + '">Prioridad fila ' + idx + "</label>" +
+              '<input class="cell-input is-mono" id="r' + idx + '" data-campo="prioridad" value="' +
+                R.esc(f.prioridad) + '" placeholder="P_" /></td>' +
+              '<td><button type="button" class="link-quiet" data-quitar="' + i +
+                '" aria-label="Quitar la fila ' + idx + '">' +
+              '<span class="icon icon-sm" data-icon="x"></span></button></td></tr>');
+
+            if (st.duplicada) {
+              /* El motivo va DEBAJO de la fila, no en un tooltip: hay que poder
+                 leerlo sin apuntar con el mouse. */
+              const dueno = S.videosDe(n).filter(function (v) { return v.secuencia === f.secuencia; })[0];
+              filas.push(
+                '<tr data-error="true"><td colspan="7">' +
+                '<p class="grid-error" id="err' + idx + '">' +
+                '<span class="icon" data-icon="alert-circle"></span>' +
+                "<span>La secuencia <strong>" + tres(f.secuencia) + "</strong> ya está tomada" +
+                (st.enElLote
+                  ? " por otra fila de este mismo lote."
+                  : ": <span class=\"font-mono\">" + id + "</span> es «" +
+                    R.esc(dueno ? dueno.titulo : "") + "»") +
+                " El ID es permanente, así que no se puede reasignar.</span></p></td></tr>");
+            }
+          });
+          R.pintar("[data-filas]", filas.join(""));
+
+          /* ── Los números del aside, todos derivados ───────────────────── */
+          R.pintar("[data-lote]",
+            medidor("Filas", lote.length) +
+            medidor("Listas", listas, listas > 0) +
+            medidor("Con error", conError, conError === 0) +
+            medidor("Falta el título", sinTitulo, sinTitulo === 0));
+
+          document.querySelectorAll("[data-reservar]").forEach(function (b) {
+            b.textContent = listas
+              ? "Reservar " + listas + (listas === 1 ? " ID" : " IDs")
+              : "Reservar IDs";
+            b.disabled = listas === 0;
+            /* Un botón deshabilitado sin motivo se lee como roto. */
+            b.title = listas ? "" : conError && !sinTitulo
+              ? "Corregí las secuencias duplicadas."
+              : "Completá el título de al menos una fila.";
+          });
+          document.querySelectorAll("[data-resumen]").forEach(function (el) {
+            el.textContent = listas + (listas === 1 ? " ID permanente" : " IDs permanentes");
+          });
+
+          cablearFilas();
+        }
+
+        function medidor(dt, dd, ok) {
+          return '<div class="meter-row"><dt>' + dt + '</dt><dd class="meter-value"' +
+            (ok === undefined ? "" : ' data-ok="' + ok + '"') + ">" + dd + "</dd></div>";
+        }
+
+        /* Al tipear se actualiza el MODELO y se repintan solo los derivados. La
+           fila no se vuelve a dibujar salvo que cambie la secuencia, que es lo
+           único que altera el ID y la validación: repintar en cada tecla haría
+           perder el foco a mitad de una palabra. */
+        function cablearFilas() {
+          document.querySelectorAll("[data-fila] [data-campo]").forEach(function (input) {
+            const i = Number(input.closest("[data-fila]").dataset.fila);
+            const campo = input.dataset.campo;
+            input.addEventListener("input", function () {
+              if (campo === "secuencia") return; /* se valida al salir del campo */
+              lote[i][campo] = input.value;
+              input.setAttribute("value", input.value);
+              refrescarContadores();
+            });
+            input.addEventListener("change", function () {
+              if (campo !== "secuencia") return;
+              const v = parseInt(input.value, 10);
+              lote[i].secuencia = isNaN(v) ? 0 : v;
+              pintar();
+            });
+          });
+          document.querySelectorAll("[data-quitar]").forEach(function (b) {
+            b.addEventListener("click", function () {
+              lote.splice(Number(b.dataset.quitar), 1);
+              pintar();
+            });
+          });
+        }
+
+        /* Solo los números, sin tocar los `<input>`: es lo que permite que el
+           aside acompañe lo que se está escribiendo sin robar el foco. */
+        function refrescarContadores() {
+          const n = numero();
+          const usadas = ocupadas(n);
+          let listas = 0, conError = 0, sinTitulo = 0;
+          lote.forEach(function (f) {
+            const st = estadoFila(f, n, usadas);
+            if (st.duplicada) conError++;
+            else if (st.sinTitulo) sinTitulo++;
+            else listas++;
+          });
+          R.pintar("[data-lote]",
+            medidor("Filas", lote.length) +
+            medidor("Listas", listas, listas > 0) +
+            medidor("Con error", conError, conError === 0) +
+            medidor("Falta el título", sinTitulo, sinTitulo === 0));
+          document.querySelectorAll("[data-reservar]").forEach(function (b) {
+            b.textContent = listas
+              ? "Reservar " + listas + (listas === 1 ? " ID" : " IDs")
+              : "Reservar IDs";
+            b.disabled = listas === 0;
+          });
+          document.querySelectorAll("[data-resumen]").forEach(function (el) {
+            el.textContent = listas + (listas === 1 ? " ID permanente" : " IDs permanentes");
+          });
+        }
+
+        /* Se escribe el atributo `value` y no solo la propiedad: con `.value` el
+           campo se ve lleno pero el documento sale vacío, y el prototipo tiene
+           que poder inspeccionarse. */
+        function sugerir() {
+          const v = tres(primeraLibre(numero()));
+          inpDesde.value = v;
+          inpDesde.setAttribute("value", v);
+        }
+
+        function rehacer() { sugerir(); semilla(); pintar(); }
+        rehacer();
+
+        selMod.addEventListener("change", rehacer);
+        /* La superficie también recompone el lote: solo BAK tiene módulos
+           mapeados, así que elegir otra cambia qué IDs se pueden reservar.
+           Antes no tenía `change` y elegir FRT no alteraba nada. */
+        selSup.addEventListener("change", function () {
+          const cod = selSup.value.slice(0, 3);
+          const sinMapear = document.querySelector("[data-sup-aviso]");
+          sinMapear.hidden = cod === "BAK";
+          document.querySelector("[data-sup-codigo]").textContent = cod;
+          selMod.disabled = cod !== "BAK";
+          document.querySelectorAll("[data-reservar]").forEach(function (b) {
+            if (cod !== "BAK") b.disabled = true;
+          });
+          if (cod === "BAK") rehacer();
+        });
+        inpDesde.addEventListener("change", function () { semilla(); pintar(); });
+
+        document.querySelector("[data-agregar-fila]").addEventListener("click", function () {
+          const usadas = ocupadas(numero()).concat(lote.map(function (f) { return f.secuencia; }));
+          let seq = lote.length ? Math.max.apply(null, lote.map(function (f) { return f.secuencia; })) + PASO : PASO;
+          while (usadas.indexOf(seq) !== -1) seq += PASO;
+          lote.push(fila(seq));
+          pintar();
+        });
+
+        /* ── Reservar ──────────────────────────────────────────────────────
+           Crea los IDs en el overlay de la escena activa. R11: nacen en
+           `backlog`, sin link y sin versión — `crear()` les pone `hitos: {}`,
+           que es exactamente eso.
+
+           Solo se crean las filas LISTAS. Las que tienen error se quedan en
+           pantalla: descartarlas en silencio haría perder lo que se escribió. */
+        document.querySelectorAll("[data-reservar]").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            const n = numero();
+            const modulo = S.modulo(n);
+            const usadas = ocupadas(n);
+            const listas = lote.filter(function (f) {
+              const st = estadoFila(f, n, usadas);
+              return !st.duplicada && !st.sinTitulo;
+            });
+            if (!listas.length) return;
+
+            listas.forEach(function (f) {
+              S.crear("videos", {
+                codigoModulo: modulo.codigo,
+                seccion: (modulo.secciones[0] || {}).titulo || "",
+                secuencia: f.secuencia,
+                titulo: f.titulo.trim(),
+                cohorte: f.cohorte.trim() || null,
+                duracion: null,
+                planes: f.planes.trim() ? f.planes.split("·").map(function (x) { return x.trim(); }) : null,
+              });
+            });
+
+            /* Se navega a la biblioteca: es donde los IDs recién reservados se
+               ven junto al resto, que es la confirmación real de que quedaron
+               creados. Un cartel de «listo» diría lo mismo sin probarlo. */
+            const e = S.escena;
+            window.location.href = "videos.html" + (e === "E5" ? "" : "?escena=" + e);
+          });
+        });
+      })();
+    </script>
   </body>
 </html>
