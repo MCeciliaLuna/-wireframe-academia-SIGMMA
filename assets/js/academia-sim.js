@@ -197,8 +197,28 @@ window.SIM = (function () {
       videos: n.videos || [],
       preguntas: n.preguntas || [],
       superficies: n.superficies || [],
+      cohortes: n.cohortes || [],
     };
   })();
+
+  /* Los cohortes creados también se materializan. Sin esto, `crear("cohortes")`
+     persiste en el overlay y no aparece en ninguna parte —el catálogo seguía
+     siendo `D.cohortes` a secas—, con lo cual el importador podía prometer que
+     creaba C01 a C20 y no crear ninguno. */
+  const todosLosCohortes = (function () {
+    const base = D.cohortes.slice();
+    const vistos = {};
+    base.forEach(function (c) { vistos[c.id] = true; });
+    nuevos.cohortes.forEach(function (c) {
+      if (!c || !c.id || vistos[c.id]) return;
+      vistos[c.id] = true;
+      base.push(Object.assign({}, c, { creadoEnOverlay: true }));
+    });
+    return base;
+  })();
+  function catalogoCohortes() {
+    return ignorarOverlay ? D.cohortes : todosLosCohortes;
+  }
 
   const modulos = (function () {
     /* Clon de un nivel por módulo, más un array de secciones propio: alcanza
@@ -222,9 +242,11 @@ window.SIM = (function () {
       const m = porCodigo[s.codigoModulo];
       if (!m) return;
       if (m.secciones.some(function (x) { return x.titulo === s.titulo; })) return;
-      m.secciones.push({
-        orden: s.orden, titulo: s.titulo, videos: [], creadoEnOverlay: true,
-      });
+      /* Copia por `Object.assign`, igual que los módulos y los videos: un
+         literal a mano descartaba en silencio todo campo que la entidad trajera
+         encima —el sello de importación, sin ir más lejos—, y la sección
+         quedaba indistinguible de las demás. */
+      m.secciones.push(Object.assign({}, s, { videos: [], creadoEnOverlay: true }));
     });
 
     nuevos.videos.forEach(function (v) {
@@ -272,7 +294,7 @@ window.SIM = (function () {
     m.secciones.forEach(function (s) {
       s.videos.forEach(function (v) {
         const id = m.codigo + "." + String(v.secuencia).padStart(3, "0");
-        const cohorte = D.cohortes.filter(function (c) { return c.id === v.cohorte; })[0] || null;
+        const cohorte = todosLosCohortes.filter(function (c) { return c.id === v.cohorte; })[0] || null;
         const reg = Object.assign({}, v, {
           id: id,
           modulo: m.numero,
@@ -345,7 +367,7 @@ window.SIM = (function () {
        prioridad tiene que seguirlo, o el tablero mostraría un video en P1
        grabándose con una tanda P3. */
     if (editado.cohorte) {
-      const c = D.cohortes.filter(function (x) { return x.id === editado.cohorte; })[0];
+      const c = catalogoCohortes().filter(function (x) { return x.id === editado.cohorte; })[0];
       editado.prioridad = c ? c.prioridad : null;
     }
     return Object.assign({}, video, editado, {
@@ -788,7 +810,7 @@ window.SIM = (function () {
       if (cohortes.indexOf(video.cohorte) === -1) return;
       const dentro = videosDeRuta(ruta);
       const pos = dentro.map(function (x) { return x.id; }).indexOf(video.id) + 1;
-      const cohorte = D.cohortes.filter(function (c) { return c.id === video.cohorte; })[0];
+      const cohorte = catalogoCohortes().filter(function (c) { return c.id === video.cohorte; })[0];
       salida.push({
         etiqueta: ruta.codigo + " · " + ruta.titulo + " · " + (cohorte ? cohorte.nombre : video.cohorte),
         orden: pos + " de " + dentro.length,
@@ -848,7 +870,7 @@ window.SIM = (function () {
     const esc = escenaId || escena;
     const hermanos = videos.filter(function (v) { return v.cohorte === video.cohorte; });
     const i = hermanos.map(function (v) { return v.id; }).indexOf(video.id);
-    const cohorte = D.cohortes.filter(function (c) { return c.id === video.cohorte; })[0] || null;
+    const cohorte = catalogoCohortes().filter(function (c) { return c.id === video.cohorte; })[0] || null;
     return {
       cohorte: cohorte,
       posicion: i + 1,
@@ -976,7 +998,7 @@ window.SIM = (function () {
 
   function cohortesConAvance(escenaId) {
     const esc = escenaId || escena;
-    return D.cohortes.map(function (c) {
+    return catalogoCohortes().map(function (c) {
       const vs = videos.filter(function (v) { return v.cohorte === c.id; })
         .map(function (v) { return conEstado(v, esc); });
       const alcanzo = function (estado) {
@@ -1466,6 +1488,39 @@ window.SIM = (function () {
     chequeo("La cola no lista videos que no llegaron a publicado",
       colaMal.length === 0, colaMal.slice(0, 3).join(", "));
 
+    /* -- Ida y vuelta de la plantilla ---------------------------------------
+       Solo corre donde `academia-import.js` está cargado: el motor no depende
+       del importador, es al revés.
+
+       NO prueba que se creen los 55. En el prototipo los 55 existen en todas las
+       escenas —la escena cambia el estado, no la existencia—, así que importar
+       el mapa completo los OMITE, que es el alta incremental funcionando y se
+       verifica en el navegador.
+
+       Prueba que las seis columnas ALCANCEN: que lo emitido se relea sin un solo
+       error y reconstruya módulo, sección, título y cohorte de cada video. Si el
+       formato perdiera un dato, se vería acá y no después de importar. */
+    const IMP = typeof window !== "undefined" ? window.IMPORT : null;
+    if (IMP) {
+      const hojas = IMP.plantilla();
+      const relectura = IMP.leer(IMP.aTexto(hojas.videos), IMP.aTexto(hojas.cohortes));
+      chequeo("Ida y vuelta · la plantilla emitida se relee sin errores",
+        relectura.errores.length === 0 && relectura.leidas.videos === hojas.videos.filas.length,
+        relectura.errores.length + " errores sobre " + relectura.leidas.videos + " filas");
+
+      const infieles = [];
+      IMP.parsearCSV(IMP.aTexto(hojas.videos)).slice(1).forEach(function (f) {
+        const v = porId[f[0]];
+        if (!v) return infieles.push(f[0] + " · no está en el dataset");
+        if (f[1] !== v.tituloModulo) infieles.push(f[0] + " · módulo");
+        if (f[2] !== v.seccion) infieles.push(f[0] + " · sección");
+        if (f[3] !== v.titulo) infieles.push(f[0] + " · título");
+        if (f[5] !== v.cohorte) infieles.push(f[0] + " · cohorte");
+      });
+      chequeo("Ida y vuelta · la plantilla reconstruye la jerarquía del dataset",
+        infieles.length === 0, infieles.slice(0, 3).join(", "));
+    }
+
     /* -- Integridad de lo creado en el overlay ------------------------------
        Estos controles sí miran la sesión: son lo único que puede detectar un
        alta mal formada, y una entidad rota se ve igual que una sana hasta que
@@ -1538,7 +1593,7 @@ window.SIM = (function () {
     /* Catálogo */
     modulos: modulos,
     modulo: function (numero) { return modulosPorNumero[numero] || null; },
-    cohortes: D.cohortes,
+    cohortes: todosLosCohortes,
     superficies: D.superficies.concat(nuevos.superficies),
     planes: D.planes,
     evaluacion: D.evaluacion,

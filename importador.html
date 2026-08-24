@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Importar el mapa de contenido · Backoffice Academia SIGMMA</title>
-    <meta name="description" content="Asistente de carga inicial: origen, mapeo de columnas, validación y confirmación." />
+    <meta name="description" content="Carga del mapa de contenido: plantilla, planilla y revisión de lo que se va a crear." />
     <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
     <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
     <link rel="stylesheet" href="assets/css/academia.css" />
@@ -134,319 +134,222 @@
                también después, para sumar un lote. -->
           <ol class="wizard" aria-label="Pasos de la importación">
             <li class="wizard-step" data-paso="1">
-              <span class="wizard-num">1</span><span><b>Origen</b>El archivo del tablero</span>
+              <span class="wizard-num">1</span><span><b>Traer el mapa</b>Plantilla y planilla</span>
             </li>
             <li class="wizard-step" data-paso="2">
-              <span class="wizard-num">2</span><span><b>Mapeo</b>Columna → campo</span>
-            </li>
-            <li class="wizard-step" data-paso="3">
-              <span class="wizard-num">3</span><span><b>Validación</b>Qué entra y qué no</span>
-            </li>
-            <li class="wizard-step" data-paso="4">
-              <span class="wizard-num">4</span><span><b>Confirmación</b>Qué se va a crear</span>
+              <span class="wizard-num">2</span><span><b>Revisar</b>Qué se crea y qué no</span>
             </li>
           </ol>
 
-          <!-- ═══════════════ PASO 1 · ORIGEN ═══════════════ -->
+          <!-- ═══════════════ PASO 1 · TRAER EL MAPA ═══════════════
+               «Descargar la plantilla» va PRIMERO, antes que cualquier campo: la
+               planilla maestra no existe todavía, así que lo primero que necesita
+               quien llega es la planilla, no un lugar donde subirla. -->
           <section data-panel-paso="1" aria-labelledby="p1" class="contents">
             <div class="grid grid-cols-[1fr_380px] items-start gap-[18px]">
               <div class="flex flex-col gap-4">
-                <h2 class="side-title !mb-0" id="p1">De dónde viene el mapa</h2>
+                <h2 class="side-title !mb-0" id="p1">Traer el mapa</h2>
 
-                <!-- OJO: esto NO es carga de video (R1). Es el CSV del tablero de
-                     Sheets, que hoy es la fuente de verdad del mapa. -->
-                <div class="dropzone-csv">
-                  <span class="icon" data-icon="grid"></span>
-                  <p class="text-sm font-bold text-gray-800">Arrastrá el CSV del tablero de producción</p>
-                  <p class="text-xs text-ink-soft">o <a href="importador.html?paso=2">elegí un archivo</a> — hasta 5 MB</p>
-                  <p class="mt-2 text-2xs text-gray-600">
-                    Es el export del Google Sheets que hoy usa Majo. No se suben videos: el mapa son
-                    IDs, no archivos.
+                <div class="side-card side-card-strong">
+                  <h3 class="side-title">¿Todavía no tenés la planilla?</h3>
+                  <p class="mb-3 text-xs text-gray-700">
+                    El sistema la emite completa: los videos del mapa con su ID, módulo, título,
+                    tag de plan y cohorte ya cargados. La columna <b>sección</b> viaja con la
+                    agrupación que propone el sistema, para <b>validarla</b> en vez de escribirla
+                    desde cero.
+                  </p>
+                  <div class="flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-primary btn-sm" data-plantilla>
+                      <span class="icon" data-icon="download"></span>Descargar la plantilla
+                    </button>
+                    <button type="button" class="btn btn-bordered btn-sm" data-plantilla-vacia>
+                      <span class="icon" data-icon="download"></span>Sin la columna sección
+                    </button>
+                  </div>
+                  <p class="foot-note">
+                    Son dos archivos: <span class="font-mono">mapa-videos</span> y
+                    <span class="font-mono">plan-cohortes</span>.
                   </p>
                 </div>
 
+                <!-- OJO: esto NO es carga de video (R1). Es la planilla del mapa:
+                     IDs, no archivos. Nunca un dropzone de video. -->
                 <div class="field">
-                  <label class="label" for="pegar">O pegar el contenido</label>
-                  <textarea class="textarea !text-xs font-mono" id="pegar" rows="5" placeholder="ID,superficie,modulo,tag de plan,cohorte,prioridad,estado,version video,version producto,fecha,impacta a
-BAK-M00.010,BAK,M00,P+B,C01,P1,backlog,,,,"></textarea>
-                  <p class="hint">Con encabezado en la primera fila. Separador coma o punto y coma.</p>
+                  <label class="label" for="arch-videos">Mapa de videos</label>
+                  <input class="input !h-9 !text-xs" id="arch-videos" type="file" accept=".csv,.tsv,.txt" data-arch="videos" />
+                  <p class="hint">O pegalo abajo. Encabezado en la primera fila; separador coma, punto y coma o tabulador.</p>
+                  <label class="sr-only" for="pegar-videos">Pegar el mapa de videos</label>
+                  <textarea class="textarea mt-2 font-mono !text-xs" id="pegar-videos" rows="5" data-pegar="videos" placeholder="id;modulo;seccion;titulo;plan;cohorte"></textarea>
+                </div>
+
+                <div class="field">
+                  <label class="label" for="arch-cohortes">Plan de cohortes</label>
+                  <input class="input !h-9 !text-xs" id="arch-cohortes" type="file" accept=".csv,.tsv,.txt" data-arch="cohortes" />
+                  <p class="hint">
+                    Obligatorio la primera vez: sin cohorte no hay prioridad Pareto, y sin prioridad
+                    el tablero no tiene orden.
+                  </p>
+                  <label class="sr-only" for="pegar-cohortes">Pegar el plan de cohortes</label>
+                  <textarea class="textarea mt-2 font-mono !text-xs" id="pegar-cohortes" rows="3" data-pegar="cohortes" placeholder="cohorte;nombre;prioridad;escenario"></textarea>
                 </div>
               </div>
 
               <aside class="side-card side-card-strong">
-                <h2 class="side-title">Columnas que se esperan</h2>
+                <h2 class="side-title">Las seis columnas</h2>
                 <p class="mb-3 text-xs text-gray-700">
-                  Son las del tablero actual. Si alguna falta o se llama distinto, se corrige en el
-                  paso siguiente.
+                  Cinco ya están escritas en el mapa de contenido. La única que hay que producir es
+                  <b>sección</b>.
                 </p>
                 <ul class="flex flex-col gap-1 font-mono text-2xs text-gray-700">
-                  <li>ID</li><li>superficie</li><li>módulo</li><li>tag de plan</li>
-                  <li>cohorte</li><li>prioridad</li><li>estado</li><li>versión video</li>
-                  <li>versión producto</li><li>fecha</li><li>impacta a</li>
+                  <li>id</li><li>modulo</li><li>seccion</li>
+                  <li>titulo</li><li>plan</li><li>cohorte</li>
                 </ul>
                 <p class="foot-note">
-                  <strong>No hay columna de link.</strong> Los videos nacen como IDs reservados: el
-                  link de YouTube se carga recién al publicar.
+                  <strong>No se piden</strong> superficie, número de módulo, secuencia, orden ni
+                  prioridad: se deducen del ID y del cohorte. Pedirlos sería invitar a que se
+                  contradigan.
+                </p>
+                <p class="foot-note">
+                  <strong>Tampoco hay columna de link.</strong> Los videos nacen como IDs
+                  reservados, en backlog: el link de YouTube se carga recién al publicar.
+                </p>
+                <p class="foot-note">
+                  <strong>Las preguntas no se importan nunca.</strong> Se escriben después de grabar
+                  cada video, para que usen su mismo lenguaje y su mismo ejemplo.
                 </p>
               </aside>
             </div>
 
             <div class="flex justify-end gap-2">
-              <a href="importador.html?paso=2" class="btn btn-primary btn-sm">
-                Continuar al mapeo <span class="icon" data-icon="arrow-right"></span>
-              </a>
+              <button type="button" class="btn btn-primary btn-sm" data-revisar disabled>
+                Revisar lo que se va a crear <span class="icon" data-icon="arrow-right"></span>
+              </button>
             </div>
           </section>
 
-          <!-- ═══════════════ PASO 2 · MAPEO ═══════════════ -->
+          <!-- ═══════════════ PASO 2 · REVISAR ═══════════════
+               Validación y previsualización JUNTAS. Estaban separadas porque el
+               mapeo de columnas podía estar mal; con formato fijo, la validación
+               ES la previsualización. Verlas juntas arregla lo que molestaba:
+               antes se veían los errores sin su consecuencia, y la consecuencia
+               sin los errores a la vista. -->
           <section data-panel-paso="2" aria-labelledby="p2" class="contents">
             <div>
-              <h2 class="side-title" id="p2">Mapeo de columnas</h2>
-              <p class="mb-3 max-w-[76ch] text-xs text-gray-700">
-                Se detectaron <strong>11 columnas</strong> en
-                <span class="font-mono">tablero-produccion.csv</span> y
-                <strong>10 se reconocieron solas</strong> por el nombre. Revisá la que quedó sugerida.
-              </p>
-              <table class="table-dense">
-                <caption class="sr-only">
-                  Correspondencia entre las columnas del archivo de origen y los campos del sistema.
-                </caption>
-                <thead>
-                  <tr>
-                    <th scope="col" class="w-[190px]">Columna del origen</th>
-                    <th scope="col" class="w-[210px]">Primer valor</th>
-                    <th scope="col">Campo del sistema</th>
-                    <th scope="col" class="w-[130px]">Detección</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr><td class="cell-mono">ID</td><td class="cell-mono">BAK-M00.010</td><td>ID permanente</td><td><span class="chip chip-publicado">automática</span></td></tr>
-                  <tr><td class="cell-mono">superficie</td><td class="cell-mono">BAK</td><td>Superficie</td><td><span class="chip chip-publicado">automática</span></td></tr>
-                  <tr><td class="cell-mono">módulo</td><td class="cell-mono">M00</td><td>Módulo</td><td><span class="chip chip-publicado">automática</span></td></tr>
-                  <tr><td class="cell-mono">tag de plan</td><td class="cell-mono">P+B</td><td>Tag de plan</td><td><span class="chip chip-publicado">automática</span></td></tr>
-                  <tr><td class="cell-mono">cohorte</td><td class="cell-mono">C01</td><td>Cohorte</td><td><span class="chip chip-publicado">automática</span></td></tr>
-                  <tr><td class="cell-mono">prioridad</td><td class="cell-mono">P1</td><td>Prioridad Pareto</td><td><span class="chip chip-publicado">automática</span></td></tr>
-                  <tr><td class="cell-mono">estado</td><td class="cell-mono">backlog</td><td>Estado de producción</td><td><span class="chip chip-publicado">automática</span></td></tr>
-                  <tr><td class="cell-mono">versión video</td><td class="text-gray-600">(vacía)</td><td>Versión</td><td><span class="chip chip-publicado">automática</span></td></tr>
-                  <tr><td class="cell-mono">versión producto</td><td class="text-gray-600">(vacía)</td><td>Versión de producto</td><td><span class="chip chip-publicado">automática</span></td></tr>
-                  <tr><td class="cell-mono">fecha</td><td class="text-gray-600">(vacía)</td><td>Fecha</td><td><span class="chip chip-publicado">automática</span></td></tr>
-                  <tr data-selected="true">
-                    <td class="cell-mono">impacta a</td>
-                    <td class="text-gray-600">(vacía)</td>
-                    <td>
-                      <label class="sr-only" for="map-impacta">Campo del sistema para «impacta a»</label>
-                      <select class="select !h-8 !text-xs" id="map-impacta">
-                        <option selected>Afectado por (versión de producto)</option>
-                        <option>Tag de plan</option>
-                        <option>— no importar esta columna —</option>
-                      </select>
-                    </td>
-                    <td><span class="chip chip-editado">sugerida</span></td>
-                  </tr>
-                </tbody>
-              </table>
-              <p class="mt-3 text-xs text-ink-soft">
-                «impacta a» no coincide con ningún nombre de campo, así que se sugirió por el
-                contenido. Es la única que hay que confirmar a mano.
-              </p>
-            </div>
-
-            <div class="flex justify-between gap-2">
-              <a href="importador.html?paso=1" class="btn btn-bordered btn-sm">
-                <span class="icon" data-icon="arrow-left"></span>Volver
-              </a>
-              <a href="importador.html?paso=3" class="btn btn-primary btn-sm">
-                Validar las <span data-n-leidas></span> filas <span class="icon" data-icon="arrow-right"></span>
-              </a>
-            </div>
-          </section>
-
-          <!-- ═══════════════ PASO 3 · VALIDACIÓN ═══════════════
-               Es el paso más importante de los cuatro: sin la pantalla de errores
-               el importador no sirve. Cada error dice su motivo y su fila. -->
-          <section data-panel-paso="3" aria-labelledby="p3" class="contents">
-            <div>
-              <h2 class="side-title" id="p3">Validación · <span data-n-leidas></span> filas leídas</h2>
+              <h2 class="side-title" id="p2">Revisar · <span data-n-leidas></span> filas leídas</h2>
+              <!-- R4 aplicado al import: los contadores se ven durante toda la
+                   revisión, no aparecen como error al final. -->
               <div class="flex gap-3">
-                <div class="metric-tile"><span class="metric-label">Listas para importar</span><p class="metric-value" data-n-videos></p></div>
-                <div class="metric-tile"><span class="metric-label">Con error</span><p class="metric-value" data-tone="alerta">2</p></div>
-                <div class="metric-tile"><span class="metric-label">A saltear</span><p class="metric-value">1</p></div>
+                <div class="metric-tile"><span class="metric-label">Se va a crear</span><p class="metric-value" data-n-crear></p></div>
+                <div class="metric-tile"><span class="metric-label">Se va a omitir</span><p class="metric-value" data-n-omitir></p></div>
+                <div class="metric-tile"><span class="metric-label">No se puede leer</span><p class="metric-value" data-tone="alerta" data-n-errores></p></div>
               </div>
             </div>
 
-            <div class="validation-group" data-tono="error">
-              <div class="validation-head">
-                <span class="icon" data-icon="alert-triangle"></span>2 filas con error — no se van a importar
-              </div>
-              <div class="validation-row">
-                <span class="validation-fila">fila 34</span>
-                <span class="font-mono">BAK-M4O.010</span>
-                <span class="text-gray-700">Cobranzas / Recibos</span>
-                <span class="validation-motivo">ID mal formado: «M4O» lleva la letra O en vez de un cero</span>
-              </div>
-              <div class="validation-row">
-                <span class="validation-fila">fila 47</span>
-                <span class="font-mono">BAK-M70.010</span>
-                <span class="text-gray-700">Caja: única vs por vendedor</span>
-                <span class="validation-motivo">Secuencia duplicada: el ID ya aparece en la fila 41</span>
+            <div data-bloque-errores hidden>
+              <div class="validation-group" data-tono="error">
+                <div class="validation-head">
+                  <span class="icon" data-icon="alert-triangle"></span>
+                  <span data-titulo-errores></span>
+                </div>
+                <div data-filas-errores></div>
               </div>
             </div>
 
-            <div class="validation-group" data-tono="neutro">
-              <div class="validation-head">
-                <span class="icon" data-icon="info"></span>1 fila a saltear
-              </div>
-              <div class="validation-row">
-                <span class="validation-fila">fila 58</span>
-                <span class="text-gray-700">Fila vacía al final del archivo</span>
+            <div data-bloque-avisos hidden>
+              <div class="validation-group" data-tono="neutro">
+                <div class="validation-head">
+                  <span class="icon" data-icon="info"></span>
+                  <span data-titulo-avisos></span>
+                </div>
+                <div data-filas-avisos></div>
               </div>
             </div>
 
-            <div class="validation-group" data-tono="ok">
-              <div class="validation-head">
-                <span class="icon" data-icon="check-circle"></span><span data-n-videos></span> filas listas — muestra de las primeras 4
+            <div data-bloque-omitir hidden>
+              <div class="validation-group" data-tono="neutro">
+                <div class="validation-head">
+                  <span class="icon" data-icon="info"></span>
+                  <span data-titulo-omitir></span>
+                </div>
+                <div data-filas-omitir></div>
               </div>
-              <div class="validation-row">
-                <span class="validation-fila">fila 2</span><span class="font-mono">BAK-M00.010</span>
-                <span class="flex-1 text-gray-700">Qué es SIGMMA: el sistema operativo de la agencia</span>
-                <span class="chip chip-meta">C01</span><span class="chip chip-backlog">backlog</span>
-              </div>
-              <div class="validation-row">
-                <span class="validation-fila">fila 3</span><span class="font-mono">BAK-M00.020</span>
-                <span class="flex-1 text-gray-700">El ciclo 360° de la operación turística</span>
-                <span class="chip chip-meta">C04</span><span class="chip chip-backlog">backlog</span>
-              </div>
-              <div class="validation-row">
-                <span class="validation-fila">fila 4</span><span class="font-mono">BAK-M00.030</span>
-                <span class="flex-1 text-gray-700">Los 7 principios y los procesos atomizados</span>
-                <span class="chip chip-meta">C04</span><span class="chip chip-backlog">backlog</span>
-              </div>
-              <div class="validation-row">
-                <span class="validation-fila">fila 5</span><span class="font-mono">BAK-M00.040</span>
-                <span class="flex-1 text-gray-700">Navegación: ingreso, menú, botones y rueda de progreso</span>
-                <span class="chip chip-meta">C01</span><span class="chip chip-backlog">backlog</span>
-              </div>
-              <p class="px-3 py-2 text-2xs text-gray-600">+ 51 filas más, todas en <strong>backlog</strong></p>
             </div>
 
-            <div class="flex justify-between gap-2">
-              <a href="importador.html?paso=2" class="btn btn-bordered btn-sm">
-                <span class="icon" data-icon="arrow-left"></span>Corregir el mapeo
-              </a>
-              <a href="importador.html?paso=4" class="btn btn-primary btn-sm">
-                Continuar con <span data-n-videos></span> filas <span class="icon" data-icon="arrow-right"></span>
-              </a>
-            </div>
-          </section>
-
-          <!-- ═══════════════ PASO 4 · CONFIRMACIÓN ═══════════════ -->
-          <section data-panel-paso="4" aria-labelledby="p4" class="contents">
             <div class="grid grid-cols-[1fr_380px] items-start gap-[18px]">
               <div>
-                <h2 class="side-title" id="p4">Qué se va a crear</h2>
+                <h3 class="side-title">Qué se va a crear</h3>
                 <table class="table-dense">
                   <caption class="sr-only">Resumen de las entidades que va a crear la importación.</caption>
                   <thead>
                     <tr><th scope="col">Entidad</th><th scope="col" class="w-[110px]">Cantidad</th><th scope="col">Detalle</th></tr>
                   </thead>
-                  <tbody>
-                    <tr>
-                      <td><strong>Videos</strong></td><td class="cell-num" data-n-videos></td>
-                      <td>Todos en <span class="chip chip-backlog">backlog</span>, sin link y sin versión</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Módulos</strong></td><td class="cell-num" data-n-modulos></td>
-                      <td>M00, M10, M20, M30, M40, M50, M60, M70, M80, M90, M95 <span class="chip chip-outline">creados por importación</span></td>
-                    </tr>
-                    <tr>
-                      <td><strong>Cohortes</strong></td><td class="cell-num" data-n-cohortes></td>
-                      <td>C01 a C20 <span class="chip chip-outline">creados por importación</span></td>
-                    </tr>
-                    <tr data-reservado="true">
-                      <td>Secciones</td><td class="cell-num">0</td>
-                      <td>El archivo no tiene columna de sección: se arman después</td>
-                    </tr>
-                    <tr data-reservado="true">
-                      <td>Superficies</td><td class="cell-num">0</td>
-                      <td>BAK, FRT y CRM ya existen como semilla</td>
-                    </tr>
-                  </tbody>
+                  <tbody data-resumen-crear></tbody>
                 </table>
-
-                <p class="alert alert-info mt-4 !text-xs">
-                  <span class="icon" data-icon="info"></span>
-                  <span>
-                    Los 11 módulos y los 20 cohortes <strong>no existían</strong>: se crean sobre la
-                    marcha y quedan marcados como «creados por importación» para revisarlos después.
-                    Rechazar esas filas obligaría a cargar todo a mano primero, que es justo lo que el
-                    importador viene a evitar.
-                  </span>
-                </p>
               </div>
 
-              <aside class="flex flex-col gap-3">
-                <div class="side-card side-card-strong">
-                  <h2 class="side-title">Después de importar</h2>
-                  <ul class="flex flex-col gap-2 text-xs text-gray-700">
-                    <li>Los <span data-n-videos></span> IDs quedan reservados en <strong>backlog</strong>.</li>
-                    <li>Nada queda publicado ni visible en el Front.</li>
-                    <li>Falta crear a mano <span class="font-mono">BAK-M35</span> (reservado) y
-                      <span class="font-mono">BAK-R01</span> (Ruta Esencial), que no vienen en el archivo.</li>
-                  </ul>
-                </div>
-                <div class="side-card">
-                  <h2 class="side-title">Se puede deshacer</h2>
-                  <p class="text-xs text-gray-700">
-                    La importación queda registrada como un lote. Si algo salió mal, se revierte
-                    entera desde Auditoría.
-                  </p>
-                </div>
+              <aside class="side-card">
+                <h3 class="side-title">Todo o nada</h3>
+                <p class="text-xs text-gray-700">
+                  Si hay filas que no se pueden leer, no se importa ninguna. Una jerarquía a medias
+                  es peor que no haber importado: no se sabe dónde quedó.
+                </p>
+                <p class="foot-note">
+                  Lo que ya existe <b>se omite</b>, nunca se pisa. Un video publicado tiene guion,
+                  preguntas y agencias que lo vieron colgando: una planilla no puede tener autoridad
+                  sobre eso.
+                </p>
               </aside>
             </div>
 
-            <div class="flex justify-between gap-2">
-              <a href="importador.html?paso=3" class="btn btn-bordered btn-sm">
-                <span class="icon" data-icon="arrow-left"></span>Volver a la validación
-              </a>
-              <a href="importador.html?paso=resultado" class="btn btn-primary btn-sm">
-                Importar <span data-n-videos></span> videos, <span data-n-modulos></span> módulos y <span data-n-cohortes></span> cohortes
-              </a>
+            <div class="flex justify-end gap-2">
+              <button type="button" class="btn btn-bordered btn-sm" data-volver>
+                <span class="icon" data-icon="arrow-left"></span>Volver
+              </button>
+              <button type="button" class="btn btn-primary btn-sm" data-confirmar disabled>Confirmar</button>
             </div>
           </section>
 
-          <!-- ═══════════════ RESULTADO ═══════════════ -->
+          <!-- ═══════════════ RESULTADO ═══════════════
+               No termina en «listo»: termina en qué hacer ahora. Después de
+               importar, el sistema queda en un estado muy específico —IDs
+               reservados en backlog— y lo único que se puede hacer es empezar a
+               grabar. -->
           <section data-panel-paso="resultado" aria-labelledby="pr" class="contents">
             <div class="placeholder-box !py-12">
               <span class="placeholder-icon" data-icon="check-circle"></span>
               <h2 class="text-h4" id="pr">El mapa quedó cargado</h2>
-              <p class="mt-3 max-w-[56ch] text-base text-gray-700">
-                Se crearon <strong><span data-n-videos></span> videos</strong>, <strong><span data-n-modulos></span> módulos</strong> y
-                <strong><span data-n-cohortes></span> cohortes</strong>. Los <span data-n-videos></span> IDs están reservados en backlog: ninguno tiene
-                link ni versión todavía.
-              </p>
-              <div class="mt-6 flex gap-2">
-                <a href="home.html?escena=E2" class="btn btn-primary btn-sm">Ir al panel de obra</a>
-                <a href="modulos.html?escena=E2" class="btn btn-bordered btn-sm">Ver los módulos</a>
+              <p class="mt-3 max-w-[56ch] text-base text-gray-700" data-resultado-texto></p>
+              <div class="mt-6 flex flex-wrap justify-center gap-2">
+                <a class="btn btn-primary btn-sm" data-ir-tablero>Ir al tablero de producción</a>
+                <a class="btn btn-bordered btn-sm" data-ir-modulos>Ver los módulos</a>
                 <button type="button" class="btn btn-bordered btn-sm" data-descargar-log>
                   <span class="icon" data-icon="download"></span>Descargar el log
+                </button>
+                <button type="button" class="btn btn-bordered btn-sm" data-deshacer>
+                  <span class="icon" data-icon="refresh"></span>Deshacer la importación
                 </button>
               </div>
             </div>
 
-            <div class="validation-group" data-tono="error">
-              <div class="validation-head">
-                <span class="icon" data-icon="alert-triangle"></span>2 filas quedaron sin importar
-              </div>
-              <div class="validation-row">
-                <span class="validation-fila">fila 34</span><span class="font-mono">BAK-M4O.010</span>
-                <span class="validation-motivo">ID mal formado — corregir en el origen y volver a importar</span>
-              </div>
-              <div class="validation-row">
-                <span class="validation-fila">fila 47</span><span class="font-mono">BAK-M70.010</span>
-                <span class="validation-motivo">Secuencia duplicada — el ID ya se creó desde la fila 41</span>
+            <div class="alert alert-info !text-xs">
+              <span class="icon" data-icon="info"></span>
+              <span>
+                <strong>Todavía no hay deuda de evaluación, y está bien.</strong> Ningún video está
+                publicado: las preguntas se escriben después de grabar cada uno, no ahora.
+              </span>
+            </div>
+
+            <div data-bloque-omitidos hidden>
+              <div class="validation-group" data-tono="neutro">
+                <div class="validation-head">
+                  <span class="icon" data-icon="info"></span>
+                  <span data-titulo-omitidos></span>
+                </div>
+                <div data-filas-omitidos></div>
               </div>
             </div>
           </section>
+
         </main>
       </div>
     </div>
@@ -457,89 +360,242 @@ BAK-M00.010,BAK,M00,P+B,C01,P1,backlog,,,,"></textarea>
     <script src="assets/js/academia-guiones.js"></script>
     <script src="assets/js/academia-preguntas.js"></script>
     <script src="assets/js/academia-sim.js"></script>
+    <script src="assets/js/academia-import.js"></script>
     <script src="assets/js/render.js"></script>
     <script src="assets/js/ui.js"></script>
     <script>
-      /* Importador de carga inicial. Los conteos salen del dataset: son los
-         mismos 55 videos, 13 módulos y 20 cohortes que después muestra el
-         tablero, así que no pueden discrepar.
+      /* Importador del mapa de contenido.
 
-         A-1: el importador CREA las entidades que faltan y las marca «creado por
-         importación». Rechazar la fila obligaría a cargar todo a mano primero,
-         que es justo lo que el importador viene a evitar. */
+         El flujo NO navega entre el paso 1 y el 2: los dos viven en esta página
+         y el texto pegado se queda en memoria. Navegar obligaría a persistir un
+         borrador de planilla en algún lado, que es estado que nadie pidió.
+
+         Sí navega al confirmar, y no es opcional: la materialización de lo creado
+         en el overlay corre UNA sola vez por carga de página, así que sin recarga
+         lo importado no aparecería. El sello viaja por la URL para que el
+         resultado sepa qué importación mostrar y cuál puede deshacer. */
       (function () {
         "use strict";
         const S = window.SIM;
-        const videos = S.videos().length;
-        /* Los módulos que entran por el CSV son los de biblioteca: el reservado y
-           la Ruta Esencial se crean a mano. El archivo no tiene columna de
-           sección, así que se crean 0 secciones — y las superficies vienen como
-           semilla, no por importación. */
-        const modulos = S.modulos.filter(function (m) { return m.tipo === "biblioteca"; }).length;
-        const cohortes = S.cohortes.length;
-        /* Las filas leídas son las del archivo: los videos más las que no se
-           pueden importar. El paso 3 es el más importante de los cuatro. */
-        const conError = 2;
-        const aSaltear = 1;
+        const I = window.IMPORT;
+        const R = window.RENDER;
+        const e = S.escena;
+        const q = e === "E5" ? "" : "?escena=" + e;
 
-        const valores = {
-          "data-n-videos": videos,
-          "data-n-modulos": modulos,
-          "data-n-cohortes": cohortes,
-          "data-n-leidas": videos + conError + aSaltear,
-        };
-        Object.keys(valores).forEach(function (attr) {
+        /* Lo pegado o subido, por hoja. Es todo el estado de la pantalla. */
+        const texto = { videos: "", cohortes: "" };
+        let plan = null;
+
+        const $ = function (sel) { return document.querySelector(sel); };
+        const poner = function (attr, valor) {
           document.querySelectorAll("[" + attr + "]").forEach(function (el) {
-            el.textContent = valores[attr];
+            el.textContent = valor;
+          });
+        };
+
+        /* ── Paso 1 ─────────────────────────────────────────────────────── */
+
+        const btnRevisar = $("[data-revisar]");
+
+        function refrescarRevisar() {
+          const hay = texto.videos.trim() !== "";
+          btnRevisar.disabled = !hay;
+          /* Un botón que no hace nada es un bug: si está apagado, dice por qué. */
+          btnRevisar.title = hay ? "" : "Todavía no trajiste el mapa de videos";
+        }
+
+        document.querySelectorAll("[data-pegar]").forEach(function (ta) {
+          ta.addEventListener("input", function () {
+            texto[ta.dataset.pegar] = ta.value;
+            refrescarRevisar();
           });
         });
-      })();
-    </script>
-    <script>
-      /* Controlador de la pantalla: solo muestra el paso pedido y marca el
-         indicador. Los cuatro pasos están escritos en el HTML. */
-      (function () {
-        "use strict";
-        const paso = UI.param("paso") || "1";
-        const orden = ["1", "2", "3", "4"];
-        const idx = orden.indexOf(paso);
 
-        document.querySelectorAll("[data-panel-paso]").forEach(function (p) {
-          p.hidden = p.dataset.panelPaso !== paso;
-        });
-
-        document.querySelectorAll(".wizard-step").forEach(function (s, i) {
-          const estado = paso === "resultado" ? "hecho" : i < idx ? "hecho" : i === idx ? "actual" : "pendiente";
-          s.dataset.pasoEstado = estado;
-          if (estado === "actual") s.setAttribute("aria-current", "step");
-        });
-
-        /* El log del lote. Se arma de la tabla de validación que ya está en
-           pantalla —las filas listas y las rechazadas con su motivo—, así que
-           el archivo dice exactamente lo mismo que se vio antes de confirmar.
-           Derivarlo de otra fuente permitiría que discreparan. */
-        const btnLog = document.querySelector("[data-descargar-log]");
-        if (btnLog) {
-          btnLog.addEventListener("click", function () {
-            const filas = [];
-            document.querySelectorAll("[data-panel-paso='3'] .validation-row").forEach(function (r) {
-              const grupo = r.closest(".validation-group");
-              const estado = grupo ? (grupo.querySelector(".validation-head") || {}).textContent : "";
-              const fila = r.querySelector(".validation-fila");
-              const motivo = r.querySelector(".validation-motivo");
-              filas.push([
-                (estado || "").replace(/\s+/g, " ").trim(),
-                fila ? fila.textContent.trim() : "",
-                r.textContent.replace(/\s+/g, " ").trim(),
-                motivo ? motivo.textContent.trim() : "",
-              ]);
-            });
-            window.UI.exportarCSV(
-              "log-importacion.csv",
-              ["Resultado", "Fila del CSV", "Contenido", "Motivo"],
-              filas
-            );
+        document.querySelectorAll("[data-arch]").forEach(function (inp) {
+          inp.addEventListener("change", function () {
+            const f = inp.files && inp.files[0];
+            if (!f) return;
+            /* `FileReader` sobre un archivo que eligió la persona: anda igual por
+               `file://`, y no hay `fetch` de por medio. */
+            const lector = new FileReader();
+            lector.onload = function () {
+              const hoja = inp.dataset.arch;
+              texto[hoja] = String(lector.result || "");
+              const ta = $("[data-pegar='" + hoja + "']");
+              if (ta) ta.value = texto[hoja];
+              refrescarRevisar();
+            };
+            lector.readAsText(f);
           });
+        });
+
+        function descargar(opciones) {
+          const hojas = I.plantilla(opciones);
+          UI.exportarCSV(hojas.videos.nombre + ".csv", hojas.videos.encabezados, hojas.videos.filas);
+          UI.exportarCSV(hojas.cohortes.nombre + ".csv", hojas.cohortes.encabezados, hojas.cohortes.filas);
+        }
+        $("[data-plantilla]").addEventListener("click", function () { descargar(null); });
+        $("[data-plantilla-vacia]").addEventListener("click", function () { descargar({ seccionVacia: true }); });
+
+        /* ── Paso 2 ─────────────────────────────────────────────────────── */
+
+        function fila(cols) {
+          return '<div class="validation-row">' + cols.join("") + "</div>";
+        }
+        function celdaFila(n) {
+          return n ? '<span class="validation-fila">fila ' + n + "</span>" : "";
+        }
+
+        function pintarGrupo(bloque, titulo, filas, texto) {
+          const caja = $("[data-bloque-" + bloque + "]");
+          caja.hidden = filas.length === 0;
+          if (!filas.length) return;
+          poner("data-titulo-" + bloque, texto);
+          R.pintar("[data-filas-" + bloque + "]", filas.join(""));
+        }
+
+        function revisar() {
+          plan = I.leer(texto.videos, texto.cohortes);
+
+          poner("data-n-leidas", plan.leidas.videos);
+          poner("data-n-crear", plan.total);
+          poner("data-n-omitir", plan.omitir.length);
+          poner("data-n-errores", plan.errores.length);
+
+          pintarGrupo("errores", null, plan.errores.map(function (x) {
+            return fila([
+              celdaFila(x.fila),
+              x.valor ? '<span class="font-mono">' + R.esc(x.valor) + "</span>" : "",
+              '<span class="validation-motivo">' + R.esc(x.motivo) + "</span>",
+            ]);
+          }), plan.errores.length + (plan.errores.length === 1
+            ? " fila no se puede leer — no se importa ninguna"
+            : " filas no se pueden leer — no se importa ninguna"));
+
+          pintarGrupo("avisos", null, plan.avisos.map(function (x) {
+            return fila([
+              '<span class="validation-motivo">' + R.esc(x.motivo) + "</span>",
+              x.valor ? '<span class="font-mono">' + R.esc(x.valor) + "</span>" : "",
+            ]);
+          }), plan.avisos.length + (plan.avisos.length === 1 ? " aviso" : " avisos") + " — no frenan la importación");
+
+          pintarGrupo("omitir", null, plan.omitir.map(function (x) {
+            return fila([
+              celdaFila(x.fila),
+              '<span class="font-mono">' + R.esc(x.id) + "</span>",
+              '<span class="validation-motivo">' + R.esc(x.motivo) + " — no se pisa</span>",
+            ]);
+          }), plan.omitir.length + (plan.omitir.length === 1 ? " fila se omite" : " filas se omiten"));
+
+          const detalle = function (lista, campo) {
+            return lista.slice(0, 6).map(function (x) { return R.esc(x[campo]); }).join(", ") +
+              (lista.length > 6 ? " y " + (lista.length - 6) + " más" : "");
+          };
+          R.pintar("[data-resumen-crear]", [
+            ["Videos", plan.crear.videos.length, plan.crear.videos.length
+              ? 'Todos en <span class="chip chip-backlog">backlog</span>, sin link y sin versión'
+              : "—"],
+            ["Módulos", plan.crear.modulos.length, plan.crear.modulos.length
+              ? detalle(plan.crear.modulos, "codigo") + ' <span class="chip chip-outline">creados por importación</span>'
+              : "—"],
+            ["Secciones", plan.crear.secciones.length, plan.crear.secciones.length
+              ? detalle(plan.crear.secciones, "titulo")
+              : "—"],
+            ["Cohortes", plan.crear.cohortes.length, plan.crear.cohortes.length
+              ? detalle(plan.crear.cohortes, "id")
+              : "—"],
+          ].map(function (r) {
+            return "<tr><td><strong>" + r[0] + '</strong></td><td class="cell-num">' + r[1] + "</td><td>" + r[2] + "</td></tr>";
+          }).join(""));
+
+          const btn = $("[data-confirmar]");
+          btn.disabled = !plan.aplicable;
+          btn.textContent = plan.aplicable
+            ? "Importar " + plan.total + (plan.total === 1 ? " registro" : " registros")
+            : "Confirmar";
+          btn.title = plan.errores.length
+            ? plan.errores.length + (plan.errores.length === 1 ? " fila no se puede leer" : " filas no se pueden leer")
+            : plan.total === 0
+              ? "No hay nada nuevo que crear: todo lo del archivo ya existe"
+              : "";
+
+          mostrar("2");
+        }
+
+        btnRevisar.addEventListener("click", revisar);
+        $("[data-volver]").addEventListener("click", function () { mostrar("1"); });
+
+        $("[data-confirmar]").addEventListener("click", function () {
+          const sello = I.aplicar(plan);
+          if (!sello) return;
+          /* Navegación obligada: sin recargar, lo creado no se materializa. */
+          window.location.href = "importador.html?paso=resultado&sello=" + encodeURIComponent(sello) +
+            (e === "E5" ? "" : "&escena=" + e);
+        });
+
+        /* ── Resultado ──────────────────────────────────────────────────── */
+
+        function pintarResultado(sello) {
+          const creados = I.loImportado(sello);
+          const mods = S.modulos.filter(function (m) { return m.importadoEn === sello; });
+          const cohs = S.cohortes.filter(function (c) { return c.importadoEn === sello; });
+          let secs = 0;
+          S.modulos.forEach(function (m) {
+            (m.secciones || []).forEach(function (s) { if (s.importadoEn === sello) secs++; });
+          });
+
+          const plural = function (n, uno, varios) { return n + " " + (n === 1 ? uno : varios); };
+          poner("data-resultado-texto",
+            "Se crearon " + plural(creados.length, "video", "videos") + ", " +
+            plural(mods.length, "módulo", "módulos") + ", " +
+            plural(secs, "sección", "secciones") + " y " +
+            plural(cohs.length, "cohorte", "cohortes") + ". Los " + creados.length +
+            " IDs quedaron reservados en backlog: ninguno tiene link ni versión todavía.");
+
+          $("[data-ir-tablero]").href = "tablero.html" + q;
+          $("[data-ir-modulos]").href = "modulos.html" + q;
+
+          const puede = I.sePuedeDeshacer(sello);
+          const btn = $("[data-deshacer]");
+          btn.disabled = !puede.puede;
+          btn.title = puede.motivo || "";
+          btn.addEventListener("click", function () {
+            I.deshacer(sello);
+            UI.recargar();
+          });
+
+          $("[data-descargar-log]").addEventListener("click", function () {
+            UI.exportarCSV("log-importacion.csv", ["Resultado", "ID", "Módulo", "Sección"],
+              creados.map(function (v) { return ["creado", v.id, v.codigoModulo, v.seccion]; }));
+          });
+
+          mostrar("resultado");
+        }
+
+        /* ── Controlador de pasos ───────────────────────────────────────── */
+
+        function mostrar(paso) {
+          document.querySelectorAll("[data-panel-paso]").forEach(function (p) {
+            p.hidden = p.dataset.panelPaso !== paso;
+          });
+          const orden = ["1", "2"];
+          const idx = orden.indexOf(paso);
+          document.querySelectorAll(".wizard-step").forEach(function (s, i) {
+            const estado = paso === "resultado" || i < idx ? "hecho" : i === idx ? "actual" : "pendiente";
+            s.dataset.pasoEstado = estado;
+            if (estado === "actual") s.setAttribute("aria-current", "step");
+            else s.removeAttribute("aria-current");
+          });
+        }
+
+        const sello = UI.param("sello");
+        if (sello) {
+          pintarResultado(sello);
+        } else {
+          /* Un `?paso=2` directo, sin archivo, no puede mostrar una revisión de
+             nada: arranca en el paso 1 en vez de fingir una pantalla vacía. */
+          refrescarRevisar();
+          mostrar("1");
         }
       })();
     </script>
