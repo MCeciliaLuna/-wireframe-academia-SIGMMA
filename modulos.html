@@ -184,14 +184,17 @@
                  el encabezado no puede discrepar con lo de abajo. -->
             <div class="flex items-start gap-3">
               <div class="flex gap-3" data-tiles-carga></div>
-              <!-- R5: la tabla es el default; las tarjetas son un conmutador,
-                   igual que el kanban del tablero. -->
+              <!-- El panel de carga es el default de esta pantalla: es desde
+                   donde se gestiona cada módulo. La tabla queda como la otra
+                   vista, para leer los 13 de corrido y ordenarlos por columna.
+                   El conmutador toma como default la PRIMERA opción, así que el
+                   orden de estos dos botones es lo que lo decide. -->
               <div class="segmented ml-auto" data-view-switch>
-                <button type="button" class="segmented-option" data-view="tabla" aria-pressed="true">
-                  <span class="icon icon-sm" data-icon="list"></span>Tabla
-                </button>
-                <button type="button" class="segmented-option" data-view="tarjetas" aria-pressed="false">
+                <button type="button" class="segmented-option" data-view="tarjetas" aria-pressed="true">
                   <span class="icon icon-sm" data-icon="grid"></span>Tarjetas
+                </button>
+                <button type="button" class="segmented-option" data-view="tabla" aria-pressed="false">
+                  <span class="icon icon-sm" data-icon="list"></span>Tabla
                 </button>
               </div>
             </div>
@@ -228,7 +231,7 @@
               <span class="filter-count" data-conteo></span>
             </div>
 
-            <div data-view-panel="tabla" class="table-scroll-y">
+            <div data-view-panel="tabla" class="table-scroll-y" hidden>
               <table class="table-dense" data-sortable>
                 <caption class="sr-only" data-caption></caption>
                 <thead>
@@ -248,7 +251,7 @@
               </table>
             </div>
 
-            <div data-view-panel="tarjetas" class="grid grid-cols-3 gap-[18px]" data-tarjetas hidden></div>
+            <div data-view-panel="tarjetas" class="grid grid-cols-3 gap-[18px]" data-tarjetas></div>
 
             <p class="text-xs text-ink-soft" data-nota></p>
           </div>

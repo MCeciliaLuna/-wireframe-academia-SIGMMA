@@ -192,7 +192,7 @@ sigue diciendo la verdad aunque la sesión tenga cambios encima.
 | `?m=` | **Cualquiera de los 13:** `0`, `10`, `20` … `95`, `R01` |
 | `?v=` | **Cualquiera de los 55:** `BAK-M30.050`. También `escritura.html`, que es por video |
 | `?tab=` | `ficha` *(default)* · `versiones` · `guion` · `preguntas` · `ubicaciones` |
-| `?vista=` | `tabla` *(default)* · `kanban` — tablero · `tarjetas` — panel de carga en `modulos.html` |
+| `?vista=` | `tabla` *(default)* · `kanban` — tablero · en `modulos.html`, `tarjetas` *(default)* · `tabla` |
 | `?modo=` | `planificacion` *(default)* · `sesion` — hoja de cohorte |
 | `?paso=` | `1` · `2` · `resultado` — importador |
 | `?sello=` | El sello de una importación — `importador.html?paso=resultado` |

@@ -255,7 +255,7 @@ Salieron de tres rondas de revisión del wireframe. **Romperlas es un error, no 
 | R2 | **La zona de identidad del video va deshabilitada, con candado.** ID, superficie, módulo y secuencia no se editan después del alta: el ID sobrevive al regrabado |
 | R3 | **Estado de producción y visibilidad en el Front son dos controles separados.** El interruptor se habilita solo si el estado es `publicado`. En el kanban la visibilidad viaja como chip dentro de la tarjeta, **nunca como columna** |
 | R4 | **Los contadores del banco se ven siempre**, durante toda la carga. No aparecen como error al final |
-| R5 | **Tablas antes que tarjetas.** La tabla es el default del tablero; el kanban es un conmutador |
+| R5 | **Tablas antes que tarjetas**, con **una excepción declarada**: en el tablero la tabla es el default y el kanban un conmutador, pero en `modulos.html` el default es el **panel de carga con tarjetas** —es la pantalla desde donde se gestiona cada módulo, y la tarjeta lleva el avance y las acciones que la fila no puede llevar—. La tabla sigue estando, en el otro lado del conmutador (D-13) |
 | R6 | **Densidad alta.** Herramienta interna de uso diario para 3 a 5 personas. Sin onboarding, sin tours, sin whitespace decorativo |
 | R7 | **Desktop 1440 px.** No hay responsive en este alcance |
 | R8 | **La Ruta Esencial referencia videos, no los copia.** Su banco es *derivado* y se muestra etiquetado como tal |
