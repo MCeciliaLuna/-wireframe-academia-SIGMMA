@@ -209,6 +209,7 @@
               </section>
 
               <aside class="flex flex-col gap-[18px]">
+                <div data-uso></div>
                 <div data-carga></div>
                 <div data-atencion></div>
               </aside>
@@ -298,6 +299,31 @@
         window.UI.poblarFiltro("plan", S.planes.map(function (p) { return p.nombre; }), "Plan");
 
         /* -- Aside ------------------------------------------------------- */
+
+        /* «Uso de la Academia» venía del panel de obra, que era la pantalla de
+           inicio. Ahí era una tarjeta suelta en una pantalla de construcción;
+           acá está en la pantalla que mide uso, que es de lo que habla.
+
+           NO se movió entera: «Meets habilitadas», «Intentos» y «Aprobaciones»
+           ya estaban en «Carga operativa», y traerlas otra vez habría dejado el
+           mismo número en dos tarjetas de la misma columna. Entra solo lo que
+           faltaba.
+
+           R10 sigue aplicando y no hace falta cablearlo de nuevo: esta pantalla
+           entera se corta arriba si no hay agencias con acceso. */
+        R.pintar("[data-uso]", R.sideCard({
+          id: "uso", titulo: "Uso de la Academia",
+          cuerpo: R.medidor([
+            { dt: "Personas en los planteles", dd: op.personas },
+            { dt: "Recorridos completos", dd: op.certificadas, ok: op.certificadas > 0 },
+            { dt: "Tasa de reprobación", dd: op.tasaReprobacion.toFixed(2) + " %",
+              ok: op.tasaReprobacion < 30 },
+          ]),
+          pie: "Sobre <strong>" + op.intentos + " intentos</strong>. La tasa de reprobación es " +
+            "la señal de <strong>contenido a revisar</strong>: si un módulo se reprueba mucho, " +
+            "el problema suele estar en el video o en las preguntas.",
+        }));
+
         R.pintar("[data-carga]", R.sideCard({
           id: "carga", titulo: "Carga operativa", fuerte: true,
           cuerpo: R.medidor([

@@ -172,6 +172,18 @@
           <div data-escena="E2,E3,E4,E5,E6" class="contents">
             <div class="flex gap-3" data-tiles></div>
 
+            <!-- El embudo de producción. Venía del panel de obra, que era la
+                 pantalla de inicio: ahí obligaba a conocer la máquina de estados
+                 antes de poder leerlo. Acá el vocabulario ya está en pantalla
+                 —son las columnas del kanban y los chips de la tabla—, así que
+                 el embudo pasa a ser el resumen de lo que se está mirando. -->
+            <section aria-labelledby="prog">
+              <h2 class="side-title" id="prog">Progreso del contenido · <span data-total-videos></span> videos</h2>
+              <div class="funnel" data-embudo></div>
+              <p class="funnel-legend" data-leyenda hidden></p>
+              <p class="mt-2 text-xs text-ink-soft" data-nota-progreso></p>
+            </section>
+
             <!-- Filtra la tabla Y el kanban con el mismo criterio: son dos
                  vistas del mismo conjunto, y que una muestre 55 y la otra 7
                  sería incoherente. De ahí `data-filtros-extra`. -->
@@ -349,6 +361,26 @@
         };
 
         R.pintar("[data-tiles]", R.tiles(TILES[esc] || TILES.E5));
+
+        /* ── El embudo ───────────────────────────────────────────────────
+           Los tramos los deriva el motor; los anchos los calcula `R.embudo`.
+           Se movió tal cual desde el panel de obra. */
+        const tramos = S.embudo(esc);
+        R.pintar("[data-embudo]", R.embudo(tramos));
+        document.querySelector("[data-total-videos]").textContent = S.videos(esc).length;
+
+        /* La leyenda solo aparece cuando el embudo tiene más de dos tramos: con
+           uno o dos, el propio tramo ya dice qué es. */
+        if (tramos.length > 2) {
+          const ley = document.querySelector("[data-leyenda]");
+          ley.hidden = false;
+          ley.innerHTML = R.leyendaEmbudo(tramos);
+        }
+
+        const NOTA_PROGRESO = {
+          E2: "Los " + S.videos(esc).length + " IDs están reservados y ninguno se grabó todavía. Es exactamente lo que se espera de la semana 1: el mapa mira hacia adelante.",
+        };
+        document.querySelector("[data-nota-progreso]").textContent = NOTA_PROGRESO[esc] || "";
 
         /* En régimen el wireframe deja tres filas seleccionadas para mostrar la
            barra de acciones en lote. Se conserva en el primer pintado: es el
