@@ -193,6 +193,36 @@
                   </div>
                 </div>
               </section>
+
+              <!-- Las secciones se declaran acá, con el módulo. Un módulo de
+                   biblioteca SIN secciones deja el syllabus de la agencia vacío:
+                   el repo aprobado arma con ellas el recorrido, el progreso
+                   parcial, el breadcrumb del reproductor y la devolución de la
+                   evaluación. Antes se creaba el módulo vacío y se avisaba por
+                   una nota al pie que «lo que sigue» era armar la primera. -->
+              <section class="side-card" aria-labelledby="secs" data-bloque="biblioteca">
+                <h2 class="side-title" id="secs">Secciones</h2>
+                <div class="flex flex-col gap-2" data-secciones></div>
+                <button type="button" class="btn btn-bordered btn-sm mt-3" data-agregar-seccion>
+                  <span class="icon icon-sm" data-icon="plus"></span>Agregar sección
+                </button>
+                <p class="hint mt-2">
+                  El orden es el de esta lista. Después se pueden agregar más desde el módulo.
+                </p>
+              </section>
+
+              <!-- R8: la Ruta referencia videos, no los copia. No lleva secciones
+                   porque sus videos se resuelven por cohorte, y su banco de
+                   preguntas es derivado. -->
+              <section class="side-card" aria-labelledby="cohs" data-bloque="ruta" hidden>
+                <h2 class="side-title" id="cohs">Cohortes que referencia</h2>
+                <p class="hint mb-2">
+                  La ruta no tiene videos propios: los toma de los cohortes que elijas. Su banco de
+                  preguntas también sale de ahí, a razón de 5 por video publicado.
+                </p>
+                <label class="sr-only" for="cohortes">Cohortes que referencia la ruta</label>
+                <select class="select !text-xs" id="cohortes" multiple size="8"></select>
+              </section>
             </form>
 
             <aside class="flex flex-col gap-3">
@@ -204,8 +234,8 @@
                   videos publicados, el banco de preguntas completo y la evaluación configurada.
                 </p>
                 <p class="foot-note">
-                  Después de crearlo, lo que sigue es
-                  <a href="alta-seccion.html">armar la primera sección</a>.
+                  El módulo se crea <strong>con sus secciones</strong>. Después, lo que sigue es
+                  reservar los IDs de sus videos.
                 </p>
               </div>
               <div class="side-card">
@@ -277,6 +307,65 @@
           return isNaN(n) ? null : selSup.value + "-M" + String(n).padStart(2, "0");
         }
 
+        /* Las secciones del módulo nuevo. Array, no filas dibujadas: el orden es
+           la posición, y el botón se habilita contra esto. Una sección recién
+           creada no tiene videos de los que derivar su orden, así que va
+           explícito —la derivación por secuencia mínima solo aplica al import. */
+        let secciones = [""];
+
+        function pintarSecciones() {
+          R.pintar("[data-secciones]", secciones.map(function (t, i) {
+            const idx = i + 1;
+            return '<div class="flex items-center gap-2" data-sec="' + i + '">' +
+              '<span class="meta w-[74px] shrink-0">Sección ' + idx + "</span>" +
+              '<label class="sr-only" for="sec' + idx + '">Nombre de la sección ' + idx + "</label>" +
+              '<input class="input !h-9 !text-xs" id="sec' + idx + '" type="text" value="' +
+                R.esc(t) + '" placeholder="Estados y plantillas" data-sec-campo />' +
+              (secciones.length > 1
+                ? '<button type="button" class="link-quiet shrink-0" data-quitar-sec="' + i +
+                  '" aria-label="Quitar la sección ' + idx + '">' +
+                  '<span class="icon icon-sm" data-icon="x"></span></button>'
+                : "") +
+              "</div>";
+          }).join(""));
+
+          document.querySelectorAll("[data-sec] [data-sec-campo]").forEach(function (input) {
+            const i = Number(input.closest("[data-sec]").dataset.sec);
+            input.addEventListener("input", function () {
+              secciones[i] = input.value;
+              input.setAttribute("value", input.value);
+              validar();
+            });
+          });
+          document.querySelectorAll("[data-quitar-sec]").forEach(function (b) {
+            b.addEventListener("click", function () {
+              secciones.splice(Number(b.dataset.quitarSec), 1);
+              pintarSecciones();
+              validar();
+            });
+          });
+        }
+
+        document.querySelector("[data-agregar-seccion]").addEventListener("click", function () {
+          secciones.push("");
+          pintarSecciones();
+          validar();
+        });
+
+        /* Los 20 cohortes, para el caso de la ruta. */
+        R.pintar("#cohortes", S.cohortes.map(function (c) {
+          return '<option value="' + R.esc(c.id) + '">' + R.esc(c.id + " · " + c.nombre) +
+            " (" + R.esc(c.prioridad || "—") + ")</option>";
+        }).join(""));
+
+        const nombradas = function () {
+          return secciones.map(function (t) { return t.trim(); }).filter(Boolean);
+        };
+        const cohortesElegidos = function () {
+          return [].slice.call(document.querySelectorAll("#cohortes option:checked"))
+            .map(function (o) { return o.value; });
+        };
+
         function validar() {
           const n = numeroDe();
           const codigo = codigoDe();
@@ -300,15 +389,32 @@
           selPlanes.disabled = reservado;
           if (reservado) inpOrden.value = "—";
 
-          btn.disabled = !!error || !inpNom.value.trim();
+          /* Cada tipo pide lo suyo, y solo se muestra lo que pide. */
+          const tipo = selTipo.value;
+          document.querySelectorAll("[data-bloque]").forEach(function (b) {
+            b.hidden = b.dataset.bloque !== tipo;
+          });
+
+          /* La compuerta: un módulo de biblioteca sin secciones deja el producto
+             roto del lado agencia, no incompleto. Y una ruta sin cohortes no
+             referencia nada, así que no tiene videos ni banco. */
+          const faltanSecciones = tipo === "biblioteca" && nombradas().length === 0;
+          const faltanCohortes = tipo === "ruta" && cohortesElegidos().length === 0;
+
+          btn.disabled = !!error || !inpNom.value.trim() || faltanSecciones || faltanCohortes;
           btn.title = error ? "Corregí el número del módulo."
-            : !inpNom.value.trim() ? "Falta el nombre del módulo." : "";
+            : !inpNom.value.trim() ? "Falta el nombre del módulo."
+            : faltanSecciones ? "Un módulo de biblioteca necesita al menos una sección: sin ellas la agencia ve el módulo vacío."
+            : faltanCohortes ? "La ruta tiene que referenciar al menos un cohorte."
+            : "";
           return !btn.disabled;
         }
 
         [inpNum, inpNom].forEach(function (el) { el.addEventListener("input", validar); });
         selTipo.addEventListener("change", validar);
         selSup.addEventListener("change", validar);
+        document.getElementById("cohortes").addEventListener("change", validar);
+        pintarSecciones();
         validar();
 
         btn.addEventListener("click", function () {
@@ -316,16 +422,27 @@
           const n = numeroDe();
           const reservado = selTipo.value === "reservado";
           const orden = parseInt(inpOrden.value, 10);
-          S.crear("modulos", {
+          const codigo = codigoDe();
+          const tipo = selTipo.value;
+          S.crear("modulos", Object.assign({
             numero: n,
-            codigo: codigoDe(),
+            codigo: codigo,
             titulo: inpNom.value.trim(),
-            tipo: selTipo.value,
+            tipo: tipo,
             orden: reservado || isNaN(orden) ? null : orden,
             planes: reservado ? null : selPlanes.value.split("·").map(function (x) { return x.trim(); }),
             activadoEn: null,
             secciones: [],
-          });
+          }, tipo === "ruta" ? { referencia: { cohortes: cohortesElegidos() } } : null));
+
+          /* Las secciones van después del módulo: la materialización las ubica
+             colgando de su `codigoModulo`, así que el módulo tiene que existir
+             primero. El orden es la posición en la lista. */
+          if (tipo === "biblioteca") {
+            nombradas().forEach(function (titulo, i) {
+              S.crear("secciones", { codigoModulo: codigo, titulo: titulo, orden: i + 1 });
+            });
+          }
           /* Al detalle del módulo recién creado: es donde sigue el trabajo
              —armar la primera sección— y la prueba de que quedó creado. */
           window.location.href = "modulo.html?m=" + n + (q ? "&" + q.slice(1) : "");

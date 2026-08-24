@@ -183,10 +183,10 @@
                     <tr>
                       <th scope="col" class="w-[90px]">Secuencia</th>
                       <th scope="col" class="w-[140px]">ID que queda</th>
+                      <th scope="col" class="w-[170px]">Sección</th>
                       <th scope="col">Título</th>
                       <th scope="col" class="w-[130px]">Tag de plan</th>
                       <th scope="col" class="w-[90px]">Cohorte</th>
-                      <th scope="col" class="w-[90px]">Prioridad</th>
                       <th scope="col" class="w-[40px]"><span class="sr-only">Quitar</span></th>
                     </tr>
                   </thead>
@@ -204,6 +204,8 @@
                   <li><strong data-resumen>IDs permanentes</strong>, todos en <span class="chip chip-backlog">backlog</span>.</li>
                   <li><strong>Sin link y sin versión.</strong> El link de YouTube se carga recién al publicar: acá se reserva el lugar, no se sube nada.</li>
                   <li>El ID queda fijo para siempre, aunque el video se regrabe.</li>
+                  <li><strong>Cada video cuelga de una sección.</strong> Sin ella la agencia no lo puede ubicar en el syllabus del módulo, así que es obligatoria.</li>
+                  <li><strong>La prioridad no se carga:</strong> la define el cohorte. Al cambiar el cohorte, la prioridad lo sigue.</li>
                 </ul>
                 <p class="foot-note">
                   Por eso se puede reservar hacia adelante: <span class="font-mono">BAK-M35</span>
@@ -221,7 +223,7 @@
                 </p>
               </div>
 
-              <!-- Los tres números se derivan de las filas. Antes estaban
+              <!-- Los números se derivan de las filas. Antes estaban
                    escritos a mano y podían contradecir a «Qué se crea», que sí
                    se calculaba. -->
               <div class="side-card">
@@ -308,21 +310,30 @@
              el error de duplicado se vea sin tener que provocarlo. Un módulo sin
              ninguna ocupada no tiene error que mostrar. */
           const choque = usadas.length ? usadas[usadas.length - 1] : null;
+          /* Con una sola sección no hay nada que elegir: se precarga y el
+             desplegable queda como confirmación, no como decisión. */
+          const secciones = (S.modulo(n) || {}).secciones || [];
+          const inicial = secciones.length === 1 ? secciones[0].titulo : "";
           lote = [];
           for (let i = 0; i < FILAS; i++) {
             const ultima = i === FILAS - 1;
-            lote.push(fila(ultima && choque ? choque : desde + i * PASO));
+            lote.push(fila(ultima && choque ? choque : desde + i * PASO, inicial));
           }
         }
 
-        function fila(seq) {
+        /* `seccionPrevia` es el caso frecuente: se cargan varios videos seguidos
+           de la misma sección. Va por FILA y no por lote porque un lote de
+           grabación cruza secciones —el cohorte agrupa por escenario, no por
+           sección—, y obligar a un lote por sección sería partir el trabajo para
+           simplificar el formulario. */
+        function fila(seq, seccionPrevia) {
           const modulo = S.modulo(numero());
           return {
             secuencia: seq,
+            seccion: seccionPrevia || "",
             titulo: "",
             planes: (modulo.planes || []).join(" · "),
             cohorte: "",
-            prioridad: "",
           };
         }
 
@@ -340,6 +351,10 @@
             duplicada: dup || repetidaEnLote,
             enElLote: !dup && repetidaEnLote,
             sinTitulo: !f.titulo.trim(),
+            /* Sin sección el video no se puede ubicar en el syllabus que ve la
+               agencia. Antes esta pantalla lo resolvía sola, colgándolo de
+               `secciones[0]`: dato incorrecto en silencio. */
+            sinSeccion: !String(f.seccion || "").trim(),
           };
         }
 
@@ -350,14 +365,9 @@
           const usadas = ocupadas(n);
 
           const filas = [];
-          let listas = 0, conError = 0, sinTitulo = 0;
 
           lote.forEach(function (f, i) {
             const st = estadoFila(f, n, usadas);
-            if (st.duplicada) conError++;
-            else if (st.sinTitulo) sinTitulo++;
-            else listas++;
-
             const idx = i + 1;
             const id = modulo.codigo + "." + tres(f.secuencia);
             filas.push(
@@ -367,6 +377,14 @@
                 tres(f.secuencia) + '"' +
               (st.duplicada ? ' aria-invalid="true" aria-describedby="err' + idx + '"' : "") + " /></td>" +
               '<td class="cell-mono">' + id + "</td>" +
+              '<td><label class="sr-only" for="x' + idx + '">Sección fila ' + idx + "</label>" +
+              '<select class="cell-input" id="x' + idx + '" data-campo="seccion"' +
+                (st.sinSeccion ? ' aria-invalid="true"' : "") + ">" +
+              '<option value="">— elegir —</option>' +
+              modulo.secciones.map(function (sec) {
+                return '<option value="' + R.esc(sec.titulo) + '"' +
+                  (sec.titulo === f.seccion ? " selected" : "") + ">" + R.esc(sec.titulo) + "</option>";
+              }).join("") + "</select></td>" +
               '<td><label class="sr-only" for="t' + idx + '">Título fila ' + idx + "</label>" +
               '<input class="cell-input" id="t' + idx + '" data-campo="titulo" value="' +
                 R.esc(f.titulo) + '" placeholder="título del video" /></td>' +
@@ -376,9 +394,6 @@
               '<td><label class="sr-only" for="c' + idx + '">Cohorte fila ' + idx + "</label>" +
               '<input class="cell-input is-mono" id="c' + idx + '" data-campo="cohorte" value="' +
                 R.esc(f.cohorte) + '" placeholder="C__" /></td>' +
-              '<td><label class="sr-only" for="r' + idx + '">Prioridad fila ' + idx + "</label>" +
-              '<input class="cell-input is-mono" id="r' + idx + '" data-campo="prioridad" value="' +
-                R.esc(f.prioridad) + '" placeholder="P_" /></td>' +
               '<td><button type="button" class="link-quiet" data-quitar="' + i +
                 '" aria-label="Quitar la fila ' + idx + '">' +
               '<span class="icon icon-sm" data-icon="x"></span></button></td></tr>');
@@ -400,29 +415,58 @@
             }
           });
           R.pintar("[data-filas]", filas.join(""));
+          pintarAside();
+          cablearFilas();
+        }
 
-          /* ── Los números del aside, todos derivados ───────────────────── */
+        /* La cuenta vive en un solo lugar. Estaba escrita dos veces —acá y en
+           `refrescarContadores`— y solo una de las dos ponía el motivo en el
+           botón: al escribir en un campo, el botón se apagaba sin decir por qué. */
+        function contar() {
+          const n = numero();
+          const usadas = ocupadas(n);
+          const c = { listas: 0, conError: 0, sinTitulo: 0, sinSeccion: 0 };
+          lote.forEach(function (f) {
+            const st = estadoFila(f, n, usadas);
+            if (st.duplicada) c.conError++;
+            else if (st.sinTitulo) c.sinTitulo++;
+            else if (st.sinSeccion) c.sinSeccion++;
+            else c.listas++;
+          });
+          return c;
+        }
+
+        function pintarAside() {
+          const c = contar();
+          const modulo = S.modulo(numero()) || { secciones: [] };
+          const sinSecciones = !modulo.secciones.length;
+
           R.pintar("[data-lote]",
             medidor("Filas", lote.length) +
-            medidor("Listas", listas, listas > 0) +
-            medidor("Con error", conError, conError === 0) +
-            medidor("Falta el título", sinTitulo, sinTitulo === 0));
+            medidor("Listas", c.listas, c.listas > 0) +
+            medidor("Con error", c.conError, c.conError === 0) +
+            medidor("Falta el título", c.sinTitulo, c.sinTitulo === 0) +
+            medidor("Falta la sección", c.sinSeccion, c.sinSeccion === 0));
 
           document.querySelectorAll("[data-reservar]").forEach(function (b) {
-            b.textContent = listas
-              ? "Reservar " + listas + (listas === 1 ? " ID" : " IDs")
+            b.textContent = c.listas
+              ? "Reservar " + c.listas + (c.listas === 1 ? " ID" : " IDs")
               : "Reservar IDs";
-            b.disabled = listas === 0;
-            /* Un botón deshabilitado sin motivo se lee como roto. */
-            b.title = listas ? "" : conError && !sinTitulo
-              ? "Corregí las secuencias duplicadas."
-              : "Completá el título de al menos una fila.";
+            b.disabled = c.listas === 0;
+            /* Un botón deshabilitado sin motivo se lee como roto. El caso del
+               módulo sin secciones va primero: es el único que no se arregla en
+               esta pantalla. */
+            b.title = c.listas ? "" : sinSecciones
+              ? "El módulo todavía no tiene secciones. Creá la primera antes de reservar IDs."
+              : c.conError && !c.sinTitulo && !c.sinSeccion
+                ? "Corregí las secuencias duplicadas."
+                : c.sinSeccion && !c.sinTitulo
+                  ? "Elegí la sección de cada fila."
+                  : "Completá el título y la sección de al menos una fila.";
           });
           document.querySelectorAll("[data-resumen]").forEach(function (el) {
-            el.textContent = listas + (listas === 1 ? " ID permanente" : " IDs permanentes");
+            el.textContent = c.listas + (c.listas === 1 ? " ID permanente" : " IDs permanentes");
           });
-
-          cablearFilas();
         }
 
         function medidor(dt, dd, ok) {
@@ -445,10 +489,16 @@
               refrescarContadores();
             });
             input.addEventListener("change", function () {
-              if (campo !== "secuencia") return;
-              const v = parseInt(input.value, 10);
-              lote[i].secuencia = isNaN(v) ? 0 : v;
-              pintar();
+              if (campo === "secuencia") {
+                const v = parseInt(input.value, 10);
+                lote[i].secuencia = isNaN(v) ? 0 : v;
+                pintar();
+                return;
+              }
+              /* Un `<select>` no emite `input` en todos los navegadores: sin
+                 esto, elegir la sección no actualizaba nada. */
+              lote[i][campo] = input.value;
+              refrescarContadores();
             });
           });
           document.querySelectorAll("[data-quitar]").forEach(function (b) {
@@ -462,29 +512,7 @@
         /* Solo los números, sin tocar los `<input>`: es lo que permite que el
            aside acompañe lo que se está escribiendo sin robar el foco. */
         function refrescarContadores() {
-          const n = numero();
-          const usadas = ocupadas(n);
-          let listas = 0, conError = 0, sinTitulo = 0;
-          lote.forEach(function (f) {
-            const st = estadoFila(f, n, usadas);
-            if (st.duplicada) conError++;
-            else if (st.sinTitulo) sinTitulo++;
-            else listas++;
-          });
-          R.pintar("[data-lote]",
-            medidor("Filas", lote.length) +
-            medidor("Listas", listas, listas > 0) +
-            medidor("Con error", conError, conError === 0) +
-            medidor("Falta el título", sinTitulo, sinTitulo === 0));
-          document.querySelectorAll("[data-reservar]").forEach(function (b) {
-            b.textContent = listas
-              ? "Reservar " + listas + (listas === 1 ? " ID" : " IDs")
-              : "Reservar IDs";
-            b.disabled = listas === 0;
-          });
-          document.querySelectorAll("[data-resumen]").forEach(function (el) {
-            el.textContent = listas + (listas === 1 ? " ID permanente" : " IDs permanentes");
-          });
+          pintarAside();
         }
 
         /* Se escribe el atributo `value` y no solo la propiedad: con `.value` el
@@ -538,14 +566,14 @@
             const usadas = ocupadas(n);
             const listas = lote.filter(function (f) {
               const st = estadoFila(f, n, usadas);
-              return !st.duplicada && !st.sinTitulo;
+              return !st.duplicada && !st.sinTitulo && !st.sinSeccion;
             });
             if (!listas.length) return;
 
             listas.forEach(function (f) {
               S.crear("videos", {
                 codigoModulo: modulo.codigo,
-                seccion: (modulo.secciones[0] || {}).titulo || "",
+                seccion: f.seccion,
                 secuencia: f.secuencia,
                 titulo: f.titulo.trim(),
                 cohorte: f.cohorte.trim() || null,
