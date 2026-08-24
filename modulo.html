@@ -138,6 +138,12 @@
             <div class="mt-8 flex gap-2" data-vacio-acciones></div>
           </div>
 
+          <!-- Los cinco pasos esenciales del módulo, en un solo lugar. El ciclo
+               dura MESES —entre declarar las secciones y escribir las preguntas
+               hay un rodaje entero—, así que no es un asistente: es un estado
+               que se consulta el día 1 y también el día 90. -->
+          <div class="mb-[14px]" data-pasos hidden></div>
+
           <div id="detalle" class="grid grid-cols-[1fr_340px] items-start gap-[18px]" hidden>
             <div class="flex flex-col gap-[10px]">
               <h2 class="side-title !mb-0" data-arbol-titulo></h2>
@@ -272,29 +278,50 @@
           const aa = S.aptitud(modulo);
           let acciones = "";
           if (!esRuta) {
-            /* Las dos altas llevan el módulo padre: llegar y tener que elegirlo
-               otra vez es preguntar algo que esta pantalla ya sabe. */
-            acciones += '<a href="alta-seccion.html?m=' + modulo.numero + amp +
-              '" class="btn btn-bordered btn-sm">' +
-              '<span class="icon" data-icon="plus"></span>Agregar sección</a>' +
-              '<a href="alta-videos.html?m=' + modulo.numero + amp +
-              '" class="btn btn-bordered btn-sm">' +
-              '<span class="icon" data-icon="film"></span>Agregar video</a>';
+            /* «Agregar sección» y «Agregar video» ya NO están acá: son las
+               acciones de los pasos 1 y 2 del tablero, que es donde tienen
+               contexto —el paso dice además por qué hay que hacerlo—. Tenerlas
+               en los dos lugares sería ofrecer lo mismo dos veces. */
+            acciones += '<a href="tablero.html' + q + '" class="btn btn-bordered btn-sm">' +
+              '<span class="icon" data-icon="columns"></span>Ver el tablero</a>' +
+              '<a href="banco.html?m=' + modulo.numero + amp + '" class="btn btn-bordered btn-sm">' +
+              '<span class="icon" data-icon="help-circle"></span>Ver el banco</a>';
           } else {
             acciones += '<a href="banco.html?m=30' + amp + '" class="btn btn-bordered btn-sm">' +
               '<span class="icon" data-icon="help-circle"></span>Ver los bancos de origen</a>';
           }
-          /* R: el botón va deshabilitado cuando no cumple, y el motivo entero está
-             en la tarjeta de aptitud — no en un tooltip. */
-          if (rr.estado === "activo") {
-            acciones += '<button type="button" class="btn btn-bordered btn-sm" ' +
-              'data-desactivar>Desactivar</button>';
-          } else {
-            acciones += '<button type="button" class="btn btn-primary btn-sm" data-activar' +
-              (aa.apto ? "" : ' disabled aria-describedby="aptitud-motivo"') + ">" +
-              accionActivar + "</button>";
+          /* La ruta no tiene tablero de pasos —no tiene secciones ni videos
+             propios (R8)—, así que su botón de activar se queda en el
+             encabezado. Los de biblioteca lo tienen en el paso 5. */
+          if (esRuta) {
+            acciones += rr.estado === "activo"
+              ? '<button type="button" class="btn btn-bordered btn-sm" data-desactivar>Desactivar</button>'
+              : '<button type="button" class="btn btn-primary btn-sm" data-activar' +
+                (aa.apto ? "" : ' disabled aria-describedby="aptitud-motivo"') + ">" +
+                accionActivar + "</button>";
           }
           R.pintar("[data-acciones]", acciones);
+
+          /* El paso 5 se lleva el botón de activar: es su acción, y así los
+             cinco pasos tienen la suya en el mismo lugar. `cablearActivacion()`
+             lo engancha por `[data-activar]`, sin importar dónde se pintó. */
+          if (!esRuta) {
+            const cajaPasos = document.querySelector("[data-pasos]");
+            cajaPasos.hidden = false;
+            R.pintar("[data-pasos]", R.tableroPasos(S.pasosDeModulo(modulo, e), {
+              activacion: rr.estado === "activo"
+                ? '<button type="button" class="btn btn-bordered btn-sm btn-block" data-desactivar>Desactivar</button>'
+                : '<button type="button" class="btn btn-primary btn-sm btn-block" data-activar' +
+                  /* El desglose entero vive en la tarjeta de aptitud —por eso el
+                     `aria-describedby`—, pero el botón lleva igual su motivo:
+                     un control apagado y mudo se lee como roto. */
+                  (aa.apto ? "" : ' disabled aria-describedby="aptitud-motivo" title="' +
+                    R.esc(aa.faltan.length ? "Faltan " + aa.faltan.join(", ") + "."
+                      : aa.aRevisar + " preguntas a revisar bloquean la activación.") + '"') + ">" +
+                  accionActivar + "</button>",
+            }));
+          }
+
           cablearActivacion();
         }
 

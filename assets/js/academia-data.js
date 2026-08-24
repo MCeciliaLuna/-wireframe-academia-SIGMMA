@@ -259,6 +259,14 @@ window.ACADEMIA_DATA = (function () {
      activar, no una condición permanente (D-4): por eso `BAK-M10` sigue activo
      con 5 de 6 videos publicados, porque `BAK-M10.050` quedó obsoleto DESPUÉS
      de la activación. */
+  /* `mapaCargadoEn` es el hito de RESERVA: en qué escena entraron los IDs de
+     este módulo. Es distinto de los hitos de un video, que hablan de su
+     producción. Sin este campo, el panel de carga contaba 55 videos en E1 —la
+     escena que el propio README describe como «nada cargado»—, porque la escena
+     cambia el ESTADO de un video, no su existencia.
+
+     Un módulo creado a mano no lo declara, y ahí se cuentan sus videos reales:
+     es el único caso en que «faltan videos» se alcanza en el recorrido normal. */
   const modulos = [
     {
       numero: "R01",
@@ -280,6 +288,7 @@ window.ACADEMIA_DATA = (function () {
       titulo: "Fundamentos",
       tipo: "biblioteca",
       videosEsperados: 4,
+      mapaCargadoEn: "E2",
       orden: 1,
       planes: TODOS,
       activadoEn: "E5",
@@ -308,6 +317,7 @@ window.ACADEMIA_DATA = (function () {
       titulo: "File",
       tipo: "biblioteca",
       videosEsperados: 6,
+      mapaCargadoEn: "E2",
       orden: 2,
       planes: TODOS,
       activadoEn: "E5",
@@ -347,6 +357,7 @@ window.ACADEMIA_DATA = (function () {
       titulo: "Entidades (clientes, pasajeros, proveedores)",
       tipo: "biblioteca",
       videosEsperados: 6,
+      mapaCargadoEn: "E2",
       orden: 3,
       planes: TODOS,
       activadoEn: null,
@@ -383,6 +394,7 @@ window.ACADEMIA_DATA = (function () {
       titulo: "Voucher / Servicios",
       tipo: "biblioteca",
       videosEsperados: 7,
+      mapaCargadoEn: "E2",
       orden: 4,
       planes: TODOS,
       activadoEn: null,
@@ -454,6 +466,7 @@ window.ACADEMIA_DATA = (function () {
       titulo: "Cobranzas / Recibos",
       tipo: "biblioteca",
       videosEsperados: 5,
+      mapaCargadoEn: "E2",
       orden: 5,
       planes: TODOS,
       activadoEn: "E5",
@@ -492,6 +505,7 @@ window.ACADEMIA_DATA = (function () {
       titulo: "Facturación",
       tipo: "biblioteca",
       videosEsperados: 6,
+      mapaCargadoEn: "E2",
       orden: 6,
       planes: TODOS,
       activadoEn: null,
@@ -528,6 +542,7 @@ window.ACADEMIA_DATA = (function () {
       titulo: "Pagos a proveedores",
       tipo: "biblioteca",
       videosEsperados: 4,
+      mapaCargadoEn: "E2",
       orden: 7,
       planes: TODOS,
       activadoEn: null,
@@ -556,6 +571,7 @@ window.ACADEMIA_DATA = (function () {
       titulo: "Caja y bancos",
       tipo: "biblioteca",
       videosEsperados: 4,
+      mapaCargadoEn: "E2",
       orden: 8,
       planes: TODOS,
       activadoEn: null,
@@ -591,6 +607,7 @@ window.ACADEMIA_DATA = (function () {
       titulo: "Informes",
       tipo: "biblioteca",
       videosEsperados: 4,
+      mapaCargadoEn: "E2",
       orden: 9,
       planes: TODOS,
       activadoEn: null,
@@ -626,6 +643,7 @@ window.ACADEMIA_DATA = (function () {
       titulo: "Contable",
       tipo: "biblioteca",
       videosEsperados: 5,
+      mapaCargadoEn: "E2",
       orden: 10,
       /* El Maestro marca C19 como «Contable (Business)». */
       planes: [BUS, COR],
@@ -662,6 +680,7 @@ window.ACADEMIA_DATA = (function () {
       titulo: "Receptivo operador",
       tipo: "biblioteca",
       videosEsperados: 4,
+      mapaCargadoEn: "E2",
       orden: 11,
       /* El Maestro marca C20 como «Receptivo operador (nicho)». */
       planes: [COR],

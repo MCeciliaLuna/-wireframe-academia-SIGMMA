@@ -83,13 +83,13 @@ node -e 'global.window={};
   process.exit(window.SIM.informe().ok ? 0 : 1)'
 ```
 
-Son **108 controles**: los 55 videos en las 6 escenas, la monotonía video por video, las 5 cadenas del
+Son **115 controles**: los 55 videos en las 6 escenas, la monotonía video por video, las 5 cadenas del
 banco, el acumulado de preguntas, que no haya operación antes de E6 y que el uso simulado sea
 determinista. Más los seis de los flujos de alta: el orden de sección derivado, que ningún video quede
 sin sección, que ningún módulo de biblioteca quede sin secciones, la cuota por video, la cola, y la
 ida y vuelta de la plantilla del importador.
 
-Sin cargar `academia-import.js` son **106**: los dos de la ida y vuelta se saltean, porque el motor no
+Sin cargar `academia-import.js` son **113**: los dos de la ida y vuelta se saltean, porque el motor no
 depende del importador.
 
 ---
@@ -192,7 +192,7 @@ sigue diciendo la verdad aunque la sesión tenga cambios encima.
 | `?m=` | **Cualquiera de los 13:** `0`, `10`, `20` … `95`, `R01` |
 | `?v=` | **Cualquiera de los 55:** `BAK-M30.050`. También `escritura.html`, que es por video |
 | `?tab=` | `ficha` *(default)* · `versiones` · `guion` · `preguntas` · `ubicaciones` |
-| `?vista=` | `tabla` *(default)* · `kanban` — tablero |
+| `?vista=` | `tabla` *(default)* · `kanban` — tablero · `tarjetas` — panel de carga en `modulos.html` |
 | `?modo=` | `planificacion` *(default)* · `sesion` — hoja de cohorte |
 | `?paso=` | `1` · `2` · `resultado` — importador |
 | `?sello=` | El sello de una importación — `importador.html?paso=resultado` |

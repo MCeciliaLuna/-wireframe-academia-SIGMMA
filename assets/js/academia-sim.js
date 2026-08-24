@@ -914,7 +914,15 @@ window.SIM = (function () {
       ? modulo.videosEsperados
       : r.totalVideos;
 
-    const creados = r.totalVideos;
+    /* Los IDs existen desde que se reservó el mapa, no desde siempre. Sin esto
+       el panel contaba 55 videos en E1, la escena que se define como «nada
+       cargado»: la escena cambia el ESTADO de un video, no su existencia, y el
+       hito de reserva es lo que cierra esa brecha.
+
+       Un módulo creado a mano no declara el hito, y ahí se cuentan sus videos
+       reales — es el único caso en que «faltan videos» se alcanza. */
+    const cargado = !modulo.mapaCargadoEn || alcanzada(modulo.mapaCargadoEn, esc);
+    const creados = cargado ? r.totalVideos : 0;
     const publicados = r.publicados;
     const preguntas = r.banco.vigentes;
     const minimo = r.banco.minimo;
@@ -958,6 +966,116 @@ window.SIM = (function () {
       preguntas: estados.reduce(function (a, x) { return a + x.preguntas; }, 0),
       estados: estados,
     };
+  }
+
+  /* -- Los cinco pasos de un módulo ----------------------------------------
+     El ciclo de vida de un módulo dura MESES: entre declarar sus secciones y
+     escribir sus preguntas hay un rodaje entero. Por eso no es un asistente
+     —que asume que se recorre de una sentada y después estorba— sino un estado
+     que se consulta el día 1 y también el día 90.
+
+     Todo se deriva. Un paso está `hecho` si su propia condición se cumple, sin
+     importar el orden; `en curso` es el PRIMERO no hecho, y es el único
+     resaltado —contesta «¿y ahora qué?» sin leer los cinco—; el resto queda en
+     `todavía no`.
+
+     La acción de cada paso lleva a la pantalla que ya lo resuelve, con el
+     módulo fijado. Cuando no corresponde, `motivo` explica por qué: un paso sin
+     acción posible se muestra apagado con su razón, no se esconde. */
+  function pasosDeModulo(modulo, escenaId) {
+    const esc = escenaId || escena;
+    const amp = esc === D.ESCENA_DEFAULT ? "" : "&escena=" + esc;
+    const x = estadoDeCarga(modulo, esc);
+    const cfg = configEvaluacion(modulo, esc);
+    const ap = aptitud(modulo, esc);
+    const secciones = modulo.secciones || [];
+    const vs = videosDe(modulo.numero, esc);
+    const grabados = vs.filter(function (v) {
+      return rango(v.estado) >= rango("grabado") && rango(v.estado) <= rango("publicado");
+    }).length;
+    const cola = colaDeEscritura(esc, modulo.numero);
+
+    const pasos = [
+      {
+        id: "secciones",
+        titulo: "Secciones",
+        hecho: secciones.length > 0,
+        detalle: secciones.length
+          ? secciones.length + (secciones.length === 1 ? " declarada" : " declaradas")
+          : "ninguna todavía",
+        accion: { rotulo: "Agregar sección", href: "alta-seccion.html?m=" + modulo.numero + amp },
+        motivo: null,
+      },
+      {
+        id: "videos",
+        titulo: "Videos",
+        /* Reservar el ID y cargar el link son el mismo paso con meses en el
+           medio: por eso el detalle muestra la cadena entera y no un número. */
+        /* Se cierra cuando no queda nada POR PRODUCIR, no cuando todo está
+           publicado: un video `obsoleto` no se va a publicar nunca, y exigirlo
+           dejaría el paso trabado para siempre. `a regrabar` y `obsoleto` son
+           posteriores a `publicado`, así que el rango los cubre. */
+        hecho: x.esperados > 0 && x.creados === x.esperados &&
+          vs.every(function (v) { return rango(v.estado) >= rango("publicado"); }),
+        detalle: x.creados + " reservados → " + grabados + " grabados → " + x.publicados + " publicados",
+        accion: x.creados < x.esperados
+          ? { rotulo: "Reservar IDs", href: "alta-videos.html?m=" + modulo.numero + amp }
+          : { rotulo: "Ir al tablero", href: "tablero.html" + (amp ? "?" + amp.slice(1) : "") },
+        motivo: secciones.length ? null : "Primero hay que declarar al menos una sección: el video cuelga de ella.",
+      },
+      {
+        id: "evaluacion",
+        titulo: "Evaluación",
+        hecho: cfg.configurada,
+        detalle: cfg.configurada
+          ? cfg.bancoMinimo + " mínimas · " + cfg.porIntento + " por intento · corte " + cfg.umbral
+          : "sin configurar",
+        accion: { rotulo: "Configurar", href: "banco.html?m=" + modulo.numero + "&config=1" + amp },
+        motivo: null,
+      },
+      {
+        id: "preguntas",
+        titulo: "Preguntas",
+        hecho: cfg.configurada && x.minimo > 0 && x.preguntas >= x.minimo,
+        detalle: x.minimo ? x.preguntas + " de " + x.minimo : x.preguntas + " escritas",
+        accion: cola.length
+          ? { rotulo: "Escribir", href: "escritura.html?v=" + cola[0].video.id + amp }
+          : { rotulo: "Ver el banco", href: "banco.html?m=" + modulo.numero + amp },
+        motivo: x.publicados === 0
+          ? "Todavía no hay ningún video publicado: la pregunta se escribe después de grabar."
+          : !cfg.configurada
+            ? "Sin evaluación configurada no hay mínimo, así que no se sabe cuántas faltan."
+            : null,
+      },
+      {
+        id: "activacion",
+        titulo: "Activación",
+        hecho: moduloEstado(modulo, esc) === "activo",
+        /* El detalle corto; el desglose de los 4 criterios vive en la tarjeta
+           de aptitud, que es literalmente eso y ya existe. Repetirlo acá sería
+           tener el mismo número en dos lugares. */
+        /* Un módulo activo puede haber dejado de cumplir la aptitud DESPUÉS de
+           activarse —la aptitud es una compuerta al activar, no una condición
+           permanente (D-4)—. Decir «faltan» en un paso marcado hecho sería
+           contradecirse: se dice que está activo, y aparte que ya no cumpliría. */
+        detalle: moduloEstado(modulo, esc) === "activo"
+          ? "activo" + (ap.apto ? "" : " · hoy no volvería a cumplir la aptitud (D-4)")
+          : ap.apto ? "cumple los criterios"
+          : ap.faltan.length ? "faltan " + ap.faltan.join(", ")
+          : ap.aRevisar ? ap.aRevisar + " preguntas a revisar"
+          : "todavía no",
+        accion: null,
+        motivo: ap.apto ? null : "La aptitud es la compuerta: mirá el detalle al costado.",
+      },
+    ];
+
+    let yaHuboPendiente = false;
+    pasos.forEach(function (p) {
+      if (p.hecho) { p.estado = "hecho"; return; }
+      p.estado = yaHuboPendiente ? "todavía no" : "en curso";
+      yaHuboPendiente = true;
+    });
+    return pasos;
   }
 
   /* El ID de la próxima pregunta de un módulo. Se deriva del banco, no del
@@ -1616,6 +1734,51 @@ window.SIM = (function () {
     chequeo("El chip de carga no retrocede entre escenas",
       retrocesosCarga.length === 0, retrocesosCarga.slice(0, 3).join(", "));
 
+    /* E1 no tenía NINGÚN control: el contrato de conteos empieza en E2, así que
+       la escena que se define como «nada cargado» era la única que nadie
+       auditaba — y de hecho contaba 55 videos. */
+    const cargadosEnE1 = bibliotecas.filter(function (m) {
+      return estadoDeCarga(m, "E1").chip !== "sin empezar";
+    });
+    /* -- Los cinco pasos ----------------------------------------------------
+       El resaltado es la única guía que da el tablero: si señalara un paso que
+       no es el primero pendiente, mandaría a hacer algo salteando lo anterior.
+       Y el avance no puede retroceder, por la misma monotonía que el resto. */
+    const resaltadoMal = [];
+    const pasosAtras = [];
+    D.ESCENAS.forEach(function (e) {
+      bibliotecas.forEach(function (m) {
+        const ps = pasosDeModulo(m, e.id);
+        const primerPendiente = ps.findIndex(function (p) { return !p.hecho; });
+        const resaltados = ps.filter(function (p) { return p.estado === "en curso"; });
+        const ok = primerPendiente === -1
+          ? resaltados.length === 0
+          : resaltados.length === 1 && ps[primerPendiente].estado === "en curso";
+        if (!ok) resaltadoMal.push(e.id + " · " + m.codigo);
+      });
+    });
+    chequeo("El paso resaltado es siempre el primero no terminado",
+      resaltadoMal.length === 0, resaltadoMal.slice(0, 3).join(", "));
+
+    bibliotecas.forEach(function (m) {
+      let previos = null;
+      D.ESCENAS.forEach(function (e) {
+        const hechos = pasosDeModulo(m, e.id).map(function (p) { return p.hecho; });
+        if (previos) {
+          hechos.forEach(function (h, i) {
+            if (previos[i] && !h) pasosAtras.push(m.codigo + " · paso " + (i + 1) + " en " + e.id);
+          });
+        }
+        previos = hechos;
+      });
+    });
+    chequeo("Ningún paso del módulo retrocede entre escenas",
+      pasosAtras.length === 0, pasosAtras.slice(0, 3).join(", "));
+
+    chequeo("E1 · ningún módulo tiene el mapa cargado",
+      cargadosEnE1.length === 0,
+      cargadosEnE1.map(function (m) { return m.codigo; }).slice(0, 3).join(", "));
+
     /* -- Ida y vuelta de la plantilla ---------------------------------------
        Solo corre donde `academia-import.js` está cargado: el motor no depende
        del importador, es al revés.
@@ -1745,6 +1908,7 @@ window.SIM = (function () {
     colaDeEscritura: colaDeEscritura,
     estadoDeCarga: estadoDeCarga,
     resumenDeCarga: resumenDeCarga,
+    pasosDeModulo: pasosDeModulo,
     CHIPS_CARGA: CHIPS_CARGA,
     proximoIdPregunta: proximoIdPregunta,
     bancoDe: bancoDe,

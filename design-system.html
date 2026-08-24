@@ -620,6 +620,16 @@
                 <td>Sin resolver acá: es la <strong>D5 del modelo de datos</strong> y afecta al desbloqueo del Front. Está anotada en el detalle de la Ruta.</td>
               </tr>
               <tr>
+                <td class="font-mono text-xs">D-13</td>
+                <td><strong>El panel de carga usa tarjetas, contra R5 y R6</strong> <span class="chip chip-publicado">cerrada</span></td>
+                <td><strong>Conmutador, no reemplazo.</strong> La tabla sigue siendo el default —R5 y R6 no se rompen— y las tarjetas son la otra vista, con el mismo patrón que el kanban del tablero. Las dos llevan los mismos <code class="font-mono text-xs">data-*</code>, así que un solo criterio de filtro acota las dos a la vez.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">D-14</td>
+                <td><strong>«Sin empezar» y «Faltan videos» casi no se ven</strong></td>
+                <td>Los 55 videos entran de una sola vez con el mapa, así que <code class="font-mono text-xs">creados</code> iguala a <code class="font-mono text-xs">esperados</code> en las escenas E2 a E6 y esos dos chips solo aparecen en E1 —donde el listado muestra su placeholder de día 0— y en módulos creados a mano o por importación incremental. No es un defecto del panel: es que el relato del prototipo no tiene una carga parcial. Queda abierto si conviene una escena que la muestre.</td>
+              </tr>
+              <tr>
                 <td class="font-mono text-xs">D-10</td>
                 <td><strong>¿La importación actualiza lo que ya existe, o solo da de alta?</strong> <span class="chip chip-publicado">cerrada</span></td>
                 <td><strong>Alta + alta incremental, nunca actualización.</strong> Una fila cuyo ID ya existe se <strong>omite</strong> y se dice cuál y por qué. Un video publicado tiene guión, preguntas y agencias que lo vieron colgando: una planilla no puede tener autoridad sobre eso. Queda abierto si más adelante conviene una actualización por ID, que es mucho más potente y mucho más delicada.</td>
@@ -651,7 +661,7 @@
           Los números ya no se escriben: se <strong>derivan</strong> del dataset, así que no pueden
           discrepar entre pantallas. Los contadores del kanban, los tiles del tablero y la columna
           «videos publicados / total» del listado salen del mismo cálculo. Estas son las cadenas que el
-          motor verifica —<code class="font-mono text-xs">SIM.verificar()</code>, 108 controles— y los
+          motor verifica —<code class="font-mono text-xs">SIM.verificar()</code>, 115 controles— y los
           tres lugares donde el wireframe no cerraba consigo mismo.
         </p>
 

@@ -17,6 +17,9 @@ con una **academia completa simulada**. Cuatro bloques de trabajo:
 - **Flujos de alta simplificados** — **19 pantallas**. La estructura del MVP entra por
   importación en vez de tipearse 44 veces, ninguna vía puede dejar un video sin sección, y
   escribir preguntas pasó de 550 aperturas de modal a una cola por video.
+- **Los pasos, centralizados** — el **panel de carga** en `modulos.html` (conmutador tabla /
+  tarjetas) y el **tablero de cinco pasos** en `modulo.html`. El panel contesta «¿cómo viene
+  la carga?» sobre los 11; el módulo, «¿qué hago con este?».
 
 **Ya no es solo maquetación, ni solo navegación.** No hay backend, ni API, ni videos reales, ni SSO.
 Pero **sí hay capa de datos, reglas de negocio derivadas, mutaciones y persistencia en
@@ -148,7 +151,7 @@ icons.js → academia-data.js → academia-agencias.js → academia-guiones.js
 **`academia-import.js` va entre `academia-sim.js` y `render.js`, y solo en `importador.html`.**
 Ninguna otra pantalla lo necesita y no hay razón para que lo cargue. El motor **no depende de
 él**: es al revés. Sus dos controles de ida y vuelta se saltean donde no está cargado, y por eso
-`verificar()` da 106 controles en una pantalla común y 108 en el importador o en el script de
+`verificar()` da 113 controles en una pantalla común y 115 en el importador o en el script de
 verificación.
 
 **Ojo con el orden de ejecución.** Los `<script src>` van al final del `<body>`, así que el script
@@ -288,6 +291,9 @@ Todas en `academia-sim.js`. Ninguna en el HTML.
 | Avance de una persona, **determinista** | `avanceDe()` — semilla estable por ID, nunca `Math.random()` |
 | Configuración de evaluación del módulo | `configEvaluacion()` — hito del dataset, o lo que guardó el overlay |
 | La prioridad la define el cohorte | `conEstado()` — al cambiar el cohorte, la prioridad lo sigue |
+| **Estado de carga de un módulo** | `estadoDeCarga()` — el chip se resuelve en cascada: `sin empezar` → `faltan videos` → `faltan publicar` → `faltan preguntas` → `completo`. El primero que da verdadero gana, así que la etiqueta dice qué hacer AHORA y no qué falta en general |
+| **Los cinco pasos del módulo** | `pasosDeModulo()` — `hecho` si su condición se cumple; `en curso` es el primero no hecho y el único resaltado; el resto, `todavía no`. **El resaltado orienta, no da permiso**: un paso se apaga por MOTIVO, nunca por posición |
+| Los IDs existen desde que se reservó el mapa | `mapaCargadoEn` — hito de reserva del módulo. Sin él, E1 contaba 55 videos en la escena que se define como «nada cargado» |
 | **Orden de una sección** | `ordenDeSeccion()` — la secuencia más baja de sus videos. Verificado: reproduce las 31 del dataset. Hace que ordenar la planilla por ID no pueda romper el syllabus. Una sección recién creada no tiene videos, así que ahí manda su `orden` explícito |
 | **Cuota de preguntas de un video** | `cuotaDeVideo()` — el mínimo de su sección repartido entre sus videos. **Orientativa:** lo exigible sigue siendo el mínimo por sección. **No es 10 parejo: va de 5 a 20** |
 | **Cola de escritura** | `colaDeEscritura()` — la unidad de trabajo es el VIDEO. Tres motivos en orden de urgencia: `sin preguntas` · `bajo cuota` · `a revisar`. **No lista lo que todavía no se publicó** |
@@ -414,7 +420,7 @@ Modelarlo así garantiza que el banco no pueda achicarse entre escenas: `0 → 1
 
 ## Verificación
 
-### 1 · `SIM.verificar()` — 108 controles
+### 1 · `SIM.verificar()` — 115 controles
 
 Reemplaza los greps manuales de coherencia numérica. Corre en la consola del navegador o en node.
 **Cargá también `academia-import.js`**, o los dos controles de ida y vuelta se saltean y son 106:

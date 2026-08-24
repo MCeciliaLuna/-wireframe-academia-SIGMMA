@@ -467,6 +467,53 @@ window.RENDER = (function () {
     );
   }
 
+  /* -- Tablero de pasos del módulo ------------------------------------------
+     Los cinco pasos esenciales en un solo lugar, con su estado derivado y una
+     acción cada uno. No es un asistente: el ciclo de vida de un módulo dura
+     meses y esto se consulta el día 1 y también el día 90.
+
+     El paso `en curso` es el único resaltado. Los `todavía no` se muestran
+     igual, apagados con su motivo: esconderlos obligaría a recordar que
+     existen, que es exactamente el problema que el tablero viene a resolver. */
+  function tableroPasos(pasos, opciones) {
+    const o = opciones || {};
+    return (
+      '<ol class="grid grid-cols-5 gap-[10px]" aria-label="Pasos del módulo">' +
+      pasos.map(function (p, i) {
+        /* Se apaga por MOTIVO, no por posición. El resaltado del paso «en
+           curso» orienta; no da ni quita permiso. En régimen se pueden escribir
+           las preguntas de los videos ya publicados aunque el paso de videos
+           siga abierto, y bloquearlo sería inventar una precondición que el
+           negocio no tiene. */
+        const apagado = !p.accion || !!p.motivo;
+        const accion = p.id === "activacion" && o.activacion
+          ? o.activacion
+          : p.accion
+            ? (apagado
+              ? '<button type="button" class="btn btn-bordered btn-sm btn-block" disabled title="' +
+                esc(p.motivo) + '">' +
+                esc(p.accion.rotulo) + "</button>"
+              : '<a href="' + esc(p.accion.href) + '" class="btn ' +
+                (p.estado === "en curso" ? "btn-primary" : "btn-bordered") +
+                ' btn-sm btn-block">' + esc(p.accion.rotulo) + "</a>")
+            : "";
+        return (
+          '<li class="side-card !p-4" data-paso="' + esc(p.id) + '" data-paso-estado="' + esc(p.estado) + '"' +
+          (p.estado === "en curso" ? ' aria-current="step"' : "") + ">" +
+          '<div class="flex items-baseline gap-2">' +
+          '<span class="wizard-num">' + (i + 1) + "</span>" +
+          '<h3 class="side-title !mb-0">' + esc(p.titulo) + "</h3>" +
+          "</div>" +
+          '<p class="mt-2 text-2xs text-gray-700">' + esc(p.detalle) + "</p>" +
+          (p.estado === "en curso" ? '<p class="mt-1 text-2xs font-bold text-primary">el que sigue</p>' : "") +
+          '<div class="mt-3">' + accion + "</div>" +
+          "</li>"
+        );
+      }).join("") +
+      "</ol>"
+    );
+  }
+
   function estadoBanco(b) {
     if (!b.configurada) return '<span class="chip chip-outline">sin configurar</span>';
     if (b.vigentes === 0) return '<span class="chip chip-alerta">sin banco</span>';
@@ -870,6 +917,7 @@ window.RENDER = (function () {
     sideCard: sideCard,
     filaModulo: filaModulo,
     tarjetaModulo: tarjetaModulo,
+    tableroPasos: tableroPasos,
     estadoBanco: estadoBanco,
     filaVideoArbol: filaVideoArbol,
     seccionArbol: seccionArbol,
