@@ -614,6 +614,69 @@ window.SIM = (function () {
     });
   }
 
+  /* -- Orden derivado de una sección ---------------------------------------
+     El orden de una sección se DERIVA de la secuencia más baja de sus videos,
+     nunca del orden en que llegaron las filas que la crearon. Es lo que hace
+     que ordenar la planilla de importación por ID, por módulo o por cohorte no
+     pueda cambiar el syllabus que ve la agencia: un «ordenar de A a Z» en
+     Sheets rompería el producto sin que nadie se entere.
+
+     Verificado contra el dataset: reproduce las 31 secciones sin excepción.
+
+     Una sección recién creada todavía no tiene videos de los que derivar nada,
+     así que ahí manda el `orden` explícito que trae la entidad. */
+  function ordenDeSeccion(seccion) {
+    const vs = (seccion && seccion.videos) || [];
+    if (!vs.length) {
+      return seccion && typeof seccion.orden === "number" ? seccion.orden : null;
+    }
+    return vs.reduce(function (min, v) {
+      return v.secuencia < min ? v.secuencia : min;
+    }, vs[0].secuencia);
+  }
+
+  /* -- Cuota de preguntas de un video --------------------------------------
+     ORIENTATIVA, no exigible. Lo que el sistema exige sigue siendo el mínimo
+     POR SECCIÓN: si alguien escribe 12 preguntas de un video y 8 de otro de la
+     misma sección, la sección está igual de sana. La cuota existe para que la
+     tarea tenga un tamaño —«escribir las de BAK-M30.050» se empieza y se
+     termina; «cargar las 50 de BAK-M30» no se termina nunca de una sentada, y
+     por eso se abandona—, no para auditar a nadie.
+
+     NO es 10 parejo: el reparto por sección va de 5 a 20 según cuántos videos
+     comparten la sección. `BAK-M00 · Moverse por SIGMMA` tiene un solo video y
+     un banco de 20. El resto de la división inexacta se reparte entre los
+     videos de menor secuencia, para que la suma cierre EXACTA contra el mínimo
+     de la sección.
+
+     Devuelve 0 si la evaluación del módulo no está configurada: antes de eso no
+     hay mínimo que repartir, igual que `resumenModulo()` muestra `—` y no
+     `0 de 50`. */
+  function cuotaDeVideo(video, escenaId) {
+    const esc = escenaId || escena;
+    if (!video) return 0;
+    const m = modulosPorNumero[video.modulo];
+    if (!m || !m.secciones || !m.secciones.length) return 0;
+    if (!configEvaluacion(m, esc).configurada) return 0;
+
+    const minimos = D.minimosDeSeccion(m);
+    let cuota = 0;
+    m.secciones.forEach(function (s, i) {
+      if (s.titulo !== video.seccion) return;
+      const vs = (s.videos || []).slice().sort(function (a, b) {
+        return a.secuencia - b.secuencia;
+      });
+      if (!vs.length) return;
+      const banco = (minimos[i] || { banco: 0 }).banco;
+      const base = Math.floor(banco / vs.length);
+      const resto = banco % vs.length;
+      let pos = 0;
+      vs.forEach(function (v, k) { if (v.secuencia === video.secuencia) pos = k; });
+      cuota = base + (pos < resto ? 1 : 0);
+    });
+    return cuota;
+  }
+
   /* -- Sorteo de un intento -----------------------------------------------
      10 preguntas sobre las 50 del módulo, RESPETANDO la cuota por sección. La
      cuota es lo que evita que el azar deje afuera un concepto central, y es la
@@ -807,6 +870,88 @@ window.SIM = (function () {
     return todos(esc).filter(function (v) {
       return v.estado === "publicado" && !conPregunta[v.id];
     });
+  }
+
+  /* -- Cola de escritura de preguntas --------------------------------------
+     La unidad de trabajo es el VIDEO, no el módulo. Es todo el cambio: «cargar
+     las 50 de un módulo» no tiene punto de corte y por eso se abandona.
+
+     La cola NO lista los 55 videos: lista lo que se puede hacer hoy. Un video
+     que no se grabó no aparece —todavía no corresponde escribirle preguntas—,
+     así que en E1 y E2 la cola está legítimamente vacía. Eso es dato, no un
+     estado roto de la pantalla.
+
+     Tres motivos, en orden de urgencia:
+       1 · `sin preguntas` — publicado y sin ninguna. Está visible para las
+           agencias y no se puede evaluar: es la `deudaDeEvaluacion()`.
+       2 · `bajo cuota`    — publicado y por debajo de la cuota de su sección.
+       3 · `a revisar`     — pasó a `a regrabar` y sus preguntas cayeron a
+           `a revisar` por la regla de `estadoPregunta()`. Acá no se escribe:
+           se revisa, que es otro trabajo y se rotula distinto.
+
+     `escritas` cuenta las que no son relleno `estructural`. Es la diferencia
+     entre la deuda formal —cuánto falta para el mínimo, que es la que habilita
+     la aptitud— y la deuda de contenido, que es la que dice cuánto trabajo
+     queda de verdad: un módulo puede figurar completo evaluando con preguntas
+     que no preguntan por SIGMMA. */
+  const MOTIVOS = ["sin preguntas", "bajo cuota", "a revisar"];
+
+  function colaDeEscritura(escenaId, moduloNumero) {
+    const esc = escenaId || escena;
+
+    const porVideo = {};
+    padronPreguntas().forEach(function (p) {
+      if (!p.videoOrigen || !alcanzada(p.creadaEn, esc)) return;
+      const c = porVideo[p.videoOrigen] ||
+        (porVideo[p.videoOrigen] = { total: 0, vigentes: 0, aRevisar: 0, escritas: 0 });
+      c.total++;
+      const est = estadoPregunta(p, esc);
+      if (est === "vigente") c.vigentes++;
+      if (est === "a revisar") c.aRevisar++;
+      if (p.origen !== "estructural") c.escritas++;
+    });
+
+    const filas = [];
+    todos(esc).forEach(function (v) {
+      if (moduloNumero !== undefined && moduloNumero !== null && v.modulo !== moduloNumero) return;
+      const m = modulosPorNumero[v.modulo];
+      /* La Ruta no entra: su banco es DERIVADO de los videos que referencia
+         (R8), así que no hay nada que escribir contra ella. */
+      if (!m || m.tipo !== "biblioteca") return;
+
+      const c = porVideo[v.id] || { total: 0, vigentes: 0, aRevisar: 0, escritas: 0 };
+      const cuota = cuotaDeVideo(v, esc);
+
+      let motivo = null;
+      if (v.estado === "publicado" && c.total === 0) motivo = "sin preguntas";
+      else if (v.estado === "publicado" && cuota > 0 && c.vigentes < cuota) motivo = "bajo cuota";
+      else if (v.estado === "a regrabar" && c.aRevisar > 0) motivo = "a revisar";
+      if (!motivo) return;
+
+      filas.push({
+        video: v,
+        modulo: m,
+        seccion: v.seccion,
+        motivo: motivo,
+        total: c.total,
+        vigentes: c.vigentes,
+        aRevisar: c.aRevisar,
+        escritas: c.escritas,
+        cuota: cuota,
+        faltan: Math.max(0, cuota - c.vigentes),
+      });
+    });
+
+    filas.sort(function (a, b) {
+      const ra = MOTIVOS.indexOf(a.motivo);
+      const rb = MOTIVOS.indexOf(b.motivo);
+      if (ra !== rb) return ra - rb;
+      /* Dentro del mismo motivo, el orden curricular del módulo y después la
+         secuencia: es el orden en que la agencia va a encontrarse los videos. */
+      if (a.modulo.orden !== b.modulo.orden) return a.modulo.orden - b.modulo.orden;
+      return a.video.secuencia - b.video.secuencia;
+    });
+    return filas;
   }
 
   /* -- Agregados del tablero y del Home ------------------------------------ */
@@ -1259,6 +1404,68 @@ window.SIM = (function () {
       chequeo("E6 · el uso simulado es determinista", a1 === a2);
     }
 
+    /* -- Jerarquía: superficie → módulo → sección → video -------------------
+       La sección es estructural del lado agencia: con ella se arma el syllabus,
+       el progreso parcial, el breadcrumb del reproductor y la devolución de la
+       evaluación. Un video sin sección o un módulo sin secciones dejan el
+       producto roto, no incompleto. */
+    const bibliotecas = catalogo().filter(function (m) { return m.tipo === "biblioteca"; });
+
+    /* El control que sostiene la regla de derivación. Si el orden que se deduce
+       de la secuencia mínima no reproduce el que declara el dataset, la regla
+       está mal y hay que enterarse acá, no después de importar. */
+    const ordenRoto = [];
+    bibliotecas.forEach(function (m) {
+      const derivado = m.secciones.slice().sort(function (a, b) {
+        return ordenDeSeccion(a) - ordenDeSeccion(b);
+      });
+      derivado.forEach(function (s, i) {
+        if (s.orden !== i + 1) ordenRoto.push(m.codigo + " · " + s.titulo);
+      });
+    });
+    chequeo("El orden de sección derivado de la secuencia mínima reproduce el dataset",
+      ordenRoto.length === 0, ordenRoto.slice(0, 3).join(", "));
+
+    const sinSeccion = padron().filter(function (v) { return !v.seccion; });
+    chequeo("Ningún video sin sección",
+      sinSeccion.length === 0, sinSeccion.map(function (v) { return v.id; }).slice(0, 3).join(", "));
+
+    const sinSecciones = bibliotecas.filter(function (m) {
+      return !m.secciones || !m.secciones.length;
+    });
+    chequeo("Ningún módulo de biblioteca sin secciones",
+      sinSecciones.length === 0, sinSecciones.map(function (m) { return m.codigo; }).join(", "));
+
+    /* La cuota por video es orientativa, pero no puede inventar un total
+       distinto al que se exige: por sección tiene que sumar el mínimo exacto. */
+    const cuotaRota = [];
+    bibliotecas.forEach(function (m) {
+      const minimos = D.minimosDeSeccion(m);
+      m.secciones.forEach(function (s, i) {
+        const suma = (s.videos || []).reduce(function (acc, v) {
+          return acc + cuotaDeVideo(porId[m.codigo + "." + String(v.secuencia).padStart(3, "0")], "E6");
+        }, 0);
+        const esperado = (minimos[i] || { banco: 0 }).banco;
+        if (suma !== esperado) cuotaRota.push(m.codigo + " · " + s.titulo + ": " + suma + " ≠ " + esperado);
+      });
+    });
+    chequeo("La cuota por video suma el mínimo de su sección",
+      cuotaRota.length === 0, cuotaRota.slice(0, 3).join(" · "));
+
+    /* La cola solo ofrece trabajo que se puede hacer hoy. Un video que no llegó
+       a publicado no tiene preguntas que escribir: ofrecerlas sería pedir que se
+       evalúe algo que todavía no existe. */
+    const colaMal = [];
+    D.ESCENAS.forEach(function (e) {
+      colaDeEscritura(e.id).forEach(function (f) {
+        if (f.video.estado !== "publicado" && f.video.estado !== "a regrabar") {
+          colaMal.push(e.id + " · " + f.video.id + " (" + f.video.estado + ")");
+        }
+      });
+    });
+    chequeo("La cola no lista videos que no llegaron a publicado",
+      colaMal.length === 0, colaMal.slice(0, 3).join(", "));
+
     /* -- Integridad de lo creado en el overlay ------------------------------
        Estos controles sí miran la sesión: son lo único que puede detectar un
        alta mal formada, y una entidad rota se ve igual que una sana hasta que
@@ -1293,6 +1500,14 @@ window.SIM = (function () {
       });
       chequeo("Overlay · los módulos creados tienen código, título y número",
         modsRotos.length === 0, modsRotos.length + " módulos");
+
+      /* La invariante que cierra el agujero: ninguna vía de alta —import, alta
+         de módulo, alta de videos— puede dejar un video sin sección. Del lado
+         agencia un video sin sección no se puede ubicar en el syllabus. */
+      const creadosSinSeccion = creados.filter(function (v) { return !v.seccion; });
+      chequeo("Overlay · ningún video creado quedó sin sección",
+        creadosSinSeccion.length === 0,
+        creadosSinSeccion.map(function (v) { return v.id; }).slice(0, 3).join(", "));
     }
 
     return { ok: fallas.length === 0, fallas: fallas, controles: controles };
@@ -1342,6 +1557,9 @@ window.SIM = (function () {
     resumenModulo: resumenModulo,
     configEvaluacion: configEvaluacion,
     seccionesDe: seccionesDe,
+    ordenDeSeccion: ordenDeSeccion,
+    cuotaDeVideo: cuotaDeVideo,
+    colaDeEscritura: colaDeEscritura,
     bancoDe: bancoDe,
     aptitud: aptitud,
     videosDeRuta: videosDeRuta,
