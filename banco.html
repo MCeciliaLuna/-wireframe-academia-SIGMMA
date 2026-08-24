@@ -190,6 +190,27 @@
                 </dl>
               </section>
 
+              <!-- La cola de trabajo. La unidad es el VIDEO, no el módulo:
+                   «cargar las 50 de un módulo» no tiene punto de corte y por eso
+                   se abandona; «escribir las de BAK-M30.050» se empieza y se
+                   termina. Lista solo lo que se puede hacer hoy, así que en una
+                   escena sin videos publicados está legítimamente vacía. -->
+              <section class="side-card" aria-labelledby="lbl-cola" data-cola-caja hidden>
+                <div class="flex items-baseline gap-3">
+                  <h2 class="side-title !mb-0" id="lbl-cola">Qué falta escribir</h2>
+                  <!-- Deuda FORMAL: cuánto falta para el mínimo, que es la que
+                       habilita la aptitud. Deuda de CONTENIDO: cuántas preguntas
+                       hay realmente escritas contra el video. Sin las dos, un
+                       módulo puede figurar completo evaluando con relleno. -->
+                  <div class="filter-bar !mb-0 !border-0 !p-0 ml-auto" role="group" aria-label="Cómo contar la deuda">
+                    <button type="button" class="filter-pill" data-deuda-modo="formal" aria-pressed="true">Deuda formal</button>
+                    <button type="button" class="filter-pill" data-deuda-modo="contenido" aria-pressed="false">Deuda de contenido</button>
+                  </div>
+                </div>
+                <p class="mt-1 text-2xs text-gray-600" data-cola-nota></p>
+                <ul class="mt-3 flex flex-col gap-2 text-xs" data-cola-lista></ul>
+              </section>
+
               <!-- R9: el estado roto se mantiene. Es el estado real mientras se
                    carga contenido, no un caso de borde. -->
               <div class="alert alert-error items-center" data-alerta hidden>
@@ -242,7 +263,6 @@
               <section class="side-card" aria-labelledby="lbl-deuda">
                 <h2 class="side-title" id="lbl-deuda">Deuda de evaluación</h2>
                 <p class="mb-[9px] text-xs" data-deuda-resumen></p>
-                <ul class="flex flex-col gap-2 text-xs" data-deuda-lista></ul>
                 <p class="foot-note" data-deuda-nota></p>
               </section>
 
@@ -796,14 +816,67 @@
         R.pintar("[data-deuda-resumen]",
           "Videos publicados sin ninguna pregunta: <strong>" + debiendo.length + " de " +
           publicados.length + "</strong>");
-        R.pintar("[data-deuda-lista]", debiendo.length
-          ? debiendo.map(function (v) {
-              return '<li class="flex items-center gap-2"><span class="row-id">' + v.id +
-                '</span><span class="flex-1">' + R.esc(v.titulo) +
-                '</span><a href="video.html?v=' + v.id + "&amp;tab=preguntas" +
-                (q ? "&amp;escena=" + e : "") + '">escribir ›</a></li>';
-            }).join("")
-          : '<li class="text-gray-600">Ninguno: todos los videos publicados tienen al menos una pregunta.</li>');
+
+        /* ── La cola de trabajo del módulo ───────────────────────────────
+           Sale del motor, que ya sabe ordenarla por urgencia. Acá solo se
+           pinta: si la pantalla la volviera a ordenar, podría discrepar con
+           la del Home, que mira lo mismo. */
+        let modoDeuda = "formal";
+
+        function pintarCola() {
+          const cola = S.colaDeEscritura(e, modulo.numero);
+          const caja = document.querySelector("[data-cola-caja]");
+          const cfg = S.configEvaluacion(modulo);
+
+          /* Sin evaluación configurada no hay mínimo que repartir, así que la
+             cuota es 0 y la cola no puede decir cuánto falta. Antes eso se
+             descubría tarde: el contador mostraba «—» y nada explicaba por qué.
+             Ahora el primer ítem no es un video, es la precondición. */
+          if (!cfg.configurada) {
+            caja.hidden = false;
+            R.pintar("[data-cola-nota]",
+              "Primero hay que configurar la evaluación: sin un mínimo declarado, " +
+              "no se puede saber cuántas preguntas falta escribir.");
+            R.pintar("[data-cola-lista]",
+              '<li class="flex items-center gap-2"><span class="flex-1">' +
+              "Configurar la evaluación de " + modulo.codigo +
+              '</span><button type="button" class="btn btn-primary btn-sm" data-modal-open="m-config">Configurar</button></li>');
+            return;
+          }
+
+          caja.hidden = cola.length === 0;
+          if (!cola.length) return;
+
+          const porContenido = modoDeuda === "contenido";
+          R.pintar("[data-cola-nota]", porContenido
+            ? "Preguntas escritas contra el video, sin contar el relleno estructural. Es la que dice cuánto trabajo queda de verdad."
+            : "Preguntas vigentes contra la cuota de su sección. Es la que habilita la aptitud del módulo.");
+
+          R.pintar("[data-cola-lista]", cola.map(function (f) {
+            const hechas = porContenido ? f.escritas : f.vigentes;
+            const rev = f.motivo === "a revisar";
+            return '<li class="flex items-center gap-2">' +
+              '<span class="row-id">' + f.video.id + "</span>" +
+              '<span class="flex-1">' + R.esc(f.video.titulo) + "</span>" +
+              '<span class="chip ' + (rev ? "chip-alerta" : "chip-outline") + '">' + f.motivo + "</span>" +
+              '<span class="meta w-[64px] shrink-0 text-right">' +
+                (rev ? f.aRevisar + " a revisar" : hechas + " de " + f.cuota) + "</span>" +
+              '<a href="escritura.html?v=' + f.video.id + (q ? "&amp;escena=" + e : "") + '">' +
+              (rev ? "revisar" : "escribir") + " ›</a></li>";
+          }).join(""));
+        }
+
+        document.querySelectorAll("[data-deuda-modo]").forEach(function (b) {
+          b.addEventListener("click", function () {
+            modoDeuda = b.dataset.deudaModo;
+            document.querySelectorAll("[data-deuda-modo]").forEach(function (x) {
+              x.setAttribute("aria-pressed", String(x === b));
+            });
+            pintarCola();
+          });
+        });
+
+        pintarCola();
         R.pintar("[data-deuda-nota]", sinPublicar.length
           ? sinPublicar.map(function (v) {
               return '<span class="font-mono">' + v.id + "</span> (" + v.estado + ")";

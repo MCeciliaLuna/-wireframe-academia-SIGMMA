@@ -362,7 +362,15 @@
               dd: cohorte ? cohorte.grabados + " / " + cohorte.total : "—",
               ok: cohorte ? cohorte.grabados === cohorte.total : undefined },
             { dt: "Videos a guionar", dd: aGuionar },
-            { dt: "Publicados sin pregunta", dd: deuda.length, ok: deuda.length === 0 },
+            /* Deja de ser un número mudo: lleva a escribir la primera. La deuda
+               de evaluación es métrica de CONSTRUCCIÓN, no de uso, así que
+               mostrarla acá no toca R10 —lo que sí sería inventar operación es
+               medir cuántas agencias la respondieron. */
+            { dt: "Publicados sin pregunta",
+              html: deuda.length
+                ? '<a href="escritura.html?v=' + deuda[0].id +
+                  (e === "E5" ? "" : "&amp;escena=" + e) + '">' + deuda.length + " · escribir ›</a>"
+                : '<span data-ok="true">0</span>' },
             { dt: "En cola de regrabación", dd: conteo["a regrabar"],
               ok: conteo["a regrabar"] === 0 },
           ]),

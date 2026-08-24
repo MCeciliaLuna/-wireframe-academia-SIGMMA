@@ -894,6 +894,18 @@ window.SIM = (function () {
     });
   }
 
+  /* El ID de la próxima pregunta de un módulo. Se deriva del banco, no del
+     reloj: sigue el formato `P-NNNNN` del dataset y no depende de cuándo se
+     apretó el botón. Vive acá porque lo necesitan las dos superficies de
+     escritura —el modal del banco y la sesión— y dos derivaciones distintas del
+     mismo ID terminarían chocando. */
+  function proximoIdPregunta(moduloNumero, escenaId) {
+    const usados = bancoDe(moduloNumero, escenaId).map(function (p) {
+      return parseInt(String(p.id).replace(/\D/g, ""), 10) || 0;
+    });
+    return "P-" + ((usados.length ? Math.max.apply(null, usados) : moduloNumero * 1000) + 1);
+  }
+
   /* -- Cola de escritura de preguntas --------------------------------------
      La unidad de trabajo es el VIDEO, no el módulo. Es todo el cambio: «cargar
      las 50 de un módulo» no tiene punto de corte y por eso se abandona.
@@ -1615,6 +1627,7 @@ window.SIM = (function () {
     ordenDeSeccion: ordenDeSeccion,
     cuotaDeVideo: cuotaDeVideo,
     colaDeEscritura: colaDeEscritura,
+    proximoIdPregunta: proximoIdPregunta,
     bancoDe: bancoDe,
     aptitud: aptitud,
     videosDeRuta: videosDeRuta,

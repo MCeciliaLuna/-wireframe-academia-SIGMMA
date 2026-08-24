@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Escribir preguntas · Backoffice Academia SIGMMA</title>
+    <meta name="description" content="Sesión de escritura de preguntas de un video, con su guión a la vista." />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="assets/fonts/sofia-sans/SofiaSans-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="stylesheet" href="assets/css/academia.css" />
+  </head>
+  <body>
+    <a href="#contenido" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[1001] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-white">Saltar al contenido</a>
+
+    <div class="app-shell">
+      <!-- app-shell: sincronizar con src/partials/app-shell.html -->
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img src="assets/img/logo.svg" alt="SIGMMA" width="96" height="16" class="w-[96px]" />
+          <span class="text-2xs font-bold text-primary">Academia</span>
+        </div>
+
+        <!-- Selector global de superficie. Todo el contenido del backoffice cuelga
+             de cuál está activa. Solo BAK tiene módulos mapeados. -->
+        <div class="relative" data-dropdown>
+          <span class="side-title mb-1 block">Superficie</span>
+          <button type="button" class="surface-picker" data-dropdown-trigger aria-expanded="false" aria-haspopup="true">
+            <span><strong>BAK</strong> · Backoffice</span>
+            <span class="icon icon-sm" data-icon="chevron-down"></span>
+          </button>
+          <div class="menu" role="menu" data-dropdown-menu hidden>
+            <a href="modulos.html?sup=BAK" class="menu-item" role="menuitem">BAK · Backoffice</a>
+            <a href="modulos.html?sup=FRT" class="menu-item" role="menuitem">FRT · Front</a>
+            <a href="modulos.html?sup=CRM" class="menu-item" role="menuitem">CRM</a>
+          </div>
+        </div>
+
+        <nav class="flex flex-col gap-4" aria-label="Secciones del backoffice">
+          <!-- Inicio va suelto, sin grupo: no es una función más sino el punto de
+               partida. En las etapas de construcción es el panel de obra. -->
+          <div class="nav-group">
+            <a href="home.html" class="nav-item" data-escena-keep>
+              <span class="icon" data-icon="activity"></span>Inicio
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Contenido</span>
+            <a href="modulos.html" class="nav-item">
+              <span class="icon" data-icon="layers"></span>Módulos
+            </a>
+            <a href="videos.html" class="nav-item">
+              <span class="icon" data-icon="film"></span>Biblioteca de videos
+            </a>
+            <a href="tablero.html" class="nav-item">
+              <span class="icon" data-icon="columns"></span>Tablero de producción
+            </a>
+            <a href="regrabacion.html" class="nav-item">
+              <span class="icon" data-icon="refresh"></span>Cola de regrabación
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Evaluación</span>
+            <a href="banco.html?m=30" class="nav-item">
+              <span class="icon" data-icon="help-circle"></span>Bancos de preguntas
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="settings"></span>Configuración
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Currícula</span>
+            <a href="modulo.html?m=R01" class="nav-item">
+              <span class="icon" data-icon="route"></span>Ruta Esencial
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Pipeline</span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="git-branch"></span>Impactos en Academia
+            </span>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Seguimiento</span>
+            <a href="panel.html" class="nav-item">
+              <span class="icon" data-icon="bar-chart"></span>Panel macro
+            </a>
+            <a href="agencias.html" class="nav-item">
+              <span class="icon" data-icon="users"></span>Detalle por agencia
+            </a>
+          </div>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Administración</span>
+            <a href="superficies.html" class="nav-item">
+              <span class="icon" data-icon="target"></span>Superficies y planes
+            </a>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="shield"></span>Usuarios y roles
+            </span>
+            <span class="nav-item" aria-disabled="true">
+              <span class="icon" data-icon="activity"></span>Auditoría
+            </span>
+          </div>
+        </nav>
+
+        <div class="sidebar-foot">
+          <span class="text-2xs text-gray-700">Majo · Contenido</span>
+        </div>
+      </aside>
+      <!-- /app-shell -->
+
+      <div class="main-col">
+        <header class="page-head">
+          <div>
+            <div class="breadcrumb" data-breadcrumb></div>
+            <h1 class="page-title">
+              <span data-titulo></span>
+              <span data-chips></span>
+              <span class="escena-badge" data-escena-label></span>
+            </h1>
+          </div>
+          <div class="page-actions" data-acciones></div>
+        </header>
+
+        <main id="contenido" class="page-body">
+          <!-- Estado vacío por DATO, no por escena: un video que todavía no se
+               publicó no tiene preguntas que escribir, en cualquier escena. -->
+          <div class="placeholder-box !py-14" id="sin-publicar" hidden>
+            <span class="placeholder-icon" data-icon="film"></span>
+            <h2 class="text-h4">Todavía no corresponde escribir preguntas</h2>
+            <p class="mt-3 max-w-[56ch] text-base text-gray-700" data-sin-publicar-texto></p>
+            <div class="mt-6 flex gap-2">
+              <a class="btn btn-primary btn-sm" data-ir-tablero>Ver en el tablero</a>
+              <a class="btn btn-bordered btn-sm" data-ir-banco>Ir al banco del módulo</a>
+            </div>
+          </div>
+
+          <div id="sesion" class="grid grid-cols-[1fr_380px] items-start gap-[18px]" hidden>
+            <div class="flex flex-col gap-[14px]">
+              <!-- R4 aplicado a la tarea: el contador se ve durante toda la
+                   sesión, no aparece como error al final. -->
+              <section class="side-card side-card-strong flex items-center gap-6" aria-labelledby="lbl-avance">
+                <div>
+                  <h2 class="side-title" id="lbl-avance">Escritas / cuota del video</h2>
+                  <p class="counter-big" data-contador></p>
+                </div>
+                <div class="flex-1">
+                  <div class="progress"><span data-progreso></span></div>
+                  <p class="mt-[6px] text-2xs text-gray-600" data-cuota-nota></p>
+                </div>
+              </section>
+
+              <section class="side-card" aria-labelledby="lbl-nueva">
+                <h2 class="side-title" id="lbl-nueva">Escribir una pregunta</h2>
+                <div class="field">
+                  <label class="label" for="texto">Enunciado</label>
+                  <textarea class="textarea !text-xs" id="texto" rows="2" placeholder="¿Qué pasa cuando…?"></textarea>
+                </div>
+                <fieldset class="mt-3">
+                  <legend class="label">Opciones · marcá la correcta</legend>
+                  <div class="flex flex-col gap-2" data-opciones></div>
+                </fieldset>
+                <p class="error-text mt-2" data-error hidden></p>
+                <div class="mt-3 flex justify-end gap-2">
+                  <button type="button" class="btn btn-bordered btn-sm" data-limpiar>Limpiar</button>
+                  <button type="button" class="btn btn-primary btn-sm" data-guardar disabled>Guardar y seguir</button>
+                </div>
+              </section>
+
+              <section class="side-card" aria-labelledby="lbl-escritas">
+                <h2 class="side-title" id="lbl-escritas">Las de este video</h2>
+                <div data-lista></div>
+              </section>
+            </div>
+
+            <aside class="flex flex-col gap-3">
+              <!-- El guión al costado es lo que hace que la pregunta hable como
+                   el video. La Plantilla de Guión lo pide explícito: la pregunta
+                   se escribe después de grabar «para que use el mismo lenguaje y
+                   el mismo ejemplo». Sin esto salen preguntas genéricas. -->
+              <section class="side-card side-card-strong" aria-labelledby="lbl-guion">
+                <h2 class="side-title" id="lbl-guion">El guión del video</h2>
+                <div class="text-xs text-gray-700" data-guion></div>
+              </section>
+
+              <section class="side-card" aria-labelledby="lbl-siguiente">
+                <h2 class="side-title" id="lbl-siguiente">Lo que sigue en la cola</h2>
+                <ul class="flex flex-col gap-2 text-xs" data-siguiente></ul>
+              </section>
+            </aside>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="assets/js/icons.js"></script>
+    <script src="assets/js/academia-data.js"></script>
+    <script src="assets/js/academia-agencias.js"></script>
+    <script src="assets/js/academia-guiones.js"></script>
+    <script src="assets/js/academia-preguntas.js"></script>
+    <script src="assets/js/academia-sim.js"></script>
+    <script src="assets/js/render.js"></script>
+    <script src="assets/js/ui.js"></script>
+    <script>
+      /* Sesión de escritura de preguntas de UN video.
+
+         Va aparte de `banco.html` por dos razones: el banco ya es la segunda
+         pantalla más grande del repo, y su contrato de URL es por módulo (`?m=`)
+         mientras esto es por video (`?v=`). Son dos direcciones distintas.
+
+         Tres cosas quedan fijas mientras se escribe: el contexto —módulo,
+         sección y video, que no se vuelven a elegir—, el guión al costado, y el
+         contador. El modal del banco pedía esas tres decisiones de contexto en
+         CADA pregunta; multiplicado por 550, es una tarea que se abandona. */
+      (function () {
+        "use strict";
+        const S = window.SIM;
+        const R = window.RENDER;
+        const e = S.escena;
+        const q = e === "E5" ? "" : "?escena=" + e;
+        const amp = e === "E5" ? "" : "&escena=" + e;
+
+        const OPCIONES = 4;
+
+        const pedido = (S.param("v") || "BAK-M30.050").toUpperCase();
+        const v = S.video(pedido, e);
+
+        /* Un ID que no existe no se disfraza mostrando otro video. */
+        if (!v) {
+          R.pintar("[data-titulo]", "Ese video no existe");
+          R.pintar("[data-breadcrumb]", '<a href="modulos.html' + q + '">Contenido / Módulos</a>');
+          const caja = document.getElementById("sin-publicar");
+          caja.hidden = false;
+          caja.querySelector("h2").textContent = "No hay ningún video con el ID " + pedido;
+          R.pintar("[data-sin-publicar-texto]",
+            "Los IDs tienen la forma <span class=\"font-mono\">BAK-M30.050</span>. " +
+            "Desde el banco de un módulo se llega a los que sí existen.");
+          document.querySelector("[data-ir-tablero]").href = "tablero.html" + q;
+          document.querySelector("[data-ir-banco]").href = "modulos.html" + q;
+          return;
+        }
+
+        const modulo = S.modulo(v.modulo);
+        const cuota = S.cuotaDeVideo(v, e);
+
+        /* ── Encabezado ─────────────────────────────────────────────────── */
+        R.pintar("[data-breadcrumb]",
+          '<a href="banco.html?m=' + modulo.numero + amp + '">Banco de ' + modulo.codigo +
+          "</a> / " + R.esc(v.seccion) + " / " + v.id);
+        R.pintar("[data-titulo]",
+          "Preguntas de " + '<span class="id-mono">' + v.id + "</span> " + R.esc(v.titulo));
+        R.pintar("[data-chips]",
+          R.chipEstado(v.estado) +
+          '<span class="chip chip-outline">' + R.esc(modulo.titulo) + "</span>" +
+          '<span class="chip chip-meta">' + R.esc(v.seccion) + "</span>");
+        R.pintar("[data-acciones]",
+          '<a href="banco.html?m=' + modulo.numero + amp + '" class="btn btn-bordered btn-sm">Volver al banco</a>' +
+          '<a href="guion.html?v=' + v.id + amp + '" class="btn btn-bordered btn-sm">Ver el guión</a>');
+
+        /* ── Estado vacío, por dato ─────────────────────────────────────── */
+        if (v.estado !== "publicado" && v.estado !== "a regrabar") {
+          const caja = document.getElementById("sin-publicar");
+          caja.hidden = false;
+          R.pintar("[data-sin-publicar-texto]",
+            "<span class=\"font-mono\">" + v.id + "</span> está en <strong>" + v.estado +
+            "</strong>. La pregunta que valida un concepto se escribe DESPUÉS de grabar el video, " +
+            "para que use su mismo lenguaje y su mismo ejemplo.");
+          document.querySelector("[data-ir-tablero]").href = "tablero.html" + q;
+          document.querySelector("[data-ir-banco]").href = "banco.html?m=" + modulo.numero + amp;
+          return;
+        }
+
+        document.getElementById("sesion").hidden = false;
+
+        /* ── El guión, al costado ───────────────────────────────────────── */
+        const guion = S.guionDe(v);
+        R.pintar("[data-guion]", guion
+          ? '<p class="font-bold text-gray-800">Intro</p><p class="mb-3">' + R.esc(guion.intro) + "</p>" +
+            '<p class="font-bold text-gray-800">Cuerpo</p><ol class="mb-3 ml-4 list-decimal">' +
+            (guion.cuerpo || []).map(function (paso) {
+              return "<li>" + R.esc(paso) + "</li>";
+            }).join("") + "</ol>" +
+            '<p class="font-bold text-gray-800">Cierre</p><p>' + R.esc(guion.cierre) + "</p>"
+          : '<p class="text-gray-600">Este video no tiene guión escrito. Se puede escribir igual, ' +
+            "pero sin el guión a la vista la pregunta tiende a salir genérica.</p>");
+
+        /* ── El formulario ──────────────────────────────────────────────── */
+        R.pintar("[data-opciones]", Array.apply(null, { length: OPCIONES }).map(function (_, i) {
+          const n = i + 1;
+          return '<div class="flex items-center gap-2">' +
+            '<input type="radio" name="correcta" id="c' + n + '" value="' + i + '"' +
+              (i === 0 ? " checked" : "") + ' aria-label="La opción ' + n + ' es la correcta" />' +
+            '<label class="sr-only" for="o' + n + '">Opción ' + n + "</label>" +
+            '<input class="input !h-9 flex-1 !text-xs" id="o' + n + '" type="text" data-opcion placeholder="opción ' + n + '" />' +
+            "</div>";
+        }).join(""));
+
+        const txt = document.getElementById("texto");
+        const btnGuardar = document.querySelector("[data-guardar]");
+        const err = document.querySelector("[data-error]");
+
+        const opciones = function () {
+          return [].slice.call(document.querySelectorAll("[data-opcion]"))
+            .map(function (i) { return i.value.trim(); });
+        };
+
+        function validar() {
+          const crudas = opciones();
+          const llenas = crudas.filter(Boolean);
+          const marcada = Number((document.querySelector('[name="correcta"]:checked') || {}).value || 0);
+          let motivo = null;
+          if (!txt.value.trim()) motivo = "Falta el enunciado.";
+          else if (llenas.length < 2) motivo = "Hacen falta al menos dos opciones.";
+          else if (!crudas[marcada]) motivo = "La opción marcada como correcta está vacía.";
+
+          err.hidden = !motivo;
+          err.textContent = motivo || "";
+          btnGuardar.disabled = !!motivo;
+          /* Un botón apagado sin motivo se lee como roto. */
+          btnGuardar.title = motivo || "";
+          return !motivo;
+        }
+
+        txt.addEventListener("input", validar);
+        document.querySelectorAll("[data-opcion]").forEach(function (i) {
+          i.addEventListener("input", validar);
+        });
+        document.querySelectorAll('[name="correcta"]').forEach(function (i) {
+          i.addEventListener("change", validar);
+        });
+        document.querySelector("[data-limpiar]").addEventListener("click", function () {
+          txt.value = "";
+          document.querySelectorAll("[data-opcion]").forEach(function (i) { i.value = ""; });
+          validar();
+          txt.focus();
+        });
+        validar();
+
+        btnGuardar.addEventListener("click", function () {
+          if (!validar()) return;
+          const crudas = opciones();
+          const marcada = Number(document.querySelector('[name="correcta"]:checked').value);
+          const llenas = crudas.filter(Boolean);
+
+          S.crear("preguntas", {
+            id: S.proximoIdPregunta(modulo.numero, e),
+            modulo: modulo.numero,
+            codigoModulo: modulo.codigo,
+            videoOrigen: v.id,
+            /* La sección la trae el video: acá no se vuelve a elegir. */
+            subtema: v.seccion,
+            texto: txt.value.trim(),
+            opciones: llenas,
+            correcta: llenas.indexOf(crudas[marcada]),
+            origen: "escrita",
+            borrador: false,
+          });
+          /* Se recarga y no se repinta: lo creado en el overlay se materializa
+             una sola vez por carga de página. La recarga deja el formulario
+             limpio y el contador arriba, que es exactamente «listo para la
+             siguiente». */
+          window.UI.recargar();
+        });
+
+        /* ── Contador y lista ───────────────────────────────────────────── */
+        const propias = S.bancoDe(modulo.numero, e).filter(function (p) {
+          return p.videoOrigen === v.id;
+        });
+        const escritas = propias.filter(function (p) { return p.origen !== "estructural"; });
+        const pct = cuota ? Math.min(100, Math.round((escritas.length / cuota) * 100)) : 0;
+
+        document.querySelector("[data-contador]").textContent =
+          escritas.length + (cuota ? " de " + cuota : "");
+        document.querySelector("[data-progreso]").style.width = pct + "%";
+        R.pintar("[data-cuota-nota]", cuota
+          ? "La cuota se deriva del mínimo de la sección «" + R.esc(v.seccion) +
+            "» repartido entre sus videos. Es orientativa: lo que se exige es el mínimo de la sección."
+          : "El módulo todavía no tiene la evaluación configurada, así que no hay mínimo que repartir.");
+
+        R.pintar("[data-lista]", propias.length
+          ? propias.map(function (p, i) {
+              return R.filaPregunta(p, { resaltar: p.estado === "a revisar" });
+            }).join("")
+          : '<p class="text-xs text-gray-600">Todavía no hay ninguna. La primera es la que más cuesta ' +
+            "y la que más sirve: es la que fija el vocabulario del resto.</p>");
+
+        /* ── Lo que sigue ───────────────────────────────────────────────── */
+        const cola = S.colaDeEscritura(e).filter(function (f) { return f.video.id !== v.id; });
+        R.pintar("[data-siguiente]", cola.length
+          ? cola.slice(0, 6).map(function (f) {
+              return '<li class="flex items-center gap-2"><span class="row-id">' + f.video.id +
+                '</span><span class="flex-1">' + R.esc(f.video.titulo) +
+                '</span><a href="escritura.html?v=' + f.video.id + amp + '">ir ›</a></li>';
+            }).join("")
+          : '<li class="text-gray-600">Nada más pendiente. Es el único video con deuda.</li>');
+      })();
+    </script>
+  </body>
+</html>
