@@ -375,6 +375,30 @@ window.RENDER = (function () {
 
   /* El rótulo del banco: «apto», «faltan N» o «sin banco». Son tres mensajes
      distintos y el del medio es el único que dice cuánto. */
+  /* -- Franja de trabajo inmediato ------------------------------------------
+     La única vista TRANSVERSAL del panel: lo demás es por módulo. Contesta
+     «¿qué hago hoy?» cruzando los 11 —el cohorte en vuelo, lo que falta
+     guionar, la deuda de preguntas y la cola de regrabación—.
+
+     Va en una fila y no en una tarjeta: cuatro números que se leen de un
+     vistazo, no un panel de texto que hay que ponerse a leer. Cada uno lleva a
+     donde se resuelve; el que no tiene adónde llevar no es un link. */
+  function franjaTrabajo(items) {
+    return items.map(function (i) {
+      const valor = i.href
+        ? '<a href="' + i.href + '">' + esc(i.valor) + " ›</a>"
+        : '<span class="meter-value"' +
+          (typeof i.ok === "boolean" ? ' data-ok="' + i.ok + '"' : "") + ">" +
+          esc(i.valor) + "</span>";
+      return (
+        '<div class="flex flex-col gap-[2px]">' +
+        '<dt class="text-2xs text-gray-600">' + esc(i.etiqueta) + "</dt>" +
+        '<dd class="text-xs font-bold">' + valor + "</dd>" +
+        "</div>"
+      );
+    }).join("");
+  }
+
   /* -- Tarjeta del panel de carga -------------------------------------------
      La misma información que la fila de la tabla, en el formato que pidió el
      mock: dos barras y tres acciones. La tabla sigue siendo el default (R5);
@@ -916,6 +940,7 @@ window.RENDER = (function () {
     medidor: medidor,
     sideCard: sideCard,
     filaModulo: filaModulo,
+    franjaTrabajo: franjaTrabajo,
     tarjetaModulo: tarjetaModulo,
     tableroPasos: tableroPasos,
     estadoBanco: estadoBanco,

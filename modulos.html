@@ -179,6 +179,24 @@
                «videos publ. / total» y «banco / mínimo» podían discrepar del
                tablero y del banco. Ahora salen del mismo cálculo. -->
           <div id="listado" class="contents" data-escena="E2,E3,E4,E5,E6">
+            <!-- La franja de inicio. Es lo único de esta pantalla que NO es por
+                 módulo: en qué momento está la Academia —el hito, que es el único
+                 texto del prototipo que no se puede calcular— y qué hay que hacer
+                 hoy cruzando los 11. -->
+            <div data-hito></div>
+            <section class="side-card" aria-labelledby="lbl-trabajo">
+              <div class="flex flex-wrap items-start gap-x-10 gap-y-3">
+                <h2 class="side-title !mb-0" id="lbl-trabajo">Trabajo inmediato</h2>
+                <dl class="flex flex-wrap items-start gap-x-8 gap-y-3" data-trabajo></dl>
+              </div>
+            </section>
+
+            <!-- R8: la Ruta va APARTE de la grilla y rotulada como derivada. No
+                 tiene videos ni banco propios —referencia los del Pareto—, así
+                 que sus números no son comparables con los de los 11 y ponerla al
+                 lado sin decirlo invita a leerla mal. -->
+            <div data-ruta></div>
+
             <!-- Panel de carga: el estado de cada módulo de un vistazo. Los tres
                  tiles salen del mismo `estadoDeCarga` que las tarjetas, así que
                  el encabezado no puede discrepar con lo de abajo. -->
@@ -302,6 +320,181 @@
 
         if (esc === "E1") return; /* El día 0 lo cubre su placeholder. */
 
+        /* ── La franja de inicio ─────────────────────────────────────────
+           Viene del «panel de obra», que era la pantalla de inicio y se
+           eliminó. El hito se movió VERBATIM: los números se derivan, pero el
+           texto de cada momento es lo único del prototipo que no se puede
+           calcular, y reescribirlo habría perdido el relato que lo hace
+           entendible en una demo. */
+        const q = esc === "E5" ? "" : "?escena=" + esc;
+        const amp = esc === "E5" ? "?" : "&amp;escena=" + esc + "&amp;";
+        const conteo = S.conteoPorEstado();
+        const videos = S.videos();
+        const ruta = S.aptitud(S.modulo("R01"));
+        const rutaResumen = ruta.resumen;
+        const deuda = S.deudaDeEvaluacion();
+        const activos = S.modulos.filter(function (m) {
+          return m.tipo !== "reservado" && S.resumenModulo(m).estado === "activo";
+        }).length;
+        const aGuionar = videos.filter(function (v) { return v.estado === "backlog"; }).length;
+
+        /* El cohorte activo: el primero que tenga algo empezado y sin terminar.
+           Si no hay ninguno a medias, el primero sin empezar. */
+        const cohortes = S.cohortesConAvance();
+        const enVuelo = cohortes.filter(function (c) {
+          return c.videos.some(function (v) {
+            const r = S.rango(v.estado);
+            return r > S.rango("backlog") && r < S.rango("publicado");
+          });
+        })[0];
+        const sinEmpezar = cohortes.filter(function (c) { return c.conGuion === 0; })[0];
+        const cohorte = enVuelo || sinEmpezar || null;
+
+        /* ── El hito ─────────────────────────────────────────────────────────
+           Uno solo. Mientras la Ruta Esencial no esté activa, el hito ES la
+           Ruta: es lo que responde cuándo se puede lanzar la Academia. Una vez
+           activa, pasa a ser el módulo de biblioteca más cerca de activarse. */
+        const rutaActiva = rutaResumen.estado === "activo";
+        /* El objetivo del banco de la Ruta NO depende de que su evaluación esté
+           configurada: son 5 preguntas por cada video que referencia, y eso se
+           sabe desde que el mapa está cargado. Si se usara el mínimo
+           configurado, en la semana 1 el hito diría «faltan 12 videos» y se
+           comería las 60 preguntas, que son la mitad del objetivo. */
+        const objetivoRuta = rutaResumen.totalVideos * S.evaluacion.preguntasHeredadasPorVideo;
+        const faltanPregRuta = Math.max(0, objetivoRuta - rutaResumen.banco.vigentes);
+        const cerca = S.moduloMasCerca();
+        let hito;
+
+        if (!rutaActiva) {
+          const faltanVideos = rutaResumen.totalVideos - rutaResumen.publicados;
+          const faltanPreg = faltanPregRuta;
+          if (ruta.apto) {
+            hito = {
+              escena: esc,
+              cumplido: true,
+              titulo: "La Ruta Esencial está lista para activar: " +
+                rutaResumen.publicados + " de " + rutaResumen.totalVideos +
+                " videos publicados y " + rutaResumen.banco.vigentes + " de " +
+                rutaResumen.banco.minimo + " preguntas",
+              texto: "Es el momento del lanzamiento. <strong>Ningún módulo de biblioteca está " +
+                "completo</strong> y aun así la Academia se puede lanzar: para eso existe la Ruta " +
+                "Esencial, que referencia los videos del Pareto en lugar de esperar a que un " +
+                "módulo entero termine.",
+              cta: { href: "modulo.html?m=R01" + (esc === "E5" ? "" : "&amp;escena=" + esc),
+                     texto: "Ver la Ruta Esencial" },
+            };
+          } else {
+            hito = {
+              escena: esc,
+              titulo: "Ruta Esencial: faltan " + faltanVideos +
+                (faltanVideos === 1 ? " video publicado" : " videos publicados") +
+                (faltanPreg ? " y " + faltanPreg + " preguntas" : "") + " para poder activarla",
+              texto: "Es el único objetivo que importa ahora. Los módulos de biblioteca están lejos, " +
+                "pero eso no es una alerta: es el punto de partida. <strong>La Academia se lanza con " +
+                "la Ruta Esencial</strong>, no con la biblioteca completa.",
+              cta: cohorte
+                ? { href: "cohorte.html?c=" + cohorte.id + (esc === "E5" ? "" : "&amp;escena=" + esc),
+                    texto: "Empezar por el cohorte " + cohorte.id }
+                : null,
+            };
+          }
+        } else if (cerca) {
+          const faltanVideos = cerca.totalVideos - cerca.publicados;
+          const partes = [];
+          if (faltanVideos) partes.push(faltanVideos + (faltanVideos === 1 ? " video" : " videos"));
+          if (cerca.banco.faltan) partes.push(cerca.banco.faltan + " preguntas");
+          hito = {
+            escena: esc,
+            titulo: cerca.modulo.codigo + ": faltan " + partes.join(" y ") + " para poder activarlo",
+            texto: "Es el módulo de biblioteca más cerca de activarse: " +
+              (faltanVideos === 0
+                ? "sus <strong>" + cerca.totalVideos + " videos ya están publicados</strong> y lo " +
+                  "único que falta es banco"
+                : "le faltan " + faltanVideos + " videos por publicar") +
+              " — tiene " + cerca.banco.vigentes + " de las " + cerca.banco.minimo +
+              " preguntas mínimas. La Ruta Esencial ya está activa desde el hito de lanzamiento.",
+            cta: { href: "banco.html?m=" + cerca.modulo.numero + (esc === "E5" ? "" : "&amp;escena=" + esc),
+                   texto: "Ir a los bancos de preguntas" },
+          };
+        } else {
+          const opHito = S.operacion();
+          hito = {
+            escena: esc,
+            cumplido: true,
+            titulo: opHito.agencias
+              ? "La Academia está en operación: " + opHito.agencias + " agencias y " +
+                opHito.personas + " personas la están usando"
+              : "Los " + activos + " módulos están activos y sus bancos completos",
+            texto: "Lo que queda es mantenimiento: " + conteo["a regrabar"] +
+              " videos en cola de regrabación porque el producto cambió, y el banco de los módulos " +
+              "afectados con preguntas a revisar." +
+              (opHito.agencias
+                ? " El panel de obra ya no es lo que importa — de acá en adelante la pregunta es " +
+                  "cuánto se usa y qué contenido hay que revisar."
+                : ""),
+            cta: { href: "tablero.html" + q, texto: "Ver la cola de regrabación" },
+          };
+        }
+
+        R.pintar("[data-hito]", R.hitoCard(hito));
+
+        /* La franja transversal. Los cuatro contadores llevan a donde se
+           resuelven; el que no tiene adónde llevar no es un link. */
+        R.pintar("[data-trabajo]", R.franjaTrabajo([
+          { etiqueta: "Cohorte activo",
+            valor: cohorte ? cohorte.id + " " + cohorte.nombre : "ninguno en curso",
+            href: cohorte ? "cohorte.html?c=" + cohorte.id + (esc === "E5" ? "" : "&escena=" + esc) : null },
+          { etiqueta: "Grabados del cohorte",
+            valor: cohorte ? cohorte.grabados + " / " + cohorte.total : "—",
+            ok: cohorte ? cohorte.grabados === cohorte.total : undefined },
+          { etiqueta: "Videos a guionar", valor: aGuionar,
+            href: aGuionar ? "tablero.html" + q : null },
+          /* Métrica de CONSTRUCCIÓN, no de uso: mostrarla acá no toca R10. */
+          { etiqueta: "Publicados sin pregunta",
+            valor: deuda.length,
+            ok: deuda.length === 0,
+            href: deuda.length ? "escritura.html?v=" + deuda[0].id + (esc === "E5" ? "" : "&escena=" + esc) : null },
+          { etiqueta: "En cola de regrabación",
+            valor: conteo["a regrabar"],
+            ok: conteo["a regrabar"] === 0,
+            href: conteo["a regrabar"] ? "regrabacion.html" + q : null },
+        ]));
+
+        /* La Ruta, aparte y rotulada como derivada (R8). Sus dos barras son las
+           mismas que tenía en el panel de obra: videos publicados del recorrido
+           y banco heredado, 5 por video referenciado. */
+        const barraRuta = function (hecho, total) {
+          const pct = total ? Math.round((hecho / total) * 100) : 0;
+          return '<div class="progress progress-sm my-2' + (pct === 100 ? " progress-complete" : "") +
+            '"><span style="width: ' + pct + '%"></span></div>';
+        };
+        R.pintar("[data-ruta]",
+          '<section class="side-card side-card-strong" aria-labelledby="lbl-ruta">' +
+          '<div class="flex items-baseline gap-2">' +
+          '<h2 class="side-title !mb-0" id="lbl-ruta">Ruta Esencial</h2>' +
+          '<span class="chip chip-meta">derivada</span>' +
+          '<span class="ml-auto">' + R.chipEstado(rutaResumen.estado === "activo" ? "publicado" : "backlog") +
+          "</span></div>" +
+          '<div class="mt-3 grid grid-cols-2 gap-x-8">' +
+          "<div>" +
+          '<div class="meter-row"><span>Videos publicados</span><b class="meter-value" data-ok="' +
+            (rutaResumen.publicados === rutaResumen.totalVideos) + '">' +
+            rutaResumen.publicados + " / " + rutaResumen.totalVideos + "</b></div>" +
+          barraRuta(rutaResumen.publicados, rutaResumen.totalVideos) +
+          "</div><div>" +
+          '<div class="meter-row"><span>Banco heredado</span><b class="meter-value" data-ok="' +
+            (rutaResumen.banco.minimo > 0 && rutaResumen.banco.faltan === 0) + '">' +
+            rutaResumen.banco.vigentes + " / " + (rutaResumen.banco.minimo || "—") + "</b></div>" +
+          barraRuta(rutaResumen.banco.vigentes, rutaResumen.banco.minimo) +
+          "</div></div>" +
+          '<p class="foot-note">' +
+          (ruta.apto
+            ? "Cumple los criterios: se puede activar."
+            : "No referencia videos propios: su banco sale de los videos del Pareto, a razón de " +
+              S.evaluacion.preguntasHeredadasPorVideo + " preguntas por video publicado.") +
+          ' <a href="modulo.html?m=R01' + (esc === "E5" ? "" : "&amp;escena=" + esc) + '">Ver la Ruta ›</a></p>' +
+          "</section>");
+
         /* En la semana 1 el origen de cada módulo todavía importa: hay que poder
            revisar qué entró por el importador. Después deja de decir algo. */
         const mostrarOrigen = esc === "E2";
@@ -363,10 +556,7 @@
           );
         });
 
-        const activos = S.modulos.filter(function (m) {
-          return m.tipo !== "reservado" && S.resumenModulo(m).estado === "activo";
-        }).length;
-
+        /* `activos` ya está declarado arriba, con las derivaciones del hito. */
         const NOTAS = {
           E2: "Las 13 filas existen y ninguna es apta: 0 videos publicados y ninguna evaluación configurada. Es el estado normal de la semana 1, no una alerta.",
           E3: "C01 publicado, C02 editado y C03 guionado. Ningún módulo llega a completarse todavía, y por eso ninguno se puede activar.",
