@@ -179,7 +179,27 @@
                «videos publ. / total» y «banco / mínimo» podían discrepar del
                tablero y del banco. Ahora salen del mismo cálculo. -->
           <div id="listado" class="contents" data-escena="E2,E3,E4,E5,E6">
-            <div class="filter-bar" data-filtros="[data-filas]">
+            <!-- Panel de carga: el estado de cada módulo de un vistazo. Los tres
+                 tiles salen del mismo `estadoDeCarga` que las tarjetas, así que
+                 el encabezado no puede discrepar con lo de abajo. -->
+            <div class="flex items-start gap-3">
+              <div class="flex gap-3" data-tiles-carga></div>
+              <!-- R5: la tabla es el default; las tarjetas son un conmutador,
+                   igual que el kanban del tablero. -->
+              <div class="segmented ml-auto" data-view-switch>
+                <button type="button" class="segmented-option" data-view="tabla" aria-pressed="true">
+                  <span class="icon icon-sm" data-icon="list"></span>Tabla
+                </button>
+                <button type="button" class="segmented-option" data-view="tarjetas" aria-pressed="false">
+                  <span class="icon icon-sm" data-icon="grid"></span>Tarjetas
+                </button>
+              </div>
+            </div>
+
+            <!-- `data-filtros-extra` es el mecanismo que ya usa el tablero para
+                 que un solo criterio acote la tabla y el kanban a la vez. Las
+                 tarjetas llevan los mismos `data-*` que las filas. -->
+            <div class="filter-bar" data-filtros="[data-filas]" data-filtros-extra="[data-tarjetas]">
               <div class="relative" data-dropdown>
                 <button type="button" class="filter-pill" data-dropdown-trigger aria-expanded="false" aria-haspopup="true" data-filtro-pill="tipo">
                   Tipo: todos <span class="icon" data-icon="chevron-down"></span>
@@ -208,7 +228,7 @@
               <span class="filter-count" data-conteo></span>
             </div>
 
-            <div class="table-scroll-y">
+            <div data-view-panel="tabla" class="table-scroll-y">
               <table class="table-dense" data-sortable>
                 <caption class="sr-only" data-caption></caption>
                 <thead>
@@ -227,6 +247,8 @@
                 <tbody data-filas></tbody>
               </table>
             </div>
+
+            <div data-view-panel="tarjetas" class="grid grid-cols-3 gap-[18px]" data-tarjetas hidden></div>
 
             <p class="text-xs text-ink-soft" data-nota></p>
           </div>
@@ -289,6 +311,30 @@
         }).join("");
 
         R.pintar("[data-filas]", filas);
+
+        /* ── Panel de carga ──────────────────────────────────────────────
+           La otra vista de los mismos módulos. Solo los de biblioteca: el
+           reservado no tiene nada que cargar todavía y la Ruta no tiene videos
+           propios (R8), así que una barra de avance mentiría en las dos. */
+        const carga = S.resumenDeCarga(esc);
+        R.pintar("[data-tiles-carga]", R.tiles([
+          ["Módulos completos", carga.completos + " / " + carga.total],
+          ["Módulos con videos faltantes", carga.conVideosFaltantes,
+            carga.conVideosFaltantes ? "alerta" : null],
+          ["Preguntas cargadas en total", carga.preguntas],
+        ]));
+
+        R.pintar("[data-tarjetas]", carga.estados.map(function (x) {
+          /* La acción «Cargar preguntas» apunta al primero de la cola de ESE
+             módulo: es el que el motor ya resolvió como más urgente. Si la cola
+             está vacía, el botón se apaga con su motivo. */
+          const cola = S.colaDeEscritura(esc, x.modulo.numero);
+          return R.tarjetaModulo(x, {
+            escena: esc === "E5" ? null : esc,
+            estadoModulo: S.resumenModulo(x.modulo, esc).estado,
+            primeroDeLaCola: cola.length ? cola[0].video.id : null,
+          });
+        }).join(""));
 
         document.getElementById("chip-total").textContent = S.modulos.length + " en BAK";
         document.querySelector("[data-conteo]").textContent = S.modulos.length + " resultados";

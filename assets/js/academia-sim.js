@@ -894,6 +894,72 @@ window.SIM = (function () {
     });
   }
 
+  /* -- Estado de carga de un módulo ----------------------------------------
+     Lo que necesita la tarjeta del panel, y nada más. Tres números de videos,
+     no dos: cuántos VA A TENER el módulo, cuántos existen y cuántos están
+     publicados. `videosEsperados` es una declaración —lo que el mapa dice que
+     va a haber— y no un conteo: por eso «faltan videos» puede significar algo
+     antes de que exista ninguno.
+
+     El chip se resuelve en cascada y el primero que da verdadero gana, así que
+     todo módulo cae en EXACTAMENTE uno. Ese orden es el que hace que la
+     etiqueta diga lo que hay que hacer ahora y no lo que falta en general: un
+     módulo sin publicar no dice «faltan preguntas» aunque también le falten. */
+  const CHIPS_CARGA = ["sin empezar", "faltan videos", "faltan publicar", "faltan preguntas", "completo"];
+
+  function estadoDeCarga(modulo, escenaId) {
+    const esc = escenaId || escena;
+    const r = resumenModulo(modulo, esc);
+    const esperados = typeof modulo.videosEsperados === "number"
+      ? modulo.videosEsperados
+      : r.totalVideos;
+
+    const creados = r.totalVideos;
+    const publicados = r.publicados;
+    const preguntas = r.banco.vigentes;
+    const minimo = r.banco.minimo;
+
+    let chip;
+    if (creados === 0) chip = "sin empezar";
+    else if (creados < esperados) chip = "faltan videos";
+    else if (publicados < creados) chip = "faltan publicar";
+    /* Sin evaluación configurada el mínimo es 0 y no hay nada que exigir: el
+       módulo no puede quedar trabado en «faltan preguntas» por una condición
+       que todavía nadie declaró. */
+    else if (minimo > 0 && preguntas < minimo) chip = "faltan preguntas";
+    else chip = "completo";
+
+    return {
+      modulo: modulo,
+      esperados: esperados,
+      creados: creados,
+      publicados: publicados,
+      preguntas: preguntas,
+      minimo: minimo,
+      chip: chip,
+      pctVideos: esperados ? Math.min(100, Math.round((publicados / esperados) * 100)) : 0,
+      pctPreguntas: minimo ? Math.min(100, Math.round((preguntas / minimo) * 100)) : 0,
+    };
+  }
+
+  /* Los tres tiles del panel. Salen del mismo `estadoDeCarga` que las tarjetas,
+     así que el encabezado no puede discrepar con lo que se ve abajo. */
+  function resumenDeCarga(escenaId) {
+    const esc = escenaId || escena;
+    const estados = catalogo()
+      .filter(function (m) { return m.tipo === "biblioteca"; })
+      .map(function (m) { return estadoDeCarga(m, esc); });
+    return {
+      total: estados.length,
+      completos: estados.filter(function (x) { return x.chip === "completo"; }).length,
+      conVideosFaltantes: estados.filter(function (x) {
+        return x.chip === "sin empezar" || x.chip === "faltan videos";
+      }).length,
+      preguntas: estados.reduce(function (a, x) { return a + x.preguntas; }, 0),
+      estados: estados,
+    };
+  }
+
   /* El ID de la próxima pregunta de un módulo. Se deriva del banco, no del
      reloj: sigue el formato `P-NNNNN` del dataset y no depende de cuándo se
      apretó el botón. Vive acá porque lo necesitan las dos superficies de
@@ -1500,6 +1566,56 @@ window.SIM = (function () {
     chequeo("La cola no lista videos que no llegaron a publicado",
       colaMal.length === 0, colaMal.slice(0, 3).join(", "));
 
+    /* -- Panel de carga -----------------------------------------------------
+       `videosEsperados` es una DECLARACIÓN —cuántos videos va a tener el
+       módulo— y la cantidad de videos es un HECHO. Hoy coinciden, y ahí está el
+       riesgo: una coincidencia silenciosa se lee como duplicación. Auditarla la
+       convierte en una invariante, y el día que dejen de coincidir el informe
+       lo dice en vez de que lo descubra una barra de avance mal dibujada. */
+    const desajustados = [];
+    let sumaEsperados = 0;
+    bibliotecas.forEach(function (m) {
+      const real = m.secciones.reduce(function (a, s) { return a + s.videos.length; }, 0);
+      sumaEsperados += m.videosEsperados || 0;
+      if (m.videosEsperados !== real) {
+        desajustados.push(m.codigo + ": declara " + m.videosEsperados + " y tiene " + real);
+      }
+    });
+    chequeo("Los videos esperados coinciden con los del dataset",
+      desajustados.length === 0, desajustados.slice(0, 3).join(" · "));
+    chequeo("Los videos esperados suman 55", sumaEsperados === 55, sumaEsperados + " esperados");
+
+    /* El chip se resuelve en cascada, así que por construcción todo módulo cae
+       en uno. Lo que el control cuida es que la cascada siga siendo EXHAUSTIVA:
+       si mañana se agrega una condición y se olvida el `else`, un módulo se
+       queda sin etiqueta y la tarjeta sale muda. */
+    const sinChip = [];
+    D.ESCENAS.forEach(function (e) {
+      bibliotecas.forEach(function (m) {
+        const c = estadoDeCarga(m, e.id).chip;
+        if (CHIPS_CARGA.indexOf(c) === -1) sinChip.push(e.id + " · " + m.codigo + ": " + c);
+      });
+    });
+    chequeo("Todo módulo cae en exactamente un chip de carga",
+      sinChip.length === 0, sinChip.slice(0, 3).join(", "));
+
+    /* Monotonía, igual que el resto: entre escenas sucesivas el avance de carga
+       no puede retroceder. Un módulo que llegó a «faltan preguntas» no puede
+       volver a «faltan publicar» en la escena siguiente. */
+    const retrocesosCarga = [];
+    bibliotecas.forEach(function (m) {
+      let previo = -1;
+      D.ESCENAS.forEach(function (e) {
+        const i = CHIPS_CARGA.indexOf(estadoDeCarga(m, e.id).chip);
+        if (previo !== -1 && i < previo) {
+          retrocesosCarga.push(m.codigo + " retrocede en " + e.id);
+        }
+        previo = i;
+      });
+    });
+    chequeo("El chip de carga no retrocede entre escenas",
+      retrocesosCarga.length === 0, retrocesosCarga.slice(0, 3).join(", "));
+
     /* -- Ida y vuelta de la plantilla ---------------------------------------
        Solo corre donde `academia-import.js` está cargado: el motor no depende
        del importador, es al revés.
@@ -1627,6 +1743,9 @@ window.SIM = (function () {
     ordenDeSeccion: ordenDeSeccion,
     cuotaDeVideo: cuotaDeVideo,
     colaDeEscritura: colaDeEscritura,
+    estadoDeCarga: estadoDeCarga,
+    resumenDeCarga: resumenDeCarga,
+    CHIPS_CARGA: CHIPS_CARGA,
     proximoIdPregunta: proximoIdPregunta,
     bancoDe: bancoDe,
     aptitud: aptitud,

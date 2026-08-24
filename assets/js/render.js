@@ -375,6 +375,98 @@ window.RENDER = (function () {
 
   /* El rótulo del banco: «apto», «faltan N» o «sin banco». Son tres mensajes
      distintos y el del medio es el único que dice cuánto. */
+  /* -- Tarjeta del panel de carga -------------------------------------------
+     La misma información que la fila de la tabla, en el formato que pidió el
+     mock: dos barras y tres acciones. La tabla sigue siendo el default (R5);
+     esto es la otra vista del conmutador, no su reemplazo.
+
+     Los tres botones NO son links sueltos: cada uno lleva a la pantalla que ya
+     resuelve ese paso, con el módulo fijado. Y el que no corresponde va
+     deshabilitado CON EL MOTIVO, nunca presente y mudo. */
+  const TONO_CARGA = {
+    "sin empezar": "chip-meta",
+    "faltan videos": "chip-alerta",
+    "faltan publicar": "chip-alerta",
+    "faltan preguntas": "chip-alerta",
+    completo: "chip-publicado",
+  };
+
+  function barraCarga(rotulo, cifra, pct) {
+    return (
+      '<div class="mt-3">' +
+      '<div class="flex items-baseline justify-between text-xs">' +
+      "<span>" + esc(rotulo) + "</span>" +
+      '<span class="meta">' + cifra + "</span>" +
+      "</div>" +
+      '<div class="progress progress-sm mt-1' + (pct === 100 ? " progress-complete" : "") +
+      '"><span style="width: ' + pct + '%"></span></div>' +
+      "</div>"
+    );
+  }
+
+  function tarjetaModulo(x, opciones) {
+    const o = opciones || {};
+    const amp = o.escena ? "&amp;escena=" + o.escena : "";
+    const m = x.modulo;
+
+    /* Una acción por paso. `motivo` vacío = habilitada. */
+    const acciones = [
+      {
+        icono: "film", rotulo: "Subir video",
+        href: "alta-videos.html?m=" + m.numero + amp,
+        motivo: x.creados >= x.esperados && x.publicados === x.creados
+          ? "Los " + x.esperados + " videos del módulo ya están publicados."
+          : "",
+      },
+      {
+        icono: "help-circle", rotulo: "Cargar preguntas",
+        href: o.primeroDeLaCola ? "escritura.html?v=" + o.primeroDeLaCola + amp : "",
+        motivo: !o.primeroDeLaCola
+          ? (x.publicados === 0
+            ? "Todavía no hay ningún video publicado: la pregunta se escribe después de grabar."
+            : "El banco de este módulo no tiene deuda.")
+          : "",
+      },
+      {
+        icono: "eye", rotulo: "Ver preguntas",
+        href: "banco.html?m=" + m.numero + amp,
+        motivo: x.publicados === 0 ? "El banco todavía no tiene nada que mostrar." : "",
+      },
+    ];
+
+    /* Los MISMOS `data-*` que la fila de la tabla. Es lo que permite que un
+       solo criterio de filtro acote las dos vistas a la vez, por el mecanismo
+       `data-filtros-extra` que ya usa el kanban del tablero. Sin esto, filtrar
+       en tabla y conmutar a tarjetas mostraría un conjunto distinto. */
+    return (
+      '<article class="card p-5" data-carga="' + esc(x.chip) + '"' +
+      ' data-id="' + esc(m.codigo) + '" data-titulo="' + esc(m.titulo) +
+      '" data-tipo="' + esc(m.tipo) + '" data-estado="' + esc(o.estadoModulo || "") +
+      '" data-plan="' + esc((m.planes || []).join(" ")) + '">' +
+      '<div class="flex items-start justify-between gap-3">' +
+      '<h3 class="text-h5">' + esc(m.titulo) + "</h3>" +
+      '<span class="chip ' + (TONO_CARGA[x.chip] || "chip-meta") + ' shrink-0">' + esc(x.chip) + "</span>" +
+      "</div>" +
+      '<p class="mt-1 text-2xs text-gray-600"><span class="font-mono">' + esc(m.codigo) + "</span> · " +
+        esc((m.planes || []).join(" · ")) + "</p>" +
+
+      barraCarga("Videos", x.publicados + " / " + x.esperados +
+        (x.creados !== x.esperados ? " · " + x.creados + " creados" : "") +
+        " · " + x.publicados + " publicados", x.pctVideos) +
+      barraCarga("Preguntas", x.preguntas + " / " + (x.minimo || "—"), x.pctPreguntas) +
+
+      '<div class="mt-4 flex flex-wrap gap-2">' +
+      acciones.map(function (a) {
+        const nombre = '<span class="icon icon-sm" data-icon="' + a.icono + '"></span>' + esc(a.rotulo);
+        return a.motivo || !a.href
+          ? '<button type="button" class="btn btn-bordered btn-sm" disabled title="' +
+            esc(a.motivo) + '">' + nombre + "</button>"
+          : '<a href="' + a.href + '" class="btn btn-bordered btn-sm">' + nombre + "</a>";
+      }).join("") +
+      "</div></article>"
+    );
+  }
+
   function estadoBanco(b) {
     if (!b.configurada) return '<span class="chip chip-outline">sin configurar</span>';
     if (b.vigentes === 0) return '<span class="chip chip-alerta">sin banco</span>';
@@ -777,6 +869,7 @@ window.RENDER = (function () {
     medidor: medidor,
     sideCard: sideCard,
     filaModulo: filaModulo,
+    tarjetaModulo: tarjetaModulo,
     estadoBanco: estadoBanco,
     filaVideoArbol: filaVideoArbol,
     seccionArbol: seccionArbol,
