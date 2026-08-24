@@ -102,7 +102,7 @@ depende del importador.
 
 | Pantalla | URL |
 |---|---|
-| **Home — panel de obra vacío** | `home.html?escena=E1` |
+| **Panel de módulos — día 0** | `modulos.html?escena=E1` |
 | **Importador del mapa** | `importador.html?paso=1` · `?paso=2` · `?paso=resultado&sello=…` |
 | Listado de módulos — vacío | `modulos.html?escena=E1` |
 | Alta de módulo *(con sus secciones)* · de sección | `alta-modulo.html` · `alta-seccion.html` |
@@ -112,7 +112,7 @@ depende del importador.
 
 | Pantalla | URL |
 |---|---|
-| **Home — mapa cargado** | `home.html?escena=E2` |
+| **Panel de módulos — mapa cargado** | `modulos.html?escena=E2` |
 | Listado — 13 filas, todo en backlog | `modulos.html?escena=E2` |
 | **Alta masiva / reserva de IDs** | `alta-videos.html` |
 | **Kanban — los 55 en una sola columna** | `tablero.html?escena=E2&vista=kanban` |
@@ -131,7 +131,7 @@ depende del importador.
 
 | Pantalla | URL |
 |---|---|
-| **Home — Ruta Esencial apta** | `home.html?escena=E4` |
+| **Panel — Ruta Esencial apta** | `modulos.html?escena=E4` |
 | **Detalle de la Ruta — apta para activar** | `modulo.html?m=R01&escena=E4` |
 
 ### Régimen (E5)
@@ -150,7 +150,7 @@ que medir. Es **R10** aplicado al pie de la letra.
 
 ### Los cuatro flujos
 
-- **F5 · Arranque en frío** — home vacío → importador (2 pasos) → 13 módulos creados
+- **F5 · Arranque en frío** — panel vacío → importador (2 pasos) → 13 módulos creados
 - **F6 · Guionar un cohorte** — hoja de C03 → editor de guión → tablero
 - **F7 · Sesión de grabación** — modo sesión → video editado
 - **F8 · Camino al lanzamiento** — home E3 (falta) → home E4 (apta) → detalle de la Ruta → activar
@@ -273,7 +273,6 @@ contenido, no de código.
 │       ├── render.js              helpers de markup
 │       └── ui.js                  solapas, conmutadores, menús, orden de tabla
 ├── index.html                     índice, agrupado por escena
-├── home.html                      panel de obra, en 6 escenas
 ├── importador.html  alta-videos.html  alta-modulo.html  alta-seccion.html
 ├── cohorte.html  guion.html  superficies.html
 ├── modulos.html  modulo.html  video.html  tablero.html  banco.html
@@ -284,7 +283,7 @@ contenido, no de código.
 └── design-system.html             catálogo, escenas y decisiones abiertas
 ```
 
-**El sidebar está duplicado en las 19 páginas de app**, a propósito: así los `.html` se abren con
+**El sidebar está duplicado en las 18 páginas de app**, a propósito: así los `.html` se abren con
 doble click. La versión canónica es `src/partials/app-shell.html`, y cada copia está delimitada por
 `<!-- app-shell: sincronizar … -->`. El control es que el bloque, sin el `aria-current`, dé el mismo
 hash en todas.
@@ -387,7 +386,8 @@ A las 9 reglas no negociables de la primera tanda se suman dos:
 - **Los 7 valores de `data-estado`** son exactamente los 7 nombres del vocabulario. Los pasos del
   importador usan `data-paso-estado`, así que no hay colisión.
 - **Las 5 cadenas de `BAK-M30`** siguen cerrando en régimen: 28 / 20 / 15 / 35 / 10.
-- **R10:** `home.html` no contiene métricas de uso. **R11:** ninguna pantalla de alta tiene campo de
+- **R10:** el uso solo existe donde hay uso — `panel.html` se corta si no hay agencias con acceso.
+  **R11:** ninguna pantalla de alta tiene campo de
   link de YouTube.
 - **Los 6 estados vacíos** de las pantallas ya maquetadas, cada uno con su explicación y una sola
   acción posible.
@@ -398,7 +398,7 @@ A las 9 reglas no negociables de la primera tanda se suman dos:
 - **Contraste WCAG AA** de todos los pares nuevos, incluidos los 7 segmentos del embudo.
 - Un solo `<h1>` por pantalla, jerarquía sin saltos, `<img>` con `alt`, sin IDs duplicados, campos con
   label, botones y links con nombre accesible.
-- **Los 19 sidebars idénticos**, verificado por hash.
+- **Los 18 sidebars idénticos**, verificado por hash.
 
 Queda para probar a mano: el recorrido de teclado completo y `prefers-reduced-motion`.
 

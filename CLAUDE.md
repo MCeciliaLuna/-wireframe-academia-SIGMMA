@@ -20,6 +20,14 @@ con una **academia completa simulada**. Cuatro bloques de trabajo:
 - **Los pasos, centralizados** — el **panel de carga** en `modulos.html` (conmutador tabla /
   tarjetas) y el **tablero de cinco pasos** en `modulo.html`. El panel contesta «¿cómo viene
   la carga?» sobre los 11; el módulo, «¿qué hago con este?».
+- **El panel es la pantalla de inicio** — **18 pantallas**: se eliminó el «panel de obra»,
+  que contaba cómo iba todo sin dejar hacer nada. Su hito por escena y su trabajo inmediato
+  quedaron como franja del panel; el embudo se fue al tablero y el uso al panel macro, que
+  pasó a llamarse **«Uso de la Academia»** porque es lo que mide.
+
+  > El control de que no quedó ninguna referencia colgada es un grep **absoluto**, así que
+  > la pantalla borrada no se nombra en ningún lado —ni para contar que se borró—. Si algún
+  > día hace falta citarla, hay que decidir primero cómo se excluye la cita del control.
 
 **Ya no es solo maquetación, ni solo navegación.** No hay backend, ni API, ni videos reales, ni SSO.
 Pero **sí hay capa de datos, reglas de negocio derivadas, mutaciones y persistencia en
@@ -111,7 +119,7 @@ valor. Lo propio del backoffice está en la **sección 6**, documentado en `DESI
 
 ### Sin build de HTML — sidebar duplicado a propósito
 
-Los `.html` son archivos planos, sin templating. El sidebar está **copiado literal en las 19 páginas
+Los `.html` son archivos planos, sin templating. El sidebar está **copiado literal en las 18 páginas
 de app**, delimitado por:
 
 ```html
@@ -472,8 +480,8 @@ grep -n "fetch(\|XMLHttpRequest" assets/js/*.js *.html              # → vacío
 # `localStorage` SOLO en el motor
 grep -ln "localStorage" assets/js/*.js                              # → academia-sim.js
 
-# R10 · el Home no inventa métricas de uso en las escenas de construcción
-grep -inE "videos vistos|% de completitud" home.html                # → solo dentro del bloque E6
+# R10 · el uso solo existe donde hay uso. `panel.html` entero se corta si no hay
+#       agencias con acceso, así que la compuerta no está en un grep sino en la pantalla.
 # R11 · ninguna pantalla de alta pide un link
 grep -nE '<(input|textarea)[^>]*(type="url"|link|youtu)' alta-videos.html importador.html  # → vacío
 # R12 · ninguna vía deja un video sin sección. Lo verifica el motor, no el grep:
@@ -486,10 +494,10 @@ grep -nE '<(input|textarea)[^>]*(type="url"|link|youtu)' alta-videos.html import
 > líneas se interpretan como comandos y **todos los controles dan ✓ porque el grep nunca corrió**.
 > Con `mapfile -t PAGS < <(ls *.html …)` y `"${PAGS[@]}"` no pasa.
 
-### 3 · Los 19 sidebars idénticos
+### 3 · Los 18 sidebars idénticos
 
 ```bash
-for f in home.html modulos.html modulo.html video.html tablero.html banco.html \
+for f in modulos.html modulo.html video.html tablero.html banco.html \
          importador.html alta-videos.html alta-modulo.html alta-seccion.html \
          cohorte.html guion.html superficies.html escritura.html \
          videos.html regrabacion.html panel.html agencias.html agencia.html; do
