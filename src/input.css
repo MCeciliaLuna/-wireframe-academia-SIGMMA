@@ -243,6 +243,9 @@
      menor que el header de 72 px de la vista agencia: acá no hay identidad de
      marca compitiendo con el contenido, y R6 pide densidad. */
   --shell-width: 1440px;
+  /* Piso del lienzo: por debajo, el grid de la pantalla se deforma y conviene
+     que scrollee antes que apretarse. */
+  --shell-min-width: 1160px;
   --sidebar-width: 200px;
   --pagehead-height: 64px;
   --z-sidebar: 1001;
@@ -673,6 +676,21 @@
     border: 1px solid var(--color-line);
     border-radius: var(--radius-xl);
     padding: 24px;
+  }
+
+  /* -- Tarjeta del panel de carga -------------------------------------------
+     La grilla de `modulos.html` estira las tres tarjetas de cada fila al mismo
+     alto. Eso alinea los BORDES, no el contenido: con un titulo de dos lineas,
+     todo lo de abajo se corria 24 px y las filas «Videos» y «Preguntas» dejaban
+     de leerse en horizontal, que es justo para lo que sirve ponerlas en grilla.
+     El pie se ancla al fondo y el desfasaje lo absorbe el aire entre encabezado
+     y medidores, que no significa nada. */
+  .card-carga {
+    display: flex;
+    flex-direction: column;
+  }
+  .card-carga-pie {
+    margin-top: auto;
   }
 
   .card-interactive {
@@ -1374,7 +1392,15 @@
   .app-shell {
     display: grid;
     grid-template-columns: var(--sidebar-width) 1fr;
-    width: var(--shell-width);
+    /* El lienzo es de 1440 (R7), pero como TECHO, no como medida clavada. Con
+       `width` fijo, una ventana de 1280 no achicaba nada: cortaba 160 px del
+       borde derecho —la accion primaria del encabezado, el panel lateral y la
+       tercera tarjeta de cada grilla— sin ningun aviso. Sigue sin haber
+       breakpoints: es un unico lienzo que se comprime. El piso evita que el
+       grid interno se deforme; por debajo de el, scrollea como antes. */
+    width: 100%;
+    max-width: var(--shell-width);
+    min-width: var(--shell-min-width);
     /* Alto fijo, no mínimo: la nota del wireframe en el layout maestro dice
        «sin footer: la tabla usa todo el alto y scrollea sola». Para que un
        contenedor interno pueda scrollear, el de afuera tiene que tener alto
@@ -1884,6 +1910,13 @@
   .metric-value[data-tone="alerta"] {
     color: var(--color-error-dark);
   }
+  /* Cuando el tile va dentro de un panel lateral y hay dos pegados —«grabados»
+     y «con guion» del cohorte, «a revisar» y «borradores» del banco—, a 28 px
+     los dos pares se tocan. Antes esto se pedia con un `!text-2xl` que no
+     compila: el `@theme` borro la escala por defecto de Tailwind. */
+  .metric-value-sm {
+    font-size: 24px;
+  }
 
   /* -- Conmutador segmentado (Tabla / Kanban) ------------------------------- */
   .segmented {
@@ -2281,6 +2314,11 @@
      acá el rótulo importa, porque «mapeo» y «validación» no son intercambiables. */
   .wizard {
     display: flex;
+    /* `.page-body` es una columna flex que scrollea. Como este bloque lleva
+       `overflow: hidden`, su alto minimo automatico resuelve a 0 y el algoritmo
+       flex lo achicaba hasta hacerlo desaparecer: en una ventana de 1440x760 los
+       dos pasos no se veian. No se encoge. */
+    flex: none;
     align-items: stretch;
     border: 1px solid var(--color-line);
     border-radius: var(--radius-md);
@@ -2428,6 +2466,26 @@
     grid-template-columns: 340px 1fr;
     gap: 18px;
     align-items: start;
+  }
+
+  /* -- Numero de paso del cuerpo del guion -----------------------------------
+     Misma familia que `.wizard-num`, un punto mas chico: aca no marca en que
+     paso estas sino que numero de paso es. Se alinea con la primera linea del
+     campo, no con el centro del bloque. */
+  .step-num {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    flex: none;
+    margin-top: 5px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 9999px;
+    background: var(--color-white);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-gray-700);
   }
 
   /* -- Receta de preparación ------------------------------------------------

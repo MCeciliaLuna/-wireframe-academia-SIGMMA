@@ -265,7 +265,7 @@ Salieron de tres rondas de revisión del wireframe. **Romperlas es un error, no 
 | R4 | **Los contadores del banco se ven siempre**, durante toda la carga. No aparecen como error al final |
 | R5 | **Tablas antes que tarjetas**, con **una excepción declarada**: en el tablero la tabla es el default y el kanban un conmutador, pero en `modulos.html` el default es el **panel de carga con tarjetas** —es la pantalla desde donde se gestiona cada módulo, y la tarjeta lleva el avance y las acciones que la fila no puede llevar—. La tabla sigue estando, en el otro lado del conmutador (D-13) |
 | R6 | **Densidad alta.** Herramienta interna de uso diario para 3 a 5 personas. Sin onboarding, sin tours, sin whitespace decorativo |
-| R7 | **Desktop 1440 px.** No hay responsive en este alcance |
+| R7 | **Desktop 1440 px, como techo y no como medida clavada.** Sigue sin haber responsive —no hay un solo breakpoint— pero el lienzo es `max-width`, no `width`: en una ventana más chica se comprime en vez de cortar el borde derecho sin avisar. El piso es 1160 px; por debajo scrollea |
 | R8 | **La Ruta Esencial referencia videos, no los copia.** Su banco es *derivado* y se muestra etiquetado como tal |
 | R9 | **El wireframe dibuja estados rotos, no ideales.** Hay que mantenerlos: el sorteo que no se puede cumplir, el módulo no apto, las preguntas a revisar |
 | R10 | **El Home mide avance de construcción, no operación** — en E1 a E5. En esas cinco escenas no hay uso, así que no hay métricas de uso: lo único de operación permitido es «módulos activos» y «agencias con acceso». **E6 queda fuera del alcance de R10**, y es la única escena donde el uso existe y se puede medir |
@@ -486,7 +486,18 @@ grep -ln "localStorage" assets/js/*.js                              # → academ
 grep -nE '<(input|textarea)[^>]*(type="url"|link|youtu)' alta-videos.html importador.html  # → vacío
 # R12 · ninguna vía deja un video sin sección. Lo verifica el motor, no el grep:
 #       los controles «Ningún video sin sección» y «Overlay · ningún video creado quedó sin sección»
+
+# El CSS versionado está al día. Es el control que más falta hacía: una clase que el
+# HTML usa y el CSS compilado no tiene NO da error en ningún lado — el navegador la
+# ignora y la pantalla sale mal en silencio. Así se perdieron `gap-x-8`, `list-decimal`
+# y `text-right`, entre otras.
+npx tailwindcss -i ./src/input.css -o /tmp/chk.css --minify
+cmp /tmp/chk.css assets/css/academia.css                            # → sin diferencias
 ```
+
+> **Una clase que no compila no avisa: se ignora.** El `@theme` es cerrado, así que pedir
+> `text-2xl` o `bg-blue-500` no rompe el build — simplemente no existe la regla. Si tocás el
+> markup, el control de arriba es lo único que separa «recompilé» de «se ve raro y no sé por qué».
 
 > **Cuidado con el idiom `cmd | grep -v X >/dev/null && …`.** Con entrada vacía y la salida redirigida
 > a `/dev/null`, GNU grep devuelve 0 y el condicional se invierte. Capturá la salida y comprobá que

@@ -29,7 +29,7 @@
 | `.chip` + 7 estados + `.chip-outline` / `-meta` / `-alerta` | Etiquetas chicas de estado y metadato | **Sí** el `.chip` genérico; los 7 estados no |
 | `.filter-bar` · `.filter-pill` · `.filter-search` · `.filter-count` | Barra de filtros de listado | **Sí** |
 | `.bulk-bar` | Acciones sobre una selección múltiple | **Sí** |
-| `.metric-tile` · `.metric-value` | Tiles de métrica de tablero | **Sí** |
+| `.metric-tile` · `.metric-value` · `.metric-value-sm` | Tiles de métrica de tablero, y su variante chica para panel lateral | **Sí** |
 | `.segmented` | Conmutador de vista de dos o tres opciones | **Sí** |
 | `.kanban` · `.kanban-col` · `.kanban-card` | Tablero por estados | Tal vez — solo si aparece otro flujo con estados |
 | `.tabs` · `.tab` · `.tab-count` | Solapas dentro de una pantalla de detalle | **Sí** — falta en el DS y es un patrón universal |
@@ -42,6 +42,7 @@
 | `.foot-note` | Nota aclaratoria al pie de un bloque | **Sí** |
 | `.escena-badge` | Rótulo del momento de construcción | No — es una anotación del prototipo |
 | `.wizard` · `.wizard-step` | Asistente por pasos con rótulo | **Sí** |
+| `.step-num` | Número de paso de una lista de campos | **Sí** |
 | `.dropzone-csv` | Importación de un archivo de datos | **Sí** |
 | `.validation-group` | Filas listas / con error / a saltear | **Sí** |
 | `.funnel` | Distribución de N ítems entre estados | **Sí** |
@@ -62,12 +63,15 @@
 backoffice tiene **16 destinos agrupados en 6 funciones**: no entran en una barra, y el wireframe
 resuelve con un sidebar de 200 px.
 
-**Tokens.** `--sidebar-width` y `--shell-width` (nuevos, en `@theme static`), `--color-surface`,
-`--color-line`, `--color-white`.
+**Tokens.** `--sidebar-width`, `--shell-width` y `--shell-min-width` (nuevos, en `@theme static`),
+`--color-surface`, `--color-line`, `--color-white`.
 
-**Nota.** `--shell-width: 1440px` fija el lienzo. **R7: no hay responsive en este alcance**, decisión
-heredada de la vista agencia. Es la única divergencia estructural con el repo hermano, que sí tiene
-tres breakpoints.
+**Nota.** `--shell-width: 1440px` es el **techo** del lienzo, no una medida clavada: va en
+`max-width`. **R7 sigue en pie —no hay un solo breakpoint—**, y es la única divergencia estructural
+con el repo hermano, que sí tiene tres. Lo que cambió es el modo de fallar: con `width` fijo, una
+ventana de 1280 no comprimía nada, cortaba 160 px del borde derecho —la acción primaria del
+encabezado, el panel lateral y la tercera tarjeta de cada grilla— sin ningún aviso.
+`--shell-min-width: 1160px` es el piso: por debajo, scrollea antes que deformar el grid.
 
 ---
 
@@ -200,6 +204,12 @@ Sheets. `.table-app` usa `--text-sm` con 14 px de padding; a 55 filas eso es scr
 **Decisión.** El número va en `--font-mono` con `tabular-nums` a 28 px. No usa la escala tipográfica
 de heading porque no es un título: es un dato.
 
+**`.metric-value-sm`** lo baja a 24 px, para cuando el tile va dentro de un panel lateral y hay dos
+pegados: «grabados» y «con guión» del cohorte, «a revisar» y «borradores» del banco. A 28 px los dos
+pares se tocan. Existe como clase propia y no como utilidad de tamaño porque **el `@theme` es
+cerrado**: antes esto se pedía con un `!text-2xl` que no compila, así que no hacía nada y nadie se
+enteraba.
+
 ---
 
 ### `.segmented` · `.segmented-option`
@@ -331,6 +341,25 @@ tiene que competir con el título.
 no son intercambiables.
 
 **Tokens.** `--color-success-bg` (paso hecho), `--color-primary` (actual), `--font-mono` (número).
+
+**Lleva `flex: none`, y no es decorativo.** `.page-body` es una columna flex que scrollea; como este
+bloque tiene `overflow: hidden`, su alto mínimo automático resuelve a 0 y el algoritmo flex lo achica
+hasta hacerlo desaparecer. En una ventana de 1440x760 los dos pasos no se veían. Vale para cualquier
+pieza con `overflow: hidden` que sea hija directa de `.page-body`.
+
+---
+
+### `.step-num`
+
+**Por qué.** El cuerpo del guión es una lista de pasos numerados, cada uno con su campo. El número
+tiene que leerse como etiqueta del campo, no como parte del texto.
+
+**Decisión.** Misma familia que `.wizard-num` —pastilla redonda, mono, 11 px— un punto más chica
+(22 px) y con `margin-top` para alinear con la primera línea del campo, no con el centro del bloque.
+Son dos cosas distintas: `.wizard-num` dice *en qué paso estás*, `.step-num` dice *qué número de paso
+es*.
+
+**Tokens.** `--color-line-strong`, `--color-white`, `--font-mono`, `--color-gray-700`.
 
 ---
 

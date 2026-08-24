@@ -295,10 +295,10 @@
         const grabados = c.grabados;
         R.pintar("[data-avance]",
           '<div><dt class="side-title !mb-1">Grabados</dt>' +
-          '<dd class="metric-value !text-2xl"' + (grabados < c.total ? ' data-tone="alerta"' : "") + ">" +
+          '<dd class="metric-value metric-value-sm"' + (grabados < c.total ? ' data-tone="alerta"' : "") + ">" +
           grabados + " / " + c.total + "</dd></div>" +
           '<div><dt class="side-title !mb-1">Con guión</dt>' +
-          '<dd class="metric-value !text-2xl">' + c.conGuion + " / " + c.total + "</dd></div>");
+          '<dd class="metric-value metric-value-sm">' + c.conGuion + " / " + c.total + "</dd></div>");
 
         /* ── Receta de preparación ──────────────────────────────────────── */
         /* Sale de las recetas de sus videos: la del cohorte es la del primero,
@@ -389,10 +389,10 @@
               '<span class="chip chip-grabado">grabado</span> y sale de la cola de rodaje.');
           R.pintar("[data-avance]",
             '<div><dt class="side-title !mb-1">Grabados</dt>' +
-            '<dd class="metric-value !text-2xl"' + (g2 < frescos.total ? ' data-tone="alerta"' : "") + ">" +
+            '<dd class="metric-value metric-value-sm"' + (g2 < frescos.total ? ' data-tone="alerta"' : "") + ">" +
             g2 + " / " + frescos.total + "</dd></div>" +
             '<div><dt class="side-title !mb-1">Con guión</dt>' +
-            '<dd class="metric-value !text-2xl">' + frescos.conGuion + " / " + frescos.total + "</dd></div>");
+            '<dd class="metric-value metric-value-sm">' + frescos.conGuion + " / " + frescos.total + "</dd></div>");
 
           /* «Marcar grabado» escribe en el overlay de la escena activa. Es un
              cambio real: el tablero y el Home lo ven. */

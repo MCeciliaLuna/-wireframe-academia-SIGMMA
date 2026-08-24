@@ -463,7 +463,7 @@ window.RENDER = (function () {
        `data-filtros-extra` que ya usa el kanban del tablero. Sin esto, filtrar
        en tabla y conmutar a tarjetas mostraría un conjunto distinto. */
     return (
-      '<article class="card p-5" data-carga="' + esc(x.chip) + '"' +
+      '<article class="card card-carga p-5" data-carga="' + esc(x.chip) + '"' +
       ' data-id="' + esc(m.codigo) + '" data-titulo="' + esc(m.titulo) +
       '" data-tipo="' + esc(m.tipo) + '" data-estado="' + esc(o.estadoModulo || "") +
       '" data-plan="' + esc((m.planes || []).join(" ")) + '">' +
@@ -474,6 +474,13 @@ window.RENDER = (function () {
       '<p class="mt-1 text-2xs text-gray-600"><span class="font-mono">' + esc(m.codigo) + "</span> · " +
         esc((m.planes || []).join(" · ")) + "</p>" +
 
+      /* Medidores y acciones van en un pie que se ancla al fondo. La grilla ya
+         iguala el alto de las tres tarjetas de una fila; sin el ancla, un título
+         de dos lineas —«Entidades (clientes, pasajeros, proveedores)»— corria su
+         tarjeta 24 px para abajo y las filas «Videos», «Preguntas» y los botones
+         dejaban de alinearse con las vecinas. Ahora el titulo crece hacia abajo
+         sin arrastrar nada. */
+      '<div class="card-carga-pie">' +
       barraCarga("Videos", x.publicados + " / " + x.esperados +
         (x.creados !== x.esperados ? " · " + x.creados + " creados" : "") +
         " · " + x.publicados + " publicados", x.pctVideos) +
@@ -487,7 +494,7 @@ window.RENDER = (function () {
             esc(a.motivo) + '">' + nombre + "</button>"
           : '<a href="' + a.href + '" class="btn btn-bordered btn-sm">' + nombre + "</a>";
       }).join("") +
-      "</div></article>"
+      "</div></div></article>"
     );
   }
 
