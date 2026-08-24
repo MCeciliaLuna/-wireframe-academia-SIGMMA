@@ -239,7 +239,7 @@
         <p class="mt-4 text-sm text-ink-soft">
           Verlo en vivo: <a href="modulos.html">modulos.html</a> · <a href="tablero.html">tablero.html</a>.
           La fuente canónica del sidebar es <code class="font-mono text-xs">src/partials/app-shell.html</code>,
-          copiada literal en las <strong>18 páginas de app</strong>. Al copiarla se cambia
+          copiada literal en las <strong>19 páginas de app</strong>. Al copiarla se cambia
           <strong>solo</strong> el
           <code class="font-mono text-xs">aria-current="page"</code>.
         </p>
@@ -620,6 +620,21 @@
                 <td>Sin resolver acá: es la <strong>D5 del modelo de datos</strong> y afecta al desbloqueo del Front. Está anotada en el detalle de la Ruta.</td>
               </tr>
               <tr>
+                <td class="font-mono text-xs">D-10</td>
+                <td><strong>¿La importación actualiza lo que ya existe, o solo da de alta?</strong> <span class="chip chip-publicado">cerrada</span></td>
+                <td><strong>Alta + alta incremental, nunca actualización.</strong> Una fila cuyo ID ya existe se <strong>omite</strong> y se dice cuál y por qué. Un video publicado tiene guión, preguntas y agencias que lo vieron colgando: una planilla no puede tener autoridad sobre eso. Queda abierto si más adelante conviene una actualización por ID, que es mucho más potente y mucho más delicada.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">D-11</td>
+                <td><strong>¿Quién define las 31 secciones?</strong></td>
+                <td>El prototipo trae una agrupación <strong>propuesta</strong>, y la plantilla que emite el importador viaja con esa columna llena para que <strong>Guillermo y Majo la validen</strong> en vez de escribirla de cero. Ninguno de los cuatro documentos fuente menciona secciones: es la única columna de la planilla que es trabajo nuevo. Si la validación devuelve otra agrupación, cambia el dataset, no el mecanismo.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">D-12</td>
+                <td><strong>La cuota de preguntas por video no es pareja: va de 5 a 20</strong></td>
+                <td>El mínimo de 50 se reparte <strong>por sección</strong>, y una sección de un solo video se lleva todo su mínimo: <code class="font-mono text-xs">BAK-M00 · Moverse por SIGMMA</code> tiene <strong>un video y un banco de 20</strong>. La cuota por video es <em>orientativa</em> —lo exigible sigue siendo el mínimo por sección— y la cola muestra el número real sin maquillarlo, porque es información útil sobre dónde está concentrado el trabajo de contenido. Queda abierto si conviene repartir distinto o partir esas secciones.</td>
+              </tr>
+              <tr>
                 <td class="font-mono text-xs">D-9</td>
                 <td><strong>Biblioteca de videos no tiene listado propio</strong> <span class="chip chip-publicado">cerrada</span></td>
                 <td>Se maquetó: <code class="font-mono text-xs">videos.html</code>. Su eje es el <strong>contenido</strong> —módulo, sección, duración, versión vigente y visibilidad en el Front—, no el rodaje: el tablero ya mira los mismos 55 videos desde la producción, con cohorte, prioridad y fecha. Son dos preguntas distintas sobre el mismo conjunto, y por eso son dos pantallas y no dos filtros de la misma.</td>
@@ -636,7 +651,7 @@
           Los números ya no se escriben: se <strong>derivan</strong> del dataset, así que no pueden
           discrepar entre pantallas. Los contadores del kanban, los tiles del tablero y la columna
           «videos publicados / total» del listado salen del mismo cálculo. Estas son las cadenas que el
-          motor verifica —<code class="font-mono text-xs">SIM.verificar()</code>, 101 controles— y los
+          motor verifica —<code class="font-mono text-xs">SIM.verificar()</code>, 108 controles— y los
           tres lugares donde el wireframe no cerraba consigo mismo.
         </p>
 

@@ -77,14 +77,20 @@ Si tocás `src/input.css`, **recompilá y commiteá el CSS**: está versionado a
 
 ```bash
 node -e 'global.window={};
-  ["academia-data","academia-agencias","academia-guiones","academia-preguntas","academia-sim"]
+  ["academia-data","academia-agencias","academia-guiones","academia-preguntas","academia-sim",
+   "academia-import"]
     .forEach(f => require(process.cwd()+"/assets/js/"+f+".js"));
   process.exit(window.SIM.informe().ok ? 0 : 1)'
 ```
 
-Son **101 controles**: los 55 videos en las 6 escenas, la monotonía video por video, las 5 cadenas del
+Son **108 controles**: los 55 videos en las 6 escenas, la monotonía video por video, las 5 cadenas del
 banco, el acumulado de preguntas, que no haya operación antes de E6 y que el uso simulado sea
-determinista.
+determinista. Más los seis de los flujos de alta: el orden de sección derivado, que ningún video quede
+sin sección, que ningún módulo de biblioteca quede sin secciones, la cuota por video, la cola, y la
+ida y vuelta de la plantilla del importador.
+
+Sin cargar `academia-import.js` son **106**: los dos de la ida y vuelta se saltean, porque el motor no
+depende del importador.
 
 ---
 
@@ -97,9 +103,9 @@ determinista.
 | Pantalla | URL |
 |---|---|
 | **Home — panel de obra vacío** | `home.html?escena=E1` |
-| **Importador de carga inicial** | `importador.html?paso=1..4` · `?paso=resultado` |
+| **Importador del mapa** | `importador.html?paso=1` · `?paso=2` · `?paso=resultado&sello=…` |
 | Listado de módulos — vacío | `modulos.html?escena=E1` |
-| Alta de módulo · de sección | `alta-modulo.html` · `alta-seccion.html` |
+| Alta de módulo *(con sus secciones)* · de sección | `alta-modulo.html` · `alta-seccion.html` |
 | Superficies y planes | `superficies.html` |
 
 ### Etapa 1 · mapa cargado (E2)
@@ -144,7 +150,7 @@ que medir. Es **R10** aplicado al pie de la letra.
 
 ### Los cuatro flujos
 
-- **F5 · Arranque en frío** — home vacío → importador (4 pasos) → 13 módulos creados
+- **F5 · Arranque en frío** — home vacío → importador (2 pasos) → 13 módulos creados
 - **F6 · Guionar un cohorte** — hoja de C03 → editor de guión → tablero
 - **F7 · Sesión de grabación** — modo sesión → video editado
 - **F8 · Camino al lanzamiento** — home E3 (falta) → home E4 (apta) → detalle de la Ruta → activar
@@ -184,11 +190,12 @@ sigue diciendo la verdad aunque la sesión tenga cambios encima.
 | `?escena=` | `E1` … `E6` — sin parámetro, **E5** |
 | `?sup=` | `BAK` *(default)* · `FRT` · `CRM` |
 | `?m=` | **Cualquiera de los 13:** `0`, `10`, `20` … `95`, `R01` |
-| `?v=` | **Cualquiera de los 55:** `BAK-M30.050` |
+| `?v=` | **Cualquiera de los 55:** `BAK-M30.050`. También `escritura.html`, que es por video |
 | `?tab=` | `ficha` *(default)* · `versiones` · `guion` · `preguntas` · `ubicaciones` |
 | `?vista=` | `tabla` *(default)* · `kanban` — tablero |
 | `?modo=` | `planificacion` *(default)* · `sesion` — hoja de cohorte |
-| `?paso=` | `1` · `2` · `3` · `4` · `resultado` — importador |
+| `?paso=` | `1` · `2` · `resultado` — importador |
+| `?sello=` | El sello de una importación — `importador.html?paso=resultado` |
 | `?c=` | **Cualquiera de los 20:** `C01` … `C20` — cohorte |
 | `?a=` | **Cualquiera de las 12 agencias**, por su identificador — `agencia.html` |
 | `?config=1` | Abre la configuración de evaluación — `banco.html` |
@@ -277,7 +284,7 @@ contenido, no de código.
 └── design-system.html             catálogo, escenas y decisiones abiertas
 ```
 
-**El sidebar está duplicado en las 18 páginas de app**, a propósito: así los `.html` se abren con
+**El sidebar está duplicado en las 19 páginas de app**, a propósito: así los `.html` se abren con
 doble click. La versión canónica es `src/partials/app-shell.html`, y cada copia está delimitada por
 `<!-- app-shell: sincronizar … -->`. El control es que el bloque, sin el `aria-current`, dé el mismo
 hash en todas.
@@ -391,7 +398,7 @@ A las 9 reglas no negociables de la primera tanda se suman dos:
 - **Contraste WCAG AA** de todos los pares nuevos, incluidos los 7 segmentos del embudo.
 - Un solo `<h1>` por pantalla, jerarquía sin saltos, `<img>` con `alt`, sin IDs duplicados, campos con
   label, botones y links con nombre accesible.
-- **Los 18 sidebars idénticos**, verificado por hash.
+- **Los 19 sidebars idénticos**, verificado por hash.
 
 Queda para probar a mano: el recorrido de teclado completo y `prefers-reduced-motion`.
 
@@ -405,7 +412,8 @@ Queda para probar a mano: el recorrido de teclado completo y `prefers-reduced-mo
   ser links: un link que no lleva a ningún lado miente.
 - **Reordenar por arrastre** (D-6): el asa `⠿` del árbol de secciones y las tarjetas del kanban
   entre columnas. Sigue siendo una decisión abierta.
-- Backend, y la **importación real de CSV**: el importador simula sus cuatro pasos, no parsea un
-  archivo. Lo que sí es real es el log que baja al final, armado de la tabla de validación.
+- Backend. **La importación sí es real**: el importador emite la plantilla, lee el archivo con
+  `FileReader` o lo pegado a mano, valida fila por fila y crea la jerarquía en el overlay. Lo que no
+  hay es un servidor del otro lado.
 - Responsive: 1440 px fijo.
 - La subida de archivos de video. Los videos viven en YouTube (R1).

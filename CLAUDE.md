@@ -14,6 +14,9 @@ con una **academia completa simulada**. Cuatro bloques de trabajo:
   **550 preguntas, 12 agencias, 56 personas** y la escena **E6 · en operación**.
 - **Backoffice operable** — **18 pantallas de app**: se abrieron 5 destinos del sidebar y **toda
   acción que se ofrece se puede ejecutar**, con el cambio persistido por escena.
+- **Flujos de alta simplificados** — **19 pantallas**. La estructura del MVP entra por
+  importación en vez de tipearse 44 veces, ninguna vía puede dejar un video sin sección, y
+  escribir preguntas pasó de 550 aperturas de modal a una cola por video.
 
 **Ya no es solo maquetación, ni solo navegación.** No hay backend, ni API, ni videos reales, ni SSO.
 Pero **sí hay capa de datos, reglas de negocio derivadas, mutaciones y persistencia en
@@ -105,7 +108,7 @@ valor. Lo propio del backoffice está en la **sección 6**, documentado en `DESI
 
 ### Sin build de HTML — sidebar duplicado a propósito
 
-Los `.html` son archivos planos, sin templating. El sidebar está **copiado literal en las 18 páginas
+Los `.html` son archivos planos, sin templating. El sidebar está **copiado literal en las 19 páginas
 de app**, delimitado por:
 
 ```html
@@ -118,7 +121,7 @@ de app**, delimitado por:
 replicá el cambio en todas las páginas y actualizá el partial. Al copiarlo, cambiá **solo** el
 `aria-current="page"`.
 
-## Los ocho archivos de JS
+## Los nueve archivos de JS
 
 No hay módulos ES (romperían `file://`). Cada archivo expone un global vía IIFE.
 
@@ -130,6 +133,7 @@ No hay módulos ES (romperían `file://`). Cada archivo expone un global vía II
 | `academia-guiones.js` | *(cuelga de `ACADEMIA_DATA`)* | Los 12 guiones de P1, verbatim |
 | `academia-preguntas.js` | *(cuelga de `ACADEMIA_DATA`)* | Las 550 preguntas, en tres capas |
 | `academia-sim.js` | `SIM` | **El motor.** Escenas, overlay, todos los agregados derivados, `verificar()` |
+| `academia-import.js` | `IMPORT` | Emite la plantilla del mapa, lee la planilla y arma el plan de alta. **Se carga solo en `importador.html`** |
 | `render.js` | `RENDER` | Helpers de markup. Emite el mismo HTML que antes estaba literal |
 | `ui.js` | `UI` | Solapas, conmutador de vista, menús, modal, orden de tabla, selección múltiple, **filtros, exportación a CSV y `rebind()`** |
 
@@ -140,6 +144,12 @@ icons.js → academia-data.js → academia-agencias.js → academia-guiones.js
         → academia-preguntas.js → academia-sim.js → render.js → ui.js
         → script inline de la página
 ```
+
+**`academia-import.js` va entre `academia-sim.js` y `render.js`, y solo en `importador.html`.**
+Ninguna otra pantalla lo necesita y no hay razón para que lo cargue. El motor **no depende de
+él**: es al revés. Sus dos controles de ida y vuelta se saltean donde no está cargado, y por eso
+`verificar()` da 106 controles en una pantalla común y 108 en el importador o en el script de
+verificación.
 
 **Ojo con el orden de ejecución.** Los `<script src>` van al final del `<body>`, así que el script
 inline corre durante el parseo y el `renderIcons()` de `icons.js` hidrata lo generado en el
@@ -153,6 +163,13 @@ filas ya generadas. Si un render ocurriera más tarde, hay que llamar a `renderI
   calcular, está de más.
 - **`academia-sim.js` es CÁLCULO, no markup.** No toca el DOM: se puede cargar en node.
 - **`render.js` es MARKUP, no cálculo.** Solo arma HTML con lo que el motor ya resolvió.
+- **`academia-import.js` es CÁLCULO también**, pero acotado a la planilla: lee, valida y devuelve un
+  plan. **No persiste nada** —el único que escribe en el almacén del navegador es el motor— y **no
+  hace pedidos de red**: el archivo lo elige la persona y se lee con `FileReader`.
+
+> **Ojo al comentar estas reglas en el código.** Los controles de disciplina son greps a secas: un
+> comentario que nombre `localStorage` o `fetch` para *enunciar* la prohibición hace fallar el
+> control igual que si lo usara. Enunciala sin escribir el token.
 
 ## La escena: en qué momento de la construcción está el sistema
 
@@ -204,16 +221,18 @@ agrega una pantalla o un estado.
 |---|---|
 | `?sup=` | `BAK` (default) · `FRT` · `CRM` |
 | `?m=` | Cualquiera de los 13: `0`, `10`, `20` … `95`, `R01` |
-| `?v=` | Cualquiera de los 55: `BAK-M30.050` |
+| `?v=` | Cualquiera de los 55: `BAK-M30.050`. También lo lee `escritura.html`, que es **por video** |
 | `?c=` | Cualquiera de los 20: `C01` … `C20` |
 | `?a=` | Cualquiera de las 12 agencias, por su identificador — `agencia.html` |
 | `?tab=` | `ficha` (default) · `versiones` · `guion` · `preguntas` · `ubicaciones` |
 | `?vista=` | `tabla` (default) · `kanban` — tablero |
 | `?escena=` | `E1` … `E6` — sin parámetro, `E5` |
 | `?modo=` | `planificacion` (default) · `sesion` — hoja de cohorte |
-| `?paso=` | `1` · `2` · `3` · `4` · `resultado` — importador |
+| `?paso=` | `1` · `2` · `resultado` — importador. **Ya no hay pasos 3 ni 4** |
+| `?sello=` | El sello de una importación — `importador.html?paso=resultado`. Sin él, la pantalla de resultado no tiene qué mostrar y arranca en el paso 1 |
 | `?sup=` | También lo lee `alta-modulo.html`, para arrancar en la superficie que se venía mirando |
 | `?m=` | También lo leen `alta-seccion.html` y `alta-videos.html`, para precargar el módulo padre |
+| `?v=` | `escritura.html?v=BAK-M30.050` — la sesión de escritura de preguntas de un video |
 | `?config=1` | Abre la configuración de evaluación — `banco.html` |
 | `?reset=1` | **Borra el overlay de `localStorage`.** Vuelve al dataset limpio, en cualquier pantalla |
 
@@ -240,6 +259,8 @@ Salieron de tres rondas de revisión del wireframe. **Romperlas es un error, no 
 | R9 | **El wireframe dibuja estados rotos, no ideales.** Hay que mantenerlos: el sorteo que no se puede cumplir, el módulo no apto, las preguntas a revisar |
 | R10 | **El Home mide avance de construcción, no operación** — en E1 a E5. En esas cinco escenas no hay uso, así que no hay métricas de uso: lo único de operación permitido es «módulos activos» y «agencias con acceso». **E6 queda fuera del alcance de R10**, y es la única escena donde el uso existe y se puede medir |
 | R11 | **Los videos nacen en `backlog`, sin link y sin versión.** El alta **nunca** pide un link de YouTube: son IDs reservados |
+| R12 | **Ningún camino puede dejar la jerarquía incompleta.** Hay tres vías para crear contenido —import, alta de módulo, alta de videos— y ninguna permite un video sin sección ni un módulo de biblioteca sin secciones. La sección es estructural del lado agencia: con ella se arma el syllabus, el progreso parcial, el breadcrumb del reproductor y la devolución de la evaluación |
+| R13 | **Si el dato ya está escrito en algún lado, se importa. Si nace del trabajo, se escribe en la pantalla donde ese trabajo ocurre.** Módulos, secciones, videos y cohortes se importan; estado, link, duración, versión y guión entran por las pantallas de producción; **las preguntas no se importan nunca** |
 
 Los 7 estados de producción, en orden: `backlog` → `guionado` → `grabado` → `editado` → `publicado`
 → `a regrabar` → `obsoleto`.
@@ -267,6 +288,10 @@ Todas en `academia-sim.js`. Ninguna en el HTML.
 | Avance de una persona, **determinista** | `avanceDe()` — semilla estable por ID, nunca `Math.random()` |
 | Configuración de evaluación del módulo | `configEvaluacion()` — hito del dataset, o lo que guardó el overlay |
 | La prioridad la define el cohorte | `conEstado()` — al cambiar el cohorte, la prioridad lo sigue |
+| **Orden de una sección** | `ordenDeSeccion()` — la secuencia más baja de sus videos. Verificado: reproduce las 31 del dataset. Hace que ordenar la planilla por ID no pueda romper el syllabus. Una sección recién creada no tiene videos, así que ahí manda su `orden` explícito |
+| **Cuota de preguntas de un video** | `cuotaDeVideo()` — el mínimo de su sección repartido entre sus videos. **Orientativa:** lo exigible sigue siendo el mínimo por sección. **No es 10 parejo: va de 5 a 20** |
+| **Cola de escritura** | `colaDeEscritura()` — la unidad de trabajo es el VIDEO. Tres motivos en orden de urgencia: `sin preguntas` · `bajo cuota` · `a revisar`. **No lista lo que todavía no se publicó** |
+| ID de la próxima pregunta | `proximoIdPregunta()` — se deriva del banco, no del reloj. Lo usan el modal del banco y la sesión de escritura |
 
 ### Mutar el overlay
 
@@ -275,7 +300,7 @@ Cinco primitivas, todas en `academia-sim.js` y todas sobre **la escena activa**:
 | Función | Qué hace |
 |---|---|
 | `anotar(tipo, id, campos)` | Cambia una entidad. `tipo` ∈ `videos` · `modulos` · `preguntas` · `cohortes` |
-| `crear(tipo, entidad)` | Da de alta. `tipo` ∈ `modulos` · `secciones` · `videos` · `preguntas` · `superficies` |
+| `crear(tipo, entidad)` | Da de alta. `tipo` ∈ `modulos` · `secciones` · `videos` · `preguntas` · `superficies` · `cohortes` |
 | `borrar(tipo, predicado)` | Solo borra lo creado en el overlay; el dataset no se toca |
 | `anotado(tipo, id, escena)` | Lee el parche |
 | `hayCambios(escena)` | Cuántos cambios tiene encima la escena |
@@ -283,6 +308,19 @@ Cinco primitivas, todas en `academia-sim.js` y todas sobre **la escena activa**:
 **Lo creado se fusiona al cargar, una sola vez** (paso de materialización), y queda marcado con
 `creadoEnOverlay`. Por eso una pantalla que da de alta **navega o recarga** en vez de re-indexar: así
 el alta se ve igual viniendo de esta sesión o de otra.
+
+**La materialización copia con `Object.assign`, no con literales.** Es lo que permite que una entidad
+lleve campos propios encima —el sello de importación, por ejemplo— sin que se descarten en silencio.
+Las secciones se armaban con un literal y perdían todo lo demás; ya no.
+
+**Las formas que espera la materialización**, y no otras:
+
+| Tipo | Forma | Dedup |
+|---|---|---|
+| `modulos` | `{numero, codigo, titulo, tipo, orden, planes, activadoEn, secciones: []}` | por `codigo` |
+| `secciones` | `{codigoModulo, titulo, orden}` — **`orden` explícito**, no derivado | por `titulo` dentro del módulo |
+| `videos` | `{codigoModulo, seccion, secuencia, titulo, cohorte, duracion, planes}` — **`seccion` por título** | por `secuencia` |
+| `cohortes` | `{id, nombre, prioridad, escenario}` | por `id` |
 
 Qué campos se leen del overlay, y nada más: `estado` y `visible` de un video, los cuatro de
 `EDITABLES` (título, cohorte, duración, planes), `versiones`, `guion`, el `estado` de un módulo y su
@@ -293,7 +331,8 @@ Tres cosas que no se negocian al mutar:
 
 1. **`verificar()` audita SIEMPRE el dataset limpio.** Levanta `ignorarOverlay`, así que el informe
    sigue midiendo el compromiso del prototipo y no la sesión. Con overlay activo antepone un control
-   informativo (`ok: null`) y suma cuatro de integridad sobre lo creado.
+   informativo (`ok: null`) y suma **cinco** de integridad sobre lo creado —el quinto exige que
+   ningún video creado quede sin sección, que es la invariante de R12.
 2. **Las reglas ganan sobre el overlay.** `visibleEnFront()` chequea `obsoleto` **antes** de leer el
    parche: un `{visible:true}` guardado no puede devolver al Front un video dado de baja (R3).
 3. **Después de mutar hay que repintar.** No hay eventos: la pantalla llama a su función de render
@@ -375,13 +414,15 @@ Modelarlo así garantiza que el banco no pueda achicarse entre escenas: `0 → 1
 
 ## Verificación
 
-### 1 · `SIM.verificar()` — 101 controles
+### 1 · `SIM.verificar()` — 108 controles
 
-Reemplaza los greps manuales de coherencia numérica. Corre en la consola del navegador o en node:
+Reemplaza los greps manuales de coherencia numérica. Corre en la consola del navegador o en node.
+**Cargá también `academia-import.js`**, o los dos controles de ida y vuelta se saltean y son 106:
 
 ```bash
 node -e 'global.window={};
-  ["academia-data","academia-agencias","academia-guiones","academia-preguntas","academia-sim"]
+  ["academia-data","academia-agencias","academia-guiones","academia-preguntas","academia-sim",
+   "academia-import"]
     .forEach(f => require(process.cwd()+"/assets/js/"+f+".js"));
   const r = window.SIM.informe();
   process.exit(r.ok ? 0 : 1)'
@@ -392,6 +433,16 @@ video** · los 12 publicados de E4 y que ningún módulo de biblioteca esté com
 banco y de sorteo por módulo · las 5 cadenas de `BAK-M30` · el acumulado de preguntas por escena · que
 el banco no se achique · **que no haya operación antes de E6** · que ningún avance saltee módulos ·
 que el uso simulado sea determinista.
+
+Y los seis de los flujos de alta: **que el orden de sección derivado de la secuencia mínima reproduzca
+las 31 del dataset** · que ningún video quede sin sección · que ningún módulo de biblioteca quede sin
+secciones · que la cuota por video sume el mínimo de su sección · que la cola no liste videos que no
+llegaron a `publicado` · y la **ida y vuelta de la plantilla**.
+
+> **La ida y vuelta no prueba que se creen los 55.** En el prototipo los 55 existen en TODAS las
+> escenas —la escena cambia el estado, no la existencia—, así que importar el mapa completo los
+> **omite**, y eso es el alta incremental funcionando. Lo que prueba es que las seis columnas
+> alcancen: que lo emitido se relea sin un error y reconstruya módulo, sección, título y cohorte.
 
 ### 2 · Disciplina del design system
 
@@ -419,6 +470,8 @@ grep -ln "localStorage" assets/js/*.js                              # → academ
 grep -inE "videos vistos|% de completitud" home.html                # → solo dentro del bloque E6
 # R11 · ninguna pantalla de alta pide un link
 grep -nE '<(input|textarea)[^>]*(type="url"|link|youtu)' alta-videos.html importador.html  # → vacío
+# R12 · ninguna vía deja un video sin sección. Lo verifica el motor, no el grep:
+#       los controles «Ningún video sin sección» y «Overlay · ningún video creado quedó sin sección»
 ```
 
 > **Cuidado con el idiom `cmd | grep -v X >/dev/null && …`.** Con entrada vacía y la salida redirigida
@@ -427,12 +480,12 @@ grep -nE '<(input|textarea)[^>]*(type="url"|link|youtu)' alta-videos.html import
 > líneas se interpretan como comandos y **todos los controles dan ✓ porque el grep nunca corrió**.
 > Con `mapfile -t PAGS < <(ls *.html …)` y `"${PAGS[@]}"` no pasa.
 
-### 3 · Los 18 sidebars idénticos
+### 3 · Los 19 sidebars idénticos
 
 ```bash
 for f in home.html modulos.html modulo.html video.html tablero.html banco.html \
          importador.html alta-videos.html alta-modulo.html alta-seccion.html \
-         cohorte.html guion.html superficies.html \
+         cohorte.html guion.html superficies.html escritura.html \
          videos.html regrabacion.html panel.html agencias.html agencia.html; do
   sed -n '/app-shell: sincronizar/,/\/app-shell/p' $f | sed 's/ aria-current="page"//' | md5sum
 done | sort -u | wc -l   # → 1
@@ -443,9 +496,18 @@ done | sort -u | wc -l   # → 1
 `google-chrome --headless=new --dump-dom`, con `--virtual-time-budget=1500` — sin eso, las capturas
 agarran el render a mitad de camino. **Sin `.html` en la URL** (ver la nota de `serve@14`).
 
-Vale la pena barrer todo, que es rápido y encuentra caídas: los **55** `video?v=` y `guion?v=`, los
-**13** `modulo?m=` y `banco?m=`, los **20** `cohorte?c=` × 2 modos, las **12** `agencia?a=`, y las
-**6** escenas × 13 pantallas. Todas las URLs de `index.html` tienen que dar 200.
+Vale la pena barrer todo, que es rápido y encuentra caídas: los **55** `video?v=`, `guion?v=` y
+`escritura?v=`, los **13** `modulo?m=` y `banco?m=`, los **20** `cohorte?c=` × 2 modos, las **12**
+`agencia?a=`, y las **6** escenas × 14 pantallas. Todas las URLs de `index.html` tienen que dar 200.
+
+**Tres recorridos que hay que manejar, no volcar:** importar la plantilla completa (omite las 55 y
+deja el botón apagado con su motivo) · importar IDs nuevos, confirmar y volver a importar lo mismo
+(la segunda vez omite todo) · escribir una pregunta en la sesión, salir y volver.
+
+> **Al confirmar la importación con `npm run serve` se cae en el paso 1, no en el resultado.** No es
+> un bug del importador: es la misma trampa de `serve@14` —el 301 sobre `.html` se come el query
+> string— y afecta a cualquier navegación con parámetros del repo. Por `file://` funciona completo.
+> Para probarlo servido, entrá al resultado por `/importador?paso=resultado&sello=…`, sin `.html`.
 
 **Para probar lo que se clickea**, `--dump-dom` no alcanza: hay que manejar la página. Un banco de
 pruebas de un archivo, servido desde el mismo origen, resuelve el problema sin sumar dependencias —
