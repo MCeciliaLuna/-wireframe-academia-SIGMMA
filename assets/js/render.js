@@ -509,7 +509,7 @@ window.RENDER = (function () {
   function tableroPasos(pasos, opciones) {
     const o = opciones || {};
     return (
-      '<ol class="grid grid-cols-5 gap-[10px]" aria-label="Pasos del módulo">' +
+      '<ol class="pasos-modulo" aria-label="Pasos del módulo">' +
       pasos.map(function (p, i) {
         /* Se apaga por MOTIVO, no por posición. El resaltado del paso «en
            curso» orienta; no da ni quita permiso. En régimen se pueden escribir

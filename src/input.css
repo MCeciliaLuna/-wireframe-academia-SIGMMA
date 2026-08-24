@@ -238,15 +238,20 @@
 /* Variables no-Tailwind usadas por los componentes de abajo */
 @theme static {
   /* -- Backoffice ---------------------------------------------------------
-     El wireframe fija el lienzo en 1440 px y el sidebar en 200 px (R7: no hay
-     responsive en este alcance). El alto de la barra superior de pantalla es
-     menor que el header de 72 px de la vista agencia: acá no hay identidad de
-     marca compitiendo con el contenido, y R6 pide densidad. */
-  --shell-width: 1440px;
+     El wireframe dibuja el lienzo en 1440 px, pero eso es la medida en la que
+     se dibujo, no un techo: la herramienta usa TODO el ancho de la ventana.
+     El sidebar de 200 px sale del wireframe y es lo unico que no crece. El
+     alto de la barra superior de pantalla es menor que el header de 72 px de
+     la vista agencia: aca no hay identidad de marca compitiendo con el
+     contenido, y R6 pide densidad. */
   /* Piso del lienzo: por debajo, el grid de la pantalla se deforma y conviene
-     que scrollee antes que apretarse. */
+     que scrollee antes que apretarse. No hay techo: ver `.app-shell`. */
   --shell-min-width: 1160px;
   --sidebar-width: 200px;
+  /* Techo del panel lateral de apoyo. Crece con la ventana pero acotado: a
+     2560 px un panel de metadatos de 700 px seria absurdo. */
+  --panel-width-min: 320px;
+  --panel-width-max: 460px;
   --pagehead-height: 64px;
   --z-sidebar: 1001;
 
@@ -1385,28 +1390,26 @@
      ====================================================================== */
 
   /* -- Shell: sidebar fijo + columna de contenido ---------------------------
-     R7: lienzo de 1440 px, sin responsive. El sidebar de 200 px sale del
-     wireframe. La vista agencia usa un header horizontal de 72 px; acá la
-     navegación es de 16 destinos agrupados en 6 funciones y no entra en una
-     barra. */
+     R7: desktop, sin responsive. El sidebar de 200 px sale del wireframe. La
+     vista agencia usa un header horizontal de 72 px; acá la navegación es de
+     16 destinos agrupados en 6 funciones y no entra en una barra. */
   .app-shell {
     display: grid;
     grid-template-columns: var(--sidebar-width) 1fr;
-    /* El lienzo es de 1440 (R7), pero como TECHO, no como medida clavada. Con
-       `width` fijo, una ventana de 1280 no achicaba nada: cortaba 160 px del
-       borde derecho —la accion primaria del encabezado, el panel lateral y la
-       tercera tarjeta de cada grilla— sin ningun aviso. Sigue sin haber
-       breakpoints: es un unico lienzo que se comprime. El piso evita que el
-       grid interno se deforme; por debajo de el, scrollea como antes. */
+    /* Todo el ancho de la ventana, sin techo. El wireframe se dibujo en 1440,
+       y durante un tiempo eso fue una medida clavada: en 1920 sobraban 240 px
+       muertos de cada lado, y en 1280 se cortaban 160 px del borde derecho.
+       Ninguna de las dos cosas es lo que quiere una herramienta interna de uso
+       diario, que necesita meter la tabla mas ancha posible en pantalla.
+       Sigue sin haber breakpoints: es un unico lienzo fluido. El piso evita
+       que el grid interno se deforme; por debajo de el, scrollea. */
     width: 100%;
-    max-width: var(--shell-width);
     min-width: var(--shell-min-width);
     /* Alto fijo, no mínimo: la nota del wireframe en el layout maestro dice
        «sin footer: la tabla usa todo el alto y scrollea sola». Para que un
        contenedor interno pueda scrollear, el de afuera tiene que tener alto
        definido. */
     height: 100vh;
-    margin-inline: auto;
     background: var(--color-white);
   }
 
@@ -1457,6 +1460,23 @@
     font-family: var(--font-mono);
     font-weight: 700;
     color: var(--color-primary);
+  }
+
+  /* -- El menu del selector de superficie ------------------------------------
+     `.menu` es un desplegable de contenido, anclado a `right: 0` y con 214 px
+     de ancho minimo. Dentro del sidebar eso no cierra: la caja de contenido
+     mide 176 px (200 menos los 12 de padding a cada lado), y como `.sidebar`
+     lleva `overflow-y: auto` —y cuando un eje no es `visible` el otro tampoco
+     puede serlo— el sidebar recorta. El menu se desbordaba 38 px hacia la
+     izquierda y se los comia: las opciones se leian «AK · Backoffice»,
+     «RT · Front» y «RM».
+
+     Un menu anclado a un control de 176 px tiene que medir 176 px. */
+  .sidebar .menu {
+    min-width: 0;
+    width: 100%;
+    left: 0;
+    right: auto;
   }
 
   /* -- Navegación agrupada por función -------------------------------------- */
@@ -1882,8 +1902,46 @@
     color: var(--color-primary-dark);
   }
 
+  /* -- Grillas que se acomodan al ancho -------------------------------------
+     No son breakpoints: son grillas intrinsecas, que resuelven cuantas columnas
+     entran a partir de un ancho minimo por celda. Es la contracara de soltar el
+     techo del lienzo: si la ventana crece y la grilla no, solo crece el aire.
+
+     `auto-fill` en las tarjetas y `auto-fit` en los tiles, y la diferencia
+     importa: con `auto-fill` la grilla mantiene el paso aunque sobren columnas
+     —11 modulos en 4 columnas dejan la ultima fila alineada a la izquierda, no
+     estirada—; con `auto-fit` las pistas vacias colapsan, que es lo que se
+     quiere con 4 o 5 tiles sueltos. */
+  .grid-tarjetas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 18px;
+  }
+  /* Los tiles llenan su fila, por el mismo motivo que `.metric-tile` no lleva
+     techo: la fila es un bloque de ancho completo y tiene que alinear con los
+     de arriba y abajo. `auto-fit` con `1fr` reparte parejo y envuelve solo si
+     no entran. */
+  .grid-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+  }
+  /* Los cinco pasos del modulo son una progresion y se leen de un vistazo: no
+     envuelven nunca —serian dos progresiones— y no se estiran a 2400 px. */
+  .pasos-modulo {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+    max-width: 1240px;
+  }
+
   /* -- Tile de métrica ------------------------------------------------------ */
   .metric-tile {
+    /* Sin techo, y es a proposito. Un tile es un rotulo y un numero de 28 px,
+       asi que estirado sobra aire adentro; pero la fila de tiles es un bloque
+       de ancho completo, hermano de la barra de progreso, la de filtros y la
+       tabla. Topar los tiles en 320 px los dejaba cortos contra todo lo demas,
+       y esa desalineacion vertical se lee peor que el aire interno. */
     flex: 1;
     padding: 10px 12px;
     border: 1px solid var(--color-line);
@@ -2457,15 +2515,49 @@
     text-align: right;
   }
 
-  /* -- Editor partido -------------------------------------------------------
-     Contexto a la izquierda, plantilla a la derecha. El guión no se escribe
-     aislado: se escribe sabiendo de dónde viene el escenario del cohorte y en
-     qué estado lo tiene que dejar para el video siguiente. */
-  .split-editor {
+  /* -- Contenido + panel de apoyo -------------------------------------------
+     El patron de 16 de las 18 pantallas: lo que se trabaja a un lado, y al
+     otro un panel de metadatos, ayuda o resumen. Vivia como utilidad suelta en
+     cada HTML, con SEIS anchos distintos —320, 330, 340, 360, 380, 400— que no
+     respondian a ningun criterio: eran el numero que quedo.
+
+     El panel crece con la ventana pero acotado. Con un ancho clavado, a 2560 px
+     la proporcion contra el contenido se iba a ~6:1 y el panel quedaba como una
+     astilla; sin techo, un panel de metadatos de 700 px es igual de absurdo.
+     `clamp` sostiene la proporcion en ~4:1 en todo el rango.
+
+     `minmax(0, 1fr)` y no `1fr`: sin el, una tabla ancha empuja la columna de
+     contenido mas alla de su parte y desborda el grid. */
+  .layout-panel,
+  .layout-panel-inverso,
+  .layout-panel-doble {
     display: grid;
-    grid-template-columns: 340px 1fr;
     gap: 18px;
+  }
+  .layout-panel,
+  .layout-panel-inverso {
     align-items: start;
+  }
+  .layout-panel {
+    grid-template-columns:
+      minmax(0, 1fr)
+      clamp(var(--panel-width-min), 22%, var(--panel-width-max));
+  }
+  /* El guion invierte el orden: el contexto de la cadena va a la IZQUIERDA,
+     porque se lee antes de escribir, no despues. */
+  .layout-panel-inverso {
+    grid-template-columns:
+      clamp(var(--panel-width-min), 22%, var(--panel-width-max))
+      minmax(0, 1fr);
+  }
+  /* La ficha del video parte el contenido en dos antes del panel. Es la unica
+     que NO lleva `align-items: start`: sus tres columnas se estiran parejas, y
+     eso es deliberado —son bloques de ficha, no un panel colgando al costado. */
+  .layout-panel-doble {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 1fr)
+      clamp(var(--panel-width-min), 18%, var(--panel-width-max));
   }
 
   /* -- Numero de paso del cuerpo del guion -----------------------------------

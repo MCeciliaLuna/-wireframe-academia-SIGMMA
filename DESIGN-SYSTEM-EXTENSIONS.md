@@ -22,6 +22,8 @@
 | Componente | Para qué | Promover al DS oficial |
 |---|---|---|
 | `.app-shell` · `.sidebar` | Shell de app interna con navegación lateral | **Sí** — cualquier backoffice futuro lo va a necesitar |
+| `.layout-panel` y sus dos variantes | Contenido + panel de apoyo, con el panel acotado por `clamp` | **Sí** |
+| `.grid-tarjetas` · `.grid-tiles` · `.pasos-modulo` | Grillas intrínsecas, sin breakpoints | **Sí** |
 | `.surface-picker` | Conmutador global de superficie (BAK/FRT/CRM) | No — es específico de la Academia |
 | `.nav-group` · `.nav-item` | Menú agrupado por función | **Sí**, junto con el shell |
 | `.page-head` · `.breadcrumb` · `.page-title` | Encabezado de pantalla interna | **Sí** |
@@ -63,15 +65,75 @@
 backoffice tiene **16 destinos agrupados en 6 funciones**: no entran en una barra, y el wireframe
 resuelve con un sidebar de 200 px.
 
-**Tokens.** `--sidebar-width`, `--shell-width` y `--shell-min-width` (nuevos, en `@theme static`),
+**Tokens.** `--sidebar-width` y `--shell-min-width` (nuevos, en `@theme static`),
 `--color-surface`, `--color-line`, `--color-white`.
 
-**Nota.** `--shell-width: 1440px` es el **techo** del lienzo, no una medida clavada: va en
-`max-width`. **R7 sigue en pie —no hay un solo breakpoint—**, y es la única divergencia estructural
-con el repo hermano, que sí tiene tres. Lo que cambió es el modo de fallar: con `width` fijo, una
-ventana de 1280 no comprimía nada, cortaba 160 px del borde derecho —la acción primaria del
-encabezado, el panel lateral y la tercera tarjeta de cada grilla— sin ningún aviso.
-`--shell-min-width: 1160px` es el piso: por debajo, scrollea antes que deformar el grid.
+**Nota.** **No hay techo de ancho.** El lienzo usa el 100 % de la ventana. El wireframe se dibujó
+en 1440 px y durante un tiempo eso fue una medida clavada, que fallaba en las dos direcciones: en
+1920 sobraban 240 px muertos de cada lado, y en 1280 se cortaban 160 px del borde derecho —la
+acción primaria del encabezado, el panel lateral y la tercera tarjeta de cada grilla— sin ningún
+aviso. Ninguna de las dos es lo que quiere una herramienta interna de uso diario, que necesita
+meter la tabla más ancha posible en pantalla.
+
+**R7 sigue en pie: no hay un solo breakpoint.** Es un único lienzo fluido, y sigue siendo la
+divergencia estructural con el repo hermano, que sí tiene tres. `--shell-min-width: 1160px` es el
+piso: por debajo, scrollea antes que deformar el grid. `--sidebar-width: 200px` es lo único que
+no crece.
+
+---
+
+### `.layout-panel` · `.layout-panel-inverso` · `.layout-panel-doble`
+
+**Por qué.** Contenido a un lado, panel de metadatos o ayuda al otro: es el patrón de 16 de las 18
+pantallas. Vivía como utilidad suelta en cada HTML, con **seis anchos distintos** —320, 330, 340,
+360, 380, 400— que no respondían a ningún criterio: eran el número que quedó.
+
+**Decisión.** El panel crece con la ventana pero acotado, con
+`clamp(var(--panel-width-min), 22%, var(--panel-width-max))`. Con un ancho clavado, al soltar el
+techo del lienzo la proporción contra el contenido se iba a ~6:1 a 2560 px y el panel quedaba como
+una astilla; sin techo, un panel de metadatos de 700 px es igual de absurdo. `clamp` sostiene la
+proporción en ~4:1 en todo el rango: 320 px hasta 1440, 370 a 1920, 460 de 2560 en adelante.
+
+La columna de contenido es `minmax(0, 1fr)` y no `1fr`: sin eso, una tabla ancha empuja la columna
+más allá de su parte y desborda el grid.
+
+**Las tres variantes.** `.layout-panel` es el patrón. `.layout-panel-inverso` pone el panel a la
+**izquierda** —`guion.html`, donde el contexto de la cadena se lee antes de escribir, no después—.
+`.layout-panel-doble` parte el contenido en dos antes del panel (`video.html`) y es la única que
+**no** lleva `align-items: start`: sus tres columnas se estiran parejas, y eso es deliberado: son
+bloques de ficha, no un panel colgando al costado.
+
+**Tokens.** `--panel-width-min` (320 px), `--panel-width-max` (460 px), nuevos.
+
+> Reemplaza a `.split-editor`, que declaraba `340px 1fr` y no se usaba en ningún lado: el patrón
+> real vivía inline.
+
+---
+
+### `.grid-tarjetas` · `.grid-tiles` · `.pasos-modulo`
+
+**Por qué.** Son la contracara de soltar el techo del lienzo: si la ventana crece y la grilla no,
+lo único que crece es el aire.
+
+**No son breakpoints.** Son grillas intrínsecas, que resuelven cuántas columnas entran a partir de
+un ancho mínimo por celda. R7 sigue sin tener un solo `@media`.
+
+| Clase | Regla | Dónde |
+|---|---|---|
+| `.grid-tarjetas` | `repeat(auto-fill, minmax(340px, 1fr))` | Panel de carga de `modulos.html`. 3 columnas a 1440, 4 a 1920, 5 a 2400 |
+| `.grid-tiles` | `repeat(auto-fit, minmax(180px, 1fr))` | Filas de tiles de métrica: `panel.html` (5), `agencia.html` (4) |
+| `.pasos-modulo` | `repeat(5, minmax(0, 1fr))` con `max-width: 1240px` | Los cinco pasos de `modulo.html`, emitidos por `RENDER.tableroPasos()` |
+
+**`auto-fill` en las tarjetas y `auto-fit` en los tiles**, y la diferencia importa: con `auto-fill`
+la grilla mantiene el paso aunque sobren columnas —11 módulos en 4 columnas dejan la última fila
+alineada a la izquierda, no estirada—; con `auto-fit` las pistas vacías colapsan, que es lo que se
+quiere con 4 o 5 tiles sueltos.
+
+**Los cinco pasos llevan techo y las otras dos no.** Una progresión de cinco se lee de un vistazo:
+no puede envolver —serían dos progresiones— ni estirarse a 2400 px. En cambio `.metric-tile` **no**
+lleva techo, aunque estirado le sobre aire adentro: la fila de tiles es un bloque de ancho completo,
+hermano de la barra de progreso, la de filtros y la tabla. Toparlos los dejaba cortos contra todo lo
+demás, y esa desalineación vertical se lee peor que el aire interno.
 
 ---
 
@@ -86,6 +148,24 @@ todo el contenido cuelga de cuál está activa. Es el conmutador de contexto de 
 **Decisión.** Es el **único elemento del sidebar que lleva peso visual de marca**: la sigla va en
 `--color-primary`. En la vista agencia el gesto de marca (`.brand-edge`) encoda estado y hay uno
 solo por pantalla; acá el criterio se mantiene — no se repartió.
+
+---
+
+### `.sidebar .menu`
+
+**Por qué.** `.menu` es el desplegable general del sistema: anclado a `right: 0`, con
+`min-width: 214px`. Dentro del sidebar eso no cierra. La caja de contenido del sidebar mide
+**176 px** (200 menos los 12 de padding a cada lado), y como `.sidebar` lleva `overflow-y: auto`
+—y cuando un eje no es `visible` el otro tampoco puede serlo, por spec— el sidebar **recorta**. El
+menú se desbordaba **38 px** hacia la izquierda y se los comía: las tres opciones se leían
+«AK · Backoffice», «RT · Front» y «RM», en lugar de BAK, FRT y CRM.
+
+**Decisión.** Un menú anclado a un control de 176 px tiene que medir 176 px: `min-width: 0`,
+`width: 100%`, `left: 0`, `right: auto`. La opción más larga, `BAK · Backoffice`, mide ~115 px
+contra 140 px útiles.
+
+> `ui.js` solo alterna `hidden` y maneja el teclado: **no posiciona nada**. Todo el
+> posicionamiento de `.menu` es CSS.
 
 ---
 

@@ -296,7 +296,7 @@ hash en todas.
 |---|---|---|---|
 | **Datos** | `mock-data.js` con reglas de negocio | **Capa de datos propia**, con 550 preguntas y 12 agencias | Los dos tienen estado real. El dataset es distinto: acá manda el ciclo de producción, allá el recorrido del alumno |
 | **Chrome** | Header horizontal de 72 px, 3 destinos | **Sidebar de 200 px**, 16 destinos en 6 grupos | No entran en una barra |
-| **Responsive** | 3 breakpoints | **1440 px fijo** | Fuera de alcance |
+| **Responsive** | 3 breakpoints | **Un lienzo fluido, sin breakpoints** | Los dos son desktop. La agencia adapta el recorrido del alumno a varios tamaños; acá se usa todo el ancho de la ventana y no hay más de un layout |
 | **JS** | 6 archivos con máquinas de estado | **8 archivos**: dataset, motor, render y UI | El motor deriva todos los agregados; nada se escribe a mano |
 | **Planes** | Professional · Business | **Professional · Business · Corporate** | Cierra D-3 con los tres reales de `web.sigmma.net/planes.html` |
 | **Naranja `#ff6b35`** | Una aparición: el certificado | **Ninguna** | Nada acá lo justifica |
@@ -415,5 +415,6 @@ Queda para probar a mano: el recorrido de teclado completo y `prefers-reduced-mo
 - Backend. **La importación sí es real**: el importador emite la plantilla, lee el archivo con
   `FileReader` o lo pegado a mano, valida fila por fila y crea la jerarquía en el overlay. Lo que no
   hay es un servidor del otro lado.
-- Responsive: 1440 px fijo.
+- Responsive: no hay breakpoints. El lienzo usa el 100 % del ancho, con un piso de 1160 px por debajo
+  del cual scrollea (R7).
 - La subida de archivos de video. Los videos viven en YouTube (R1).
