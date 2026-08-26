@@ -363,10 +363,10 @@
               texto: "Es el único objetivo que importa ahora. Los módulos de biblioteca están lejos, " +
                 "pero eso no es una alerta: es el punto de partida. <strong>La Academia se lanza con " +
                 "la Ruta Esencial</strong>, no con la biblioteca completa.",
-              cta: cohorte
-                ? { href: "cohorte.html?c=" + cohorte.id + (esc === "E5" ? "" : "&amp;escena=" + esc),
-                    texto: "Empezar por el cohorte " + cohorte.id }
-                : null,
+              /* El cohorte sigue siendo el dato que dice por dónde empezar,
+                 pero su hoja quedó fuera del MVP: el destino es el tablero,
+                 que es donde los videos de ese cohorte se mueven de estado. */
+              cta: { href: "tablero.html" + q, texto: "Ir al tablero de producción" },
             };
           }
         } else if (cerca) {
@@ -400,21 +400,24 @@
               " videos en cola de regrabación porque el producto cambió, y el banco de los módulos " +
               "afectados con preguntas a revisar." +
               (opHito.agencias
-                ? " El panel de obra ya no es lo que importa — de acá en adelante la pregunta es " +
-                  "cuánto se usa y qué contenido hay que revisar."
+                ? " La construcción ya no es lo que importa — de acá en adelante la pregunta es " +
+                  "cuánto se usa y qué contenido hay que revisar. Medir el uso queda fuera del MVP."
                 : ""),
-            cta: { href: "tablero.html" + q, texto: "Ver la cola de regrabación" },
+            cta: { href: "tablero.html" + q, texto: "Ver los videos a regrabar en el tablero" },
           };
         }
 
         R.pintar("[data-hito]", R.hitoCard(hito));
 
-        /* La franja transversal. Los cuatro contadores llevan a donde se
-           resuelven; el que no tiene adónde llevar no es un link. */
+        /* La franja transversal. Cada contador lleva a donde se resuelve; el
+           que no tiene adónde llevar no es un link. */
         R.pintar("[data-trabajo]", R.franjaTrabajo([
+          /* Los dos del cohorte quedaron sin destino: su hoja está fuera del
+             MVP. Siguen siendo dato derivado y se muestran; lo que no hacen es
+             fingir un link. */
           { etiqueta: "Cohorte activo",
             valor: cohorte ? cohorte.id + " " + cohorte.nombre : "ninguno en curso",
-            href: cohorte ? "cohorte.html?c=" + cohorte.id + (esc === "E5" ? "" : "&escena=" + esc) : null },
+            href: null },
           { etiqueta: "Grabados del cohorte",
             valor: cohorte ? cohorte.grabados + " / " + cohorte.total : "—",
             ok: cohorte ? cohorte.grabados === cohorte.total : undefined },
@@ -428,7 +431,7 @@
           { etiqueta: "En cola de regrabación",
             valor: conteo["a regrabar"],
             ok: conteo["a regrabar"] === 0,
-            href: conteo["a regrabar"] ? "regrabacion.html" + q : null },
+            href: conteo["a regrabar"] ? "tablero.html" + q : null },
         ]));
 
         /* La Ruta, aparte y rotulada como derivada (R8). Sus dos barras son las

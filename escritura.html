@@ -235,7 +235,9 @@
           '<span class="chip chip-meta">' + R.esc(v.seccion) + "</span>");
         R.pintar("[data-acciones]",
           '<a href="banco.html?m=' + modulo.numero + amp + '" class="btn btn-bordered btn-sm">Volver al banco</a>' +
-          '<a href="guion.html?v=' + v.id + amp + '" class="btn btn-bordered btn-sm">Ver el guión</a>');
+          /* El guión ya no tiene editor propio: se lee en la solapa del video. */
+          '<a href="video.html?v=' + v.id + '&tab=guion' + amp +
+            '" class="btn btn-bordered btn-sm">Ver el guión</a>');
 
         /* ── Estado vacío, por dato ─────────────────────────────────────── */
         if (v.estado !== "publicado" && v.estado !== "a regrabar") {

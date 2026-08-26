@@ -312,7 +312,7 @@
             "El mapa de contenido tiene 55 videos con ID permanente. <span class=\"font-mono\">" +
             R.esc(id) + "</span> no es ninguno de ellos.");
           document.querySelector("[data-vacio-cta]").setAttribute("href", "tablero.html" + q);
-          document.querySelector("[data-breadcrumb]").textContent = "Contenido / Biblioteca de videos";
+          document.querySelector("[data-breadcrumb]").textContent = "Contenido / Módulos";
           return;
         }
 
@@ -532,7 +532,7 @@
               '<div><h3 class="side-title !mb-1">Intro <span class="font-normal normal-case ' +
                 'tracking-normal">· a cámara · ~15 seg</span></h3>' +
               '<div class="side-card !p-[9px] text-xs text-gray-800" aria-hidden="true">' +
-                "El guión estructurado se edita en el editor de guión y receta.</div></div>" +
+                "Presenta el problema que el video resuelve.</div></div>" +
               '<div><h3 class="side-title !mb-1">Cuerpo <span class="font-normal normal-case ' +
                 'tracking-normal">· voz sobre pantalla</span></h3>' +
               '<div class="side-card !p-[9px] text-xs text-gray-800" aria-hidden="true">' +
@@ -541,8 +541,11 @@
                 'tracking-normal">· a cámara · ~10 seg</span></h3>' +
               '<div class="side-card !p-[9px] text-xs text-gray-800" aria-hidden="true">' +
                 "Invita a la evaluación del módulo.</div></div>" +
-              '<a href="guion.html?v=' + v.id + amp + '" class="btn btn-bordered btn-sm self-start">' +
-              '<span class="icon" data-icon="edit"></span>Abrir el editor de guión</a>' +
+              /* Sin botón: en el MVP el guión se LEE acá y se escribe fuera
+                 del backoffice. Un «Abrir el editor» que no abre nada sería
+                 exactamente el bug que la regla del prototipo prohíbe. */
+              '<p class="foot-note !mt-4">El guión se lee acá. Editarlo queda fuera del ' +
+                'alcance del MVP.</p>' +
               "</section>" +
               '<aside class="side-card"><h2 class="side-title">Qué NO mostrar</h2>' +
               '<ul class="flex flex-col gap-2 text-xs">' +
@@ -555,9 +558,8 @@
               '<p class="mt-2 max-w-[54ch] text-sm text-ink-soft">Está en <strong>' + v.estado +
               "</strong>. El guión se escribe en contexto de su cohorte —" +
               (cohorte ? R.esc(cohorte.id + " " + cohorte.nombre) : "sin cohorte") +
-              "— para que la cadena de datos entre videos cierre.</p>" +
-              '<a href="guion.html?v=' + v.id + amp + '" class="btn btn-primary btn-sm mt-6">' +
-              "Escribir el guión</a></div>");
+              "— para que la cadena de datos entre videos cierre. Escribirlo queda fuera del " +
+              "alcance del MVP.</p></div>");
 
           /* ── Solapa 4 · Preguntas ───────────────────────────────────────── */
           document.querySelector("[data-n-preguntas]").textContent = preguntas.length;

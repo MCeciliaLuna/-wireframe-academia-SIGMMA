@@ -116,8 +116,8 @@
                   <span class="icon" data-icon="alert-triangle"></span>
                   <span>
                     <strong data-sup-codigo>FRT</strong> todavía no tiene módulos mapeados, así que
-                    no hay dónde reservar IDs. La currícula de esa superficie se define primero en
-                    <a href="superficies.html">Superficies y planes</a>.
+                    no hay dónde reservar IDs. La currícula de esa superficie se define primero
+                    creando sus módulos.
                   </span>
                 </div>
                 <div class="grid grid-cols-3 gap-3">
@@ -554,11 +554,13 @@
               });
             });
 
-            /* Se navega a la biblioteca: es donde los IDs recién reservados se
-               ven junto al resto, que es la confirmación real de que quedaron
-               creados. Un cartel de «listo» diría lo mismo sin probarlo. */
+            /* Se navega al módulo: es donde los IDs recién reservados se ven
+               colgados de su sección, que es la confirmación real de que
+               quedaron creados. Un cartel de «listo» diría lo mismo sin
+               probarlo. Y deja al usuario en los cinco pasos, con el paso de
+               videos ya avanzado. */
             const e = S.escena;
-            window.location.href = "videos.html" + (e === "E5" ? "" : "?escena=" + e);
+            window.location.href = "modulo.html?m=" + n + (e === "E5" ? "" : "&escena=" + e);
           });
         });
       })();
