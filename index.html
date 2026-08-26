@@ -26,8 +26,20 @@
         <p class="alert alert-info mt-6">
           <span class="icon" data-icon="info"></span>
           <span>
-            <strong>Es solo maquetación.</strong> No hay backend, ni API, ni videos reales, ni
-            persistencia. Los datos están escritos en el HTML. Diseñado a <strong>1440 px</strong>.
+            <strong>Alcance del MVP: crear y ver módulos.</strong> De los catorce destinos del
+            wireframe quedan cuatro — Módulos, Tablero de producción, Bancos de preguntas y Ruta
+            Esencial — y diez pantallas de app. El seguimiento de uso, el detalle por agencia,
+            superficies y planes, la biblioteca de videos, la cola de regrabación y la producción de
+            rodaje quedaron fuera (D-17).
+          </span>
+        </p>
+        <p class="alert alert-warning mt-3">
+          <span class="icon" data-icon="alert-triangle"></span>
+          <span>
+            No hay backend, ni API, ni videos reales, ni SSO. <strong>Pero sí hay capa de datos,
+            reglas de negocio derivadas, mutaciones y persistencia en el navegador</strong>, así que
+            todo lo que se ofrece se puede ejecutar. Desktop, sin responsive: un único lienzo fluido
+            con piso en <strong>1160 px</strong>.
           </span>
         </p>
       </header>
@@ -81,7 +93,6 @@
               <tr><td class="font-mono text-xs">V03</td><td>Listado de módulos — vacío</td><td><a href="modulos.html?escena=E1" class="font-mono text-xs">modulos.html?escena=E1</a></td></tr>
               <tr><td class="font-mono text-xs">V04</td><td>Alta de módulo</td><td><a href="alta-modulo.html" class="font-mono text-xs">alta-modulo.html</a></td></tr>
               <tr><td class="font-mono text-xs">V05</td><td>Alta de sección</td><td><a href="alta-seccion.html" class="font-mono text-xs">alta-seccion.html</a></td></tr>
-              <tr><td class="font-mono text-xs">V06</td><td>Superficies y planes</td><td><a href="superficies.html" class="font-mono text-xs">superficies.html</a></td></tr>
               <tr><td class="font-mono text-xs">—</td><td>Módulo sin secciones</td><td><a href="modulo.html?m=30&amp;escena=E1" class="font-mono text-xs">modulo.html?m=30&amp;escena=E1</a></td></tr>
               <tr><td class="font-mono text-xs">—</td><td>Tablero sin videos</td><td><a href="tablero.html?escena=E1" class="font-mono text-xs">tablero.html?escena=E1</a></td></tr>
             </tbody>
@@ -125,10 +136,7 @@
           <table class="table-app">
             <thead><tr><th scope="col" class="w-[64px]">#</th><th scope="col">Pantalla</th><th scope="col">URL</th></tr></thead>
             <tbody>
-              <tr><td class="font-mono text-xs">V11</td><td><strong>Editor de guión y receta</strong></td><td><a href="guion.html?v=BAK-M30.050&amp;escena=E3" class="font-mono text-xs">guion.html?v=BAK-M30.050&amp;escena=E3</a></td></tr>
-              <tr><td class="font-mono text-xs">V12</td><td><strong>Hoja de cohorte — planificación</strong></td><td><a href="cohorte.html?c=C03&amp;escena=E3&amp;modo=planificacion" class="font-mono text-xs">cohorte.html?c=C03&amp;escena=E3&amp;modo=planificacion</a></td></tr>
               <tr><td class="font-mono text-xs">V13</td><td>Tablero — avance mixto entre cohortes</td><td><a href="tablero.html?escena=E3" class="font-mono text-xs">tablero.html?escena=E3</a></td></tr>
-              <tr><td class="font-mono text-xs">V14</td><td><strong>Hoja de cohorte — sesión de grabación</strong></td><td><a href="cohorte.html?c=C03&amp;escena=E3&amp;modo=sesion" class="font-mono text-xs">…&amp;modo=sesion</a></td></tr>
               <tr><td class="font-mono text-xs">V15</td><td>Video <code class="font-mono text-xs">editado</code> — sin link todavía</td><td><a href="video.html?v=BAK-M10.020&amp;escena=E3" class="font-mono text-xs">video.html?v=BAK-M10.020&amp;escena=E3</a></td></tr>
               <tr><td class="font-mono text-xs">—</td><td>Panel — falta para el hito</td><td><a href="modulos.html?escena=E3" class="font-mono text-xs">modulos.html?escena=E3</a></td></tr>
             </tbody>
@@ -188,10 +196,6 @@
               <tr><td class="font-mono text-xs">S08</td><td><strong>Sesión de escritura de un video</strong></td><td><a href="escritura.html?v=BAK-M30.050" class="font-mono text-xs">escritura.html?v=BAK-M30.050</a></td></tr>
               <tr><td class="font-mono text-xs">—</td><td>Sesión — video sin publicar, todavía no corresponde</td><td><a href="escritura.html?v=BAK-M30.050&amp;escena=E2" class="font-mono text-xs">escritura.html?v=…&amp;escena=E2</a></td></tr>
               <tr><td class="font-mono text-xs">—</td><td>Sesión — video a regrabar, sus preguntas van a revisión</td><td><a href="escritura.html?v=BAK-M30.060&amp;escena=E5" class="font-mono text-xs">escritura.html?v=…&amp;escena=E5</a></td></tr>
-              <tr><td class="font-mono text-xs">—</td><td><strong>Biblioteca de videos</strong> <span class="chip chip-meta">D-9</span></td><td><a href="videos.html" class="font-mono text-xs">videos.html</a></td></tr>
-              <tr><td class="font-mono text-xs">—</td><td><strong>Cola de regrabación</strong> — 3 videos y 1 obsoleto</td><td><a href="regrabacion.html" class="font-mono text-xs">regrabacion.html</a></td></tr>
-              <tr><td class="font-mono text-xs">—</td><td>Cola vacía — ningún publicado se quedó viejo</td><td><a href="regrabacion.html?escena=E3" class="font-mono text-xs">regrabacion.html?escena=E3</a></td></tr>
-              <tr><td class="font-mono text-xs">—</td><td>Uso de la Academia — sin uso que medir <span class="chip chip-meta">R10</span></td><td><a href="panel.html" class="font-mono text-xs">panel.html</a></td></tr>
               <tr><td class="font-mono text-xs">—</td><td>Superficie sin mapear</td><td><a href="modulos.html?sup=FRT" class="font-mono text-xs">modulos.html?sup=FRT</a> · <a href="modulos.html?sup=CRM" class="font-mono text-xs">?sup=CRM</a></td></tr>
             </tbody>
           </table>
@@ -206,36 +210,32 @@
         <p class="mb-5 max-w-[74ch] text-sm text-ink-soft">
           La escena que cierra la línea de tiempo. Los 11 módulos de biblioteca activos, los bancos en
           <strong>50 preguntas</strong> cada uno y <strong>12 agencias</strong> usando la Academia.
-          Es la <strong>única escena con uso</strong>, y por eso la única donde las métricas de
-          operación tienen algo que medir: en las cinco anteriores el Home mide obra, no consumo
-          (R10). Quedan 3 videos en cola de regrabación y 1 obsoleto — una Academia en marcha siempre
-          arrastra algo de deuda, porque el producto sigue cambiando.
+          Es la <strong>única escena con uso</strong>, aunque medirlo quedó fuera del MVP: el dato
+          está y las reglas de R10 lo siguen custodiando, pero ya no hay pantalla que lo muestre.
+          Quedan 3 videos a regrabar y 1 obsoleto — una Academia en marcha siempre arrastra algo de
+          deuda, porque el producto sigue cambiando.
         </p>
         <div class="table-wrap">
           <table class="table-app">
             <thead><tr><th scope="col" class="w-[64px]">#</th><th scope="col">Pantalla</th><th scope="col">URL</th></tr></thead>
             <tbody>
-              <tr><td class="font-mono text-xs">—</td><td><strong>Uso de la Academia</strong></td><td><a href="panel.html?escena=E6" class="font-mono text-xs">panel.html?escena=E6</a></td></tr>
               <tr><td class="font-mono text-xs">—</td><td>Listado — los 11 activos, bancos completos</td><td><a href="modulos.html?escena=E6" class="font-mono text-xs">modulos.html?escena=E6</a></td></tr>
               <tr><td class="font-mono text-xs">—</td><td>Tablero — 51 publicados, 3 a regrabar</td><td><a href="tablero.html?escena=E6" class="font-mono text-xs">tablero.html?escena=E6</a></td></tr>
               <tr><td class="font-mono text-xs">—</td><td>Banco completo — 50 de 50</td><td><a href="banco.html?m=00&amp;escena=E6" class="font-mono text-xs">banco.html?m=00&amp;escena=E6</a></td></tr>
               <tr><td class="font-mono text-xs">—</td><td>Banco con deuda de revisión</td><td><a href="banco.html?m=30&amp;escena=E6" class="font-mono text-xs">banco.html?m=30&amp;escena=E6</a></td></tr>
               <tr><td class="font-mono text-xs">—</td><td>Módulo activo que dejó de ser apto <span class="chip chip-meta">D-4</span></td><td><a href="modulo.html?m=30&amp;escena=E6" class="font-mono text-xs">modulo.html?m=30&amp;escena=E6</a></td></tr>
-              <tr><td class="font-mono text-xs">—</td><td>Planes con agencias asignadas</td><td><a href="superficies.html?escena=E6" class="font-mono text-xs">superficies.html?escena=E6</a></td></tr>
-              <tr><td class="font-mono text-xs">—</td><td><strong>Uso de la Academia — por módulo</strong></td><td><a href="panel.html?escena=E6" class="font-mono text-xs">panel.html?escena=E6</a></td></tr>
-              <tr><td class="font-mono text-xs">—</td><td><strong>Agencias — las 12 con acceso</strong></td><td><a href="agencias.html?escena=E6" class="font-mono text-xs">agencias.html?escena=E6</a></td></tr>
-              <tr><td class="font-mono text-xs">—</td><td>Detalle de una agencia — avance del plantel</td><td><a href="agencia.html?a=andes-receptivo&amp;escena=E6" class="font-mono text-xs">agencia.html?a=andes-receptivo&amp;escena=E6</a></td></tr>
             </tbody>
           </table>
         </div>
       </section>
 
       <section class="mb-12">
-        <h2 class="text-h4 mb-1">Cualquier módulo, cualquier video, cualquier cohorte</h2>
+        <h2 class="text-h4 mb-1">Cualquier módulo, cualquier video</h2>
         <p class="mb-5 max-w-[74ch] text-sm text-ink-soft">
           Las pantallas ya no sirven un solo caso maquetado: los datos salen del dataset, así que
-          <strong>los 13 módulos, los 55 videos y los 20 cohortes</strong> tienen su pantalla en
-          cualquiera de las seis escenas. Estos son los casos que más enseñan.
+          <strong>los 13 módulos y los 55 videos</strong> tienen su pantalla en cualquiera de las seis
+          escenas. Estos son los casos que más enseñan. Los 20 cohortes siguen en el dataset —el
+          tablero los muestra y la prioridad los sigue—, pero su hoja quedó fuera del MVP.
         </p>
         <div class="table-wrap">
           <table class="table-app">
@@ -248,12 +248,6 @@
               <tr><td>Módulo reservado, sin contenido</td><td><a href="modulo.html?m=35" class="font-mono text-xs">modulo.html?m=35</a></td></tr>
               <tr><td>Banco de un módulo sin publicar todavía</td><td><a href="banco.html?m=50" class="font-mono text-xs">banco.html?m=50</a></td></tr>
               <tr><td>La Ruta Esencial no tiene banco propio: lo hereda <span class="chip chip-meta">R8</span></td><td><a href="banco.html?m=R01" class="font-mono text-xs">banco.html?m=R01</a></td></tr>
-              <tr><td>Guión escrito verbatim del cohorte P1</td><td><a href="guion.html?v=BAK-M00.010" class="font-mono text-xs">guion.html?v=BAK-M00.010</a></td></tr>
-              <tr><td>Video sin guión: la plantilla vacía, con la cadena resuelta</td><td><a href="guion.html?v=BAK-M50.020" class="font-mono text-xs">guion.html?v=BAK-M50.020</a></td></tr>
-              <tr><td>Cohorte de P4 sin escenario declarado</td><td><a href="cohorte.html?c=C19" class="font-mono text-xs">cohorte.html?c=C19</a></td></tr>
-              <tr><td>Matriz plan × módulo <span class="chip chip-meta">D-3 cerrada</span></td><td><a href="superficies.html#matriz" class="font-mono text-xs">superficies.html#matriz</a></td></tr>
-              <tr><td>Cualquiera de las 12 agencias, por su identificador</td><td><a href="agencia.html?a=viajes-del-sur&amp;escena=E6" class="font-mono text-xs">agencia.html?a=…&amp;escena=E6</a></td></tr>
-              <tr><td>Agencia inexistente: avisa, no muestra otra</td><td><a href="agencia.html?a=no-existe&amp;escena=E6" class="font-mono text-xs">agencia.html?a=no-existe&amp;escena=E6</a></td></tr>
               <tr><td><strong>La guía paso por paso, control por control</strong> <span class="chip chip-meta">D-16</span></td><td><a href="alta-modulo.html?guia=1" class="font-mono text-xs">alta-modulo.html?guia=1</a></td></tr>
               <tr><td>La compuerta: «Siguiente» apagado con el motivo que escribió la pantalla</td><td><a href="alta-modulo.html?guia=1" class="font-mono text-xs">alta-modulo.html?guia=1</a> <span class="text-ink-soft">— el número por defecto ya existe</span></td></tr>
               <tr><td>El popover <strong>dentro de un modal</strong>, sin velo propio</td><td><a href="banco.html?m=50&amp;escena=E2&amp;config=1&amp;guia=1" class="font-mono text-xs">banco.html?m=50&amp;escena=E2&amp;config=1&amp;guia=1</a></td></tr>
@@ -267,7 +261,7 @@
       </section>
 
       <section class="mb-10">
-        <h2 class="text-h4 mb-1">Los cinco flujos</h2>
+        <h2 class="text-h4 mb-1">Los tres flujos</h2>
         <p class="mb-4 text-sm text-ink-soft">Recorridos completos, en orden.</p>
         <div class="grid grid-cols-2 gap-4">
           <div class="card p-5">
@@ -279,23 +273,6 @@
               <a href="importador.html?paso=2">revisar</a> →
               <a href="importador.html?paso=resultado">resultado</a> →
               <a href="modulos.html?escena=E2">13 módulos</a>
-            </p>
-          </div>
-          <div class="card p-5">
-            <h3 class="text-h5">F6 · Guionar un cohorte</h3>
-            <p class="mt-2 text-sm text-gray-700">Valida que el guión se escriba en contexto de cadena.</p>
-            <p class="mt-3 text-xs">
-              <a href="cohorte.html?c=C03&amp;escena=E3">Hoja de C03</a> →
-              <a href="guion.html?v=BAK-M30.050&amp;escena=E3">editor de guión</a> →
-              <a href="tablero.html?escena=E3">tablero</a>
-            </p>
-          </div>
-          <div class="card p-5">
-            <h3 class="text-h5">F7 · Sesión de grabación</h3>
-            <p class="mt-2 text-sm text-gray-700">La pantalla que Majo tiene abierta mientras graba.</p>
-            <p class="mt-3 text-xs">
-              <a href="cohorte.html?c=C03&amp;escena=E3&amp;modo=sesion">Modo sesión</a> →
-              <a href="video.html?v=BAK-M10.020&amp;escena=E3">video editado</a>
             </p>
           </div>
           <div class="card card-active p-5">

@@ -29,6 +29,22 @@ con una **academia completa simulada**. Cuatro bloques de trabajo:
   > la pantalla borrada no se nombra en ningún lado —ni para contar que se borró—. Si algún
   > día hace falta citarla, hay que decidir primero cómo se excluye la cita del control.
 
+- **Recorte al alcance del MVP** — **10 pantallas** y **4 destinos vivos** en el sidebar. El
+  MVP es **crear y ver módulos**, así que salieron ocho pantallas y tres grupos enteros del
+  menú: seguimiento de uso, detalle por agencia, superficies y planes, biblioteca de videos,
+  cola de regrabación y la producción de rodaje —hoja de cohorte y editor de guión—. Ver D-17.
+
+  > **El tablero y los bancos NO son destinos que se conserven por las dudas:** son los pasos
+  > 2, 3 y 4 de `pasosDeModulo()`. Sin ellos el módulo no llega a `activo` —el paso 4 se traba
+  > con «Todavía no hay ningún video publicado» y el paso 5 nunca cumple aptitud—, así que
+  > recortarlos no simplifica el MVP: lo deja sin poder terminar un módulo.
+
+  > **El motor y el dataset no se tocaron.** `modulos.html` sigue usando `operacion()` para el
+  > hito de E6 y `escritura.html` usa `guionDe()`, así que borrar las pantallas **no habilita**
+  > borrar sus datos: `academia-agencias.js` y `academia-guiones.js` siguen cargando, y los 15
+  > controles de R10 siguen midiendo. Que los **122 controles** sigan en verde es la red que
+  > dice que el recorte no rompió nada.
+
 **Ya no es solo maquetación, ni solo navegación.** No hay backend, ni API, ni videos reales, ni SSO.
 Pero **sí hay capa de datos, reglas de negocio derivadas, mutaciones y persistencia en
 `localStorage`**. Eso revierte a propósito una decisión de la tanda 1 (ver «El cambio de
@@ -119,7 +135,7 @@ valor. Lo propio del backoffice está en la **sección 6**, documentado en `DESI
 
 ### Sin build de HTML — sidebar duplicado a propósito
 
-Los `.html` son archivos planos, sin templating. El sidebar está **copiado literal en las 18 páginas
+Los `.html` son archivos planos, sin templating. El sidebar está **copiado literal en las 10 páginas
 de app**, delimitado por:
 
 ```html
@@ -253,12 +269,9 @@ agrega una pantalla o un estado.
 | `?sup=` | `BAK` (default) · `FRT` · `CRM` |
 | `?m=` | Cualquiera de los 13: `0`, `10`, `20` … `95`, `R01` |
 | `?v=` | Cualquiera de los 55: `BAK-M30.050`. También lo lee `escritura.html`, que es **por video** |
-| `?c=` | Cualquiera de los 20: `C01` … `C20` |
-| `?a=` | Cualquiera de las 12 agencias, por su identificador — `agencia.html` |
 | `?tab=` | `ficha` (default) · `versiones` · `guion` · `preguntas` · `ubicaciones` |
 | `?vista=` | `tabla` (default) · `kanban` — tablero |
 | `?escena=` | `E1` … `E6` — sin parámetro, `E5` |
-| `?modo=` | `planificacion` (default) · `sesion` — hoja de cohorte |
 | `?paso=` | `1` · `2` · `resultado` — importador. **Ya no hay pasos 3 ni 4** |
 | `?sello=` | El sello de una importación — `importador.html?paso=resultado`. Sin él, la pantalla de resultado no tiene qué mostrar y arranca en el paso 1 |
 | `?sup=` | También lo lee `alta-modulo.html`, para arrancar en la superficie que se venía mirando |
@@ -386,7 +399,7 @@ Tres cosas que no se negocian al mutar:
 2. **Las reglas ganan sobre el overlay.** `visibleEnFront()` chequea `obsoleto` **antes** de leer el
    parche: un `{visible:true}` guardado no puede devolver al Front un video dado de baja (R3).
 3. **Después de mutar hay que repintar.** No hay eventos: la pantalla llama a su función de render
-   —el patrón es `cohorte.html:395-400`— y si re-pintó un `tbody`, además a `UI.rebind()`, o la
+   —el patrón es `tablero.html:396-398`— y si re-pintó un `tbody`, además a `UI.rebind()`, o la
    selección múltiple y los filtros quedan sin cablear.
 
 **Por qué determinista:** con `Math.random()` el avance cambiaría en cada carga y el prototipo se
@@ -523,12 +536,26 @@ grep -n "fetch(\|XMLHttpRequest" assets/js/*.js *.html              # → vacío
 # `localStorage` SOLO en el motor
 grep -ln "localStorage" assets/js/*.js                              # → academia-sim.js
 
-# R10 · el uso solo existe donde hay uso. `panel.html` entero se corta si no hay
-#       agencias con acceso, así que la compuerta no está en un grep sino en la pantalla.
+# R10 · el uso solo existe donde hay uso. Ya no hay pantalla que lo muestre —medirlo
+#       quedó fuera del MVP—, pero la regla sigue viva en el motor: 15 de los 122
+#       controles verifican que no haya operación antes de E6.
 # R11 · ninguna pantalla de alta pide un link
 grep -nE '<(input|textarea)[^>]*(type="url"|link|youtu)' alta-videos.html importador.html  # → vacío
 # R12 · ninguna vía deja un video sin sección. Lo verifica el motor, no el grep:
 #       los controles «Ningún video sin sección» y «Overlay · ningún video creado quedó sin sección»
+
+# Ningún link apunta a una pantalla que no existe. Es el control que faltaba, y el
+# recorte del MVP es lo que lo hizo evidente: un href a un archivo borrado NO da error
+# en ningún lado —el 404 llega recién cuando alguien lo clickea— y `verificar()` audita
+# el dato, no la navegación, así que los 122 controles siguen en verde igual.
+# Se excluye `planes.html`, que es web.sigmma.net y es externo, y `app-shell.html`, que
+# es el partial y no se sirve. Anclar a `href` es lo que evita el falso positivo de
+# `f.html`, que en render.js es el acceso a una propiedad y no un nombre de archivo.
+mapfile -t PAGS < <(ls *.html)
+grep -rhoE 'href *=? *["'"'"']?[a-z0-9-]+\.html' "${PAGS[@]}" assets/js/*.js \
+  | grep -oE '[a-z0-9-]+\.html$' | sort -u \
+  | grep -vE '^(planes|app-shell)\.html$' \
+  | while read -r f; do [ -e "$f" ] || echo "COLGADO: $f"; done   # → vacío
 
 # El CSS versionado está al día. Es el control que más falta hacía: una clase que el
 # HTML usa y el CSS compilado no tiene NO da error en ningún lado — el navegador la
@@ -548,25 +575,30 @@ cmp /tmp/chk.css assets/css/academia.css                            # → sin di
 > líneas se interpretan como comandos y **todos los controles dan ✓ porque el grep nunca corrió**.
 > Con `mapfile -t PAGS < <(ls *.html …)` y `"${PAGS[@]}"` no pasa.
 
-### 3 · Los 18 sidebars idénticos
+### 3 · Los 10 sidebars idénticos
 
 ```bash
 for f in modulos.html modulo.html video.html tablero.html banco.html \
          importador.html alta-videos.html alta-modulo.html alta-seccion.html \
-         cohorte.html guion.html superficies.html escritura.html \
-         videos.html regrabacion.html panel.html agencias.html agencia.html; do
-  sed -n '/app-shell: sincronizar/,/\/app-shell/p' $f | sed 's/ aria-current="page"//' | md5sum
+         escritura.html; do
+  sed -n '/app-shell: sincronizar/,/<!-- \/app-shell -->/p' $f \
+    | sed 's/ aria-current="page"//' | md5sum
 done | sort -u | wc -l   # → 1
 ```
+
+> **Ojo con el marcador de cierre.** `/\/app-shell/` matchea también la línea de
+> apertura, porque ahí dice `src/partials/app-shell.html`: el rango se abre y se cierra
+> en la misma línea y el `sed` devuelve un renglón. Hay que anclarlo al comentario
+> completo, `<!-- \/app-shell -->`, o los diez hashes coinciden **por vacío**.
 
 ### 4 · Recorrido en el navegador
 
 `google-chrome --headless=new --dump-dom`, con `--virtual-time-budget=1500` — sin eso, las capturas
 agarran el render a mitad de camino. **Sin `.html` en la URL** (ver la nota de `serve@14`).
 
-Vale la pena barrer todo, que es rápido y encuentra caídas: los **55** `video?v=`, `guion?v=` y
-`escritura?v=`, los **13** `modulo?m=` y `banco?m=`, los **20** `cohorte?c=` × 2 modos, las **12**
-`agencia?a=`, y las **6** escenas × 14 pantallas. Todas las URLs de `index.html` tienen que dar 200.
+Vale la pena barrer todo, que es rápido y encuentra caídas: los **55** `video?v=` y `escritura?v=`,
+los **13** `modulo?m=` y `banco?m=`, y las **6** escenas × 10 pantallas. Todas las URLs de
+`index.html` tienen que dar 200.
 
 **Tres recorridos que hay que manejar, no volcar:** importar la plantilla completa (omite las 55 y
 deja el botón apagado con su motivo) · importar IDs nuevos, confirmar y volver a importar lo mismo

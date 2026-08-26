@@ -102,7 +102,9 @@ La columna de contenido es `minmax(0, 1fr)` y no `1fr`: sin eso, una tabla ancha
 más allá de su parte y desborda el grid.
 
 **Las tres variantes.** `.layout-panel` es el patrón. `.layout-panel-inverso` pone el panel a la
-**izquierda** —`guion.html`, donde el contexto de la cadena se lee antes de escribir, no después—.
+**izquierda**, para cuando el contexto se lee antes de trabajar y no después. La pantalla que lo
+estrenó —el editor de guión— quedó fuera del MVP (D-17), pero la variante se conserva: es la que
+sostiene ese patrón de lectura.
 `.layout-panel-doble` parte el contenido en dos antes del panel (`video.html`) y es la única que
 **no** lleva `align-items: start`: sus tres columnas se estiran parejas, y eso es deliberado: son
 bloques de ficha, no un panel colgando al costado.
@@ -125,7 +127,7 @@ un ancho mínimo por celda. R7 sigue sin tener un solo `@media`.
 | Clase | Regla | Dónde |
 |---|---|---|
 | `.grid-tarjetas` | `repeat(auto-fill, minmax(340px, 1fr))` | Panel de carga de `modulos.html`. 3 columnas a 1440, 4 a 1920, 5 a 2400 |
-| `.grid-tiles` | `repeat(auto-fit, minmax(180px, 1fr))` | Filas de tiles de métrica: `panel.html` (5), `agencia.html` (4) |
+| `.grid-tiles` | `repeat(auto-fit, minmax(180px, 1fr))` | Filas de tiles de métrica: `modulos.html` y `tablero.html` |
 | `.pasos-modulo` | `repeat(5, minmax(0, 1fr))` con `max-width: 1240px` | Los cinco pasos de `modulo.html`, emitidos por `RENDER.tableroPasos()` |
 
 **`auto-fill` en las tarjetas y `auto-fit` en los tiles**, y la diferencia importa: con `auto-fill`

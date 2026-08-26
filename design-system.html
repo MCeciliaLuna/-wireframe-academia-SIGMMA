@@ -239,9 +239,11 @@
         <p class="mt-4 text-sm text-ink-soft">
           Verlo en vivo: <a href="modulos.html">modulos.html</a> · <a href="tablero.html">tablero.html</a>.
           La fuente canónica del sidebar es <code class="font-mono text-xs">src/partials/app-shell.html</code>,
-          copiada literal en las <strong>19 páginas de app</strong>. Al copiarla se cambia
+          copiada literal en las <strong>10 páginas de app</strong>. Al copiarla se cambia
           <strong>solo</strong> el
-          <code class="font-mono text-xs">aria-current="page"</code>.
+          <code class="font-mono text-xs">aria-current="page"</code>. Quedan
+          <strong>tres grupos</strong>: los destinos fuera del alcance del MVP van deshabilitados y
+          un grupo entero en gris no se muestra (D-17).
         </p>
       </section>
 
@@ -587,7 +589,7 @@
               <tr>
                 <td class="font-mono text-xs">D-7</td>
                 <td><strong>Cohortes: el wireframe contradice al Maestro de Producción</strong> <span class="chip chip-publicado">cerrada</span></td>
-                <td><strong>Manda el Maestro de Producción.</strong> Es el plan de rodaje real, con el escenario de datos compartido de cada cohorte; el wireframe de baja fidelidad nunca los tuvo especificados, se generaron por aproximación. Y el cohorte dejó de ser una columna: ahora es una pantalla de trabajo (<a href="cohorte.html?c=C03&amp;escena=E3">hoja de cohorte</a>) con receta y encadenamiento, y si contradice el plan real no se puede usar para grabar. Los 55 videos están alineados al Maestro: <code class="font-mono text-xs">BAK-M30.030</code> queda en C07.</td>
+                <td><strong>Manda el Maestro de Producción.</strong> Es el plan de rodaje real, con el escenario de datos compartido de cada cohorte; el wireframe de baja fidelidad nunca los tuvo especificados, se generaron por aproximación. Y el cohorte dejó de ser una columna: llegó a ser una pantalla de trabajo con receta y encadenamiento, y si contradice el plan real no se puede usar para grabar; esa hoja quedó fuera del alcance del MVP (D-17), pero los 20 cohortes siguen en el dataset y la prioridad los sigue. Los 55 videos están alineados al Maestro: <code class="font-mono text-xs">BAK-M30.030</code> queda en C07.</td>
               </tr>
               <tr>
                 <td class="font-mono text-xs">D-8</td>
@@ -656,8 +658,13 @@
               </tr>
               <tr>
                 <td class="font-mono text-xs">D-9</td>
-                <td><strong>Biblioteca de videos no tiene listado propio</strong> <span class="chip chip-publicado">cerrada</span></td>
-                <td>Se maquetó: <code class="font-mono text-xs">videos.html</code>. Su eje es el <strong>contenido</strong> —módulo, sección, duración, versión vigente y visibilidad en el Front—, no el rodaje: el tablero ya mira los mismos 55 videos desde la producción, con cohorte, prioridad y fecha. Son dos preguntas distintas sobre el mismo conjunto, y por eso son dos pantallas y no dos filtros de la misma.</td>
+                <td><strong>Biblioteca de videos no tiene listado propio</strong> <span class="chip chip-alerta">reabierta</span></td>
+                <td>Se había cerrado maquetando una pantalla propia: su eje es el <strong>contenido</strong> —módulo, sección, duración, versión vigente y visibilidad en el Front—, no el rodaje, y el tablero mira los mismos 55 videos desde la producción. Eran dos preguntas distintas sobre el mismo conjunto. <strong>El recorte del MVP la suspende</strong> (D-17): la pregunta por el contenido se contesta desde el árbol de secciones del módulo, y la entrada del sidebar queda deshabilitada en vez de borrada, para que se vea que el destino existe y todavía no está. Queda abierto si vuelve como pantalla o como filtro del tablero.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">D-17</td>
+                <td><strong>El alcance del MVP es crear y ver módulos</strong> <span class="chip chip-publicado">cerrada</span></td>
+                <td><strong>Diez pantallas y cuatro destinos vivos.</strong> Quedan las cuatro de creación —importador, alta de módulo, de sección y de videos—, las tres de visualización —módulos, módulo y video— y las tres que <em>son</em> los pasos 2, 3 y 4 del módulo: tablero, banco y escritura. Estas últimas no se conservan por las dudas: sin ellas el módulo no llega a <code class="font-mono text-xs">activo</code>. Salieron ocho pantallas —biblioteca de videos, cola de regrabación, hoja de cohorte, editor de guión, uso de la Academia, agencias, detalle de agencia, y superficies y planes—. <strong>Regla nueva del sidebar:</strong> los destinos fuera del alcance van como <code class="font-mono text-xs">span aria-disabled</code>, como los que nunca se maquetaron, pero <strong>un grupo cuyos destinos están todos deshabilitados no se muestra</strong> — dejar Pipeline, Seguimiento y Administración enteros en gris hacía que el 70 % del menú fuera ruido, y eso contradice R6. El motor y el dataset no se tocaron: los 122 controles siguen en verde, que es lo que dice que el recorte no rompió nada.</td>
               </tr>
             </tbody>
           </table>

@@ -106,7 +106,6 @@ depende del importador.
 | **Importador del mapa** | `importador.html?paso=1` · `?paso=2` · `?paso=resultado&sello=…` |
 | Listado de módulos — vacío | `modulos.html?escena=E1` |
 | Alta de módulo *(con sus secciones)* · de sección | `alta-modulo.html` · `alta-seccion.html` |
-| Superficies y planes | `superficies.html` |
 
 ### Etapa 1 · mapa cargado (E2)
 
@@ -121,11 +120,12 @@ depende del importador.
 
 | Pantalla | URL |
 |---|---|
-| **Editor de guión y receta** | `guion.html?v=BAK-M30.050&escena=E3` |
-| **Hoja de cohorte — planificación** | `cohorte.html?c=C03&escena=E3` |
-| **Hoja de cohorte — sesión de grabación** | `cohorte.html?c=C03&escena=E3&modo=sesion` |
 | Tablero — avance mixto entre cohortes | `tablero.html?escena=E3` |
 | Video `editado`, sin link todavía | `video.html?v=BAK-M10.020&escena=E3` |
+| Guión del video, en su solapa | `video.html?v=BAK-M30.050&tab=guion&escena=E3` |
+
+La hoja de cohorte y el editor de guión quedaron fuera del MVP (D-17). El guión **se lee** en la
+solapa del video; escribirlo pasa a ser trabajo de contenido fuera del backoffice.
 
 ### Hito de lanzamiento (E4)
 
@@ -137,16 +137,16 @@ depende del importador.
 ### Régimen (E5)
 
 `modulos.html` · `modulo.html?m=30` · `video.html?v=BAK-M30.050` (+ `&tab=`) · `tablero.html`
-(+ `?vista=kanban`) · `banco.html?m=30` · `videos.html` · `regrabacion.html` ·
-`design-system.html#shell`
+(+ `?vista=kanban`) · `banco.html?m=30` · `escritura.html?v=BAK-M30.050` · `design-system.html#shell`
 
 ### En operación (E6)
 
-`panel.html?escena=E6` · `agencias.html?escena=E6` · `agencia.html?a=andes-receptivo&escena=E6`
+`modulos.html?escena=E6` · `tablero.html?escena=E6` · `banco.html?m=00&escena=E6` ·
+`modulo.html?m=30&escena=E6`
 
-Son las únicas tres pantallas que miden **uso**. En E1 a E5 no hay agencias, así que muestran el
-estado vacío en vez de ceros: un cero se lee como «va mal», y lo que pasa es que todavía no hay nada
-que medir. Es **R10** aplicado al pie de la letra.
+**Medir el uso quedó fuera del MVP** (D-17): las tres pantallas que lo mostraban salieron. El dato
+sigue en el dataset y **R10 sigue custodiado por el motor** —15 de los 122 controles verifican que no
+haya operación antes de E6—, pero ya no hay pantalla que lo muestre.
 
 ### Los cinco flujos
 
@@ -195,11 +195,10 @@ persiste por escena en `localStorage`. `?reset=1` vuelve al dataset limpio.
 | `modulo.html` | **Activar y desactivar el módulo** — el final del flujo F8 · abrir la **guía paso por paso** |
 | `tablero.html` | Cambiar el estado, asignar cohorte o mandar a la cola **en lote**, sobre la selección |
 | `banco.html` | Configurar la evaluación · escribir una pregunta · filtrar por estado, sección y video |
-| `guion.html` | Escribir y guardar el guión, que pasa el video a `guionado` |
+| `escritura.html` | La sesión de escritura de preguntas, video por video |
 | `alta-videos.html` | **Reservar IDs** de verdad — nacen en `backlog`, sin link y sin versión (R11) |
 | `alta-modulo.html` · `alta-seccion.html` | Crear módulos y secciones |
-| `superficies.html` | Dar de alta una superficie, que nace sin mapear |
-| `cohorte.html` | El checklist de «antes de apretar REC», que ahora se conserva |
+| `importador.html` | Traer el mapa completo, revisarlo y crear la jerarquía |
 | Listados | Filtrar, buscar y **exportar a CSV lo que está filtrado** |
 
 Lo que **no** cambia nunca: el ID, la superficie, el módulo y la secuencia de un video. Es **R2** —
@@ -220,11 +219,8 @@ sigue diciendo la verdad aunque la sesión tenga cambios encima.
 | `?v=` | **Cualquiera de los 55:** `BAK-M30.050`. También `escritura.html`, que es por video |
 | `?tab=` | `ficha` *(default)* · `versiones` · `guion` · `preguntas` · `ubicaciones` |
 | `?vista=` | `tabla` *(default)* · `kanban` — tablero · en `modulos.html`, `tarjetas` *(default)* · `tabla` |
-| `?modo=` | `planificacion` *(default)* · `sesion` — hoja de cohorte |
 | `?paso=` | `1` · `2` · `resultado` — importador |
 | `?sello=` | El sello de una importación — `importador.html?paso=resultado` |
-| `?c=` | **Cualquiera de los 20:** `C01` … `C20` — cohorte |
-| `?a=` | **Cualquiera de las 12 agencias**, por su identificador — `agencia.html` |
 | `?config=1` | Abre la configuración de evaluación — `banco.html` |
 | `?guia=` | `1` abre la guía paso por paso · `0` la suprime — las 7 pantallas del flujo |
 | `?reset=1` | **Borra el overlay de `localStorage`** y vuelve al dataset limpio, en cualquier pantalla |
@@ -298,20 +294,27 @@ contenido, no de código.
 │       ├── academia-guiones.js    los 12 guiones de P1, verbatim
 │       ├── academia-preguntas.js  las 550 preguntas, en tres capas
 │       ├── academia-sim.js        EL MOTOR · escenas, overlay, agregados, verificar()
+│       ├── academia-import.js     la plantilla del mapa · solo en importador.html
 │       ├── render.js              helpers de markup
-│       └── ui.js                  solapas, conmutadores, menús, orden de tabla
+│       ├── ui.js                  solapas, conmutadores, menús, orden de tabla
+│       └── academia-guia.js       la guía paso por paso · las 7 pantallas del flujo
 ├── index.html                     índice, agrupado por escena
-├── importador.html  alta-videos.html  alta-modulo.html  alta-seccion.html
-├── cohorte.html  guion.html  superficies.html
-├── modulos.html  modulo.html  video.html  tablero.html  banco.html
-├── videos.html                    biblioteca de videos · cierra D-9
-├── regrabacion.html               cola de regrabación · los `a regrabar` y su deuda
-├── panel.html                     panel macro · uso por módulo, solo donde hay uso
-├── agencias.html  agencia.html    seguimiento por agencia y por persona
+├── importador.html  alta-modulo.html  alta-seccion.html  alta-videos.html
+│                                  las cuatro vías de creación
+├── modulos.html  modulo.html  video.html
+│                                  visualización · panel, detalle con los 5 pasos, ficha
+├── tablero.html  banco.html  escritura.html
+│                                  los pasos 2, 3 y 4 del módulo
 └── design-system.html             catálogo, escenas y decisiones abiertas
 ```
 
-**El sidebar está duplicado en las 18 páginas de app**, a propósito: así los `.html` se abren con
+Salieron ocho pantallas con el recorte del MVP: la biblioteca de videos, la cola de regrabación, la
+hoja de cohorte, el editor de guión, el uso de la Academia, el listado y el detalle de agencias, y
+superficies y planes. **El motor y el dataset quedaron intactos** —`academia-agencias.js` y
+`academia-guiones.js` siguen cargando, porque `modulos.html` usa `operacion()` y `escritura.html` usa
+`guionDe()`—, así que los **122 controles** de `verificar()` siguen en verde. Ver D-17.
+
+**El sidebar está duplicado en las 10 páginas de app**, a propósito: así los `.html` se abren con
 doble click. La versión canónica es `src/partials/app-shell.html`, y cada copia está delimitada por
 `<!-- app-shell: sincronizar … -->`. El control es que el bloque, sin el `aria-current`, dé el mismo
 hash en todas.
@@ -413,10 +416,10 @@ A las 9 reglas no negociables de la primera tanda se suman dos:
   las filas de la tabla, estado por estado.
 - **Los 7 valores de `data-estado`** son exactamente los 7 nombres del vocabulario. Los pasos del
   importador usan `data-paso-estado`, así que no hay colisión.
-- **Las 5 cadenas de `BAK-M30`** siguen cerrando en régimen: 28 / 20 / 15 / 35 / 10.
-- **R10:** el uso solo existe donde hay uso — `panel.html` se corta si no hay agencias con acceso.
-  **R11:** ninguna pantalla de alta tiene campo de
-  link de YouTube.
+- **Las 5 cadenas de `BAK-M30`** siguen cerrando en régimen: 28 / 20 / 30 / 50 / 10.
+- **R10:** el uso solo existe donde hay uso. Medirlo quedó fuera del MVP, así que ya no hay pantalla
+  que lo muestre, pero la regla vive en el motor: 15 de los 122 controles verifican que no haya
+  operación antes de E6. **R11:** ninguna pantalla de alta tiene campo de link de YouTube.
 - **Los 6 estados vacíos** de las pantallas ya maquetadas, cada uno con su explicación y una sola
   acción posible.
 - **Sin `font-medium`/`font-semibold`, sin hex sueltos, sin clases de la paleta default.**
@@ -426,7 +429,9 @@ A las 9 reglas no negociables de la primera tanda se suman dos:
 - **Contraste WCAG AA** de todos los pares nuevos, incluidos los 7 segmentos del embudo.
 - Un solo `<h1>` por pantalla, jerarquía sin saltos, `<img>` con `alt`, sin IDs duplicados, campos con
   label, botones y links con nombre accesible.
-- **Los 18 sidebars idénticos**, verificado por hash.
+- **Los 10 sidebars idénticos**, verificado por hash.
+- **Ningún link apunta a una pantalla que no existe.** Es el control que faltaba: un `href` a un
+  archivo borrado no da error en ningún lado, y `verificar()` audita el dato, no la navegación.
 
 Queda para probar a mano: el recorrido de teclado completo y `prefers-reduced-motion`.
 
