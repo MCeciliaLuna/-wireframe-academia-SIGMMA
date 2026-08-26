@@ -269,29 +269,6 @@ window.RENDER = (function () {
     );
   }
 
-  /* -- Medidores -----------------------------------------------------------
-     `data-ok` pinta el valor: `false` es lo que falta, `true` lo que ya está.
-     Se omite cuando el número no es una meta —«13 módulos mapeados» no está
-     bien ni mal— porque si todo estuviera marcado, la marca no diría nada. */
-  function medidor(filas) {
-    return '<dl class="flex flex-col gap-3 text-xs">' + filas.map(function (f) {
-      const ok = typeof f.ok === "boolean" ? ' data-ok="' + f.ok + '"' : "";
-      return '<div class="meter-row"><dt>' + esc(f.dt) + '</dt><dd class="meter-value"' + ok + ">" +
-        (f.html || esc(f.dd)) + "</dd></div>";
-    }).join("") + "</dl>";
-  }
-
-  function sideCard(c) {
-    const pie = c.pie ? '<p class="foot-note">' + c.pie + "</p>" : "";
-    return (
-      '<section class="side-card' + (c.fuerte ? " side-card-strong" : "") +
-        '" aria-labelledby="' + c.id + '">' +
-      '<h2 class="side-title" id="' + c.id + '">' + esc(c.titulo) + "</h2>" +
-      c.cuerpo + pie +
-      "</section>"
-    );
-  }
-
   /* La barra de filtros dejó de armarse acá: las pills viven en el HTML de cada
      pantalla y `UI.bindFilters()` las hace filtrar de verdad. Antes esta función
      emitía pills decorativas al lado de un contador que sí era real, y las dos
@@ -773,154 +750,6 @@ window.RENDER = (function () {
     );
   }
 
-  /* -- Biblioteca de videos -------------------------------------------------
-     El eje es el CONTENIDO, no el rodaje: dónde vive el video, cuánto dura, qué
-     versión está al aire y si se ve en el Front. El tablero mira lo mismo desde
-     la producción —cohorte, prioridad, fecha— y por eso son dos pantallas y no
-     dos filtros de la misma. */
-  function filaBiblioteca(v, opciones) {
-    const o = opciones || {};
-    const q = o.escena ? "&amp;escena=" + esc(o.escena) : "";
-    /* La visibilidad en el Front viaja como chip, nunca como columna de estado
-       (R3): son dos ejes distintos y mezclarlos los confunde. */
-    const front = v.visible
-      ? '<span class="chip chip-publicado">visible</span>'
-      : '<span class="chip chip-outline">oculto</span>';
-    return (
-      '<tr data-id="' + esc(v.id) + '" data-titulo="' + esc(v.titulo) +
-        '" data-estado="' + esc(v.estado) + '" data-modulo="' + esc(v.codigoModulo) +
-        '" data-seccion="' + esc(v.seccion) + '" data-visible="' + v.visible + '">' +
-      '<td class="cell-mono">' + esc(v.id) + "</td>" +
-      '<td><a href="video.html?v=' + esc(v.id) + q + '">' + esc(v.titulo) + "</a></td>" +
-      '<td><a href="modulo.html?m=' + esc(v.modulo) + q + '" class="link-quiet">' +
-        esc(v.codigoModulo) + "</a></td>" +
-      "<td>" + esc(v.seccion) + "</td>" +
-      '<td class="cell-num">' + oVacio(v.duracion) + "</td>" +
-      "<td>" + chipEstado(v.estado) + "</td>" +
-      '<td class="cell-mono">' + oVacio(v.version) + "</td>" +
-      "<td>" + front + "</td>" +
-      '<td class="cell-mono">' + oVacio((v.planes || []).join(" · ")) + "</td>" +
-      "</tr>"
-    );
-  }
-
-  /* -- Cola de regrabación --------------------------------------------------
-     Un video a regrabar no es solo un video: arrastra las preguntas que dejó
-     inválidas. Mostrar las dos cosas juntas es todo el punto de la pantalla. */
-  function filaRegrabacion(x, opciones) {
-    const o = opciones || {};
-    const q = o.escena ? "&amp;escena=" + esc(o.escena) : "";
-    const v = x.video;
-    const deuda = x.aRevisar
-      ? '<span class="chip chip-alerta">' + x.aRevisar +
-        (x.aRevisar === 1 ? " pregunta" : " preguntas") + "</span>"
-      : '<span class="text-gray-600">—</span>';
-    return (
-      '<tr data-id="' + esc(v.id) + '" data-titulo="' + esc(v.titulo) +
-        '" data-estado="' + esc(v.estado) + '" data-modulo="' + esc(v.codigoModulo) +
-        '" data-revisar="' + x.aRevisar + '">' +
-      '<td class="cell-mono">' + esc(v.id) + "</td>" +
-      '<td><a href="video.html?v=' + esc(v.id) + q + '">' + esc(v.titulo) + "</a></td>" +
-      '<td><a href="modulo.html?m=' + esc(v.modulo) + q + '" class="link-quiet">' +
-        esc(v.codigoModulo) + "</a></td>" +
-      "<td>" + chipEstado(v.estado) + "</td>" +
-      '<td class="cell-mono">' + oVacio(v.version) + "</td>" +
-      '<td class="cell-mono">' + oVacio(v.afectadoPor) + "</td>" +
-      "<td>" + deuda + "</td>" +
-      '<td class="cell-mono">' + esc(x.ubicaciones) + "</td>" +
-      "</tr>"
-    );
-  }
-
-  /* -- Panel macro · uso por módulo ---------------------------------------
-     La tasa de reprobación es la única columna que señala CONTENIDO a revisar:
-     si un módulo se reprueba mucho, el problema está en el video o en las
-     preguntas, no en la gente. Por eso lleva tono de alerta y las demás no. */
-  function filaUsoModulo(u, opciones) {
-    const o = opciones || {};
-    const q = o.escena ? "&amp;escena=" + esc(o.escena) : "";
-    const m = u.modulo;
-    /* El chip de alerta es el vocabulario que el resto del backoffice ya usa
-       para «esto necesita una decisión». Un color suelto en la celda diría lo
-       mismo peor y sumaría un token que el design system no tiene. */
-    const tasa = u.tasaReprobacion.toFixed(2) + " %";
-    const celdaTasa = u.tasaReprobacion >= (o.umbralAlerta || 30)
-      ? '<span class="chip chip-alerta">' + tasa + "</span>"
-      : tasa;
-    return (
-      '<tr data-id="' + esc(m.codigo) + '" data-titulo="' + esc(m.titulo) +
-        '" data-tasa="' + u.tasaReprobacion + '" data-agencias="' + u.pctAgencias + '">' +
-      '<td class="cell-mono">' + esc(m.codigo) + "</td>" +
-      '<td><a href="modulo.html?m=' + esc(m.numero) + q + '">' + esc(m.titulo) + "</a></td>" +
-      '<td class="cell-num">' + u.personasEnPlan + "</td>" +
-      '<td class="cell-num">' + u.aprobaron + "</td>" +
-      '<td class="cell-num">' + u.intentos + "</td>" +
-      '<td class="cell-num">' + celdaTasa + "</td>" +
-      '<td class="cell-num">' + u.agenciasCompletas + " / " + u.agenciasEnPlan + "</td>" +
-      '<td class="cell-num">' + u.pctAgencias.toFixed(2) + " %</td>" +
-      "</tr>"
-    );
-  }
-
-  /* -- Agencias -------------------------------------------------------------
-     El denominador es el RECORRIDO DEL PLAN, no los 11 módulos: un módulo fuera
-     de plan no entra al cálculo, así que mostrar «3 de 11» para una Professional
-     diría que va atrasada cuando en realidad terminó. */
-  function filaAgencia(a, opciones) {
-    const o = opciones || {};
-    const q = o.escena ? "&amp;escena=" + esc(o.escena) : "";
-    const pct = a.totalRecorrido && a.plantel
-      ? (a.aprobacionesTotales / (a.plantel * a.totalRecorrido)) * 100 : 0;
-    return (
-      '<tr data-id="' + esc(a.id) + '" data-titulo="' + esc(a.nombre) +
-        '" data-plan="' + esc(a.plan) + '" data-avance="' + pct.toFixed(2) + '">' +
-      '<td><a href="agencia.html?a=' + esc(a.id) + q + '">' + esc(a.nombre) + "</a></td>" +
-      '<td><span class="chip chip-meta">' + esc(a.plan) + "</span></td>" +
-      '<td class="cell-num">' + a.plantel + "</td>" +
-      '<td class="cell-num">' + a.totalRecorrido + "</td>" +
-      '<td class="cell-num">' + a.certificadas + "</td>" +
-      '<td class="cell-num">' + barraPct(pct) + "</td>" +
-      "</tr>"
-    );
-  }
-
-  /* -- Personas de una agencia --------------------------------------------- */
-  function filaPersona(p, opciones) {
-    const o = opciones || {};
-    const q = o.escena ? "&amp;escena=" + esc(o.escena) : "";
-    const av = p.avance;
-    const total = av.recorrido.length;
-    const enCurso = av.enCurso
-      ? '<a href="modulo.html?m=' + esc(av.enCurso.modulo.numero) + q + '" class="link-quiet">' +
-        esc(av.enCurso.modulo.codigo) + "</a> · " + av.enCurso.vistos + " de " +
-        av.enCurso.videos + " videos"
-      : VACIO;
-    const estado = av.certificada
-      ? '<span class="chip chip-publicado">recorrido completo</span>'
-      : '<span class="chip chip-outline">en curso</span>';
-    return (
-      '<tr data-id="' + esc(p.id) + '" data-titulo="' + esc(p.nombre) +
-        '" data-aprobados="' + av.aprobados.length + '">' +
-      "<td>" + esc(p.nombre) +
-        (p.coordinadora ? ' <span class="chip chip-meta">coordinadora</span>' : "") + "</td>" +
-      '<td class="cell-num">' + av.aprobados.length + " / " + total + "</td>" +
-      '<td class="cell-num">' + barraPct(total ? (av.aprobados.length / total) * 100 : 0) + "</td>" +
-      "<td>" + enCurso + "</td>" +
-      "<td>" + estado + "</td>" +
-      "</tr>"
-    );
-  }
-
-  /* Barra de avance con su valor al lado. Se repite en tres pantallas. */
-  function barraPct(pct) {
-    const v = Math.max(0, Math.min(100, pct || 0));
-    return (
-      '<span class="inline-flex items-center gap-2">' +
-      '<span class="progress progress-sm w-[72px]"><span style="width: ' + v.toFixed(2) + '%"></span></span>' +
-      "<b>" + v.toFixed(0) + " %</b></span>"
-    );
-  }
-
   /* -- Guía paso por paso --------------------------------------------------
      El popover anclado y la barra de modo. Markup solamente: qué control es, si
      está listo y con qué motivo lo resolvió la pantalla, todo lo decide
@@ -1038,8 +867,6 @@ window.RENDER = (function () {
     embudo: embudo,
     leyendaEmbudo: leyendaEmbudo,
     hitoCard: hitoCard,
-    medidor: medidor,
-    sideCard: sideCard,
     filaModulo: filaModulo,
     franjaTrabajo: franjaTrabajo,
     tarjetaModulo: tarjetaModulo,
@@ -1051,12 +878,6 @@ window.RENDER = (function () {
     aptitudCard: aptitudCard,
     filaPregunta: filaPregunta,
     seccionBanco: seccionBanco,
-    filaBiblioteca: filaBiblioteca,
-    filaRegrabacion: filaRegrabacion,
-    filaUsoModulo: filaUsoModulo,
-    filaAgencia: filaAgencia,
-    filaPersona: filaPersona,
-    barraPct: barraPct,
     guiaEstado: guiaEstado,
     guiaPopover: guiaPopover,
     guiaBarra: guiaBarra,
