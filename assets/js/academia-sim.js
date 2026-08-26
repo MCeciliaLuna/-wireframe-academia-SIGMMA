@@ -176,6 +176,75 @@ window.SIM = (function () {
     return !porId[id];
   }
 
+  /* -- Estado de la guía ---------------------------------------------------
+     La guía paso por paso de creación de un módulo necesita recordar dos cosas
+     entre pantallas: sobre qué módulo está abierta, y si ya se mostró alguna
+     vez. Vive acá porque este es el único archivo que escribe en el almacén
+     del navegador, y va en una CLAVE PROPIA —no dentro del overlay de
+     entidades— por dos motivos: el overlay declara exactamente qué campos
+     consume cada cálculo, y esto no es un cambio sobre una entidad.
+
+     Comparte el prefijo, así que `?reset=1` la limpia sola: volver al dataset
+     limpio tiene que devolver también la guía a como estaba el primer día.
+
+     Por escena, como todo lo demás. Haber recorrido la guía en el Mes 1 no
+     puede decidir qué se muestra en régimen: son dos momentos distintos.
+
+     Lo que NO se guarda acá es en qué paso va: eso lo deriva `pasosDeModulo()`
+     del estado real del módulo. Un puntero propio se desincronizaría en cuanto
+     alguien avanzara el módulo desde otra pantalla. */
+  function claveGuia(escenaId) {
+    return PREFIJO + "guia:" + (escenaId || escena);
+  }
+
+  /* Respaldo en memoria para cuando el almacén está bloqueado —modo privado, o
+     un navegador estricto sobre `file://`—. Un cambio de entidad que no persiste
+     se pierde y se ve que se perdió; una guía que no persiste queda A MEDIAS
+     dentro de la misma pantalla: el popover abre pero `activa()` sigue en falso,
+     así que no habría barra de modo ni bloqueos. Media guía se lee como una
+     pantalla rota, y por eso este estado vive en memoria aunque no se pueda
+     guardar. No sobrevive a la navegación, y eso sí es aceptable. */
+  const guiaEnMemoria = {};
+
+  function guia(escenaId) {
+    const clave = claveGuia(escenaId);
+    if (!almacen) return guiaEnMemoria[clave] || null;
+    try {
+      return JSON.parse(almacen.getItem(clave) || "null");
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function guardarGuia(datos, escenaId) {
+    const clave = claveGuia(escenaId);
+    guiaEnMemoria[clave] = datos;
+    if (!almacen) return datos;
+    try {
+      almacen.setItem(clave, JSON.stringify(datos));
+    } catch (e) {
+      /* Cuota llena: queda el respaldo en memoria. */
+    }
+    return datos;
+  }
+
+  function abrirGuia(codigoModulo) {
+    return guardarGuia({ modulo: codigoModulo, activa: true, vista: true });
+  }
+
+  /* Cerrar conserva `vista`: la guía no vuelve a abrirse sola después de que
+     alguien la cerró. Ofrecerla de nuevo en cada carga sería exactamente el
+     asistente que estorba. */
+  function cerrarGuia() {
+    const g = guia() || {};
+    return guardarGuia({ modulo: g.modulo || null, activa: false, vista: true });
+  }
+
+  function guiaVista(escenaId) {
+    const g = guia(escenaId);
+    return !!(g && g.vista);
+  }
+
   /* -- Materialización -----------------------------------------------------
      El dataset es la semilla; el overlay puede sumarle entidades. Fusionar acá
      —una sola vez, antes de indexar— es lo que hace que un módulo o un video
@@ -973,6 +1042,13 @@ window.SIM = (function () {
      escribir sus preguntas hay un rodaje entero. Por eso no es un asistente
      —que asume que se recorre de una sentada y después estorba— sino un estado
      que se consulta el día 1 y también el día 90.
+
+     Encima de este cálculo hay una guía paso por paso (`academia-guia.js`) que
+     acompaña control por control. No lo contradice y no lo toca: la guía LEE esta
+     derivación para saber qué etapa le falta al módulo, y nada más. Los pasos de
+     acá no saben que la guía existe, y hay que conservarlo así: si esta función
+     empezara a consultarla, el estado del módulo pasaría a depender de si alguien
+     abrió una ayuda. Ver la decisión D-16.
 
      Todo se deriva. Un paso está `hecho` si su propia condición se cumple, sin
      importar el orden; `en curso` es el PRIMERO no hecho, y es el único
@@ -1812,6 +1888,89 @@ window.SIM = (function () {
         infieles.length === 0, infieles.slice(0, 3).join(", "));
     }
 
+    /* -- La guía paso por paso ----------------------------------------------
+       La guía explica los cinco pasos del módulo, así que su mapa tiene que
+       cubrirlos EXACTAMENTE. Si mañana un paso se renombra acá y la guía no se
+       entera, el paso se queda sin texto y sin acción: no falla nada, se
+       muestra un hueco. Estos controles son lo único que lo detecta.
+
+       Solo corren donde `academia-guia.js` está cargado. El motor no depende de
+       la guía —es al revés—, y por eso la guía se puede requerir en node: su
+       acceso al DOM es perezoso, justamente para que estos controles no queden
+       colgados de tener un navegador. */
+    const GUI = typeof window !== "undefined" ? window.GUIA : null;
+    if (GUI) {
+      const refModulo = catalogo().filter(function (m) {
+        return m.tipo === "biblioteca";
+      })[0];
+      const delMotor = pasosDeModulo(refModulo, "E5").map(function (p) { return p.id; });
+      const deLaGuia = GUI.pasos();
+
+      /* `crear` es la única etapa que el motor no modela: su condición es
+         «¿existe el módulo?» y vive en la guía. Las otras cinco son las del
+         motor, en el mismo orden — el orden ES la narración, y además es la
+         numeración que el tablero ya tiene pintada en la misma pantalla. */
+      const esperados = ["crear"].concat(delMotor);
+      chequeo("Guía · cubre las cinco etapas del módulo, más el alta",
+        deLaGuia.length === esperados.length &&
+          deLaGuia.every(function (id, i) { return id === esperados[i]; }),
+        "guía: " + deLaGuia.join(" → ") + " · motor: " + esperados.join(" → "));
+
+      const mudas = deLaGuia.filter(function (id) {
+        const t = GUI.texto(id);
+        return !t || !t.titulo || !t.detalle;
+      });
+      chequeo("Guía · ninguna etapa queda sin texto", mudas.length === 0, mudas.join(", "));
+
+      /* Un paso de la guía es UN CONTROL. Una etapa sin controles no se puede
+         recorrer: quedaría una etapa nombrada que no lleva a ningún campo. */
+      const vacias = deLaGuia.filter(function (id) { return GUI.campos(id).length === 0; });
+      chequeo("Guía · toda etapa tiene al menos un control", vacias.length === 0, vacias.join(", "));
+
+      /* Cada control declara dónde vive, con qué anclarse y qué explicar. Sin
+         `pantalla` la guía no sabe en qué pantalla ofrecerlo; sin `ancla` no hay
+         nada que resaltar; sin `detalle` el popover sale vacío. */
+      const rotos = [];
+      deLaGuia.forEach(function (id) {
+        GUI.campos(id).forEach(function (c, i) {
+          if (!c.pantalla || !c.ancla || !c.titulo || !c.detalle) {
+            rotos.push(id + "[" + i + "]");
+          }
+        });
+      });
+      chequeo("Guía · todo control declara pantalla, ancla, título y detalle",
+        rotos.length === 0, rotos.slice(0, 3).join(", "));
+
+      /* Dos controles con la misma ancla en la misma pantalla harían que
+         «Siguiente» se quedara clavado en el mismo lugar dos veces. */
+      const repes = [];
+      deLaGuia.forEach(function (id) {
+        const vistos = {};
+        GUI.campos(id).forEach(function (c) {
+          const k = c.pantalla + " " + c.ancla;
+          if (vistos[k]) repes.push(id + " · " + k);
+          vistos[k] = true;
+        });
+      });
+      chequeo("Guía · ningún control repite su ancla dentro de la etapa",
+        repes.length === 0, repes.slice(0, 3).join(", "));
+
+      /* El motivo por el que no se puede avanzar sale del DOM que la PANTALLA ya
+         pintó —su `aria-invalid`, su `[data-*-error]`, el `title` de su botón—, y
+         el destino sale de `pasosDeModulo().accion`. Un literal en la guía sería
+         un segundo mensaje para la misma regla, y el que se queda viejo. */
+      const inventados = deLaGuia.filter(function (id) { return GUI.textoLiteral(id); });
+      chequeo("Guía · ningún control redacta su propio motivo ni su destino",
+        inventados.length === 0, inventados.join(", "));
+    }
+
+    /* El estado de la guía vive en su propia clave, FUERA del overlay de
+       entidades. Si alguien lo mudara adentro, pasaría a viajar en el mismo JSON
+       que los cambios de las entidades y `hayCambios()` empezaría a contar
+       «abrí una guía» como un cambio del dataset. */
+    chequeo("Guía · su estado no se mezcla con el overlay de entidades",
+      !Object.prototype.hasOwnProperty.call(leerOverlay(), "guia"));
+
     /* -- Integridad de lo creado en el overlay ------------------------------
        Estos controles sí miran la sesión: son lo único que puede detectar un
        alta mal formada, y una entidad rota se ve igual que una sana hasta que
@@ -1945,6 +2104,13 @@ window.SIM = (function () {
     borrar: borrar,
     hayCambios: hayCambios,
     idLibre: idLibre,
+
+    /* Guía paso por paso · estado, no progreso: el paso vigente lo deriva
+       `pasosDeModulo()` y no se guarda. */
+    guia: guia,
+    abrirGuia: abrirGuia,
+    cerrarGuia: cerrarGuia,
+    guiaVista: guiaVista,
     reset: function () {
       if (!almacen) return;
       Object.keys(almacen)

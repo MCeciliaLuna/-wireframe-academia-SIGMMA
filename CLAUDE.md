@@ -132,7 +132,7 @@ de app**, delimitado por:
 replicá el cambio en todas las páginas y actualizá el partial. Al copiarlo, cambiá **solo** el
 `aria-current="page"`.
 
-## Los nueve archivos de JS
+## Los diez archivos de JS
 
 No hay módulos ES (romperían `file://`). Cada archivo expone un global vía IIFE.
 
@@ -147,20 +147,34 @@ No hay módulos ES (romperían `file://`). Cada archivo expone un global vía II
 | `academia-import.js` | `IMPORT` | Emite la plantilla del mapa, lee la planilla y arma el plan de alta. **Se carga solo en `importador.html`** |
 | `render.js` | `RENDER` | Helpers de markup. Emite el mismo HTML que antes estaba literal |
 | `ui.js` | `UI` | Solapas, conmutador de vista, menús, modal, orden de tabla, selección múltiple, **filtros, exportación a CSV y `rebind()`** |
+| `academia-guia.js` | `GUIA` | **La guía paso por paso** de creación de un módulo, **control por control**: el mapa de etapas × controles, el popover con spotlight y la compuerta de «Siguiente». **Se carga solo en las 7 pantallas del flujo** |
 
 **Orden de carga obligatorio**, y no es negociable — cada uno necesita al anterior:
 
 ```
 icons.js → academia-data.js → academia-agencias.js → academia-guiones.js
         → academia-preguntas.js → academia-sim.js → render.js → ui.js
-        → script inline de la página
+        → academia-guia.js → script inline de la página
 ```
 
 **`academia-import.js` va entre `academia-sim.js` y `render.js`, y solo en `importador.html`.**
 Ninguna otra pantalla lo necesita y no hay razón para que lo cargue. El motor **no depende de
-él**: es al revés. Sus dos controles de ida y vuelta se saltean donde no está cargado, y por eso
-`verificar()` da 113 controles en una pantalla común y 115 en el importador o en el script de
-verificación.
+él**: es al revés. Sus dos controles de ida y vuelta se saltean donde no está cargado.
+
+**`academia-guia.js` va DESPUÉS de `ui.js`**, y solo en las **7 pantallas del flujo de creación de
+un módulo**: `modulo.html`, `alta-modulo.html`, `alta-seccion.html`, `alta-videos.html`,
+`banco.html`, `escritura.html` y `tablero.html`. Necesita a los tres de arriba —motor, render y
+UI— y se auto-inicializa en el `DOMContentLoaded`, así que corre cuando el script inline ya pintó.
+Seis de sus siete controles se saltean donde no está cargado.
+
+**Cuántos controles da `verificar()`**, entonces, según qué hay cargado:
+
+| Dónde | Controles |
+|---|---|
+| Una pantalla común | **114** |
+| `importador.html` | **116** |
+| Una de las 7 del flujo | **120** |
+| El script de node de abajo, con los diez | **122** |
 
 **Ojo con el orden de ejecución.** Los `<script src>` van al final del `<body>`, así que el script
 inline corre durante el parseo y el `renderIcons()` de `icons.js` hidrata lo generado en el
@@ -177,6 +191,12 @@ filas ya generadas. Si un render ocurriera más tarde, hay que llamar a `renderI
 - **`academia-import.js` es CÁLCULO también**, pero acotado a la planilla: lee, valida y devuelve un
   plan. **No persiste nada** —el único que escribe en el almacén del navegador es el motor— y **no
   hace pedidos de red**: el archivo lo elige la persona y se lee con `FileReader`.
+- **`academia-guia.js` es CÁLCULO + DOM acotado.** Resuelve qué control corresponde a la pantalla y
+  si está completo, y arma el popover. **No persiste nada** ni deriva ningún agregado propio: la
+  etapa la da `pasosDeModulo()` y el control vigente es el primero que no está listo. **Y no
+  reimplementa ninguna validación:** lee el veredicto que la pantalla ya pintó en el DOM. Su acceso
+  al DOM es **perezoso**, a propósito, así que se puede requerir en node y sus controles corren sin
+  navegador.
 
 > **Ojo al comentar estas reglas en el código.** Los controles de disciplina son greps a secas: un
 > comentario que nombre `localStorage` o `fetch` para *enunciar* la prohibición hace fallar el
@@ -245,6 +265,8 @@ agrega una pantalla o un estado.
 | `?m=` | También lo leen `alta-seccion.html` y `alta-videos.html`, para precargar el módulo padre |
 | `?v=` | `escritura.html?v=BAK-M30.050` — la sesión de escritura de preguntas de un video |
 | `?config=1` | Abre la configuración de evaluación — `banco.html` |
+| `?guia=` | `1` abre la guía paso por paso sobre el `?m=` de la pantalla · `0` la cierra **y suprime el auto-arranque**, para compartir un link sin ella. Solo en las 7 pantallas del flujo |
+| | La guía **no apaga ningún control de la app** (D-16): su única compuerta es su propia «Siguiente», que no habilita hasta que el control actual esté completo o correcto |
 | `?reset=1` | **Borra el overlay de `localStorage`.** Vuelve al dataset limpio, en cualquier pantalla |
 
 > **Después de mutar, recargá con `UI.recargar()`, nunca con `location.reload()`.** Descarta
@@ -306,6 +328,8 @@ Todas en `academia-sim.js`. Ninguna en el HTML.
 | **Cuota de preguntas de un video** | `cuotaDeVideo()` — el mínimo de su sección repartido entre sus videos. **Orientativa:** lo exigible sigue siendo el mínimo por sección. **No es 10 parejo: va de 5 a 20** |
 | **Cola de escritura** | `colaDeEscritura()` — la unidad de trabajo es el VIDEO. Tres motivos en orden de urgencia: `sin preguntas` · `bajo cuota` · `a revisar`. **No lista lo que todavía no se publicó** |
 | ID de la próxima pregunta | `proximoIdPregunta()` — se deriva del banco, no del reloj. Lo usan el modal del banco y la sesión de escritura |
+| **Dónde quedó la guía** | No es una regla nueva. La etapa es el paso `en curso` de `pasosDeModulo()` y, dentro de ella, el control vigente es **el primero que no está listo**. La guía **no guarda progreso**, así que no puede desincronizarse si el módulo avanza desde otra pantalla o otra sesión |
+| **«¿Este control está completo?»** | No vive en el motor: la guía lo **lee del DOM** que la pantalla ya pintó — `aria-invalid`, `[data-*-error]`, y el `disabled` + `title` del botón primario. Reimplementarlo daría dos redacciones para la misma regla, y la de la guía sería la que se queda vieja |
 
 ### Mutar el overlay
 
@@ -318,6 +342,18 @@ Cinco primitivas, todas en `academia-sim.js` y todas sobre **la escena activa**:
 | `borrar(tipo, predicado)` | Solo borra lo creado en el overlay; el dataset no se toca |
 | `anotado(tipo, id, escena)` | Lee el parche |
 | `hayCambios(escena)` | Cuántos cambios tiene encima la escena |
+
+Y cuatro más para el estado de la guía, que va en su **propia clave** —`academia:sim:guia:<escena>`—
+y no dentro del overlay de entidades: aquel declara exactamente qué campos consume cada cálculo, y
+abrir una guía no es un cambio sobre una entidad. Comparte el prefijo, así que **`?reset=1` la limpia
+sola**. Un control de `verificar()` vigila que no se mude adentro.
+
+| Función | Qué hace |
+|---|---|
+| `guia(escena)` | Lee el estado: `{modulo, activa, vista}` o `null` |
+| `abrirGuia(codigo)` | Activa la guía sobre un módulo y marca `vista` |
+| `cerrarGuia()` | Desactiva. **Conserva `vista`**, así que no vuelve a abrirse sola |
+| `guiaVista(escena)` | Si ya se mostró en esta escena. Gobierna el auto-arranque |
 
 **Lo creado se fusiona al cargar, una sola vez** (paso de materialización), y queda marcado con
 `creadoEnOverlay`. Por eso una pantalla que da de alta **navega o recarga** en vez de re-indexar: así
@@ -428,15 +464,16 @@ Modelarlo así garantiza que el banco no pueda achicarse entre escenas: `0 → 1
 
 ## Verificación
 
-### 1 · `SIM.verificar()` — 115 controles
+### 1 · `SIM.verificar()` — 122 controles
 
 Reemplaza los greps manuales de coherencia numérica. Corre en la consola del navegador o en node.
-**Cargá también `academia-import.js`**, o los dos controles de ida y vuelta se saltean y son 106:
+**Cargá también `academia-import.js` y `academia-guia.js`**, o los controles que dependen de ellos
+se saltean (ver la tabla de conteos más arriba):
 
 ```bash
 node -e 'global.window={};
   ["academia-data","academia-agencias","academia-guiones","academia-preguntas","academia-sim",
-   "academia-import"]
+   "academia-import","academia-guia"]
     .forEach(f => require(process.cwd()+"/assets/js/"+f+".js"));
   const r = window.SIM.informe();
   process.exit(r.ok ? 0 : 1)'
@@ -447,6 +484,12 @@ video** · los 12 publicados de E4 y que ningún módulo de biblioteca esté com
 banco y de sorteo por módulo · las 5 cadenas de `BAK-M30` · el acumulado de preguntas por escena · que
 el banco no se achique · **que no haya operación antes de E6** · que ningún avance saltee módulos ·
 que el uso simulado sea determinista.
+
+Y los siete de la guía paso por paso: **que su mapa cubra exactamente las cinco etapas del motor más
+el alta** —es lo único que detecta que se renombre un paso y la guía quede muda— · que ninguna etapa
+quede sin texto · que toda etapa tenga al menos un control · que todo control declare pantalla,
+ancla, título y detalle · que ningún control repita su ancla dentro de la etapa · que ningún control
+redacte su propio motivo ni su destino · y que su estado no se mezcle con el overlay de entidades.
 
 Y los seis de los flujos de alta: **que el orden de sección derivado de la secuencia mínima reproduzca
 las 31 del dataset** · que ningún video quede sin sección · que ningún módulo de biblioteca quede sin

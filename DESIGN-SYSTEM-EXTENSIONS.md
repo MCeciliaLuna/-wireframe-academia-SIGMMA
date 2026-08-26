@@ -54,6 +54,10 @@
 | `.recipe-box` | Precondición antes de una acción | Tal vez |
 | `.chain-link` | Dependencia entre ítems de una secuencia | Tal vez |
 | `.checklist-live` | Checklist operable, no de solo lectura | **Sí** |
+| `.guia-velo` · `.guia-foco` · `.guia-popover` | Capa de ayuda que resalta una parte de la pantalla | **Sí** — cualquier producto con un flujo largo la necesita |
+| `.guia-barra` | Aviso de que hay un modo activo, con su salida | **Sí** |
+| `.guia-estado` | Si el control ya está completo, o el motivo por el que no | **Sí** |
+| `.guia-popover-en-modal` | La misma capa de ayuda cuando lo que explica vive dentro de un modal | **Sí**, junto con el popover |
 
 ---
 
@@ -524,6 +528,61 @@ precondición, no un formulario.
 **Por qué.** `.checklist` es de **solo lectura** —el estado de publicación de un video—. Esta se
 tilda de verdad: es la que se usa antes de grabar, con el `.choice` heredado adentro para que el
 checkbox sea real y se opere con teclado.
+
+---
+
+## La guía paso por paso — 5 piezas
+
+### `.guia-velo` · `.guia-foco`
+
+El velo cubre la pantalla y **se recorta** sobre el elemento resaltado con un `clip-path` que le
+pone el JS. No reusa `.modal-overlay`: aquel tapa todo por igual, y este tiene que dejar ver **y
+clickear** la parte que se está explicando. Son dos cosas distintas, y compartir la clase habría
+obligado a una de las dos a mentir.
+
+El hueco se agranda 10 px alrededor del ancla, y no es un detalle estético: el anillo de foco de
+`.guia-foco` es un `box-shadow` con esparcido, y si el hueco quedara justo, el borde del anillo
+caería debajo del velo y se vería cortado.
+
+Dos tokens nuevos de apilamiento, porque el techo del DS era `--z-tooltip: 1003` y esta capa tiene
+que quedar por encima de todo lo que explica: `--z-guia-velo: 1004` y `--z-guia: 1005`. El velo va
+un escalón debajo del popover para que lo resaltado se lea recortado contra él.
+
+### `.guia-popover`
+
+Un `role="dialog"` anclado, no un tooltip. `.tooltip` lleva `white-space: nowrap` y sirve para una
+etiqueta de una línea; esto tiene título, prosa, el estado real del paso y dos acciones.
+
+El ancho va acotado con `clamp(320px, 30vw, 420px)`, por el mismo motivo que el panel lateral: el
+lienzo es fluido y sin techo, y un popover de 700 px en una pantalla de 2560 px se lee peor que uno
+de 380. La posición y la rotación de la flecha las resuelve el JS según de qué lado del ancla quedó.
+
+### `.guia-barra`
+
+La franja que dice que hay un modo activo, en qué paso va y cómo salir. **No participa del velo**, a
+propósito: tiene que seguir legible y clickeable con el popover cerrado, porque es de donde sale la
+salida. Sin ella, un control apagado por el modo no tendría de dónde explicarse.
+
+### `.guia-estado`
+
+La línea que dice si el control ya está completo, o el motivo por el que todavía no se puede
+avanzar. Dos estados por `data-ok`: verde cuando está listo, ámbar cuando falta.
+
+Lo importante no es el estilo: es que **el texto lo escribió la pantalla, no la guía**. Sale del
+`[data-error-num]`, del `[data-cfg-error]`, del `[data-error]` o del `title` del botón primario, que
+es donde cada pantalla ya publica su veredicto. Si la guía redactara el suyo, habría dos mensajes
+para la misma regla y el de la guía sería el que se queda viejo.
+
+### `.guia-popover-en-modal`
+
+El mismo popover cuando el control que explica vive **dentro de un modal** —los tres campos de la
+configuración de evaluación—. Deja de flotar y pasa a ser un bloque del panel: el modal ya tiene su
+overlay y su foco atrapado, así que no hace falta un segundo velo, y un globo posicionado contra el
+viewport se le escaparía al hacer scroll.
+
+No hubo que tocar `ui.js` para esto. Su `trap()` recalcula `focusables(openModal)` en **cada** `Tab`,
+así que toma los botones del popover sin saber que existen. Lo único que la guía hace distinto ahí es
+no registrar su propio handler de `Escape`: con un modal abierto, el `Esc` es del modal.
 
 ---
 

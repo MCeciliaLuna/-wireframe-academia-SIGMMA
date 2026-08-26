@@ -261,6 +261,11 @@
   --z-header: 1000;
   --z-modal: 1002;
   --z-tooltip: 1003;
+  /* La guia va por ENCIMA de todo, tooltip incluido: es la capa que explica el
+     resto, asi que nada del resto puede taparla. El velo queda un escalon por
+     debajo del popover para que el paso resaltado se vea recortado contra el. */
+  --z-guia-velo: 1004;
+  --z-guia: 1005;
   --dur-fast: 150ms;
   --dur-base: 250ms;
   --dur-slow: 350ms;
@@ -1926,6 +1931,116 @@
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 12px;
   }
+  /* -- Guia paso por paso ---------------------------------------------------
+     La capa que explica los cinco pasos de un modulo. Tres piezas: el velo con
+     el recorte sobre el paso vigente, el popover anclado, y la barra de modo.
+
+     El velo NO es el `.modal-overlay`: aquel tapa todo por igual y este tiene
+     que dejar ver —y clickear— el paso resaltado. Son dos cosas distintas y
+     compartir la clase habria obligado a una a mentir. */
+  .guia-velo {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-guia-velo);
+    /* El recorte lo pone el JS en `clip-path`, con el rectangulo del ancla.
+       Sin recorte el velo cubre la pantalla entera, que es el estado correcto
+       mientras todavia no se midio nada. */
+    background: rgba(0, 0, 0, 0.55);
+    animation: fade-in var(--dur-base) ease-in-out;
+  }
+
+  /* El paso resaltado. Se levanta sobre el velo y se recorta contra el: es el
+     unico lugar de la pantalla que queda a plena luz. */
+  .guia-foco {
+    position: relative;
+    z-index: var(--z-guia-velo);
+    border-radius: var(--radius-md);
+    box-shadow:
+      0 0 0 3px var(--color-primary),
+      0 0 0 8px rgba(255, 255, 255, 0.28);
+  }
+
+  .guia-popover {
+    position: absolute;
+    z-index: var(--z-guia);
+    /* Acotado con `clamp`, como el panel lateral: el lienzo es fluido y un
+       popover de 700 px en una pantalla de 2560 px se lee peor que uno de 380. */
+    width: clamp(320px, 30vw, 420px);
+    padding: 16px;
+    background: var(--color-white);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-modal);
+    animation: slide-up var(--dur-base) var(--ease-brand);
+  }
+  .guia-popover-flecha {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: var(--color-white);
+    border-left: 1px solid var(--color-line);
+    border-top: 1px solid var(--color-line);
+    /* La posicion y la rotacion las resuelve el JS segun de que lado quedo el
+       popover respecto del ancla. */
+  }
+
+  /* La barra de modo. Queda pegada arriba del contenido y no participa del
+     velo: tiene que seguir legible y clickeable mientras el popover esta
+     cerrado, porque es de donde sale la salida. */
+  .guia-barra {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    border: 1px solid var(--color-primary-light);
+    border-left: 3px solid var(--color-primary);
+    border-radius: var(--radius-md);
+    background: var(--color-info-bg);
+    font-size: var(--text-xs);
+    color: var(--color-primary-dark);
+  }
+
+  /* La linea de estado del control: listo, u opcional, o el motivo por el que
+     todavia no se puede avanzar. El motivo lo escribio la PANTALLA —la guia lo
+     lee, no lo redacta—, asi que el tono tiene que ser el mismo que usa el resto
+     del producto para un dato que falta. */
+  .guia-estado {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 7px 9px;
+    border-radius: var(--radius-md);
+    font-size: var(--text-2xs);
+    line-height: 1.4;
+    background: var(--color-warning-bg);
+    border: 1px solid var(--color-warning-line);
+    color: var(--color-warning-dark);
+  }
+  .guia-estado[data-ok="true"] {
+    background: var(--color-success-bg);
+    border-color: var(--color-success-line);
+    color: var(--color-success-dark);
+  }
+
+  /* El popover cuando el control que explica vive dentro de un modal. Deja de
+     flotar y pasa a ser un bloque del panel: el modal ya tiene su overlay y su
+     foco atrapado, y un globo posicionado contra el viewport se le escaparia al
+     hacer scroll. */
+  .guia-popover-en-modal {
+    position: static;
+    width: auto;
+    margin-top: 16px;
+    box-shadow: none;
+    border-color: var(--color-primary-light);
+    border-left-width: 3px;
+    border-left-color: var(--color-primary);
+    animation: none;
+  }
+  .guia-popover-en-modal .guia-popover-flecha {
+    display: none;
+  }
+
   /* Los cinco pasos del modulo son una progresion y se leen de un vistazo: no
      envuelven nunca —serian dos progresiones— y no se estiran a 2400 px. */
   .pasos-modulo {

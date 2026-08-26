@@ -762,6 +762,11 @@ window.UI = (function () {
     escenas: ESCENAS,
     showModal: showModal,
     closeModal: closeModal,
+    /* Solo lectura, y existe por un motivo: la guía paso por paso maneja su
+       propio foco y no puede abrirse encima de un modal —dos trampas de foco a
+       la vez dejan el Tab dando vueltas en la de arriba y el Esc cerrando la
+       equivocada—. Preguntar es más barato que coordinar. */
+    modalAbierto: function () { return !!openModal; },
     loading: loading,
     rebind: rebind,
     recargar: recargar,

@@ -515,7 +515,12 @@ window.RENDER = (function () {
            curso» orienta; no da ni quita permiso. En régimen se pueden escribir
            las preguntas de los videos ya publicados aunque el paso de videos
            siga abierto, y bloquearlo sería inventar una precondición que el
-           negocio no tiene. */
+           negocio no tiene.
+
+           La guía paso por paso NO apaga nada de acá: acompaña control por
+           control y su única compuerta es su propio «Siguiente». Ese fue el
+           cierre de D-16 —se probó apagar los controles de la app y se
+           descartó—, y es lo que deja este tablero con su regla intacta. */
         const apagado = !p.accion || !!p.motivo;
         const accion = p.id === "activacion" && o.activacion
           ? o.activacion
@@ -916,6 +921,95 @@ window.RENDER = (function () {
     );
   }
 
+  /* -- Guía paso por paso --------------------------------------------------
+     El popover anclado y la barra de modo. Markup solamente: qué control es, si
+     está listo y con qué motivo lo resolvió la pantalla, todo lo decide
+     `academia-guia.js`.
+
+     El popover es un `role="dialog"`, no un tooltip: tiene título, prosa, el
+     estado del control y hasta cuatro acciones. `.tooltip` lleva
+     `white-space: nowrap` y sirve para una etiqueta de una línea.
+
+     La numeración de la etapa es LA DEL TABLERO de `modulo.html`, que está en la
+     misma pantalla: dos numeraciones para lo mismo hacían que la tarjeta dijera
+     «2 · Videos» y el globo «3 de 6» al mismo tiempo. El alta no es una de las
+     cinco —el módulo todavía no existe— así que se rotula en lugar de numerarse. */
+
+  /* La línea de estado. Se re-pinta sola en cada tecleo, sin tocar el resto del
+     popover: re-pintarlo entero le robaría el foco al campo que se está
+     llenando, que es justo el campo que la guía pidió llenar. */
+  function guiaEstado(d) {
+    if (d.listo) {
+      return '<span class="icon icon-sm" data-icon="check-circle"></span>' +
+        "<span>" + (d.tipo === "nota" ? "leído" : "listo") + "</span>";
+    }
+    return '<span class="icon icon-sm" data-icon="alert-circle"></span><span>' +
+      esc(d.motivoSiguiente || "Falta completar este campo.") + "</span>";
+  }
+
+  function guiaPopover(d) {
+    const previo = d.etapaNumero === 0;
+    const etapa = previo
+      ? "antes de empezar · " + esc(d.etapaTitulo)
+      : "paso " + d.etapaNumero + " de " + d.totalEtapas + " · " + esc(d.etapaTitulo);
+    return (
+      '<div class="guia-popover" role="dialog" aria-labelledby="guia-t" aria-describedby="guia-d" tabindex="-1">' +
+      '<div class="guia-popover-flecha" aria-hidden="true"></div>' +
+      '<div class="flex items-baseline gap-2">' +
+      '<span class="eyebrow">' + etapa + "</span>" +
+      '<span class="meta ml-auto">' + (d.iCampo + 1) + " de " + d.nCampos + "</span>" +
+      "</div>" +
+      '<h2 class="side-title !mb-0 mt-1" id="guia-t">' + esc(d.titulo) +
+      (d.opcional ? ' <span class="label-optional">opcional</span>' : "") + "</h2>" +
+      '<p class="mt-2 text-xs text-gray-700" id="guia-d">' + d.detalle + "</p>" +
+      /* El estado del control, con el motivo que escribió la pantalla. */
+      '<p class="guia-estado mt-3" data-guia-estado data-ok="' + (d.listo ? "true" : "false") + '">' +
+      guiaEstado(d) + "</p>" +
+      /* Un destino solo aparece cuando el motor lo resolvió (el puente del hub). */
+      (d.accion
+        ? '<div class="mt-3"><a href="' + esc(d.accion.href) +
+          '" class="btn btn-primary btn-sm btn-block" data-guia-ir>' +
+          esc(d.accion.rotulo) + "</a></div>"
+        : "") +
+      '<div class="mt-3 flex items-center gap-2">' +
+      (d.anterior
+        ? '<button type="button" class="btn btn-ghost btn-sm" data-guia-anterior>' +
+          '<span class="icon icon-sm" data-icon="chevron-left"></span>Anterior</button>'
+        : "") +
+      (d.siguiente
+        ? '<button type="button" class="btn btn-bordered btn-sm" data-guia-siguiente' +
+          (d.motivoSiguiente ? ' disabled title="' + esc(d.motivoSiguiente) + '"' : "") +
+          ">Siguiente<span class=\"icon icon-sm\" data-icon=\"chevron-right\"></span></button>"
+        : '<span class="meta">último de esta pantalla</span>') +
+      '<button type="button" class="link-quiet ml-auto" data-guia-salir>Salir de la guía</button>' +
+      "</div></div>"
+    );
+  }
+
+  /* La barra de modo. Es lo que hace que la guía no se lea como una ventana
+     suelta: dice que hay un recorrido abierto, sobre qué módulo, en qué paso y
+     en qué control, y ofrece la salida. */
+  function guiaBarra(b) {
+    const etapa = b.etapaNumero === 0
+      ? "antes de empezar: " + esc(b.etapaTitulo)
+      : "paso " + b.etapaNumero + " de " + b.totalEtapas + ": " + esc(b.etapaTitulo);
+    return (
+      '<div class="guia-barra" role="status">' +
+      '<span class="icon icon-sm" data-icon="route" aria-hidden="true"></span>' +
+      "<span><b>Guía paso por paso</b> · " + esc(b.modulo) + " — " + etapa +
+      (b.campo
+        ? ' <span class="text-ink-soft">· ' + esc(b.campo) +
+          " (" + (b.iCampo + 1) + " de " + b.nCampos + ")</span>"
+        : "") +
+      "</span>" +
+      '<button type="button" class="btn btn-bordered btn-sm ml-auto" data-guia-ver' +
+      (b.motivoVer ? ' disabled title="' + esc(b.motivoVer) + '"' : "") +
+      ">Ver el paso</button>" +
+      '<button type="button" class="btn btn-ghost btn-sm" data-guia-salir>Salir de la guía</button>' +
+      "</div>"
+    );
+  }
+
   /* -- Pintar --------------------------------------------------------------
      Escribe el HTML y hidrata los iconos que haya dentro. `renderIcons` marca
      lo que ya pintó, así que volver a llamarlo no duplica nada. */
@@ -963,6 +1057,9 @@ window.RENDER = (function () {
     filaAgencia: filaAgencia,
     filaPersona: filaPersona,
     barraPct: barraPct,
+    guiaEstado: guiaEstado,
+    guiaPopover: guiaPopover,
+    guiaBarra: guiaBarra,
     pintar: pintar,
   };
 })();

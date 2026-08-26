@@ -148,14 +148,41 @@ Son las únicas tres pantallas que miden **uso**. En E1 a E5 no hay agencias, as
 estado vacío en vez de ceros: un cero se lee como «va mal», y lo que pasa es que todavía no hay nada
 que medir. Es **R10** aplicado al pie de la letra.
 
-### Los cuatro flujos
+### Los cinco flujos
 
 - **F5 · Arranque en frío** — panel vacío → importador (2 pasos) → 13 módulos creados
 - **F6 · Guionar un cohorte** — hoja de C03 → editor de guión → tablero
 - **F7 · Sesión de grabación** — modo sesión → video editado
 - **F8 · Camino al lanzamiento** — home E3 (falta) → home E4 (apta) → detalle de la Ruta → activar
+- **F9 · Crear un módulo, paso por paso** — la guía, control por control, atravesando las 7 pantallas
 
 **F8 es el que responde cuándo se puede lanzar la Academia**, y el más valioso para negocio.
+
+### La guía paso por paso
+
+El tablero de `modulo.html` ya decía **qué falta** para completar un módulo. Lo que no había era nada
+que acompañe **la ejecución**: dónde escribir, qué va en cada campo, qué apretar después.
+
+**Un paso de la guía es UN CONTROL** —este `select`, este `input`, este botón—, no una etapa. Son
+**34 controles** repartidos en las 7 pantallas, numerados dentro de su etapa para que el número
+coincida con el del tablero: «paso 2 de 5 · Videos — 5 de 10».
+
+Se abre **sola la primera vez** de cada escena —en el alta de un módulo y en el detalle de un módulo
+sin terminar— y después se retoma con **«Retomar la guía»**. Resalta el control con un velo recortado
+y explica qué va ahí.
+
+- **Señala y explica. No escribe ni aprieta nada:** el tipeo y el clic son de la persona.
+- **No apaga ningún control de la app.** Ninguno. Las 7 pantallas se comportan igual con la guía
+  abierta que sin ella. Es la decisión **D-16**, que revirtió la vía contraria.
+- **Su única compuerta es su propia «Siguiente»**, que no habilita hasta que el control actual esté
+  completo o correcto. Los campos con default —superficie, tipo, planes, orden— se explican pero
+  **no traban**.
+- **El veredicto no lo inventa: lo lee del DOM que la pantalla ya pintó** — `aria-invalid`,
+  `[data-*-error]`, y el `disabled` + `title` del botón primario. Así el motivo que muestra es
+  literalmente el texto de la pantalla, y no pueden divergir.
+- **No guarda progreso.** La etapa la da `pasosDeModulo()`; dentro de ella, el control vigente es el
+  primero que no está listo. Todo derivado.
+- `?guia=1` la abre; `?guia=0` la suprime, para compartir un link sin ella.
 
 ### Lo que se puede hacer, y queda guardado
 
@@ -165,7 +192,7 @@ persiste por escena en `localStorage`. `?reset=1` vuelve al dataset limpio.
 | Dónde | Qué |
 |---|---|
 | `video.html` | Cambiar el estado entre los 7 · prender o apagar la visibilidad en el Front · editar título, plan, cohorte y duración · cargar una versión nueva · duplicar |
-| `modulo.html` | **Activar y desactivar el módulo** — el final del flujo F8 |
+| `modulo.html` | **Activar y desactivar el módulo** — el final del flujo F8 · abrir la **guía paso por paso** |
 | `tablero.html` | Cambiar el estado, asignar cohorte o mandar a la cola **en lote**, sobre la selección |
 | `banco.html` | Configurar la evaluación · escribir una pregunta · filtrar por estado, sección y video |
 | `guion.html` | Escribir y guardar el guión, que pasa el video a `guionado` |
@@ -199,6 +226,7 @@ sigue diciendo la verdad aunque la sesión tenga cambios encima.
 | `?c=` | **Cualquiera de los 20:** `C01` … `C20` — cohorte |
 | `?a=` | **Cualquiera de las 12 agencias**, por su identificador — `agencia.html` |
 | `?config=1` | Abre la configuración de evaluación — `banco.html` |
+| `?guia=` | `1` abre la guía paso por paso · `0` la suprime — las 7 pantallas del flujo |
 | `?reset=1` | **Borra el overlay de `localStorage`** y vuelve al dataset limpio, en cualquier pantalla |
 
 ---
@@ -297,7 +325,7 @@ hash en todas.
 | **Datos** | `mock-data.js` con reglas de negocio | **Capa de datos propia**, con 550 preguntas y 12 agencias | Los dos tienen estado real. El dataset es distinto: acá manda el ciclo de producción, allá el recorrido del alumno |
 | **Chrome** | Header horizontal de 72 px, 3 destinos | **Sidebar de 200 px**, 16 destinos en 6 grupos | No entran en una barra |
 | **Responsive** | 3 breakpoints | **Un lienzo fluido, sin breakpoints** | Los dos son desktop. La agencia adapta el recorrido del alumno a varios tamaños; acá se usa todo el ancho de la ventana y no hay más de un layout |
-| **JS** | 6 archivos con máquinas de estado | **8 archivos**: dataset, motor, render y UI | El motor deriva todos los agregados; nada se escribe a mano |
+| **JS** | 6 archivos con máquinas de estado | **10 archivos**: dataset, motor, render, UI, importador y guía | El motor deriva todos los agregados; nada se escribe a mano |
 | **Planes** | Professional · Business | **Professional · Business · Corporate** | Cierra D-3 con los tres reales de `web.sigmma.net/planes.html` |
 | **Naranja `#ff6b35`** | Una aparición: el certificado | **Ninguna** | Nada acá lo justifica |
 
