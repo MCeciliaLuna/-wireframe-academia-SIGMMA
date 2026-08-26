@@ -36,29 +36,29 @@
         </div>
 
         <nav class="flex flex-col gap-4" aria-label="Secciones del backoffice">
-          <!-- El punto de partida es Módulos: es la pantalla desde donde se
-               gestiona cada uno, y desde donde se ve cómo viene la carga de
-               todos. Antes había un «Inicio» suelto arriba —el panel de obra—,
-               que contaba cómo iba todo sin dejar hacer nada; se eliminó y su
-               contenido se repartió: el hito y el trabajo inmediato quedaron
-               en el panel, el embudo en el tablero y el uso en el panel macro.
+          <!-- El punto de partida es Módulos: es la pantalla desde donde se gestiona
+               cada uno, y desde donde se ve cómo viene la carga de todos.
 
-               `data-escena-keep` viajaba en ese «Inicio» y pasa acá: sin él,
-               entrar a Módulos desde E6 te devolvía al régimen sin avisar. -->
+               `data-escena-keep` viaja acá porque sin él, entrar a Módulos desde E6
+               te devolvía al régimen sin avisar.
+
+               El alcance del MVP es CREAR y VER módulos, así que de los catorce
+               destinos del wireframe quedan cuatro vivos y cuatro deshabilitados, y
+               los tres grupos que quedaban enteros en gris no se muestran (D-17). -->
           <div class="nav-group">
             <span class="nav-group-title">Contenido</span>
-            <a href="modulos.html" class="nav-item" data-escena-keep>
+            <a href="modulos.html" aria-current="page" class="nav-item" data-escena-keep>
               <span class="icon" data-icon="layers"></span>Módulos
             </a>
-            <a href="videos.html" class="nav-item" aria-current="page">
+            <span class="nav-item" aria-disabled="true">
               <span class="icon" data-icon="film"></span>Biblioteca de videos
-            </a>
+            </span>
             <a href="tablero.html" class="nav-item">
               <span class="icon" data-icon="columns"></span>Tablero de producción
             </a>
-            <a href="regrabacion.html" class="nav-item">
+            <span class="nav-item" aria-disabled="true">
               <span class="icon" data-icon="refresh"></span>Cola de regrabación
-            </a>
+            </span>
           </div>
 
           <div class="nav-group">
@@ -78,36 +78,6 @@
             </a>
             <span class="nav-item" aria-disabled="true">
               <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
-            </span>
-          </div>
-
-          <div class="nav-group">
-            <span class="nav-group-title">Pipeline</span>
-            <span class="nav-item" aria-disabled="true">
-              <span class="icon" data-icon="git-branch"></span>Impactos en Academia
-            </span>
-          </div>
-
-          <div class="nav-group">
-            <span class="nav-group-title">Seguimiento</span>
-            <a href="panel.html" class="nav-item">
-              <span class="icon" data-icon="bar-chart"></span>Uso de la Academia
-            </a>
-            <a href="agencias.html" class="nav-item">
-              <span class="icon" data-icon="users"></span>Detalle por agencia
-            </a>
-          </div>
-
-          <div class="nav-group">
-            <span class="nav-group-title">Administración</span>
-            <a href="superficies.html" class="nav-item">
-              <span class="icon" data-icon="target"></span>Superficies y planes
-            </a>
-            <span class="nav-item" aria-disabled="true">
-              <span class="icon" data-icon="shield"></span>Usuarios y roles
-            </span>
-            <span class="nav-item" aria-disabled="true">
-              <span class="icon" data-icon="activity"></span>Auditoría
             </span>
           </div>
         </nav>

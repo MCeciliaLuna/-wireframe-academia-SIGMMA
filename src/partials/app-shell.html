@@ -15,19 +15,30 @@
      corresponda. Nada más.
 
      Los destinos que el prototipo NO maqueta van como <span aria-disabled="true">,
-     no como <a>: el wireframe dibuja el menú completo y hay que mostrarlo
-     entero, pero un link que no lleva a ningún lado miente. Quedan fuera del
+     no como <a>: un link que no lleva a ningún lado miente. Quedan fuera del
      orden de tabulación.
 
-     Quedan cinco, y todos por el mismo motivo: necesitan entidades que el
-     dataset no tiene. «Configuración» de evaluación se resuelve por modal
-     desde el banco, así que tampoco necesita pantalla propia.
+     Quedan cuatro, y son los que el MVP no cubre. El alcance es CREAR y VER
+     módulos, así que de los catorce destinos del wireframe hay cuatro vivos:
 
-        · Configuración (Evaluación)  → se configura por modal en banco.html
-        · Matriz perfil × módulo      → no hay perfiles en el dataset
-        · Impactos en Academia        → no hay pipeline de producto
-        · Usuarios y roles            → no hay usuarios ni roles
-        · Auditoría                   → no hay log de auditoría
+        · Módulos               → la pantalla de inicio
+        · Tablero de producción → el paso 2 del módulo, donde el video se publica
+        · Bancos de preguntas   → los pasos 3 y 4, config por modal y escritura
+        · Ruta Esencial         → modulo.html?m=R01
+
+     Y cuatro deshabilitados, cada uno con su motivo:
+
+        · Biblioteca de videos   → fuera del alcance del MVP (reabre D-9)
+        · Cola de regrabación    → fuera del alcance del MVP
+        · Configuración          → se configura por modal en banco.html
+        · Matriz perfil × módulo → no hay perfiles en el dataset
+
+     REGLA NUEVA (D-17): un grupo cuyos destinos están TODOS deshabilitados no
+     se muestra. Antes el menú se dibujaba entero porque el wireframe lo dibuja
+     entero, pero con el recorte del MVP eso dejaba tres grupos enteros en gris
+     —Pipeline, Seguimiento y Administración—, y un sidebar que es 70 % ruido
+     contradice R6. Los tres salieron; los destinos que contenían no existen ni
+     como pantalla ni como entrada.
      ========================================================================= -->
 
 <aside class="sidebar">
@@ -53,28 +64,28 @@
 
   <nav class="flex flex-col gap-4" aria-label="Secciones del backoffice">
     <!-- El punto de partida es Módulos: es la pantalla desde donde se gestiona
-         cada uno, y desde donde se ve cómo viene la carga de todos. Antes había
-         un «Inicio» suelto arriba —el panel de obra—, que contaba cómo iba todo
-         sin dejar hacer nada; se eliminó y su contenido se repartió: el hito y
-         el trabajo inmediato quedaron acá, el embudo en el tablero y el uso en
-         el panel macro.
+         cada uno, y desde donde se ve cómo viene la carga de todos.
 
-         `data-escena-keep` viajaba en ese «Inicio» y pasa acá: sin él, entrar a
-         Módulos desde E6 te devolvía al régimen sin avisar. -->
+         `data-escena-keep` viaja acá porque sin él, entrar a Módulos desde E6
+         te devolvía al régimen sin avisar.
+
+         El alcance del MVP es CREAR y VER módulos, así que de los catorce
+         destinos del wireframe quedan cuatro vivos y cuatro deshabilitados, y
+         los tres grupos que quedaban enteros en gris no se muestran (D-17). -->
     <div class="nav-group">
       <span class="nav-group-title">Contenido</span>
-      <a href="modulos.html" class="nav-item" data-escena-keep aria-current="page">
+      <a href="modulos.html" aria-current="page" class="nav-item" data-escena-keep>
         <span class="icon" data-icon="layers"></span>Módulos
       </a>
-      <a href="videos.html" class="nav-item">
+      <span class="nav-item" aria-disabled="true">
         <span class="icon" data-icon="film"></span>Biblioteca de videos
-      </a>
+      </span>
       <a href="tablero.html" class="nav-item">
         <span class="icon" data-icon="columns"></span>Tablero de producción
       </a>
-      <a href="regrabacion.html" class="nav-item">
+      <span class="nav-item" aria-disabled="true">
         <span class="icon" data-icon="refresh"></span>Cola de regrabación
-      </a>
+      </span>
     </div>
 
     <div class="nav-group">
@@ -94,36 +105,6 @@
       </a>
       <span class="nav-item" aria-disabled="true">
         <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
-      </span>
-    </div>
-
-    <div class="nav-group">
-      <span class="nav-group-title">Pipeline</span>
-      <span class="nav-item" aria-disabled="true">
-        <span class="icon" data-icon="git-branch"></span>Impactos en Academia
-      </span>
-    </div>
-
-    <div class="nav-group">
-      <span class="nav-group-title">Seguimiento</span>
-      <a href="panel.html" class="nav-item">
-        <span class="icon" data-icon="bar-chart"></span>Uso de la Academia
-      </a>
-      <a href="agencias.html" class="nav-item">
-        <span class="icon" data-icon="users"></span>Detalle por agencia
-      </a>
-    </div>
-
-    <div class="nav-group">
-      <span class="nav-group-title">Administración</span>
-      <a href="superficies.html" class="nav-item">
-        <span class="icon" data-icon="target"></span>Superficies y planes
-      </a>
-      <span class="nav-item" aria-disabled="true">
-        <span class="icon" data-icon="shield"></span>Usuarios y roles
-      </span>
-      <span class="nav-item" aria-disabled="true">
-        <span class="icon" data-icon="activity"></span>Auditoría
       </span>
     </div>
   </nav>
