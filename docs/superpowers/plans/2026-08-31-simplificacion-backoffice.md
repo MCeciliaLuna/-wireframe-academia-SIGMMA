@@ -778,11 +778,13 @@ Hoy `modulo.html` pinta el título «Árbol de secciones» y **nada** que expliq
 - [ ] **Step 1: escribir el control que falla**
 
 ```bash
-grep -c 'la secuencia más baja' modulo.html      # → 1
-grep -c 'data-arbol-orden' modulo.html           # → 1
+grep -c 'secuencia más baja</strong> de sus videos' modulo.html   # → 1
+grep -c 'data-arbol-orden' modulo.html                            # → 2 (el markup y la línea que lo oculta)
 ```
 
 - [ ] **Step 2: correr y verificar que falla** — los dos dan `0`.
+
+> **El control mide la cadena que el markup TIENE, tags incluidos.** La primera redacción de este plan pedía el markup con `<strong>secuencia más baja</strong>` y un control `grep -c 'la secuencia más baja'`, que con el tag puesto da **0**: el brief se contradecía solo, y el implementador lo resolvió sacando el énfasis. Es al revés — el énfasis es lo que el lector necesita ver de un vistazo, así que **el markup manda y el control se adapta**.
 
 - [ ] **Step 3: el rótulo**
 
@@ -815,7 +817,7 @@ google-chrome --headless=new --virtual-time-budget=6000 \
 
 - [ ] **Step 5: batería completa** — los 5 bloques. El rótulo usa `hint`, que ya existe: el `cmp` del CSS no debería moverse.
 
-- [ ] **Step 6: `CLAUDE.md`** — en la fila de **Orden de una sección**, agregar al final: `La pantalla lo dice: el árbol de secciones lleva el rótulo de dónde sale ese orden, porque un orden que no se puede cambiar y no se explica se lee como un bug. En la Ruta no se pinta —ahí el orden lo da el cohorte (R8)—.`
+- [ ] **Step 6: `CLAUDE.md`** — en la fila de **Orden de una sección**, **cerrar la oración anterior con un punto** —`…ahí manda su `orden` explícito.`— y después agregar: `La pantalla lo dice: el árbol de secciones lleva el rótulo de dónde sale ese orden, porque un orden que no se puede cambiar y no se explica se lee como un bug. En la Ruta no se pinta —ahí el orden lo da el cohorte (R8)—.`
 
 - [ ] **Step 7: commit**
 
