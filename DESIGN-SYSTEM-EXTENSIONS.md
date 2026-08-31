@@ -31,6 +31,7 @@
 | `.chip` + 7 estados + `.chip-outline` / `-meta` / `-alerta` | Etiquetas chicas de estado y metadato | **Sí** el `.chip` genérico; los 7 estados no |
 | `.filter-bar` · `.filter-pill` · `.filter-search` · `.filter-count` | Barra de filtros de listado | **Sí** |
 | `.bulk-bar` | Acciones sobre una selección múltiple | **Sí** |
+| `.menu-item[aria-disabled]` · `.menu-item-motivo` | Ítem de menú apagado con su motivo visible, sin sacarlo del foco (D-22) | **Sí** |
 | `.metric-tile` · `.metric-value` · `.metric-value-sm` | Tiles de métrica de tablero, y su variante chica para panel lateral | **Sí** |
 | `.segmented` | Conmutador de vista de dos o tres opciones | **Sí** |
 | `.kanban` · `.kanban-col` · `.kanban-card` | Tablero por estados | Tal vez — solo si aparece otro flujo con estados |
@@ -277,6 +278,22 @@ Sheets. `.table-app` usa `--text-sm` con 14 px de padding; a 55 filas eso es scr
 
 **Tokens.** `--color-info-bg`, `--color-info-line`, `--color-primary-dark`. Es el mismo lenguaje que
 `.alert-info`, en versión compacta de una línea.
+
+---
+
+### `.menu-item[aria-disabled="true"]` · `.menu-item-motivo`
+
+**Por qué.** «Mover a otra sección» (D-22) es el primer menú del backoffice con ítems que pueden
+quedar apagados —la sección donde el video ya está—. La regla del bloque es que un control que no
+hace nada es un bug si no dice por qué, y eso vale también adentro de un menú.
+
+**Decisión.** `aria-disabled="true"`, no `disabled`: con el atributo nativo el ítem sale del orden de
+foco y quien usa lector de pantalla nunca llega al motivo. El motivo va como texto visible dentro de
+la misma fila (`.menu-item-motivo`), no solo en `title` — el navegador no muestra el tooltip sobre un
+control deshabilitado.
+
+**Tokens.** `--color-ink-muted`, ya usado por `.btn[aria-disabled="true"]`. `--text-xs` para el
+motivo, la misma escala que `.validation-motivo`.
 
 ---
 

@@ -1915,6 +1915,32 @@
     color: var(--color-primary-dark);
   }
 
+  /* -- Ítem de menú deshabilitado, con motivo visible (D-22) ----------------
+     `.menu-item` es heredado (sección 1-5) y hasta acá ningún menú del
+     backoffice tenía ítems apagados. Este es el primero: usa `aria-disabled`
+     en vez de `disabled` porque el motivo tiene que seguir siendo alcanzable
+     por teclado y por lector de pantalla —con `disabled` nativo el control
+     sale del orden de foco y el motivo nunca se lee—, y el motivo mismo va
+     como texto visible en la propia fila, no solo en `title`: sobre un
+     control deshabilitado el navegador no muestra el tooltip. */
+  .menu-item[aria-disabled="true"] {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    cursor: not-allowed;
+    color: var(--color-ink-muted);
+  }
+  .menu-item[aria-disabled="true"]:hover,
+  .menu-item[aria-disabled="true"]:focus-visible {
+    background: transparent;
+    color: var(--color-ink-muted);
+  }
+  .menu-item-motivo {
+    font-size: var(--text-xs);
+    font-weight: 400;
+    color: var(--color-ink-muted);
+  }
+
   /* -- Grillas que se acomodan al ancho -------------------------------------
      No son breakpoints: son grillas intrinsecas, que resuelven cuantas columnas
      entran a partir de un ancho minimo por celda. Es la contracara de soltar el

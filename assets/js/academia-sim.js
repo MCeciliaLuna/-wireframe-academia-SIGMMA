@@ -437,9 +437,12 @@ window.SIM = (function () {
      sobrevive al regrabado y los videos cuelgan de él.
 
      `seccion` es distinto de los otros cuatro: no es un atributo del video,
-     es su PERTENENCIA (D-22). Los otros cuatro se editan libremente desde la
-     ficha; este solo lo escribe la acción en lote de mover, y con su propia
-     compuerta —`movible()`— delante. */
+     es su PERTENENCIA (D-22). La pantalla solo ofrece moverlo con su propia
+     compuerta —`movible()`— delante, pero eso es una CONVENCIÓN de la
+     interfaz, no algo que el motor haga cumplir acá: quien escriba en el
+     overlay sin pasar por esa compuerta igual queda cubierto, porque
+     `seccionEfectiva()` valida el título contra las secciones del módulo del
+     propio video antes de aceptar el parche. */
   const EDITABLES = ["titulo", "cohorte", "duracion", "planes", "seccion"];
 
   function conEstado(video, escenaId) {
@@ -701,16 +704,28 @@ window.SIM = (function () {
      por video, que este motor ya declara orientativa. */
   function seccionEfectiva(video, escenaId) {
     const esc = escenaId || escena;
+    /* El estructural resuelve por ID contra `porId` —el padrón SIN
+       parchear—, nunca contra `video.seccion` del objeto que llegó. Si a
+       esta función le pasan un video ya resuelto por `conEstado()`/
+       `S.video()` en OTRA escena, ese objeto ya trae `.seccion` parchado por
+       esa escena (`seccion` está en EDITABLES): usarlo acá devolvería la
+       sección de una escena distinta a la pedida. `porId` es la estructura
+       del dataset, la misma que ya usan `seccionesDe()` y los controles de
+       las 5 cadenas. */
+    const raw = porId[video.id] || video;
+    const estructural = raw.seccion;
     const cambio = anotado("videos", video.id, esc) || {};
-    /* El fallback resuelve por ID contra `porId` —el padrón SIN parchear—,
-       nunca contra `video.seccion` del objeto que llegó. Si a esta función le
-       pasan un video ya resuelto por `conEstado()`/`S.video()` en OTRA
-       escena, ese objeto ya trae `.seccion` parchado por esa escena (`seccion`
-       está en EDITABLES): usarlo acá devolvería la sección de una escena
-       distinta a la pedida. `porId` es la estructura del dataset, la misma
-       que ya usan `seccionesDe()` y los controles de las 5 cadenas. */
-    const estructural = porId[video.id] ? porId[video.id].seccion : video.seccion;
-    return cambio.seccion || estructural;
+    /* El parche solo vale si nombra una sección REAL DEL MÓDULO DE ESTE
+       VIDEO. Sin este chequeo, escribir en el overlay el título de una
+       sección de otro módulo —o uno inventado— saca al video de su árbol sin
+       meterlo en ningún otro: exactamente lo que R12 prohíbe. La compuerta
+       de la pantalla (`movible()`, y que el menú solo liste secciones
+       propias) cierra el camino del usuario; esto cierra el del motor, para
+       cualquiera que llame a `anotar()` sin pasar por esa pantalla. */
+    const modulo = modulosPorNumero[raw.modulo];
+    const valida = cambio.seccion && modulo &&
+      modulo.secciones.some(function (s) { return s.titulo === cambio.seccion; });
+    return valida ? cambio.seccion : estructural;
   }
 
   /* La compuerta de D-22, y vive acá y no en la pantalla: si la escribiera el
@@ -739,16 +754,22 @@ window.SIM = (function () {
        movido (D-22) tiene que aparecer en su sección destino y desaparecer de
        la de origen. La lista de secciones —su orden y sus mínimos— sigue
        saliendo de `modulo.secciones` sin tocarse; lo que cambia es qué videos
-       caen en cada una. `videosDe()`/`padron()` van sección por sección, no
-       por secuencia global, así que hay que ordenar acá explícitamente. */
-    const todosLosVideos = modulo.secciones.reduce(function (acc, s) {
-      return acc.concat(s.videos.map(function (v) {
-        return conEstado(porId[modulo.codigo + "." + String(v.secuencia).padStart(3, "0")], esc);
-      }));
-    }, []);
+       caen en cada una. `videosDe()` va sección por sección, no por
+       secuencia global, así que hay que ordenar acá explícitamente.
+
+       La sección efectiva se resuelve UNA VEZ por video acá afuera, no una
+       vez por cada (sección × video) adentro del `.map` de abajo:
+       `seccionEfectiva()` hace lectura del overlay por llamada, y con 4
+       secciones ese costo se multiplicaba por 4 sin necesidad. */
+    const todosLosVideos = videosDe(modulo.numero, esc);
+    const porSeccion = {};
+    todosLosVideos.forEach(function (v) {
+      const t = seccionEfectiva(v, esc);
+      (porSeccion[t] = porSeccion[t] || []).push(v);
+    });
     return modulo.secciones.map(function (s, i) {
-      const vs = todosLosVideos
-        .filter(function (v) { return seccionEfectiva(v, esc) === s.titulo; })
+      const vs = (porSeccion[s.titulo] || [])
+        .slice()
         .sort(function (a, b) { return a.secuencia - b.secuencia; });
       const ps = b.filter(function (p) { return p.subtema === s.titulo; });
       const vigentes = ps.filter(function (p) { return p.estado === "vigente"; }).length;
@@ -1834,9 +1855,11 @@ window.SIM = (function () {
       sinSeccion.length === 0, sinSeccion.map(function (v) { return v.id; }).slice(0, 3).join(", "));
 
     /* -- Mover un video de sección (D-22) --------------------------------
-       Los cuatro controles cubren la invariante de R12 extendida al movimiento,
+       Los cinco controles cubren la invariante de R12 extendida al movimiento,
        y la compuerta que la hace cierta. Sin el tercero, la restricción de
-       D-22 sería una promesa de la pantalla y no una propiedad del motor. */
+       D-22 sería una promesa de la pantalla y no una propiedad del motor. El
+       quinto cubre que `seccionEfectiva()` no confíe en el campo del objeto
+       que le llega para resolver el fallback estructural. */
     chequeo(
       "Sección efectiva · sin overlay coincide con la estructural en los 55",
       todos().every(function (v) { return seccionEfectiva(v) === v.seccion; }),

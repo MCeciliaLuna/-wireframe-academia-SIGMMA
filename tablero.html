@@ -481,10 +481,22 @@
         const triggerMover = document.querySelector("[data-mover-trigger]");
         const menuMover = document.querySelector("[data-menu-secciones]");
 
+        /* Estado inicial del trigger, para que un `return` temprano (sin
+           selección, o con IDs que no resolvieron a ningún video) no deje
+           colgado el `disabled`/`title` de la evaluación anterior. */
+        function resetearMover() {
+          triggerMover.disabled = false;
+          triggerMover.removeAttribute("title");
+          R.pintar("[data-menu-secciones]", "");
+        }
+
         function actualizarMover() {
+          if (!triggerMover) return;
           const ids = window.UI.seleccionados();
-          if (!ids.length || !triggerMover) return;
+          if (!ids.length) { resetearMover(); return; }
           const seleccion = ids.map(function (id) { return S.video(id, esc); }).filter(Boolean);
+          if (!seleccion.length) { resetearMover(); return; }
+
           const modulos = {};
           seleccion.forEach(function (v) { modulos[v.modulo] = true; });
           const cruzaModulos = Object.keys(modulos).length > 1;
@@ -508,21 +520,26 @@
           triggerMover.removeAttribute("title");
           const modulo = S.modulo(seleccion[0].modulo);
           const secciones = modulo ? S.seccionesDe(modulo, esc) : [];
-          /* Las secciones donde YA está alguno de los seleccionados: moverlo
-             ahí no haría nada. Se muestran igual, deshabilitadas con el
-             motivo a la vista, en vez de sacarlas de la lista — con una
-             selección que cruza secciones, sacarlas dejaría un menú distinto
-             según quién se marcó, y eso es más difícil de leer que un botón
-             apagado. */
-          const ocupadas = {};
-          seleccion.forEach(function (v) { ocupadas[S.seccionEfectiva(v, esc)] = true; });
+          /* Deshabilitada solo si TODOS los seleccionados ya están ahí: con
+             dos videos sin preguntas en secciones distintas del mismo módulo,
+             consolidarlos en una de esas dos secciones es una acción legítima
+             y tiene que seguir ofrecida. Deshabilitar apenas ALGUNO ya esté
+             ahí (como hacía la versión anterior) la bloqueaba sin motivo real
+             y encima mostraba un motivo falso para el video que no está ahí. */
+          const efectivas = seleccion.map(function (v) { return S.seccionEfectiva(v, esc); });
           R.pintar("[data-menu-secciones]", secciones.map(function (s) {
-            const yaAhi = !!ocupadas[s.titulo];
-            return '<button type="button" class="menu-item" role="menuitem"' +
-              (yaAhi
-                ? ' disabled title="Ya está en esta sección: moverlo acá no cambiaría nada."'
-                : ' data-seccion-lote="' + R.esc(s.titulo) + '"') +
-              '>' + R.esc(s.titulo) + "</button>";
+            const yaAhiTodos = efectivas.every(function (t) { return t === s.titulo; });
+            /* `aria-disabled`, no `disabled`: con `disabled` nativo el ítem
+               sale del orden de foco y quien usa lector de pantalla nunca
+               llega al motivo. El motivo además va como texto VISIBLE
+               (`.menu-item-motivo`), no solo en `title` — Chrome no muestra
+               el tooltip sobre un control deshabilitado. */
+            return yaAhiTodos
+              ? '<button type="button" class="menu-item" role="menuitem" aria-disabled="true">' +
+                R.esc(s.titulo) +
+                '<span class="menu-item-motivo">Ya está en esta sección</span></button>'
+              : '<button type="button" class="menu-item" role="menuitem" data-seccion-lote="' +
+                R.esc(s.titulo) + '">' + R.esc(s.titulo) + "</button>";
           }).join(""));
         }
 
