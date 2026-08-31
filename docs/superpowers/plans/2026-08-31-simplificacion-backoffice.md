@@ -882,7 +882,7 @@ En `auditar()`, después del control «Ningún video sin sección»:
 
     chequeo(
       "Sección efectiva · los videos de cada sección salen ordenados por secuencia",
-      modulos.filter(function (m) { return m.tipo === "biblioteca"; }).every(function (m) {
+      catalogo().filter(function (m) { return m.tipo === "biblioteca"; }).every(function (m) {
         return seccionesDe(m).every(function (s) {
           return s.videos.every(function (v, i) {
             return i === 0 || v.secuencia >= s.videos[i - 1].secuencia;
@@ -904,6 +904,8 @@ En `auditar()`, después del control «Ningún video sin sección»:
     );
 ```
 
+> **El accesor de módulos:** dentro de la IIFE existen `modulos` (local, línea 292), `catalogo()` y `D.modulos`, y los controles de `auditar()` usan los dos últimos —`D.modulos` en la línea 1628 y `catalogo()` en la 1763—. Arriba está escrito `catalogo()`, que es lo que usa el control más cercano. **Si el control que quede inmediatamente arriba del tuyo usa otro, usá ese**: la consistencia local vale más que mi elección. Los tres ven el dataset limpio, porque `verificar()` levanta `ignorarOverlay`.
+>
 > **Ojo:** este plan ya cometió **dos veces** el mismo error —escribir `videos(esc)` y `modulo(v.modulo)`, que dentro de la IIFE **no existen**: son claves del objeto exportado—. Los nombres internos son **`todos()`** y **`modulosPorNumero[]`**, y así están escritos arriba. Copiá el bloque revisándolo, no en piloto automático. Y si al implementar encontrás cualquier otro dato de este plan que no cierre contra el árbol, **avisá antes de adaptarlo**: en este plan ya hubo ocho números y snippets mal.
 
 - [ ] **Step 2: correr y verificar que falla** — `ReferenceError: seccionEfectiva is not defined`.
