@@ -612,9 +612,14 @@ en todos los formularios de la Academia.
 El design system tiene **un solo patrón de modal**, bien resuelto (overlay al 60 %, foco atrapado,
 `Esc`, el foco vuelve al disparador). **No tiene drawer.**
 
-El wireframe de la tanda 1 **no dibuja ninguno de los dos**, así que no se inventó nada. Pero los
-botones «Agregar sección», «Agregar video» y «Escribir pregunta» tienen que abrir algo, y eso está
-sin decidir. Es una decisión de UX pendiente, no un olvido de la maquetación.
+El wireframe de la tanda 1 **no dibuja ninguno de los dos**, así que no se inventó nada. La pregunta
+era qué abren «Agregar sección», «Agregar video» y «Escribir pregunta».
+
+**Se está respondiendo sin drawer.** «Escribir pregunta» usa el modal que ya existe. «Agregar video»
+—que ahora vive en cada sección del árbol del módulo— navega a la reserva de IDs con la sección
+precargada: es un lote de hasta N filas, y eso no entra en un modal. «Agregar sección» todavía
+navega a su propia pantalla, y va a resolverse como **formulario inline** en el árbol, que es donde
+está el contexto. Queda abierto si el drawer hace falta para algo más.
 
 ### 3 · Componentes heredados que el backoffice no usa
 

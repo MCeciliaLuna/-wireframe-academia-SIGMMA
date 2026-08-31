@@ -276,6 +276,7 @@ agrega una pantalla o un estado.
 | `?sello=` | El sello de una importación — `importador.html?paso=resultado`. Sin él, la pantalla de resultado no tiene qué mostrar y arranca en el paso 1 |
 | `?sup=` | También lo lee `alta-modulo.html`, para arrancar en la superficie que se venía mirando |
 | `?m=` | También lo leen `alta-seccion.html` y `alta-videos.html`, para precargar el módulo padre |
+| `?seccion=` | El **título** de una sección del `?m=`, URL-encodeado — `alta-videos.html?m=30&seccion=Carga%20y%20proceso`. Precarga esa sección en todas las filas del lote. Lo emite cada sección del árbol de `modulo.html`. **Precargar no es atar:** la columna «Sección» sigue estando y el lote sigue pudiendo cruzar secciones, porque el cohorte agrupa por escenario. Si el título no existe en el módulo, se ignora; al cambiar de módulo, se suelta |
 | `?v=` | `escritura.html?v=BAK-M30.050` — la sesión de escritura de preguntas de un video |
 | `?config=1` | Abre la configuración de evaluación — `banco.html` |
 | `?guia=` | `1` abre la guía paso por paso sobre el `?m=` de la pantalla · `0` la cierra **y suprime el auto-arranque**, para compartir un link sin ella. Solo en las 7 pantallas del flujo |
