@@ -290,36 +290,6 @@
           return;
         }
 
-        /* ── Las dos puertas ─────────────────────────────────────────────
-           Fase 4 del prompt de simplificación, sin su pantalla: el hub
-           informaba y derivaba, que es por lo que se eliminó el panel de obra.
-           Acá cada puerta lleva a la pantalla donde la tarea se hace. Va
-           ANTES del corte de E1: también en el día 0 hay que poder reservar
-           los IDs, así que las dos puertas no pueden quedar detrás del
-           placeholder que cubre el resto de la franja. */
-        const esperandoLink = S.sinLink(esc);
-        R.pintar("[data-puertas]", R.puertas([
-          {
-            titulo: "Cargar el link de un video ya grabado",
-            bajada: "Hay " + esperandoLink.length +
-              (esperandoLink.length === 1 ? " video con su ID reservado" : " videos con su ID reservado") +
-              " esperando el link. Entrás a la ficha y cargás la versión.",
-            quien: "Cualquiera del equipo · no hace falta saber la estructura de antemano",
-            href: esperandoLink.length
-              ? "video.html?v=" + esperandoLink[0].id + (esc === "E5" ? "" : "&escena=" + esc)
-              : null,
-            motivo: "Ningún video está esperando link en este momento.",
-          },
-          {
-            titulo: "Reservar los IDs de lo que se va a grabar",
-            bajada: "Entra la estructura del mapa desde la planilla maestra. " +
-              "Los videos quedan en backlog, sin link, listos para guionar.",
-            quien: "Producción de contenido · el lote se pega de una vez",
-            href: "importador.html" + (esc === "E5" ? "" : "?escena=" + esc),
-            motivo: null,
-          },
-        ]));
-
         if (esc === "E1") return; /* El día 0 lo cubre su placeholder. */
 
         /* ── La franja de inicio ─────────────────────────────────────────
@@ -437,6 +407,52 @@
             cta: { href: "tablero.html" + q, texto: "Ver los videos a regrabar en el tablero" },
           };
         }
+
+        /* ── Las dos puertas ─────────────────────────────────────────────
+           Fase 4 del prompt de simplificación, sin su pantalla: el hub
+           informaba y derivaba, que es por lo que se eliminó el panel de obra.
+           Acá cada puerta lleva a la pantalla donde la tarea se hace.
+
+           Van DESPUÉS del corte de E1, a propósito: en E1 no se pintan. El
+           placeholder del día 0 ya cumple esa función — su CTA primario es
+           "Importar el mapa de contenido", el mismo destino que la segunda
+           puerta, más "crear el primer módulo a mano" como salida
+           secundaria. Mostrar las puertas ahí encima daría una puerta
+           muerta (nada espera link todavía) más un duplicado del CTA que
+           ya está arriba: peor que no mostrar nada. */
+        const esperandoLink = S.sinLink(esc);
+        /* Los `a regrabar` sí esperan un link nuevo, pero por la vía del
+           tablero, no por esta puerta: `sinLink()` los excluye porque ya
+           tuvieron una versión vigente (ver el comentario de la función).
+           El motivo de la puerta apagada tiene que decir la causa real de
+           HOY, no una frase única para dos estados opuestos. */
+        const aRegrabar = videos.filter(function (v) { return v.estado === "a regrabar"; }).length;
+        const motivoSinLink = aRegrabar
+          ? "Ningún ID nuevo está esperando su primer link. Hay " + aRegrabar +
+            (aRegrabar === 1 ? " video a regrabar" : " videos a regrabar") +
+            " que van a necesitar uno nuevo, pero esa vía es el tablero, no esta puerta."
+          : "Ya están todos publicados: ningún ID está esperando su primer link.";
+        R.pintar("[data-puertas]", R.puertas([
+          {
+            titulo: "Cargar el link de un video",
+            bajada: "Hay " + esperandoLink.length +
+              (esperandoLink.length === 1 ? " ID reservado" : " IDs reservados") +
+              " todavía sin link. Si ya tenés el archivo, entrás a la ficha y cargás la versión.",
+            quien: "Cualquiera del equipo · no hace falta saber la estructura de antemano",
+            href: esperandoLink.length
+              ? "video.html?v=" + esperandoLink[0].id + (esc === "E5" ? "" : "&escena=" + esc)
+              : null,
+            motivo: motivoSinLink,
+          },
+          {
+            titulo: "Reservar los IDs de lo que se va a grabar",
+            bajada: "Entra la estructura del mapa desde la planilla maestra. " +
+              "Los videos quedan en backlog, sin link, listos para guionar.",
+            quien: "Producción de contenido · el lote se pega de una vez",
+            href: "importador.html" + (esc === "E5" ? "" : "?escena=" + esc),
+            motivo: null,
+          },
+        ]));
 
         R.pintar("[data-hito]", R.hitoCard(hito));
 

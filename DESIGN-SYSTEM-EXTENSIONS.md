@@ -543,7 +543,21 @@ entra por donde su tarea tiene sentido— sin sumar un destino más al sidebar.
 **Decisión.** La puerta apagada es un **`<div>`, no un `<a>` sin `href`**: un link sin destino igual
 recibe foco y se lee como accionable, y eso es justo lo que la regla de «un botón que no hace nada es
 un bug» prohíbe. Cuando `href` es `null`, `motivo` es obligatorio y se pinta en el lugar de la
-bajada, así el control apagado dice **por qué** en vez de quedar mudo.
+bajada, así el control apagado dice **por qué** en vez de quedar mudo. El helper `puertas()` no
+confía en que el caller lo recuerde: si falta el motivo, el markup emitido lo delata en vez de
+quedar en silencio.
+
+**El motivo no es una frase única para dos causas opuestas.** «Nada espera link» puede significar
+«todavía no se reservó nada» o «ya está todo publicado», que son estados inversos. La puerta de
+cargar link resuelve el motivo en cascada, como `estadoDeCarga()`: si hay videos `a regrabar`
+esperando un link nuevo por otra vía, lo dice; si no, dice que ya está todo publicado.
+
+**En E1 las dos puertas no se pintan.** El contenedor sigue en el markup —dentro del bloque
+`data-escena="E2,E3,E4,E5,E6"`—, pero el script nunca llama a `R.puertas()` antes de su `return`
+temprano de E1. No es un descuido: el placeholder del día 0 ya tiene su propio CTA al importador
+—el mismo destino que la segunda puerta— más «crear el primer módulo a mano» como salida
+secundaria. Pintar las puertas ahí encima daría una puerta muerta (nada espera link todavía) más
+un duplicado del CTA que ya está arriba.
 
 **Tokens.** `border-line`, `border-primary-light` (hover), `bg-surface`, `bg-white`, `text-ink`,
 `text-ink-soft`, `rounded-md` — todos ya existentes en el `@theme`, no se agregó ninguno.

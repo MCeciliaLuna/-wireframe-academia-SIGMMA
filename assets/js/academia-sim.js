@@ -1219,7 +1219,23 @@ window.SIM = (function () {
      · el hito de reserva del módulo — `videos()` devuelve los 55 en todas las
        escenas, y sin esto E1 ofrecería 54 videos para cargar en la escena que
        se define como «nada cargado». Es el mismo cierre que hace
-       `estadoDeCarga()` con `mapaCargadoEn`. */
+       `estadoDeCarga()` con `mapaCargadoEn`.
+
+     La exclusión que no es evidente leyendo el filtro: `grabado` y `editado`
+     NUNCA aparecen acá, y no es un accidente del dataset. `versionesDe()`
+     sintetiza una versión vigente en cuanto `rango(estado) >= rango("grabado")`,
+     así que «sin versión vigente» equivale, bajo la semántica del motor, a
+     «todavía sin grabar». Un video ya grabado o editado siempre tiene versión
+     vigente sintética y esta función lo descarta como si ya tuviera link.
+     Incluir esos dos estados es otra tarea: obligaría a tocar la síntesis de
+     `versionesDe()`, no el filtro de acá.
+
+     El orden es curricular, no de urgencia: se ordena por `id` ascendente y
+     el caller manda siempre al primero de la lista, o sea al ID más bajo —
+     nunca al más urgente. Es a propósito, para que la puerta sea
+     determinista. Contrastar con su vecina `colaDeEscritura()`, que ordena
+     por motivo → `modulo.orden` → `secuencia` porque ahí sí importa cuál se
+     resuelve primero. */
   function sinLink(escenaId) {
     const esc = escenaId || escena;
     return todos(esc).filter(function (v) {

@@ -379,7 +379,7 @@
           /* El tag de plan ya no es «plan A / plan B»: son los tres planes reales
              del producto (D-3 cerrada). */
           const combos = [
-            { id: "plan", etiqueta: "Tag de plan",
+            { id: "plan", etiqueta: "¿A qué planes aplica?",
               opts: [S.planes.map(function (p) { return p.nombre; }).join(" · ")]
                 .concat(S.planes.map(function (p) { return p.nombre; })),
               actual: (v.planes || []).join(" · ") },

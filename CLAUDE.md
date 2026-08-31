@@ -30,10 +30,16 @@ con una **academia completa simulada**. Cuatro bloques de trabajo:
   > día hace falta citarla, hay que decidir primero cómo se excluye la cita del control.
 
   Sobre esa franja se montaron las **dos puertas** de la Fase 4 del prompt de
-  simplificación —cargar el link de algo ya grabado, o reservar los IDs de lo
-  que se va a grabar—. Se montaron **ahí y no en una pantalla nueva**: un hub
+  simplificación —cargar el link de un video, o reservar los IDs de lo que se
+  va a grabar—. Se montaron **ahí y no en una pantalla nueva**: un hub
   «¿Qué querés hacer?» informa y deriva, que es exactamente por lo que se
   eliminó el panel de obra.
+
+  **En E1 las dos puertas no se muestran**, a propósito. El placeholder del
+  día 0 ya cumple esa función con su propio CTA al importador —el mismo
+  destino que la segunda puerta— más «crear el primer módulo a mano» como
+  salida secundaria. Pintar las puertas ahí encima daría una puerta muerta
+  (nada espera link todavía) más un duplicado del CTA que ya está arriba.
 
 - **Recorte al alcance del MVP** — **10 pantallas** y **4 destinos vivos** en el sidebar. El
   MVP es **crear y ver módulos**, así que salieron ocho pantallas y tres grupos enteros del
@@ -255,7 +261,12 @@ escena sí lo permitía, y era el riesgo más grande del dato hecho a mano.
    momento con el rótulo cambiado.
 3. **Monotonía temporal: entre escenas sucesivas, el estado de un video solo puede avanzar.** Las
    únicas excepciones son `a regrabar` y `obsoleto`, posteriores a `publicado`. Vale igual para todo
-   contador derivado: el banco no baja y un módulo ya activado sigue activo.
+   contador de **logro acumulado**: el banco no baja y un módulo ya activado sigue activo.
+
+   > No vale para todo contador derivado sin más — un contador de **deuda** sube cuando aparece
+   > trabajo y baja cuando se hace, y eso también es correcto: `deudaDeEvaluacion()`, `colaDeEscritura()`
+   > y `sinLink()` no son monótonos y no tienen por qué serlo. Tomada al pie de la letra, la frase
+   > anterior los condenaba a los tres.
 
 **Los estados vacíos son dato, no escena.** Un módulo sin videos publicados muestra «todavía no
 corresponde escribir preguntas» en **cualquier** escena: `banco.html?m=50` en régimen y
@@ -524,7 +535,12 @@ llegaron a `publicado` · y la **ida y vuelta de la plantilla**.
 
 ### 2 · Disciplina del design system
 
-`design-system.html` se excluye: ahí los hex son contenido legítimo.
+`design-system.html` se excluye: ahí los hex son contenido legítimo. `docs/` queda fuera de estos
+greps por el mismo motivo que `app-shell.html` no se sirve: los globs de raíz (`*.html`,
+`assets/js/*.js`, `src/`) no lo alcanzan, y está bien que no lo alcancen — es material de spec y
+tiene que quedar **verbatim**. `docs/html-model-simplificacion.html` tiene 34 hex sueltos, dos
+`type="url"` y el error B-4 de «Standard» por «Professional»: son del documento fuente, no del
+prototipo, y "corregirlos" ahí falsificaría la cita.
 
 ```bash
 PAGS=$(ls *.html | grep -v design-system.html)

@@ -217,13 +217,13 @@ window.GUIA = (function () {
         },
         {
           pantalla: "alta-videos.html", ancla: "#t1", tipo: "campo", requerido: true,
-          titulo: "Título de la primera fila",
+          titulo: "¿Qué enseña este video? de la primera fila",
           detalle: "Una fila sin título no está terminada de cargar, y no se reserva. Es " +
             "distinto de una fila con error: eso hay que corregirlo, esto hay que escribirlo.",
         },
         {
           pantalla: "alta-videos.html", ancla: "#p1", tipo: "campo", requerido: false,
-          titulo: "Tag de plan de la fila",
+          titulo: "¿A qué planes aplica? de la fila",
           detalle: "Por defecto hereda el del módulo. Solo se cambia cuando un video puntual " +
             "pertenece a otro plan que el resto — en los 55 del mapa pasa una sola vez.",
         },
