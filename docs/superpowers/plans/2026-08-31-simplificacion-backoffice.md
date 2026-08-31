@@ -266,7 +266,7 @@ E6 0
 controles: 121 | fallas: 0
 ```
 
-> `E2 54` y no 55 porque `BAK-M00.010` ya tiene versión vigente en el dataset desde el arranque. `E6 0` es correcto y es dato, no bug: en E6 los 55 videos están en `publicado`, `a regrabar` u `obsoleto`, así que ninguno espera link — y la Task 2 tiene que mostrar ese vacío con su motivo, no un link muerto.
+> `E2 54` y no 55 porque **`BAK-M30.050`** ya figura con una versión vigente en E2. Y el motivo no es «desde el arranque»: `versionesDe()` devuelve el array explícito de `versiones` **sin mirar el estado**, así que un video en `backlog` puede tener una v2 vigente. Verificalo, no lo asumas — la primera redacción de este plan nombraba `BAK-M00.010` y era falso. `E6 0` es correcto y es dato, no bug: en E6 los 55 videos están en `publicado`, `a regrabar` u `obsoleto`, así que ninguno espera link — y la Task 2 tiene que mostrar ese vacío con su motivo, no un link muerto.
 
 - [ ] **Step 5: correr la batería completa de regresión**
 
@@ -333,12 +333,19 @@ Banco de pruebas de un archivo, servido desde el mismo origen. Crear `/tmp/claud
       const w = await cargar("/modulos?escena=" + e);
       const cont = w.document.querySelector("[data-puertas]");
       if (!cont) { log(e + " · SIN CONTENEDOR"); continue; }
+      /* MEDIR LAYOUT, NO CONTAR NODOS. La primera versión de esta prueba usaba
+         solo `querySelectorAll` y dio un FALSO POSITIVO: en E1 las puertas se
+         pintaban dentro de `#listado`, que lleva `data-escena-off` y se apaga
+         con `display:none !important`, así que los nodos existían y no se veían.
+         El instrumento estaba ciego justo al defecto que existía para atrapar. */
+      const r = cont.getBoundingClientRect();
+      const visible = !!(cont.offsetParent && r.width > 0 && r.height > 0);
       const activas = cont.querySelectorAll("a.puerta").length;
       const apagadas = cont.querySelectorAll("div.puerta").length;
-      const conMotivo = Array.from(cont.querySelectorAll("div.puerta"))
-        .filter((d) => (d.textContent || "").trim().length > 40).length;
-      log(e + " · activas=" + activas + " apagadas=" + apagadas +
-          " apagadas-con-motivo=" + conMotivo);
+      const mudas = Array.from(cont.querySelectorAll("div.puerta"))
+        .filter((d) => (d.textContent || "").trim().length < 40).length;
+      log(e + " · visible=" + visible + " activas=" + activas +
+          " apagadas=" + apagadas + " mudas=" + mudas);
     }
     log("FIN");
   })();
@@ -484,12 +491,18 @@ google-chrome --headless=new --virtual-time-budget=6000 \
 Esperado, exacto:
 
 ```
-E1 · activas=1 apagadas=1 apagadas-con-motivo=1
-E2 · activas=2 apagadas=0 apagadas-con-motivo=0
-E5 · activas=2 apagadas=0 apagadas-con-motivo=0
-E6 · activas=1 apagadas=1 apagadas-con-motivo=1
+E1 · visible=false activas=0 apagadas=0 mudas=0
+E2 · visible=true  activas=2 apagadas=0 mudas=0
+E3 · visible=true  activas=2 apagadas=0 mudas=0
+E4 · visible=true  activas=2 apagadas=0 mudas=0
+E5 · visible=true  activas=2 apagadas=0 mudas=0
+E6 · visible=true  activas=1 apagadas=1 mudas=0
 FIN
 ```
+
+> **En E1 no se pinta ninguna puerta, y es correcto.** El placeholder del día 0 ya cumple esa función, y mejor: explica que no hay contenido cargado y su CTA primario es «Importar el mapa de contenido» → `importador.html`, que es **exactamente el destino de la segunda puerta**, con «crear el primer módulo a mano» como salida secundaria. Mostrar las puertas ahí daría una puerta muerta más un duplicado del CTA que está justo arriba. Por eso el `R.pintar` va **abajo** de `if (esc === "E1") return;`: pintar dentro de un contenedor oculto es trabajo para nadie.
+>
+> La primera redacción de este plan esperaba `E1 · activas=1 apagadas=1` y montaba el bloque arriba de ese `return`. Estaba mal por las dos puntas — el número y el lugar — y la prueba que contaba nodos no lo detectó.
 
 Después:
 
