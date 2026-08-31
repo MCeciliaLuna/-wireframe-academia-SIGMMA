@@ -152,7 +152,7 @@ La Fase 4 del prompt pide dos puertas de entrada, y la primera es «subir un vid
 - Modify: `CLAUDE.md` — tabla de reglas de negocio y tabla de conteos de `verificar()`
 
 **Interfaces:**
-- Consumes: `videos(escenaId)`, `versionesDe(video, escenaId)`, `rango(estado)`, `modulo(numero)`, `alcanzada(hito, escenaId)` — todas ya exportadas por `SIM`.
+- Consumes, **por su nombre INTERNO a la IIFE, no por el exportado**: `todos(escenaId)` (se exporta como `videos`), `modulosPorNumero[numero]` (se exporta como `modulo()`), `versionesDe(video, escenaId)`, `rango(estado)`, `alcanzada(hito, escenaId)`. Es el patrón que ya usan `estadoDeCarga()` y `resumenModulo()`: acceden al índice directo, nunca al wrapper exportado. Escribir `videos(esc)` o `modulo(v.modulo)` tira `ReferenceError`.
 - Produces: `SIM.sinLink(escenaId) → Array<video>`. Cada elemento es un video ya con estado derivado (la forma que devuelve `videos()`). Ordenado por `id` ascendente. La Task 2 consume exactamente esto.
 
 - [ ] **Step 1: escribir el control que falla**
@@ -225,9 +225,9 @@ En `assets/js/academia-sim.js`, inmediatamente antes de `function colaDeEscritur
        `estadoDeCarga()` con `mapaCargadoEn`. */
   function sinLink(escenaId) {
     const esc = escenaId || escena;
-    return videos(esc).filter(function (v) {
+    return todos(esc).filter(function (v) {
       if (rango(v.estado) >= rango("publicado")) return false;
-      const m = modulo(v.modulo);
+      const m = modulosPorNumero[v.modulo];
       const cargado = !m || !m.mapaCargadoEn || alcanzada(m.mapaCargadoEn, esc);
       if (!cargado) return false;
       return !versionesDe(v, esc).some(function (x) { return x.vigente; });
