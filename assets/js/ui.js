@@ -407,14 +407,19 @@ window.UI = (function () {
       if (!tabs.length) return;
 
       function activar(clave, mover) {
-        let hubo = false;
+        /* Se PREGUNTA antes de escribir. Al revés —marcar en el loop y salir
+           después si no hubo coincidencia— dejaba todas las solapas con
+           `aria-selected="false"` y, peor, con `tabindex="-1"`: con un `?tab=`
+           que no existe, el tablist entero salía del orden de foco y sus
+           paneles quedaban inalcanzables con teclado. En `video.html` eran
+           cinco. Operable 100 % por teclado es piso, no aspiración. */
+        const hubo = tabs.some(function (t) { return t.dataset.tab === clave; });
+        if (!hubo) return false;
         tabs.forEach(function (t) {
           const on = t.dataset.tab === clave;
-          if (on) hubo = true;
           t.setAttribute("aria-selected", on ? "true" : "false");
           t.setAttribute("tabindex", on ? "0" : "-1");
         });
-        if (!hubo) return false;
         scope.querySelectorAll("[data-panel]").forEach(function (p) {
           p.hidden = p.dataset.panel !== clave;
         });
@@ -442,7 +447,14 @@ window.UI = (function () {
         });
       });
 
-      activar(param("tab") || tabs[0].dataset.tab);
+      /* Si el `?tab=` pedido no existe, cae a la primera solapa. `activar()`
+         ya devuelve `false` cuando la clave no matchea: esto solo usa esa
+         respuesta en vez de ignorarla. Sin el fallback el tablist quedaba sin
+         ninguna solapa seleccionada y sin roving tabindex, y la pantalla decía
+         «se muestra Contenido» sobre un tablist que no lo marcaba. */
+      if (!activar(param("tab") || tabs[0].dataset.tab)) {
+        activar(tabs[0].dataset.tab);
+      }
     });
   }
 
