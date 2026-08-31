@@ -434,8 +434,13 @@ window.SIM = (function () {
 
   /* Los campos del video que la ficha deja editar. La IDENTIDAD no está: ID,
      superficie, módulo y secuencia no se editan nunca (R2), porque el ID
-     sobrevive al regrabado y los videos cuelgan de él. */
-  const EDITABLES = ["titulo", "cohorte", "duracion", "planes"];
+     sobrevive al regrabado y los videos cuelgan de él.
+
+     `seccion` es distinto de los otros cuatro: no es un atributo del video,
+     es su PERTENENCIA (D-22). Los otros cuatro se editan libremente desde la
+     ficha; este solo lo escribe la acción en lote de mover, y con su propia
+     compuerta —`movible()`— delante. */
+  const EDITABLES = ["titulo", "cohorte", "duracion", "planes", "seccion"];
 
   function conEstado(video, escenaId) {
     const esc = escenaId || escena;
@@ -684,6 +689,32 @@ window.SIM = (function () {
     return candidatos[0];
   }
 
+  /* -- Dónde vive hoy un video ---------------------------------------------
+     La sección la POSEE el dataset —`modulo.secciones[].videos`— y el campo
+     `seccion` del video es derivado al indexar. Mover un video es entonces lo
+     único del overlay que cambia una pertenencia y no un atributo, así que
+     tiene su propio derivado y su propia compuerta.
+
+     Los mínimos NO siguen al video movido: los reparte `minimosDeSeccion()`,
+     que es dato y lee la lista estructural. Lo exigible sigue siendo el mínimo
+     por sección y el total del módulo no cambia; lo que se corre es la cuota
+     por video, que este motor ya declara orientativa. */
+  function seccionEfectiva(video, escenaId) {
+    const esc = escenaId || escena;
+    const cambio = anotado("videos", video.id, esc) || {};
+    return cambio.seccion || video.seccion;
+  }
+
+  /* La compuerta de D-22, y vive acá y no en la pantalla: si la escribiera el
+     tablero, sería una promesa de la interfaz en vez de una propiedad del
+     motor, y `verificar()` no podría auditarla. */
+  function movible(video, escenaId) {
+    const esc = escenaId || escena;
+    return padronPreguntas().filter(function (p) {
+      return p.videoOrigen === video.id && alcanzada(p.creadaEn, esc);
+    }).length === 0;
+  }
+
   /* -- Secciones ----------------------------------------------------------
      Cada sección lleva sus dos indicadores: banco mínimo y mínimo por sorteo.
      Los mínimos los reparte el dataset; acá se cuentan las preguntas reales. */
@@ -696,8 +727,21 @@ window.SIM = (function () {
       ? D.minimosDeSeccion(modulo)
       : modulo.secciones.map(function () { return { banco: 0, sorteo: 0 }; });
     const b = bancoDe(modulo.numero, esc);
+    /* Se arma sobre TODOS los videos del módulo, no sobre `s.videos`: un video
+       movido (D-22) tiene que aparecer en su sección destino y desaparecer de
+       la de origen. La lista de secciones —su orden y sus mínimos— sigue
+       saliendo de `modulo.secciones` sin tocarse; lo que cambia es qué videos
+       caen en cada una. `videosDe()`/`padron()` van sección por sección, no
+       por secuencia global, así que hay que ordenar acá explícitamente. */
+    const todosLosVideos = modulo.secciones.reduce(function (acc, s) {
+      return acc.concat(s.videos.map(function (v) {
+        return conEstado(porId[modulo.codigo + "." + String(v.secuencia).padStart(3, "0")], esc);
+      }));
+    }, []);
     return modulo.secciones.map(function (s, i) {
-      const vs = s.videos.map(function (v) { return conEstado(porId[modulo.codigo + "." + String(v.secuencia).padStart(3, "0")], esc); });
+      const vs = todosLosVideos
+        .filter(function (v) { return seccionEfectiva(v, esc) === s.titulo; })
+        .sort(function (a, b) { return a.secuencia - b.secuencia; });
       const ps = b.filter(function (p) { return p.subtema === s.titulo; });
       const vigentes = ps.filter(function (p) { return p.estado === "vigente"; }).length;
       const min = minimos[i] || { banco: 0, sorteo: 0 };
@@ -1781,6 +1825,52 @@ window.SIM = (function () {
     chequeo("Ningún video sin sección",
       sinSeccion.length === 0, sinSeccion.map(function (v) { return v.id; }).slice(0, 3).join(", "));
 
+    /* -- Mover un video de sección (D-22) --------------------------------
+       Los cuatro controles cubren la invariante de R12 extendida al movimiento,
+       y la compuerta que la hace cierta. Sin el tercero, la restricción de
+       D-22 sería una promesa de la pantalla y no una propiedad del motor. */
+    chequeo(
+      "Sección efectiva · sin overlay coincide con la estructural en los 55",
+      todos().every(function (v) { return seccionEfectiva(v) === v.seccion; }),
+      "el derivado se despegó del dataset limpio"
+    );
+
+    chequeo(
+      "Sección efectiva · siempre devuelve una sección real del módulo",
+      todos().every(function (v) {
+        const m = modulosPorNumero[v.modulo];
+        return !m || m.secciones.some(function (s) { return s.titulo === seccionEfectiva(v); });
+      }),
+      "algún video quedó apuntando a una sección que su módulo no tiene"
+    );
+
+    chequeo(
+      "Sección efectiva · los videos de cada sección salen ordenados por secuencia",
+      catalogo().filter(function (m) { return m.tipo === "biblioteca"; }).every(function (m) {
+        return seccionesDe(m).every(function (s) {
+          return s.videos.every(function (v, i) {
+            return i === 0 || v.secuencia >= s.videos[i - 1].secuencia;
+          });
+        });
+      }),
+      "alguna sección devolvió sus videos desordenados"
+    );
+
+    chequeo(
+      "Mover · ningún video con preguntas es movible",
+      todos().every(function (v) {
+        /* «Con preguntas» es «con preguntas YA alcanzadas en esta escena»,
+           igual que decide `movible()`: una pregunta con `creadaEn` en una
+           escena futura todavía no existe acá, así que no puede vetar el
+           movimiento de hoy. */
+        const conPreguntas = padronPreguntas().filter(function (p) {
+          return p.videoOrigen === v.id && alcanzada(p.creadaEn, escena);
+        }).length > 0;
+        return !conPreguntas || !movible(v);
+      }),
+      "la compuerta de D-22 no está cerrada en el motor"
+    );
+
     const sinSecciones = bibliotecas.filter(function (m) {
       return !m.secciones || !m.secciones.length;
     });
@@ -2147,6 +2237,8 @@ window.SIM = (function () {
     resumenModulo: resumenModulo,
     configEvaluacion: configEvaluacion,
     seccionesDe: seccionesDe,
+    seccionEfectiva: seccionEfectiva,
+    movible: movible,
     ordenDeSeccion: ordenDeSeccion,
     cuotaDeVideo: cuotaDeVideo,
     colaDeEscritura: colaDeEscritura,

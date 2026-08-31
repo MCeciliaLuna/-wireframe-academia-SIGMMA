@@ -199,10 +199,10 @@ Seis de sus siete controles se saltean donde no está cargado.
 
 | Dónde | Controles |
 |---|---|
-| Una pantalla común | **121** |
-| `importador.html` | **123** |
-| Una de las 7 del flujo | **127** |
-| El script de node de abajo, con los diez | **129** |
+| Una pantalla común | **125** |
+| `importador.html` | **127** |
+| Una de las 7 del flujo | **131** |
+| El script de node de abajo, con los diez | **133** |
 
 **Ojo con el orden de ejecución.** Los `<script src>` van al final del `<body>`, así que el script
 inline corre durante el parseo y el `renderIcons()` de `icons.js` hidrata lo generado en el
@@ -362,6 +362,8 @@ Todas en `academia-sim.js`. Ninguna en el HTML.
 | ID de la próxima pregunta | `proximoIdPregunta()` — se deriva del banco, no del reloj. Lo usan el modal del banco y la sesión de escritura |
 | **Dónde quedó la guía** | No es una regla nueva. La etapa es el paso `en curso` de `pasosDeModulo()` y, dentro de ella, el control vigente es **el primero que no está listo**. La guía **no guarda progreso**, así que no puede desincronizarse si el módulo avanza desde otra pantalla o otra sesión |
 | **«¿Este control está completo?»** | No vive en el motor: la guía lo **lee del DOM** que la pantalla ya pintó — `aria-invalid`, `[data-*-error]`, y el `disabled` + `title` del botón primario. Reimplementarlo daría dos redacciones para la misma regla, y la de la guía sería la que se queda vieja |
+| **Dónde vive hoy un video (D-22)** | `seccionEfectiva(video, escenaId)` — el parche del overlay si existe, y si no la sección estructural. La sección la POSEE el dataset, así que mover un video es la única mutación del overlay que cambia una pertenencia y no un atributo |
+| **La compuerta de mover un video (D-22)** | `movible(video, escenaId)` — cierra en 0 preguntas ya alcanzadas para ese video. Vive en el motor y no en la pantalla, o `verificar()` no podría auditarla |
 
 ### Mutar el overlay
 
@@ -404,10 +406,18 @@ Las secciones se armaban con un literal y perdían todo lo demás; ya no.
 | `videos` | `{codigoModulo, seccion, secuencia, titulo, cohorte, duracion, planes}` — **`seccion` por título** | por `secuencia` |
 | `cohortes` | `{id, nombre, prioridad, escenario}` | por `id` |
 
-Qué campos se leen del overlay, y nada más: `estado` y `visible` de un video, los cuatro de
-`EDITABLES` (título, cohorte, duración, planes), `versiones`, `guion`, el `estado` de un módulo y su
-`evaluacion`, el `estado` de una pregunta, y el `entorno` de un cohorte. **Escribir cualquier otro
-campo persiste el JSON pero ningún cálculo lo consume.**
+Qué campos se leen del overlay, y nada más: `estado` y `visible` de un video, los cinco de
+`EDITABLES` (título, cohorte, duración, planes, **sección**), `versiones`, `guion`, el `estado` de un
+módulo y su `evaluacion`, el `estado` de una pregunta, y el `entorno` de un cohorte. **Escribir
+cualquier otro campo persiste el JSON pero ningún cálculo lo consume.**
+
+`seccion` es distinto de los otros cuatro de `EDITABLES`: no es un atributo del video, es su
+**pertenencia** (D-22, mover un video a otra sección en lote). Tiene su propia compuerta —
+`movible(video, escenaId)`, cierra solo con 0 preguntas ya alcanzadas— y su propio derivado,
+`seccionEfectiva(video, escenaId)`, que devuelve el título de la sección donde el video vive hoy: el
+parche del overlay si existe, y si no la sección estructural. Los mínimos **no siguen** al video
+movido: los reparte `minimosDeSeccion()`, que es dato y lee la lista estructural; lo que se corre es
+`cuotaDeVideo()`, que el motor ya declara orientativa.
 
 Tres cosas que no se negocian al mutar:
 
@@ -496,7 +506,7 @@ Modelarlo así garantiza que el banco no pueda achicarse entre escenas: `0 → 1
 
 ## Verificación
 
-### 1 · `SIM.verificar()` — 129 controles
+### 1 · `SIM.verificar()` — 133 controles
 
 Reemplaza los greps manuales de coherencia numérica. Corre en la consola del navegador o en node.
 **Cargá también `academia-import.js` y `academia-guia.js`**, o los controles que dependen de ellos
@@ -527,6 +537,11 @@ Y los seis de los flujos de alta: **que el orden de sección derivado de la secu
 las 31 del dataset** · que ningún video quede sin sección · que ningún módulo de biblioteca quede sin
 secciones · que la cuota por video sume el mínimo de su sección · que la cola no liste videos que no
 llegaron a `publicado` · y la **ida y vuelta de la plantilla**.
+
+Y los cuatro de mover un video de sección (D-22): **que `seccionEfectiva()` coincida con la sección
+estructural en los 55 sin overlay** · que siempre devuelva una sección real del módulo del video ·
+que `seccionesDe()` devuelva los videos de cada sección ordenados por secuencia · y que ningún video
+con preguntas ya alcanzadas sea `movible()`.
 
 > **La ida y vuelta no prueba que se creen los 55.** En el prototipo los 55 existen en TODAS las
 > escenas —la escena cambia el estado, no la existencia—, así que importar el mapa completo los

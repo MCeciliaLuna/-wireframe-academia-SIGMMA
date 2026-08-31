@@ -211,6 +211,12 @@
                   <div class="menu max-h-[280px] overflow-y-auto" role="menu" data-dropdown-menu hidden data-menu-cohortes></div>
                 </div>
                 <button type="button" class="btn btn-bordered btn-sm" data-a-la-cola>Agregar a la cola</button>
+                <div class="relative" data-dropdown>
+                  <button type="button" class="btn btn-bordered btn-sm" data-dropdown-trigger data-mover-trigger aria-expanded="false" aria-haspopup="true">
+                    Mover a otra sección <span class="icon icon-sm" data-icon="chevron-down"></span>
+                  </button>
+                  <div class="menu" role="menu" data-dropdown-menu hidden data-menu-secciones></div>
+                </div>
                 <button type="button" class="link-quiet ml-auto" data-bulk-clear>limpiar selección</button>
               </div>
 
@@ -445,6 +451,7 @@
           ids.forEach(function (id) { S.anotar("videos", id, campos); });
           recordarSeleccion();
           pintarTodo();
+          actualizarMover();
         }
 
         document.querySelector("[data-menu-estados]").addEventListener("click", function (ev) {
@@ -465,6 +472,55 @@
         document.querySelector("[data-a-la-cola]").addEventListener("click", function () {
           enLote({ estado: "a regrabar" });
         });
+
+        /* «Mover a otra sección» (D-22). El menú depende de la selección —a
+           diferencia de estado y cohorte, que valen para cualquier video—, así
+           que se repuebla en cada cambio en vez de una sola vez. El veredicto
+           de si se puede mover lo da el motor (`S.movible`), nunca la pantalla:
+           acá solo se lee y se pinta el motivo. */
+        const triggerMover = document.querySelector("[data-mover-trigger]");
+        const menuMover = document.querySelector("[data-menu-secciones]");
+
+        function actualizarMover() {
+          const ids = window.UI.seleccionados();
+          if (!ids.length || !triggerMover) return;
+          const seleccion = ids.map(function (id) { return S.video(id, esc); }).filter(Boolean);
+          const modulos = {};
+          seleccion.forEach(function (v) { modulos[v.modulo] = true; });
+          const cruzaModulos = Object.keys(modulos).length > 1;
+          const conPreguntas = seleccion.filter(function (v) { return !S.movible(v, esc); });
+
+          if (cruzaModulos) {
+            triggerMover.disabled = true;
+            triggerMover.title = "La selección cruza módulos: moverlos cambiaría el ID, y el ID no cambia nunca.";
+            R.pintar("[data-menu-secciones]", "");
+            return;
+          }
+          if (conPreguntas.length > 0) {
+            triggerMover.disabled = true;
+            triggerMover.title = conPreguntas.length + " de los seleccionados tienen preguntas " +
+              "escritas: moverlos dejaría su banco fuera de sección";
+            R.pintar("[data-menu-secciones]", "");
+            return;
+          }
+
+          triggerMover.disabled = false;
+          triggerMover.removeAttribute("title");
+          const modulo = S.modulo(seleccion[0].modulo);
+          const secciones = modulo ? S.seccionesDe(modulo, esc) : [];
+          R.pintar("[data-menu-secciones]", secciones.map(function (s) {
+            return '<button type="button" class="menu-item" role="menuitem" data-seccion-lote="' +
+              R.esc(s.titulo) + '">' + R.esc(s.titulo) + "</button>";
+          }).join(""));
+        }
+
+        document.querySelector("table[data-bulk]").addEventListener("change", actualizarMover);
+        menuMover.addEventListener("click", function (ev) {
+          const b = ev.target.closest("[data-seccion-lote]");
+          if (!b) return;
+          enLote({ seccion: b.dataset.seccionLote });
+        });
+        actualizarMover();
 
         document.querySelector("[data-exportar]").addEventListener("click", function () {
           window.UI.exportarCSV(
