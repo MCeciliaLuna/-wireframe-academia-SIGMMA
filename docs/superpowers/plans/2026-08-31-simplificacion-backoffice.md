@@ -543,9 +543,18 @@ La sección «Microcopy» del prompt pide nombrar por la tarea y no por la tabla
 **Límite que no se cruza:** se cambia **solo texto visible**. `data-campo="secuencia"`, `data-estado`, `data-paso-estado` y los nombres de campo del dataset **no se tocan** — ese vocabulario se copia a desarrollo, y renombrarlo rompe el contrato con `academia-import.js` y con la materialización del overlay.
 
 **Files:**
-- Modify: `alta-videos.html` (encabezados de la grilla y `<label>` de destino)
-- Modify: `alta-modulo.html`, `alta-seccion.html`, `banco.html` (labels)
-- Modify: `design-system.html` (tabla de microcopy)
+- Modify: `alta-videos.html` — los dos `<th>` de la grilla **y los dos `<label class="sr-only">` de esas mismas columnas**
+- Modify: `video.html` — el label del campo `f-titulo`
+- Modify: `alta-modulo.html` — el label del campo `planes`
+- Modify: `design-system.html` — tabla de microcopy, **solo con filas verdaderas**
+
+> **Dos cosas que la primera redacción de esta tarea hizo mal, y son la lección.**
+>
+> **Una:** cambiaba el `<th>` visible y dejaba el `<label class="sr-only">` de esa misma celda con el nombre viejo. La grilla emite un label por celda, así que la columna quedaba llamándose «¿Qué enseña este video?» con los ojos y «Título fila 1» con un lector de pantalla. Los `<th>` y los labels de las columnas que se tocan **se cambian juntos**; los de `Secuencia`, `Sección` y `Cohorte` quedan intactos porque sus encabezados no cambian.
+>
+> **La otra:** la tabla declaraba en su columna «Dónde» pantallas donde el rótulo no estaba escrito —`video.html` decía «Título», `alta-modulo.html` decía «Planes»—. Una tabla rotulada como contrato verificable que afirma cuatro cosas falsas es peor que no tenerla. **Toda fila que se deje tiene que tener su grep**, y el rótulo se implementa en *todas* las pantallas que la fila nombra: la regla del proyecto dice que una acción conserva el mismo nombre en todo el flujo, así que cambiarlo en el alta y no en la ficha del mismo video es la inconsistencia que la tarea venía a eliminar.
+>
+> **`alta-seccion.html` y `banco.html` quedan afuera**, y no por alcance sino por motivo: «¿Visible para las agencias?» describiría un estado que este modelo no tiene (ver **D-26**), y «Sub-tema del banco» esconde que el sub-tema *es* el título de la sección, que es justo lo que hace entendible la regla.
 
 **Interfaces:**
 - Consumes: nada. Es una tarea de texto.
@@ -564,8 +573,6 @@ En `design-system.html`, en la sección de vocabulario, agregar la tabla de equi
               <tbody>
                 <tr><td>¿Qué enseña este video?</td><td>Título</td><td>alta-videos, video</td></tr>
                 <tr><td>¿A qué planes aplica?</td><td>Tag de plan</td><td>alta-videos, alta-modulo</td></tr>
-                <tr><td>¿Visible para las agencias?</td><td>Estado activo / inactivo</td><td>modulo</td></tr>
-                <tr><td>Sub-tema del banco</td><td>Sección</td><td>banco, escritura</td></tr>
                 <tr><td>Reservar IDs <em>(ya estaba)</em></td><td>Guardar / Enviar</td><td>alta-videos</td></tr>
               </tbody>
             </table>
