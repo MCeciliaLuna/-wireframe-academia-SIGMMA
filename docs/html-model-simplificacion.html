@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Academia SIGMMA · Constructor de contenido (wireframe navegable)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EAEEEF;
+  --surface:#FFFFFF;
+  --surface-sunk:#F4F7F7;
+  --ink:#16262C;
+  --ink-2:#3D5560;
+  --muted:#6E838C;
+  --line:#D2DCDE;
+  --line-soft:#E4EBEC;
+  --accent:#0E6A60;
+  --accent-soft:#DCEBE8;
+  --warn:#A65613;
+  --warn-soft:#F6E9D9;
+  --stop:#8E3B3B;
+  --stop-soft:#F3E2E2;
+  --plan:#3C5A9A;
+  --plan-soft:#E1E8F4;
+  --r:3px;
+  --sans:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--sans);
+  background:var(--paper);
+  color:var(--ink);
+  font-size:14px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ---------- shell ---------- */
+.app{display:grid;grid-template-columns:216px 1fr;min-height:100vh}
+.rail{background:var(--ink);color:#CFDCDE;padding:18px 0 24px;display:flex;flex-direction:column}
+.brand{padding:0 18px 20px;border-bottom:1px solid rgba(255,255,255,.09)}
+.brand strong{display:block;color:#fff;font-weight:600;letter-spacing:-.01em}
+.brand span{font-size:11.5px;color:#7E979C}
+.railgroup{padding:16px 0 4px}
+.railgroup h4{margin:0 18px 6px;font-size:10.5px;font-weight:600;color:#6F878C;letter-spacing:.04em}
+.railitem{display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:none;border:0;padding:7px 18px;color:#C3D3D6;font-size:13px;border-left:2px solid transparent}
+.railitem:hover{background:rgba(255,255,255,.05);color:#fff}
+.railitem[aria-current="true"]{background:rgba(255,255,255,.09);color:#fff;border-left-color:var(--accent);font-weight:500}
+.railitem.off{color:#5D7378;cursor:not-allowed}
+.railitem.off:hover{background:none;color:#5D7378}
+.railitem .pend{margin-left:auto;font-size:10px;color:#5D7378;border:1px solid #33474D;border-radius:2px;padding:0 4px}
+.railfoot{margin-top:auto;padding:14px 18px 0;border-top:1px solid rgba(255,255,255,.09);font-size:11.5px;color:#7E979C}
+
+.main{display:flex;flex-direction:column;min-width:0}
+
+/* ---------- topbar / escenas ---------- */
+.top{background:var(--surface);border-bottom:1px solid var(--line);padding:10px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.crumb{font-size:13px;color:var(--muted);min-width:0}
+.crumb b{color:var(--ink);font-weight:500}
+.escenas{margin-left:auto;display:flex;align-items:center;gap:8px}
+.escenas>span{font-size:11.5px;color:var(--muted)}
+.segbar{display:flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.seg{background:var(--surface);border:0;border-right:1px solid var(--line-soft);padding:4px 9px;font-size:12px;color:var(--ink-2);font-family:var(--mono)}
+.seg:last-child{border-right:0}
+.seg[aria-pressed="true"]{background:var(--ink);color:#fff}
+.escena-note{width:100%;font-size:12px;color:var(--muted);padding-top:2px}
+
+/* ---------- generic ---------- */
+.wrap{padding:22px;max-width:1180px}
+h1{font-size:21px;font-weight:600;letter-spacing:-.015em;margin:0 0 4px}
+h2{font-size:15px;font-weight:600;margin:0 0 10px}
+h3{font-size:13px;font-weight:600;margin:0 0 6px}
+.lede{color:var(--ink-2);margin:0 0 22px;max-width:66ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.btn{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:6px 12px;font-size:13px;color:var(--ink)}
+.btn:hover{border-color:var(--ink-2)}
+.btn-p{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500}
+.btn-p:hover{background:#0B554D;border-color:#0B554D}
+.btn-q{background:none;border-color:transparent;color:var(--accent);padding:6px 6px}
+.btn-q:hover{border-color:transparent;text-decoration:underline}
+.btn-sm{padding:3px 8px;font-size:12px}
+.row{display:flex;gap:8px;align-items:center}
+.sep{height:1px;background:var(--line-soft);margin:14px 0}
+label{display:block;font-size:12px;font-weight:500;color:var(--ink-2);margin-bottom:4px}
+input[type=text],input[type=url],select,textarea{
+  width:100%;font-family:inherit;font-size:13px;color:var(--ink);
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:6px 8px
+}
+textarea{font-family:var(--mono);font-size:12.5px;line-height:1.6;resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 2px var(--accent-soft)}
+.hint{font-size:11.5px;color:var(--muted);margin-top:4px}
+.mono{font-family:var(--mono)}
+
+/* estado chips */
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;padding:1px 7px;border-radius:2px;white-space:nowrap;border:1px solid transparent}
+.chip::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
+.st-backlog{background:var(--surface-sunk);color:var(--muted);border-color:var(--line)}
+.st-guionado{background:var(--plan-soft);color:var(--plan)}
+.st-grabado{background:var(--plan-soft);color:var(--plan)}
+.st-editado{background:var(--plan-soft);color:var(--plan)}
+.st-publicado{background:var(--accent-soft);color:var(--accent)}
+.st-regrabar{background:var(--warn-soft);color:var(--warn)}
+.st-obsoleto{background:var(--stop-soft);color:var(--stop)}
+.tag{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:2px;padding:0 5px;background:var(--surface)}
+.idbadge{font-family:var(--mono);font-size:12px;background:var(--surface-sunk);border:1px solid var(--line);border-radius:2px;padding:1px 6px;color:var(--ink-2)}
+
+/* ---------- hub ---------- */
+.doors{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:26px}
+.door{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:block;width:100%}
+.door:hover{border-color:var(--accent);background:#FDFEFE}
+.door .kicker{font-size:12px;color:var(--muted);margin-bottom:8px}
+.door strong{display:block;font-size:17px;font-weight:600;letter-spacing:-.01em;margin-bottom:6px}
+.door p{margin:0 0 14px;color:var(--ink-2);font-size:13px;max-width:44ch}
+.door .who{font-size:11.5px;color:var(--muted);border-top:1px solid var(--line-soft);padding-top:10px}
+.mini{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:8px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.stat b{display:block;font-size:22px;font-weight:600;letter-spacing:-.02em;font-family:var(--mono)}
+.stat span{font-size:11.5px;color:var(--muted)}
+.tasklist{list-style:none;margin:0;padding:0}
+.tasklist li{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--line-soft);font-size:13px}
+.tasklist li:last-child{border-bottom:0}
+.tasklist .grow{flex:1;min-width:0}
+.tasklist .sub{color:var(--muted);font-size:12px}
+
+/* ---------- constructor: tree + detail ---------- */
+.split{display:grid;grid-template-columns:minmax(420px,1fr) minmax(360px,460px);gap:0;flex:1;min-height:0}
+.treecol{border-right:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;min-width:0}
+.treebar{padding:10px 14px;border-bottom:1px solid var(--line-soft);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.treebar input[type=text]{width:190px}
+.tree{overflow:auto;padding:6px 0 60px;flex:1}
+
+.node{display:flex;align-items:center;gap:8px;padding:5px 14px;border-left:2px solid transparent;position:relative}
+.node:hover{background:var(--surface-sunk)}
+.node.sel{background:var(--accent-soft);border-left-color:var(--accent)}
+.twist{background:none;border:0;padding:0;width:14px;color:var(--muted);font-size:10px;line-height:1}
+.node .label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;background:none;border:0;padding:0}
+.n-mod{padding-left:12px;font-weight:600;border-top:1px solid var(--line-soft)}
+.n-mod:first-child{border-top:0}
+.n-sec{padding-left:36px;color:var(--ink-2);font-weight:500}
+.n-vid{padding-left:58px}
+.n-vid .label{color:var(--ink-2)}
+.node.inactive{opacity:.62}
+.node.inactive .label{font-style:italic}
+.legend-inactive{padding:2px 14px 8px 36px;font-size:11.5px;color:var(--warn)}
+.addrow{padding:3px 14px 8px 58px}
+.addrow.sec{padding-left:36px}
+.addrow.mod{padding-left:12px;padding-bottom:16px}
+.addbtn{background:none;border:1px dashed var(--line);border-radius:var(--r);color:var(--muted);font-size:12px;padding:3px 9px}
+.addbtn:hover{border-color:var(--accent);color:var(--accent);border-style:solid}
+.selbox{width:13px;height:13px;accent-color:var(--accent);flex:none}
+
+/* inline quick form */
+.quick{margin:4px 14px 12px 58px;border:1px solid var(--accent);border-radius:var(--r);background:#FBFDFD;padding:12px}
+.quick .qhead{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}
+.quick .qhead b{font-size:13px}
+.quick .qhead small{color:var(--muted);font-size:11.5px}
+.qgrid{display:grid;gap:10px;margin-bottom:10px}
+.derived{background:var(--surface-sunk);border:1px solid var(--line-soft);border-radius:var(--r);padding:9px 11px;font-size:12px;color:var(--ink-2)}
+.derived dl{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:0}
+.derived dt{color:var(--muted)}
+.derived dd{margin:0}
+.radioset{display:flex;gap:8px;flex-wrap:wrap}
+.radiopill{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:var(--r);padding:6px 10px;font-size:12.5px;background:var(--surface);cursor:pointer}
+.radiopill input{accent-color:var(--accent);margin:0}
+.radiopill.on{border-color:var(--accent);background:var(--accent-soft)}
+
+/* bulk bar */
+.bulk{position:sticky;bottom:0;background:var(--ink);color:#fff;padding:9px 14px;display:flex;gap:10px;align-items:center;font-size:13px}
+.bulk .btn{background:transparent;border-color:#3B5158;color:#DCE7E9}
+.bulk .btn:hover{border-color:#7E979C}
+.bulk .count{font-weight:600}
+.bulk .x{margin-left:auto}
+
+/* detail panel */
+.detail{background:var(--surface-sunk);overflow:auto;min-width:0}
+.dhead{padding:16px 18px 0}
+.dhead .idline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.dhead h2{font-size:16px;margin:0 0 8px;letter-spacing:-.01em}
+.dmeta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);padding:0 18px}
+.tab{background:none;border:0;border-bottom:2px solid transparent;padding:8px 11px;font-size:13px;color:var(--muted)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:500}
+.dbody{padding:16px 18px 40px}
+.fieldgrid{display:grid;gap:12px}
+.ro{display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--r);padding:6px 9px;font-size:13px;color:var(--ink-2)}
+.ro .lock{font-size:11px;color:var(--muted)}
+.info{border:0;background:var(--line-soft);color:var(--ink-2);border-radius:50%;width:15px;height:15px;font-size:10px;line-height:15px;text-align:center;padding:0;flex:none}
+.checklist{list-style:none;margin:0;padding:0;font-size:13px}
+.checklist li{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--line-soft);align-items:center}
+.checklist li:last-child{border-bottom:0}
+.checklist .mk{width:14px;flex:none;text-align:center;font-size:12px}
+.ok{color:var(--accent)}
+.miss{color:var(--warn)}
+.emptynote{color:var(--muted);font-size:13px;background:var(--surface);border:1px dashed var(--line);border-radius:var(--r);padding:14px}
+
+/* subtemas */
+.bar{height:6px;background:var(--line-soft);border-radius:99px;overflow:hidden;margin-top:5px}
+.bar i{display:block;height:100%;background:var(--accent)}
+.bar.low i{background:var(--warn)}
+.bar.zero i{background:var(--stop)}
+.sublist{list-style:none;margin:10px 0 0;padding:0}
+.sublist li{padding:8px 0;border-bottom:1px solid var(--line-soft)}
+.sublist li:last-child{border-bottom:0}
+.sublist .lineup{display:flex;justify-content:space-between;gap:10px;font-size:13px}
+.sublist .n{font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+/* ---------- importar ---------- */
+.steps{display:flex;gap:0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:18px;background:var(--surface)}
+.step{flex:1;padding:10px 14px;border-right:1px solid var(--line-soft);font-size:12.5px;color:var(--muted)}
+.step:last-child{border-right:0}
+.step[data-on="true"]{background:var(--ink);color:#fff}
+.step b{display:block;font-weight:500}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;font-weight:500;color:var(--muted);font-size:11.5px;padding:7px 10px;border-bottom:1px solid var(--line);background:var(--surface-sunk);position:sticky;top:0}
+td{padding:7px 10px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+tr[data-bad="true"] td{background:#FDF6F6}
+.cellmono{font-family:var(--mono);font-size:12px}
+.rowerr{color:var(--stop);font-size:11.5px;display:block;margin-top:3px}
+.rowfix{display:inline-flex;gap:6px;margin-top:5px}
+.tablewrap{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.summary{display:flex;gap:16px;align-items:center;padding:12px 0;font-size:13px}
+.summary .ok b,.summary .bad b{font-family:var(--mono)}
+
+/* toast */
+.toast{position:fixed;right:18px;bottom:18px;background:var(--ink);color:#fff;padding:10px 14px;border-radius:var(--r);font-size:13px;max-width:340px;box-shadow:0 6px 18px rgba(22,38,44,.18);z-index:50}
+.toast.hide{display:none}
+
+/* annotation flags (wireframe notes) */
+.note{background:#FFFBEF;border:1px solid #E8DCB8;border-left:3px solid #C9A227;border-radius:var(--r);padding:10px 12px;font-size:12.5px;color:#5C4A15;margin:14px 0}
+.note b{color:#3F3210}
+.notesToggle{font-size:12px}
+body.notes-off .note{display:none}
+
+@media (max-width:1000px){
+  .app{grid-template-columns:1fr}
+  .rail{display:none}
+  .split{grid-template-columns:1fr}
+  .treecol{border-right:0;border-bottom:1px solid var(--line)}
+  .doors,.mini{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ======== RAIL ======== -->
+  <nav class="rail" aria-label="Navegación principal">
+    <div class="brand">
+      <strong>Academia SIGMMA</strong>
+      <span>Backoffice de contenido</span>
+    </div>
+
+    <div class="railgroup">
+      <h4>Empezar</h4>
+      <button class="railitem" data-go="hub" aria-current="true">Qué querés hacer</button>
+    </div>
+
+    <div class="railgroup">
+      <h4>Contenido</h4>
+      <button class="railitem" data-go="constructor">Estructura de la Academia</button>
+      <button class="railitem" data-go="importar">Cargar desde planilla</button>
+    </div>
+
+    <div class="railgroup">
+      <h4>Seguimiento</h4>
+      <button class="railitem off" disabled>Avance por agencia <span class="pend">después</span></button>
+      <button class="railitem off" disabled>Panel general <span class="pend">después</span></button>
+    </div>
+
+    <div class="railfoot">
+      Wireframe navegable · no guarda datos<br>
+      <label style="display:flex;gap:6px;align-items:center;margin-top:8px;color:#7E979C;font-weight:400" class="notesToggle">
+        <input type="checkbox" id="notesChk" checked style="accent-color:#0E6A60"> Ver notas de diseño
+      </label>
+    </div>
+  </nav>
+
+  <!-- ======== MAIN ======== -->
+  <div class="main">
+    <header class="top">
+      <div class="crumb" id="crumb">Academia SIGMMA</div>
+      <div class="escenas">
+        <span>Momento de la Academia</span>
+        <div class="segbar" role="group" aria-label="Escena de construcción">
+          <button class="seg" data-esc="E1" aria-pressed="false">E1</button>
+          <button class="seg" data-esc="E2" aria-pressed="false">E2</button>
+          <button class="seg" data-esc="E3" aria-pressed="false">E3</button>
+          <button class="seg" data-esc="E4" aria-pressed="true">E4</button>
+          <button class="seg" data-esc="E5" aria-pressed="false">E5</button>
+        </div>
+      </div>
+      <div class="escena-note" id="escenaNote"></div>
+    </header>
+
+    <div id="screens"></div>
+  </div>
+</div>
+
+<div class="toast hide" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =========================================================
+   DATOS — módulos BAK reales del mapa de grabación
+   ========================================================= */
+const PERFILES = ['Corporate','Business','Standard'];
+
+const DATA = [
+ {id:'BAK-M00', name:'Fundamentos', tag:'P+B', active:true, perfiles:PERFILES, subtemas:['Concepto','Ciclo 360','Principios','Navegación'], secciones:[
+   {name:'Concepto y navegación', videos:[
+     {seq:'010', t:'Qué es SIGMMA: el sistema operativo de la agencia', p:'P1', c:'C01', dur:'3:40'},
+     {seq:'020', t:'El ciclo 360° de la operación turística', p:'P2', c:'C04', dur:'4:10'},
+     {seq:'030', t:'Los 7 principios y los procesos atomizados', p:'P2', c:'C04', dur:'4:30'},
+     {seq:'040', t:'Navegación: ingreso, menú, último file, rueda de progreso', p:'P1', c:'C01', dur:'3:20'}
+   ]}
+ ]},
+ {id:'BAK-M10', name:'File', tag:'P+B', active:true, perfiles:PERFILES, subtemas:['Búsqueda','Alta de file','Monedas','Estados','Salida grupal'], secciones:[
+   {name:'Alta y búsqueda', videos:[
+     {seq:'010', t:'Buscar file (número, filtros, por nombre)', p:'P1', c:'C02', dur:'2:40'},
+     {seq:'020', t:'Crear y editar file: tipo de servicio, individual vs grupal', p:'P1', c:'C02', dur:'4:50'},
+     {seq:'030', t:'Moneda de registro vs moneda de documento', p:'P1', c:'C02', dur:'3:00'}
+   ]},
+   {name:'Datos y estados', videos:[
+     {seq:'040', t:'Datos del file: nombre, destino IATA, fechas, segmentación', p:'P2', c:'C05', dur:'3:50'},
+     {seq:'050', t:'Estados del file (automáticos y manuales, cerrar file)', p:'P2', c:'C05', dur:'4:00'},
+     {seq:'060', t:'Salida grupal: vincular files e informe de salida', p:'P3', c:'C13', dur:'4:40'}
+   ]}
+ ]},
+ {id:'BAK-M20', name:'Entidades: clientes, pasajeros, proveedores', tag:'P+B', active:true, perfiles:PERFILES, subtemas:['Cliente','Cliente vs Pasajero','Pasajero','Proveedor','Importación'], secciones:[
+   {name:'Clientes y pasajeros', videos:[
+     {seq:'010', t:'Cargar cliente: físico vs jurídico, autocompletar por ARCA/CUIT', p:'P1', c:'C02', dur:'4:40'},
+     {seq:'020', t:'Cliente: solapas (documentación, tarjetas, clasificación)', p:'P2', c:'C06', dur:'4:20'},
+     {seq:'030', t:'Cliente vs Pasajero (el concepto que más se confunde)', p:'P1', c:'C02', dur:'3:00'},
+     {seq:'040', t:'Cargar pasajero: pax principal, agregar a base de clientes', p:'P1', c:'C02', dur:'3:30'}
+   ]},
+   {name:'Proveedores e importación', videos:[
+     {seq:'050', t:'Proveedor: turístico y no turístico', p:'P2', c:'C06', dur:'3:10'},
+     {seq:'060', t:'Importar base de clientes y proveedores desde Excel', p:'P2', c:'C06', dur:'4:30'}
+   ]}
+ ]},
+ {id:'BAK-M30', name:'Voucher / Servicios', tag:'P+B', active:true, perfiles:PERFILES, subtemas:['Concepto de voucher','Carga','Margen','Impuestos','Procesar','Estados','Modelos'], secciones:[
+   {name:'Voucher y cobro', videos:[
+     {seq:'010', t:'Qué es el voucher: perfil operativo y administrativo', p:'P1', c:'C03', dur:'3:00'},
+     {seq:'020', t:'Cargar voucher: tipo, subtipo, proveedor', p:'P1', c:'C03', dur:'4:50'},
+     {seq:'050', t:'Procesar el voucher: impacto en la cuenta del proveedor', p:'P1', c:'C03', dur:'2:40'}
+   ]},
+   {name:'Margen e impuestos', videos:[
+     {seq:'030', t:'Margen: comisión vs utilidad', p:'P2', c:'C07', dur:'4:00'},
+     {seq:'040', t:'Conceptos impositivos e IVA; separar aéreo de terrestre', p:'P2', c:'C07', dur:'4:40'}
+   ]},
+   {name:'Estados y plantillas', videos:[
+     {seq:'060', t:'Estados del voucher y cotización', p:'P3', c:'C12', dur:'3:30'},
+     {seq:'070', t:'Modelos: armar plantillas de venta reutilizables', p:'P3', c:'C12', dur:'4:20'}
+   ]}
+ ]},
+ {id:'BAK-M35', name:'Tráfico / asignación de butaca', tag:'P+B', active:false, perfiles:PERFILES, subtemas:[], secciones:[
+   {name:'Asignación de butaca', videos:[
+     {seq:'010', t:'Tráfico: asignación de butaca', p:'P3', c:'—', dur:''}
+   ]}
+ ]},
+ {id:'BAK-M40', name:'Cobranzas / Recibos', tag:'P+B', active:true, perfiles:PERFILES, subtemas:['Modos de recibo','Valores','Moneda','Devolución','Cuenta corriente'], secciones:[
+   {name:'Recibos', videos:[
+     {seq:'010', t:'Recibo: modos indicado, automático y detallado', p:'P1', c:'C03', dur:'4:50'},
+     {seq:'020', t:'Valores: efectivo, transferencia, tarjeta y de tercero', p:'P2', c:'C08', dur:'4:10'},
+     {seq:'030', t:'Moneda y tipo de cambio en el recibo', p:'P2', c:'C08', dur:'3:40'}
+   ]},
+   {name:'Saldos y devoluciones', videos:[
+     {seq:'040', t:'Devolución / egreso', p:'P3', c:'C14', dur:'3:00'},
+     {seq:'050', t:'Cuenta corriente del cliente y saldos por moneda', p:'P2', c:'C08', dur:'4:20'}
+   ]}
+ ]},
+ {id:'BAK-M50', name:'Facturación', tag:'P+B', active:true, perfiles:PERFILES, subtemas:['Factura al pasajero','IVA y CAE','Verificación','Notas de crédito','Tipo de cambio'], secciones:[
+   {name:'Factura al pasajero', videos:[
+     {seq:'010', t:'Factura al pasajero: por servicio vs por producto', p:'P2', c:'C09', dur:'4:00'},
+     {seq:'020', t:'Categoría de IVA → factura A/B; ARCA y CAE', p:'P2', c:'C09', dur:'4:40'},
+     {seq:'030', t:'Verificar el voucher antes de facturar', p:'P2', c:'C09', dur:'3:20'}
+   ]},
+   {name:'Ajustes y casos', videos:[
+     {seq:'040', t:'Notas de crédito', p:'P3', c:'C15', dur:'3:10'},
+     {seq:'050', t:'Factura parcial: dividir entre pasajeros', p:'P3', c:'C15', dur:'3:50'},
+     {seq:'060', t:'Tipo de cambio promedio ponderado', p:'P3', c:'C15', dur:'4:10'}
+   ]}
+ ]},
+ {id:'BAK-M60', name:'Pagos a proveedores', tag:'P+B', active:true, perfiles:PERFILES, subtemas:['Orden de pago','Factura de compra','Saldos','Cuenta corriente'], secciones:[
+   {name:'Órdenes de pago', videos:[
+     {seq:'010', t:'Orden de pago: automático, dividido y manual', p:'P2', c:'C10', dur:'4:20'},
+     {seq:'020', t:'Vincular factura de compra e importador ARCA', p:'P3', c:'C16', dur:'3:50'},
+     {seq:'030', t:'Saldo a favor, anular y reabrir', p:'P3', c:'C16', dur:'3:00'},
+     {seq:'040', t:'Cuenta corriente del proveedor', p:'P2', c:'C10', dur:'3:40'}
+   ]}
+ ]},
+ {id:'BAK-M70', name:'Caja y bancos', tag:'P+B', active:true, perfiles:PERFILES, subtemas:['Caja','Asientos','Apertura y cierre','Bancos'], secciones:[
+   {name:'Caja', videos:[
+     {seq:'010', t:'Caja: única vs por vendedor/cajero', p:'P2', c:'C11', dur:'3:30'},
+     {seq:'020', t:'Asientos automáticos y manuales, egresos, centro de costo', p:'P3', c:'C17', dur:'4:40'},
+     {seq:'030', t:'Apertura y cierre de caja', p:'P3', c:'C17', dur:'3:00'}
+   ]},
+   {name:'Bancos', videos:[
+     {seq:'040', t:'Bancos, transferencias y scan de comprobantes con IA', p:'P3', c:'C17', dur:'4:20'}
+   ]}
+ ]},
+ {id:'BAK-M80', name:'Informes', tag:'P+B', active:true, perfiles:PERFILES, subtemas:['Operativos','Vencimientos','Dashboard','Administrativos'], secciones:[
+   {name:'Informes de uso diario', videos:[
+     {seq:'010', t:'Informes operativos: saldos, listados, comisiones', p:'P2', c:'C11', dur:'4:00'},
+     {seq:'020', t:'Informe de vencimientos: cobranzas y pagos', p:'P2', c:'C11', dur:'3:40'}
+   ]},
+   {name:'Dashboard y administración', videos:[
+     {seq:'030', t:'Dashboard: KPIs del negocio', p:'P3', c:'C18', dur:'4:10', tag:'B'},
+     {seq:'040', t:'Informes administrativos: ingresos y egresos', p:'P3', c:'C18', dur:'3:50'}
+   ]}
+ ]},
+ {id:'BAK-M90', name:'Contable', tag:'B', active:true, perfiles:['Business'], subtemas:['Plan de cuentas','Asientos','Libros','Balance','Cierres'], secciones:[
+   {name:'Contabilidad Business', videos:[
+     {seq:'010', t:'Plan de cuentas: para qué sirve', p:'P4', c:'C19', dur:'4:00'},
+     {seq:'020', t:'Asientos automáticos: cómo se configuran', p:'P4', c:'C19', dur:'4:30'},
+     {seq:'030', t:'Libro diario, libro banco y mayor', p:'P4', c:'C19', dur:'4:10'},
+     {seq:'040', t:'Balance de suma y saldo', p:'P4', c:'C19', dur:'3:40'},
+     {seq:'050', t:'Ejercicios contables y cierres', p:'P4', c:'C19', dur:'4:20'}
+   ]}
+ ]},
+ {id:'BAK-M95', name:'Receptivo operador', tag:'B-nicho', active:true, perfiles:['Business'], subtemas:['Tarifario','Itinerario','Multidestino','Prestadores'], secciones:[
+   {name:'Tarifario e itinerarios', videos:[
+     {seq:'010', t:'Tarifario por proveedor: tipo, categoría, vigencia, temporada', p:'P4', c:'C20', dur:'4:40'},
+     {seq:'020', t:'Armar el itinerario con el tarifario', p:'P4', c:'C20', dur:'4:20'},
+     {seq:'030', t:'Modelos multidestino (paquetes)', p:'P4', c:'C20', dur:'4:00'},
+     {seq:'040', t:'Prestador nacional vs internacional e impacto impositivo', p:'P4', c:'C20', dur:'3:50'}
+   ]}
+ ]}
+];
+
+const ESCENAS = {
+  E1:{label:'E1 · Día cero', note:'Nada cargado todavía. Así ve la pantalla la primera persona que entra.'},
+  E2:{label:'E2 · IDs reservados', note:'Los 55 videos existen como IDs en backlog. Ninguno grabado, ningún banco de preguntas armado.'},
+  E3:{label:'E3 · Guionando y grabando', note:'Los de Prioridad 1 están entre guionados y grabados. El resto sigue en backlog.'},
+  E4:{label:'E4 · Ruta esencial publicada', note:'Los 12 videos de P1 están publicados: una agencia ya puede hacer una reserva completa. P2 en producción.'},
+  E5:{label:'E5 · En régimen', note:'Todo publicado. Aparece lo que era invisible antes: la cola de "a regrabar" cuando cambia el producto.'}
+};
+
+/* estado por escena (derivado, para no duplicar data) */
+function estadoDe(mod, vid, esc){
+  if(!mod.active) return 'backlog';
+  const p = vid.p;
+  if(esc==='E2') return 'backlog';
+  if(esc==='E3') return p==='P1' ? (vid.seq<'030'?'grabado':'guionado') : 'backlog';
+  if(esc==='E4') return p==='P1' ? 'publicado' : (p==='P2' ? 'guionado' : 'backlog');
+  if(esc==='E5'){
+    const regrabar = ['BAK-M30.020','BAK-M40.010','BAK-M20.010'];
+    return regrabar.includes(mod.id+'.'+vid.seq) ? 'a regrabar' : 'publicado';
+  }
+  return 'backlog';
+}
+function preguntasDe(mod, esc){
+  if(esc==='E1'||esc==='E2') return 0;
+  if(esc==='E3') return mod.id==='BAK-M00'?12:0;
+  if(esc==='E4'){
+    const listos = {'BAK-M00':50,'BAK-M10':50,'BAK-M20':50,'BAK-M30':38,'BAK-M40':22};
+    return listos[mod.id]||0;
+  }
+  return mod.active?50:0;
+}
+
+/* =========================================================
+   ESTADO DE LA UI
+   ========================================================= */
+const S = {
+  screen:'hub',
+  escena:'E4',
+  open:{'BAK-M30':true},
+  sel:null,          // {kind:'mod'|'sec'|'vid', modId, secIdx, vidSeq}
+  tab:'ficha',
+  quick:null,        // {modId, secIdx, modo:'tengo'|'reservar'}
+  checked:new Set(),
+  filtro:'',
+  soloPend:false,
+  importPaso:1,
+  omitidas:new Set()
+};
+
+const $ = s => document.querySelector(s);
+const el = (t,c,h)=>{const n=document.createElement(t); if(c)n.className=c; if(h!==undefined)n.innerHTML=h; return n;};
+const esc = s => String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+
+function toast(msg){
+  const t=$('#toast'); t.textContent=msg; t.classList.remove('hide');
+  clearTimeout(toast._id); toast._id=setTimeout(()=>t.classList.add('hide'),3600);
+}
+const stClass = s => 'st-'+s.replace(/\s+/g,'').replace('aregrabar','regrabar');
+
+function modulosVisibles(){
+  if(S.escena==='E1') return [];
+  return DATA;
+}
+function findMod(id){ return DATA.find(m=>m.id===id); }
+function vidId(mod,v){ return mod.id+'.'+v.seq; }
+function nextSeq(sec){
+  const nums = sec.videos.map(v=>parseInt(v.seq,10));
+  const max = nums.length?Math.max(...nums):0;
+  return String(max+10).padStart(3,'0');
+}
+
+/* =========================================================
+   RENDER · shell
+   ========================================================= */
+function render(){
+  $('#escenaNote').textContent = ESCENAS[S.escena].note;
+  document.querySelectorAll('.seg').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.esc===S.escena)));
+  document.querySelectorAll('.railitem[data-go]').forEach(b=>b.setAttribute('aria-current', String(b.dataset.go===S.screen)));
+  const crumbs = {hub:'Qué querés hacer', constructor:'Contenido › Estructura de la Academia', importar:'Contenido › Cargar desde planilla'};
+  $('#crumb').innerHTML = '<b>'+ESCENAS[S.escena].label+'</b> · '+crumbs[S.screen];
+  const host = $('#screens'); host.innerHTML='';
+  if(S.screen==='hub') host.appendChild(viewHub());
+  if(S.screen==='constructor') host.appendChild(viewConstructor());
+  if(S.screen==='importar') host.appendChild(viewImportar());
+}
+
+/* =========================================================
+   PANTALLA 1 · Hub — dos puertas de entrada
+   ========================================================= */
+function viewHub(){
+  const w = el('div','wrap');
+  const mods = modulosVisibles();
+  let total=0, pub=0, sinLink=0, regr=0, pregs=0;
+  mods.forEach(m=>m.secciones.forEach(s=>s.videos.forEach(v=>{
+    total++; const e=estadoDe(m,v,S.escena);
+    if(e==='publicado')pub++; if(e==='a regrabar')regr++;
+    if(e!=='publicado'&&e!=='a regrabar')sinLink++;
+  })));
+  mods.forEach(m=>pregs+=preguntasDe(m,S.escena));
+
+  w.innerHTML = `
+    <h1>¿Qué querés hacer?</h1>
+    <p class="lede">Elegí por la tarea, no por la tabla. El sistema se ocupa de los IDs, la superficie y el orden.</p>`;
+
+  const doors = el('div','doors');
+  doors.innerHTML = `
+    <button class="door" data-door="tengo">
+      <span class="kicker">Lo más frecuente</span>
+      <strong>Subir un video que ya tengo</strong>
+      <p>Pegás el link, elegís en qué parte de la Academia va y listo. Tres datos, nada más.</p>
+      <span class="who">Cualquier persona del equipo · no hace falta saber la estructura de antemano</span>
+    </button>
+    <button class="door" data-door="reservar">
+      <span class="kicker">Planificación</span>
+      <strong>Reservar lo que se va a grabar</strong>
+      <p>Creás los videos que todavía no existen para que aparezcan en el plan de rodaje. Sin link, porque todavía no hay.</p>
+      <span class="who">Producción de contenido (Majo) · se puede pegar toda la planilla de una</span>
+    </button>`;
+  w.appendChild(doors);
+
+  if(mods.length===0){
+    w.appendChild(el('div','emptynote','<b>La Academia está vacía.</b><br>Empezá cargando la estructura de módulos desde la planilla maestra, o creá el primer módulo a mano.<div class="row" style="margin-top:12px"><button class="btn btn-p" data-go="importar">Cargar desde planilla</button><button class="btn" data-go="constructor">Crear el primer módulo</button></div>'));
+    w.appendChild(el('div','note','<b>Nota de diseño ·</b> Una pantalla vacía es una invitación a actuar, no un error. En E1 no mostramos una tabla sin filas: mostramos los dos caminos posibles.'));
+    return w;
+  }
+
+  const mini = el('div','mini');
+  mini.innerHTML = `
+    <div class="stat"><b>${total}</b><span>videos en el mapa</span></div>
+    <div class="stat"><b>${pub}</b><span>publicados</span></div>
+    <div class="stat"><b>${sinLink}</b><span>todavía sin grabar</span></div>
+    <div class="stat"><b>${regr}</b><span>marcados a regrabar</span></div>`;
+  w.appendChild(mini);
+
+  const list = el('div','card');
+  list.innerHTML = `<div style="padding:12px 14px;border-bottom:1px solid var(--line-soft)"><h3 style="margin:0">Lo que está esperando algo</h3></div>`;
+  const ul = el('ul','tasklist');
+  const items = [];
+  if(regr) items.push(['Hay '+regr+' videos marcados a regrabar','Salieron cambios de producto que los dejaron viejos','Ver la cola']);
+  const modsIncompletos = mods.filter(m=>m.active && preguntasDe(m,S.escena)>0 && preguntasDe(m,S.escena)<50);
+  modsIncompletos.slice(0,2).forEach(m=>items.push([m.id+' · banco incompleto', preguntasDe(m,S.escena)+' de 50 preguntas cargadas','Completar banco']));
+  if(sinLink) items.push([sinLink+' videos esperan grabación','Están reservados con ID y guion pendiente','Ver plan de rodaje']);
+  items.forEach(([a,b,c])=>{
+    const li=el('li'); li.innerHTML=`<span class="grow"><b style="font-weight:500">${esc(a)}</b><br><span class="sub">${esc(b)}</span></span><button class="btn btn-sm" data-go="constructor">${esc(c)}</button>`;
+    ul.appendChild(li);
+  });
+  list.appendChild(ul);
+  w.appendChild(list);
+
+  w.appendChild(el('div','note','<b>Nota de diseño ·</b> Las dos puertas resuelven la regla del modelo que dice que el alta de video nunca pide link de YouTube. En vez de explicarla con un mensaje, cada persona entra por donde su tarea tiene sentido y la regla deja de ser un obstáculo.'));
+  return w;
+}
+
+/* =========================================================
+   PANTALLA 2 · Constructor — árbol + detalle
+   ========================================================= */
+function viewConstructor(){
+  const split = el('div','split');
+  split.appendChild(treeCol());
+  split.appendChild(detailCol());
+  return split;
+}
+
+function treeCol(){
+  const col = el('div','treecol');
+
+  const bar = el('div','treebar');
+  bar.innerHTML = `
+    <input type="text" id="filtro" placeholder="Buscar módulo, video o ID" value="${esc(S.filtro)}" aria-label="Buscar">
+    <label class="row" style="font-size:12px;color:var(--muted);gap:5px;margin:0">
+      <input type="checkbox" id="soloPend" ${S.soloPend?'checked':''} style="accent-color:var(--accent)"> Solo lo pendiente
+    </label>
+    <button class="btn btn-sm" id="collapseAll" style="margin-left:auto">Cerrar todo</button>`;
+  col.appendChild(bar);
+
+  const tree = el('div','tree');
+  const mods = modulosVisibles();
+
+  if(mods.length===0){
+    tree.appendChild(el('div','emptynote','<b>Todavía no hay módulos.</b><br>Creá el primero o pegá la planilla maestra.'));
+    tree.querySelector('.emptynote').style.margin='14px';
+    col.appendChild(tree);
+    return col;
+  }
+
+  mods.forEach(mod=>{
+    const isOpen = !!S.open[mod.id];
+    const pregs = preguntasDe(mod,S.escena);
+
+    // ---- nodo módulo
+    const n = el('div','node n-mod'+(mod.active?'':' inactive')+(isSel('mod',mod.id)?' sel':''));
+    n.innerHTML = `
+      <button class="twist" data-toggle="${mod.id}" aria-expanded="${isOpen}" aria-label="Abrir módulo">${isOpen?'▾':'▸'}</button>
+      <button class="label" data-sel="mod|${mod.id}">${esc(mod.name)}</button>
+      <span class="idbadge">${mod.id}</span>
+      <span class="tag">${esc(mod.tag)}</span>
+      ${mod.active?'':'<span class="chip st-obsoleto">inactivo</span>'}
+      <span class="tag" title="Preguntas del banco de este módulo">${pregs}/50 preg.</span>`;
+    tree.appendChild(n);
+
+    if(!isOpen) return;
+
+    if(!mod.active){
+      tree.appendChild(el('div','legend-inactive','Módulo inactivo: no se muestra a las agencias y no acepta videos nuevos hasta activarlo.'));
+    }
+
+    mod.secciones.forEach((sec,si)=>{
+      const ns = el('div','node n-sec'+(mod.active?'':' inactive')+(isSel('sec',mod.id,si)?' sel':''));
+      ns.innerHTML = `
+        <span class="twist" aria-hidden="true">└</span>
+        <button class="label" data-sel="sec|${mod.id}|${si}">${esc(sec.name)}</button>
+        <span class="tag">${sec.videos.length} videos</span>`;
+      tree.appendChild(ns);
+
+      sec.videos.forEach(v=>{
+        const e = estadoDe(mod,v,S.escena);
+        if(S.soloPend && (e==='publicado')) return;
+        const id = vidId(mod,v);
+        if(S.filtro && !(id+' '+v.t).toLowerCase().includes(S.filtro.toLowerCase())) return;
+        const nv = el('div','node n-vid'+(isSel('vid',mod.id,si,v.seq)?' sel':''));
+        nv.innerHTML = `
+          <input type="checkbox" class="selbox" data-check="${id}" ${S.checked.has(id)?'checked':''} aria-label="Seleccionar ${id}">
+          <span class="idbadge">${id}</span>
+          <button class="label" data-sel="vid|${mod.id}|${si}|${v.seq}">${esc(v.t)}</button>
+          <span class="tag">${v.p}</span>
+          <span class="chip ${stClass(e)}">${e}</span>`;
+        tree.appendChild(nv);
+      });
+
+      // alta de video en contexto
+      if(mod.active){
+        if(S.quick && S.quick.modId===mod.id && S.quick.secIdx===si){
+          tree.appendChild(quickForm(mod,sec,si));
+        } else {
+          const ar = el('div','addrow');
+          ar.innerHTML = `<button class="addbtn" data-add="vid|${mod.id}|${si}">+ agregar video acá</button>`;
+          tree.appendChild(ar);
+        }
+      }
+    });
+
+    if(mod.active){
+      const ars = el('div','addrow sec');
+      ars.innerHTML = `<button class="addbtn" data-add="sec|${mod.id}">+ agregar sección a ${mod.id}</button>`;
+      tree.appendChild(ars);
+    }
+  });
+
+  const arm = el('div','addrow mod');
+  arm.innerHTML = `<button class="addbtn" data-add="mod">+ agregar módulo</button>`;
+  tree.appendChild(arm);
+
+  tree.appendChild(el('div','note','<b>Nota de diseño ·</b> El botón de alta vive <i>dentro</i> del nodo padre. Nadie tiene que recordar a qué módulo o sección pertenece lo que está creando: el contexto es el lugar donde hizo clic. Fijate que BAK-M35, por estar inactivo, directamente no ofrece "agregar video": la regla de integridad se ve, no se explica con un error.'));
+
+  col.appendChild(tree);
+
+  if(S.checked.size){
+    const b = el('div','bulk');
+    b.innerHTML = `
+      <span class="count">${S.checked.size} seleccionados</span>
+      <button class="btn btn-sm" data-bulk="regrabar">Marcar a regrabar</button>
+      <button class="btn btn-sm" data-bulk="publicado">Marcar publicado</button>
+      <button class="btn btn-sm" data-bulk="cohorte">Asignar cohorte…</button>
+      <button class="btn btn-sm" data-bulk="mover">Mover a otra sección…</button>
+      <button class="btn btn-sm x" data-bulk="clear">Deseleccionar</button>`;
+    col.appendChild(b);
+  }
+  return col;
+}
+
+function isSel(kind,modId,secIdx,vidSeq){
+  const s=S.sel; if(!s||s.kind!==kind||s.modId!==modId) return false;
+  if(kind==='mod') return true;
+  if(s.secIdx!==secIdx) return false;
+  if(kind==='sec') return true;
+  return s.vidSeq===vidSeq;
+}
+
+/* ---- alta rápida de video: 3 preguntas + metadata derivada ---- */
+function quickForm(mod,sec,si){
+  const seq = nextSeq(sec);
+  const modo = S.quick.modo || 'tengo';
+  const q = el('div','quick');
+  q.innerHTML = `
+    <div class="qhead">
+      <b>Nuevo video</b>
+      <small>en ${esc(mod.name)} › ${esc(sec.name)}</small>
+    </div>
+
+    <div class="qgrid">
+      <div>
+        <label for="qt">¿Qué enseña este video?</label>
+        <input type="text" id="qt" placeholder="Ej: Anular un recibo ya emitido" autocomplete="off">
+        <p class="hint">Escribilo como se lo contarías a alguien: una funcionalidad, un concepto.</p>
+      </div>
+
+      <div>
+        <label>¿En qué estado está?</label>
+        <div class="radioset" id="qmodo">
+          <label class="radiopill ${modo==='tengo'?'on':''}"><input type="radio" name="modo" value="tengo" ${modo==='tengo'?'checked':''}> Ya lo tengo grabado</label>
+          <label class="radiopill ${modo==='reservar'?'on':''}"><input type="radio" name="modo" value="reservar" ${modo==='reservar'?'checked':''}> Todavía no se grabó</label>
+        </div>
+      </div>
+
+      ${modo==='tengo' ? `
+      <div>
+        <label for="qlink">Link de YouTube</label>
+        <input type="url" id="qlink" placeholder="https://youtube.com/watch?v=…">
+        <p class="hint">De acá se toma la duración sola. Si el video es privado o no listado, avisamos antes de publicar.</p>
+      </div>` : `
+      <div class="derived">Queda reservado en <b>backlog</b>, sin link. Aparece en el plan de rodaje para guionar y grabar.</div>`}
+    </div>
+
+    <div class="derived">
+      <dl>
+        <dt>ID que le toca</dt><dd><span class="idbadge">${mod.id}.${seq}</span> <button class="info" data-info="id" title="De dónde sale este ID" aria-label="De dónde sale este ID">i</button></dd>
+        <dt>Superficie</dt><dd>${mod.id.split('-')[0]} · ${mod.id.split('-')[0]==='BAK'?'SIGMMA Backend':'—'}</dd>
+        <dt>Módulo y sección</dt><dd>${esc(mod.name)} › ${esc(sec.name)}</dd>
+        <dt>Plan al que aplica</dt><dd>${esc(mod.tag)} <span class="hint" style="display:inline">(heredado del módulo)</span></dd>
+        <dt>Orden</dt><dd>último de la sección</dd>
+      </dl>
+    </div>
+
+    <div class="row" style="margin-top:12px">
+      <button class="btn btn-p" data-quick="save">Guardar video</button>
+      <button class="btn" data-quick="save-more">Guardar y crear otro</button>
+      <button class="btn-q" data-quick="cancel">Cancelar</button>
+      <span class="hint" style="margin-left:auto">Cohorte, prioridad y versión de producto se completan después, en la ficha.</span>
+    </div>`;
+  return q;
+}
+
+/* ---- panel de detalle ---- */
+function detailCol(){
+  const d = el('div','detail');
+  if(!S.sel){
+    const wrap=el('div','dbody');
+    wrap.appendChild(el('div','emptynote','Elegí un módulo, una sección o un video del árbol para ver y editar su ficha.'));
+    wrap.appendChild(el('div','note','<b>Nota de diseño ·</b> Maestro-detalle: la estructura queda siempre visible a la izquierda mientras editás a la derecha. Nunca perdés de vista dónde estás parada.'));
+    d.appendChild(wrap); return d;
+  }
+  const mod = findMod(S.sel.modId);
+  if(S.sel.kind==='mod') return detailModulo(d,mod);
+  if(S.sel.kind==='sec') return detailSeccion(d,mod,mod.secciones[S.sel.secIdx]);
+  return detailVideo(d,mod,mod.secciones[S.sel.secIdx]);
+}
+
+function tabsBar(list){
+  const t=el('div','tabs');
+  list.forEach(([k,lbl])=>{
+    const b=el('button','tab',esc(lbl));
+    b.setAttribute('role','tab'); b.setAttribute('aria-selected',String(S.tab===k)); b.dataset.tab=k;
+    t.appendChild(b);
+  });
+  return t;
+}
+
+function detailModulo(d,mod){
+  const pregs = preguntasDe(mod,S.escena);
+  const h=el('div','dhead');
+  h.innerHTML=`
+    <div class="idline"><span class="idbadge">${mod.id}</span><span class="tag">${esc(mod.tag)}</span>${mod.active?'<span class="chip st-publicado">activo</span>':'<span class="chip st-obsoleto">inactivo</span>'}</div>
+    <h2>${esc(mod.name)}</h2>
+    <div class="dmeta"><span class="tag">${mod.secciones.length} secciones</span><span class="tag">${mod.secciones.reduce((a,s)=>a+s.videos.length,0)} videos</span><span class="tag">${pregs}/50 preguntas</span></div>`;
+  d.appendChild(h);
+  const tabs = ['ficha','banco','perfiles'].includes(S.tab)?S.tab:'ficha'; S.tab=tabs;
+  d.appendChild(tabsBar([['ficha','Ficha'],['banco','Banco de preguntas'],['perfiles','Perfiles de agencia']]));
+  const b=el('div','dbody');
+
+  if(S.tab==='ficha'){
+    b.innerHTML=`
+      <div class="fieldgrid">
+        <div><label>ID del módulo</label><div class="ro"><span class="mono">${mod.id}</span><button class="info" data-info="id" aria-label="Cómo se arma el ID">i</button><span class="lock">generado por el sistema</span></div></div>
+        <div><label for="mn">Nombre</label><input type="text" id="mn" value="${esc(mod.name)}"></div>
+        <div><label for="mt">Plan al que aplica</label>
+          <select id="mt"><option ${mod.tag==='P+B'?'selected':''}>P+B — todos los planes</option><option ${mod.tag==='B'?'selected':''}>B — solo Business</option><option ${mod.tag==='B-nicho'?'selected':''}>B-nicho — Business, caso puntual</option></select></div>
+        <div><label>Visible para las agencias</label>
+          <div class="radioset">
+            <label class="radiopill ${mod.active?'on':''}"><input type="radio" name="act" ${mod.active?'checked':''}> Sí, está publicado</label>
+            <label class="radiopill ${mod.active?'':'on'}"><input type="radio" name="act" ${mod.active?'':'checked'}> No, en preparación</label>
+          </div>
+          <p class="hint">${mod.active?'Si lo pasás a "en preparación", sus videos y su evaluación dejan de verse en la Academia.':'Mientras esté en preparación no acepta videos nuevos ni se muestra a las agencias.'}</p>
+        </div>
+      </div>
+      <div class="note"><b>Nota de diseño ·</b> El campo se llama "visible para las agencias", no "estado activo/inactivo". Se nombra por lo que la persona quiere lograr, no por el valor que se guarda en la base.</div>`;
+  }
+
+  if(S.tab==='banco'){
+    const total = pregs;
+    const cls = total===0?'zero':(total<50?'low':'');
+    let subhtml='';
+    if(mod.subtemas.length===0){
+      subhtml='<div class="emptynote">Este módulo todavía no tiene sub-temas definidos. Los sub-temas son las etiquetas que garantizan que las 10 preguntas del examen no dejen afuera un concepto central.</div>';
+    } else {
+      const reparto = repartir(total, mod.subtemas.length);
+      subhtml='<ul class="sublist">'+mod.subtemas.map((s,i)=>{
+        const n=reparto[i];
+        return `<li><div class="lineup"><span>${esc(s)}</span><span class="n">${n} preguntas ${n===0?'<span class="miss">· sin cubrir</span>':''}</span></div><div class="bar ${n===0?'zero':(n<6?'low':'')}"><i style="width:${Math.min(100,n/8*100)}%"></i></div></li>`;
+      }).join('')+'</ul>';
+    }
+    b.innerHTML=`
+      <h3>Banco de preguntas del módulo</h3>
+      <p class="hint" style="margin:0 0 10px">El examen toma 10 al azar de estas 50. Por eso importa que ningún sub-tema quede en cero.</p>
+      <div style="font-family:var(--mono);font-size:20px">${total}<span style="color:var(--muted);font-size:13px"> / 50</span></div>
+      <div class="bar ${cls}"><i style="width:${total/50*100}%"></i></div>
+      ${subhtml}
+      <div class="sep"></div>
+      <div class="row"><button class="btn btn-p btn-sm" data-go="importar">Pegar preguntas desde planilla</button><button class="btn btn-sm">Agregar una pregunta</button></div>
+      <div class="note"><b>Nota de diseño ·</b> El banco vive como solapa del módulo, no como pantalla suelta. Así la relación "las preguntas son del módulo, no del video" queda clara sin necesidad de explicarla. El contador por sub-tema convierte una regla invisible en algo que se ve de un vistazo.</div>`;
+  }
+
+  if(S.tab==='perfiles'){
+    b.innerHTML=`
+      <h3>¿Qué agencias tienen que hacer este módulo?</h3>
+      <div class="radioset" style="margin:10px 0 0;flex-direction:column;align-items:stretch">
+        ${PERFILES.map(p=>`<label class="radiopill ${mod.perfiles.includes(p)?'on':''}" style="justify-content:flex-start"><input type="checkbox" ${mod.perfiles.includes(p)?'checked':''}> ${p}</label>`).join('')}
+      </div>
+      <p class="hint">Cada agencia ve solo los módulos de su perfil. Si desmarcás todos, el módulo no se le muestra a nadie.</p>
+      <div class="note"><b>Nota de diseño ·</b> Esto es la matriz Perfil × Módulo del modelo de datos, pero mostrada desde el módulo (donde la persona está trabajando) en vez de como una grilla aparte de 3 × 11 que nadie sabe cuándo abrir.</div>`;
+  }
+  d.appendChild(b); return d;
+}
+
+function repartir(total,n){
+  const out=new Array(n).fill(0); let left=total, i=0;
+  const objetivo = Math.ceil(50/n);
+  while(left>0 && i<n*3){ const k=i%n; const add=Math.min(objetivo-out[k], left, 3); if(add>0){out[k]+=add; left-=add;} i++; }
+  return out;
+}
+
+function detailSeccion(d,mod,sec){
+  const h=el('div','dhead');
+  h.innerHTML=`<div class="idline"><span class="tag">Sección de ${mod.id}</span></div><h2>${esc(sec.name)}</h2><div class="dmeta"><span class="tag">${sec.videos.length} videos</span></div>`;
+  d.appendChild(h);
+  S.tab='ficha';
+  d.appendChild(tabsBar([['ficha','Ficha']]));
+  const b=el('div','dbody');
+  b.innerHTML=`
+    <div class="fieldgrid">
+      <div><label for="sn">Nombre de la sección</label><input type="text" id="sn" value="${esc(sec.name)}"><p class="hint">Es solo un agrupamiento visual dentro del módulo. Ayuda a que una lista de 7 videos se lea como dos ideas.</p></div>
+      <div><label>Módulo al que pertenece</label><div class="ro"><span class="mono">${mod.id}</span> · ${esc(mod.name)}<span class="lock">definido por su lugar en el árbol</span></div></div>
+      <div><label>Orden dentro del módulo</label><div class="row"><button class="btn btn-sm">↑ Subir</button><button class="btn btn-sm">↓ Bajar</button><span class="hint" style="margin:0">o arrastrala en el árbol</span></div></div>
+    </div>
+    <div class="note"><b>Nota de diseño ·</b> El módulo padre es de solo lectura porque ya lo eligió el árbol. Y el reordenamiento ofrece botones además de arrastrar: arrastrar solo con mouse deja afuera a quien navega con teclado.</div>`;
+  d.appendChild(b); return d;
+}
+
+function detailVideo(d,mod,sec){
+  const v = sec.videos.find(x=>x.seq===S.sel.vidSeq);
+  const id = vidId(mod,v);
+  const e = estadoDe(mod,v,S.escena);
+  const tieneLink = (e==='publicado'||e==='a regrabar');
+  const h=el('div','dhead');
+  h.innerHTML=`
+    <div class="idline">
+      <span class="idbadge">${id}</span>
+      <button class="info" data-info="id" aria-label="Cómo se arma el ID">i</button>
+      <span class="chip ${stClass(e)}">${e}</span>
+    </div>
+    <h2>${esc(v.t)}</h2>
+    <div class="dmeta"><span class="tag">${esc(v.tag||mod.tag)}</span><span class="tag">Prioridad ${v.p}</span><span class="tag">Cohorte ${esc(v.c)}</span>${v.dur?`<span class="tag">${v.dur}</span>`:''}</div>`;
+  d.appendChild(h);
+  const tabs = ['ficha','prod','traza'].includes(S.tab)?S.tab:'ficha'; S.tab=tabs;
+  d.appendChild(tabsBar([['ficha','Ficha'],['prod','Producción'],['traza','Trazabilidad']]));
+  const b=el('div','dbody');
+
+  if(S.tab==='ficha'){
+    const falta=[];
+    if(!tieneLink) falta.push('Link del video');
+    if(!v.dur) falta.push('Duración');
+    if(v.c==='—') falta.push('Cohorte de grabación');
+    b.innerHTML=`
+      <div class="fieldgrid">
+        <div><label>ID permanente</label>
+          <div class="ro"><span class="mono">${id}</span><span class="lock">no cambia nunca, ni si lo regrabás</span></div>
+        </div>
+        <div><label for="vt">¿Qué enseña?</label><input type="text" id="vt" value="${esc(v.t)}"></div>
+        <div><label>Dónde está en la Academia</label><div class="ro">${esc(mod.name)} › ${esc(sec.name)}<span class="lock">se cambia arrastrando en el árbol</span></div></div>
+        <div><label for="vl">Link del video</label><input type="url" id="vl" value="${tieneLink?'https://youtube.com/watch?v=demo'+v.seq:''}" placeholder="Todavía no hay video grabado"><p class="hint">${tieneLink?'Duración leída del video: '+v.dur:'Se completa cuando el video exista. Mientras tanto el ID queda reservado.'}</p></div>
+        <div><label>Estado</label>
+          <div class="row" style="flex-wrap:wrap">
+            <span class="chip ${stClass(e)}">${e}</span>
+            ${siguienteEstado(e)?`<button class="btn btn-sm btn-p">${siguienteEstado(e)}</button>`:''}
+            <button class="btn-q btn-sm">Ver los 7 estados</button>
+          </div>
+          <p class="hint">Mostramos el paso siguiente como botón, en vez de una lista de siete opciones donde hay que adivinar cuál corresponde.</p>
+        </div>
+      </div>
+      ${falta.length?`<div class="sep"></div><h3>Falta completar</h3><ul class="checklist">${falta.map(f=>`<li><span class="mk miss">○</span>${esc(f)}</li>`).join('')}</ul>`:'<div class="sep"></div><ul class="checklist"><li><span class="mk ok">●</span>Ficha completa</li></ul>'}
+      <div class="note"><b>Nota de diseño ·</b> El ID no se tipea nunca: se deriva de la posición en el árbol y se muestra como dato de solo lectura. La arquitectura se conserva entera y el costo de entenderla baja a cero.</div>`;
+  }
+
+  if(S.tab==='prod'){
+    b.innerHTML=`
+      <div class="fieldgrid">
+        <div><label for="pc">Cohorte de grabación</label><select id="pc"><option>${esc(v.c)}</option><option>Sin asignar</option></select><p class="hint">Un cohorte agrupa videos que comparten el mismo escenario de datos: se prepara una vez y se graban varios de corrido.</p></div>
+        <div><label for="pp">Prioridad de grabado</label><select id="pp"><option>${v.p} </option></select><p class="hint">P1 es lo que más se repite en los onboardings. No cambia el orden en que la agencia lo ve.</p></div>
+        <div><label>Guion</label><div class="row"><button class="btn btn-sm">${e==='backlog'?'Escribir guion':'Ver guion'}</button><span class="hint" style="margin:0">plantilla: intro a cámara · cuerpo en pantalla · cierre</span></div></div>
+        <div><label>Escenario que hay que dejar listo antes de grabar</label><textarea rows="3" placeholder="Ej: cliente demo ya creado, file abierto con un pasajero">${e==='backlog'?'':'Viene del video anterior del cohorte.'}</textarea></div>
+      </div>
+      <div class="note"><b>Nota de diseño ·</b> Todo esto existía en el alta original y lo saqué de ahí. Son datos de producción: importan cuando se va a grabar, no cuando el video se crea. Diferirlos es lo que baja el alta de doce campos a tres.</div>`;
+  }
+
+  if(S.tab==='traza'){
+    b.innerHTML=`
+      <div class="fieldgrid">
+        <div><label>Versión del video</label><div class="ro">v1<span class="lock">sube al regrabar</span></div></div>
+        <div><label>Versión de producto que muestra</label><div class="ro">sgm2026.07<span class="lock">de la release</span></div></div>
+        <div><label>Qué desarrollo lo dejó viejo</label>
+          ${e==='a regrabar'?'<div class="ro" style="border-color:var(--warn);background:var(--warn-soft)">Cambió la carga de voucher en sgm2026.09 — hay que regrabar</div>':'<div class="ro">Nada pendiente</div>'}
+          <p class="hint">Cuando producción declara el impacto de un desarrollo, los videos afectados aparecen acá solos.</p>
+        </div>
+        <div><label>Historial</label>
+          <ul class="checklist">
+            <li><span class="mk ok">●</span>Creado el 20/07/2026 · reserva de ID</li>
+            ${e!=='backlog'?'<li><span class="mk ok">●</span>Guion listo el 24/07/2026</li>':''}
+            ${tieneLink?'<li><span class="mk ok">●</span>Publicado el 05/08/2026</li>':''}
+            ${e==='a regrabar'?'<li><span class="mk miss">○</span>Marcado a regrabar el 28/08/2026</li>':''}
+          </ul>
+        </div>
+      </div>
+      <div class="note"><b>Nota de diseño ·</b> El ID permanente vuelve barato el versionado: el video cambia, sube la versión, y todo lo que apunta a ese ID (playlist, evaluación, informes) sigue funcionando.</div>`;
+  }
+  d.appendChild(b); return d;
+}
+
+function siguienteEstado(e){
+  const m={'backlog':'Marcar como guionado','guionado':'Marcar como grabado','grabado':'Marcar como editado','editado':'Publicar','a regrabar':'Publicar nueva versión'};
+  return m[e]||null;
+}
+
+/* =========================================================
+   PANTALLA 3 · Cargar desde planilla
+   ========================================================= */
+const FILAS = [
+ ['BAK-M30.060','Estados del voucher y cotización','P+B','P3','C12',null],
+ ['BAK-M30.070','Modelos: armar plantillas de venta reutilizables','P+B','P3','C12',null],
+ ['BAK-M40.060','Anular un recibo ya emitido','P+B','P3','C14',null],
+ ['BAK-M31.010','Tráfico: asignación de butaca','P+B','P3','—','El módulo BAK-M31 no existe. ¿Querías decir BAK-M35?'],
+ ['BAK-M50.070','Factura E de exportación','P+B','P3','C15',null],
+ ['BAK-M70.050','Conciliación bancaria automática','P+B','P3','C17',null],
+ ['BAK-M35.010','Tráfico: asignación de butaca','P+B','P3','—','Ya existe un video con este ID en la Academia.'],
+ ['BAK-M80.050','Informe de rentabilidad por vendedor','','P3','C18','Falta el plan al que aplica (P+B, B o B-nicho).'],
+ ['BAK-M20.070','Unificar clientes duplicados','P+B','P2','C06',null]
+];
+
+function viewImportar(){
+  const w=el('div','wrap');
+  w.innerHTML=`<h1>Cargar desde planilla</h1><p class="lede">Copiá las filas del tablero maestro y pegalas acá. Antes de guardar nada, te muestro fila por fila qué entró bien y qué hay que corregir.</p>`;
+
+  const steps=el('div','steps');
+  [['1','Pegar las filas'],['2','Revisar'],['3','Confirmar']].forEach(([n,l],i)=>{
+    const s=el('div','step',`<b>${l}</b><span>paso ${n} de 3</span>`);
+    s.dataset.on = String(S.importPaso===i+1);
+    steps.appendChild(s);
+  });
+  w.appendChild(steps);
+
+  if(S.importPaso===1){
+    const c=el('div','card'); c.style.padding='16px';
+    c.innerHTML=`
+      <label for="pasteBox">Pegá acá (una fila por video)</label>
+      <textarea id="pasteBox" rows="9" placeholder="BAK-M30.060	Estados del voucher y cotización	P+B	P3	C12
+BAK-M30.070	Modelos: plantillas de venta	P+B	P3	C12"></textarea>
+      <p class="hint">Columnas esperadas: ID (opcional, lo generamos si falta) · qué enseña · plan · prioridad · cohorte. El orden de las columnas se puede ajustar en el paso 2.</p>
+      <div class="row" style="margin-top:14px">
+        <button class="btn btn-p" data-imp="demo">Revisar las filas</button>
+        <button class="btn" data-imp="csv">Subir un archivo CSV</button>
+        <span class="hint" style="margin-left:auto">También podés pegar preguntas del banco: mismo flujo, columnas distintas.</span>
+      </div>`;
+    w.appendChild(c);
+    w.appendChild(el('div','note','<b>Nota de diseño ·</b> Nadie carga 55 videos ni 50 preguntas de a uno. Como los datos ya viven en una planilla, la vía más corta es aceptar el pegado directo en vez de pedirle a la persona que los transcriba a un formulario.'));
+    return w;
+  }
+
+  const buenas = FILAS.filter((f,i)=>!f[5] && !S.omitidas.has(i));
+  const malas = FILAS.filter((f,i)=>f[5] && !S.omitidas.has(i));
+
+  const tw=el('div','tablewrap');
+  const tb=el('table');
+  tb.innerHTML=`<thead><tr><th style="width:26px"></th><th>ID</th><th>Qué enseña</th><th>Plan</th><th>Pri.</th><th>Cohorte</th></tr></thead>`;
+  const body=el('tbody');
+  FILAS.forEach((f,i)=>{
+    if(S.omitidas.has(i)) return;
+    const bad=!!f[5];
+    const tr=el('tr'); tr.dataset.bad=String(bad);
+    tr.innerHTML=`
+      <td>${bad?'<span class="miss">✕</span>':'<span class="ok">✓</span>'}</td>
+      <td class="cellmono">${esc(f[0])}</td>
+      <td>${esc(f[1])}${bad?`<span class="rowerr">${esc(f[5])}</span><span class="rowfix"><button class="btn btn-sm" data-fix="${i}">Corregir</button><button class="btn btn-sm" data-skip="${i}">Omitir fila</button></span>`:''}</td>
+      <td>${esc(f[2])||'<span class="miss">—</span>'}</td>
+      <td>${esc(f[3])}</td>
+      <td>${esc(f[4])}</td>`;
+    body.appendChild(tr);
+  });
+  tb.appendChild(body); tw.appendChild(tb); w.appendChild(tw);
+
+  const sum=el('div','summary');
+  sum.innerHTML=`
+    <span class="ok"><b>${buenas.length}</b> filas listas</span>
+    <span class="bad miss"><b>${malas.length}</b> con algo para revisar</span>
+    <span style="margin-left:auto" class="row">
+      <button class="btn" data-imp="back">Volver a pegar</button>
+      <button class="btn btn-p" data-imp="ok" ${buenas.length?'':'disabled'}>Importar ${buenas.length} videos</button>
+    </span>`;
+  w.appendChild(sum);
+  w.appendChild(el('div','note','<b>Nota de diseño ·</b> Vista previa obligatoria: nunca un import a ciegas. Cada error se explica en la fila que lo causó y ofrece la salida ahí mismo (corregir u omitir), en lugar de rechazar el archivo entero por una celda vacía.'));
+  return w;
+}
+
+/* =========================================================
+   EVENTOS
+   ========================================================= */
+document.addEventListener('click', ev=>{
+  const t = ev.target.closest('[data-go],[data-door],[data-esc],[data-toggle],[data-sel],[data-add],[data-quick],[data-tab],[data-bulk],[data-imp],[data-fix],[data-skip],[data-info],#collapseAll');
+  if(!t) return;
+
+  if(t.dataset.go){ S.screen=t.dataset.go; S.importPaso=1; render(); return; }
+
+  if(t.dataset.door){
+    S.screen='constructor';
+    const mod = DATA.find(m=>m.id==='BAK-M40') || DATA[0];
+    S.open[mod.id]=true;
+    S.quick={modId:mod.id, secIdx:0, modo: t.dataset.door==='tengo'?'tengo':'reservar'};
+    S.sel=null;
+    render();
+    toast(t.dataset.door==='tengo' ? 'Elegí dónde va el video y pegá el link.' : 'Reservá el ID ahora; el link se carga cuando exista el video.');
+    return;
+  }
+
+  if(t.dataset.esc){ S.escena=t.dataset.esc; S.checked.clear(); S.quick=null; if(S.escena==='E1'){S.sel=null;} render(); return; }
+
+  if(t.dataset.toggle){ const id=t.dataset.toggle; S.open[id]=!S.open[id]; render(); return; }
+
+  if(t.id==='collapseAll'){ S.open={}; S.quick=null; render(); return; }
+
+  if(t.dataset.sel){
+    const [kind,modId,secIdx,vidSeq]=t.dataset.sel.split('|');
+    S.sel={kind,modId,secIdx:secIdx!==undefined?+secIdx:undefined,vidSeq};
+    if(kind==='mod') S.open[modId]=true;
+    S.tab='ficha';
+    render(); return;
+  }
+
+  if(t.dataset.add){
+    const parts=t.dataset.add.split('|');
+    if(parts[0]==='vid'){ S.quick={modId:parts[1],secIdx:+parts[2],modo:'tengo'}; render(); return; }
+    if(parts[0]==='sec'){ toast('Alta de sección: se abriría con el módulo '+parts[1]+' ya fijado.'); return; }
+    if(parts[0]==='mod'){ toast('Alta de módulo: pide nombre, plan y perfiles. El ID lo propone el sistema.'); return; }
+  }
+
+  if(t.dataset.quick){
+    const a=t.dataset.quick;
+    if(a==='cancel'){ S.quick=null; render(); return; }
+    const mod=findMod(S.quick.modId), sec=mod.secciones[S.quick.secIdx];
+    const titulo=($('#qt')&&$('#qt').value.trim())||'Video sin título';
+    const seq=nextSeq(sec);
+    sec.videos.push({seq,t:titulo,p:'P3',c:'—',dur:'',_nuevo:true});
+    toast('Guardado como '+mod.id+'.'+seq+' · no tuviste que elegir superficie, módulo, sección ni orden.');
+    if(a==='save'){ S.quick=null; S.sel={kind:'vid',modId:mod.id,secIdx:S.quick?S.quick.secIdx:0,vidSeq:seq}; }
+    render(); return;
+  }
+
+  if(t.dataset.tab){ S.tab=t.dataset.tab; render(); return; }
+
+  if(t.dataset.bulk){
+    const a=t.dataset.bulk;
+    if(a==='clear'){ S.checked.clear(); render(); return; }
+    const n=S.checked.size;
+    if(a==='regrabar'){ toast(n+' videos marcados a regrabar. Dos clics en vez de '+n+' recorridos completos.'); }
+    if(a==='publicado'){ toast(n+' videos publicados.'); }
+    if(a==='cohorte'){ toast('Asignar cohorte a '+n+' videos de una sola vez.'); }
+    if(a==='mover'){ toast('Mover '+n+' videos a otra sección, manteniendo su ID.'); }
+    S.checked.clear(); render(); return;
+  }
+
+  if(t.dataset.imp){
+    const a=t.dataset.imp;
+    if(a==='demo'){ S.importPaso=2; render(); return; }
+    if(a==='back'){ S.importPaso=1; S.omitidas.clear(); render(); return; }
+    if(a==='csv'){ toast('También acepta CSV, con mapeo de columnas.'); return; }
+    if(a==='ok'){ S.importPaso=1; S.omitidas.clear(); S.screen='constructor'; render(); toast('Videos importados. Quedaron en backlog, con su ID reservado.'); return; }
+  }
+
+  if(t.dataset.fix){ toast('Se abriría la fila para corregirla, sin descartar el resto del pegado.'); return; }
+  if(t.dataset.skip){ S.omitidas.add(+t.dataset.skip); render(); return; }
+
+  if(t.dataset.info==='id'){
+    toast('El ID se arma solo: BAK (la superficie) + M30 (el módulo donde está) + 050 (de diez en diez, para poder intercalar). Es permanente: no cambia ni si regrabás el video.');
+    return;
+  }
+});
+
+document.addEventListener('change', ev=>{
+  const t=ev.target;
+  if(t.id==='notesChk'){ document.body.classList.toggle('notes-off', !t.checked); return; }
+  if(t.id==='soloPend'){ S.soloPend=t.checked; render(); return; }
+  if(t.dataset && t.dataset.check!==undefined){
+    const id=t.dataset.check;
+    t.checked?S.checked.add(id):S.checked.delete(id);
+    render(); return;
+  }
+  if(t.name==='modo'){ S.quick.modo=t.value; render(); return; }
+});
+
+document.addEventListener('input', ev=>{
+  if(ev.target.id==='filtro'){
+    S.filtro=ev.target.value;
+    const pos=ev.target.selectionStart;
+    render();
+    const f=$('#filtro'); if(f){f.focus(); f.setSelectionRange(pos,pos);}
+  }
+});
+
+render();
+</script>
+</body>
+</html>

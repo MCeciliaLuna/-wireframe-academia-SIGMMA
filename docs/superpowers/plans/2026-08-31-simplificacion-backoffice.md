@@ -1,0 +1,716 @@
+# Simplificación del backoffice de la Academia · Plan de implementación
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** cerrar el delta real entre lo que pide `docs/prompt-simplificacion.md` y lo que el repo ya construyó, sin romper ninguna de las 13 reglas cableadas ni bajar de 122 controles en verde.
+
+**Architecture:** el repo ya implementó entre el 60 % y el 70 % de las Fases 1 a 6 con otra forma —árbol en `modulo.html`, carga masiva en `importador.html`, IDs derivados por R2/R11, checklist de completitud en `video.html`, acciones en lote en `tablero.html`—. Lo que queda no es construcción: son **tres tareas desbloqueadas** y **nueve decisiones** donde el prompt contradice una decisión ya tomada. El plan pone las tres tareas primero, cada una con su control nuevo en `SIM.verificar()`, y deja las nueve decisiones como compuertas explícitas con la opción recomendada.
+
+**Tech Stack:** HTML plano sin templating · Tailwind v4 CSS-first (`@theme` cerrado) · JS por IIFE global, sin módulos ES · verificación por `SIM.verificar()` en node + greps + Chrome headless.
+
+**Spec:** `docs/prompt-simplificacion.md` (requerimientos) y `docs/html-model-simplificacion.html` (referencia de interacción, **no** de estilo). Contexto del repo: `CLAUDE.md`.
+
+## Global Constraints
+
+Todo requerimiento de cada tarea incluye implícitamente esta sección.
+
+- **Nomenclatura:** la empresa es **SIGMMA**, siempre en mayúsculas y con doble M. El producto es **SIGMMA.net** en contexto comercial y `sigmma.net` en técnico. **Nunca «SIGMA».**
+- **Planes comerciales:** **Professional · Business · Corporate**. El `PERFILES = ['Corporate','Business','Standard']` del HTML modelo es el error de documento fuente B-4/D-3: **no se copia.**
+- UI y comentarios de código en **español rioplatense**. Fechas `DD/MM/YYYY`; formato técnico `YYYY-MM-DD`.
+- **Sigue prohibido:** `fetch`, `XMLHttpRequest`, módulos ES, números agregados escritos a mano, hex sueltos en HTML o JS, clases de paleta Tailwind por defecto (`bg-blue-500`, `font-medium`, `text-2xl` no compilan).
+- **El almacén del navegador se escribe SOLO desde `academia-sim.js`.** Al comentar esta regla, no escribir el token: los controles de disciplina son greps a secas y un comentario que lo nombre hace fallar el control igual que si lo usara.
+- **R11:** los videos nacen en `backlog`, sin link y sin versión. El alta **nunca** pide un link de YouTube. Verificado por grep sobre `alta-videos.html` e `importador.html`.
+- **R12:** ningún camino puede dejar un video sin sección ni un módulo de biblioteca sin secciones.
+- **R13:** lo que ya está escrito se importa; lo que nace del trabajo se escribe en la pantalla donde ese trabajo ocurre. **Las preguntas no se importan nunca.**
+- **R6 · densidad alta**, R7 · desktop y todo el ancho, sin un solo breakpoint, piso 1160 px.
+- **Un botón que no hace nada es un bug, no una maqueta.** Si una acción no se puede ejecutar, el control va deshabilitado **con el motivo a la vista** — no presente y mudo.
+- **El sidebar está copiado literal en las 10 páginas de app.** Fuente canónica: `src/partials/app-shell.html`. Al replicar se cambia **solo** el `aria-current="page"`.
+- **Después de mutar, recargar con `UI.recargar()`, nunca con `location.reload()`** — descarta `reset=1` de la URL.
+- **Para probar cualquier URL con parámetros bajo `npm run serve`, usar la ruta sin `.html`.** `serve@14` responde 301 y se come el query string.
+- **Baseline verificado el 31/08/2026:** 122 controles, 0 fallas, `ok: true`.
+
+## Batería de regresión
+
+La misma para todas las tareas. Es el "run the tests" de este repo: no hay suite de unit tests.
+
+```bash
+cd /home/mcecilialuna/Escritorio/SIGMMA/ACADEMIA-BACKLOG/academia-SIGMMA
+
+# 1 · los controles del motor (122 + los que agregue la tarea)
+node -e 'global.window={};
+  ["academia-data","academia-agencias","academia-guiones","academia-preguntas","academia-sim",
+   "academia-import","academia-guia"]
+    .forEach(f => require(process.cwd()+"/assets/js/"+f+".js"));
+  const r = window.SIM.verificar();
+  console.log("controles:", r.controles.length, "| fallas:", r.fallas.length);
+  r.fallas.forEach(f => console.log("  FALLA:", f));
+  process.exit(r.ok ? 0 : 1)'
+
+# 2 · disciplina del design system
+mapfile -t PAGS < <(ls *.html | grep -v design-system.html)
+grep -n "font-medium\|font-semibold" "${PAGS[@]}"                          # → vacío
+grep -nE "#[0-9a-fA-F]{6}\b" "${PAGS[@]}" | grep -v href=                  # → vacío
+grep -nE "#[0-9a-fA-F]{6}\b" assets/js/*.js                                # → vacío
+grep -noE "\b(bg|text|border)-(red|blue|green|slate|sky|amber|emerald)-[0-9]{2,3}" "${PAGS[@]}"  # → vacío
+grep -rn "SIGMA[^M]" *.html *.md assets/js/ src/ | grep -v SIGMMA | grep -v '«SIGMA»'           # → vacío
+grep -n "fetch(\|XMLHttpRequest" assets/js/*.js *.html                     # → vacío
+grep -ln "localStorage" assets/js/*.js                                     # → academia-sim.js
+grep -nE '<(input|textarea)[^>]*(type="url"|link|youtu)' alta-videos.html importador.html       # → vacío
+
+# 3 · ningún link colgado
+mapfile -t TODAS < <(ls *.html)
+grep -rhoE 'href *=? *["'"'"']?[a-z0-9-]+\.html' "${TODAS[@]}" assets/js/*.js \
+  | grep -oE '[a-z0-9-]+\.html$' | sort -u \
+  | grep -vE '^(planes|app-shell)\.html$' \
+  | while read -r f; do [ -e "$f" ] || echo "COLGADO: $f"; done            # → vacío
+
+# 4 · los 10 sidebars idénticos
+for f in modulos.html modulo.html video.html tablero.html banco.html \
+         importador.html alta-videos.html alta-modulo.html alta-seccion.html \
+         escritura.html; do
+  sed -n '/app-shell: sincronizar/,/<!-- \/app-shell -->/p' $f \
+    | sed 's/ aria-current="page"//' | md5sum
+done | sort -u | wc -l                                                     # → 1
+
+# 5 · el CSS versionado al día
+npx tailwindcss -i ./src/input.css -o /tmp/chk.css --minify
+cmp /tmp/chk.css assets/css/academia.css                                   # → sin diferencias
+```
+
+> **Cuidado con `cmd | grep -v X >/dev/null && …`:** con entrada vacía y salida a `/dev/null`, GNU grep devuelve 0 y el condicional se invierte. Capturá la salida y comprobá que esté vacía. Y no pases la lista de páginas sin comillas a un `bash -c`: las líneas se interpretan como comandos y **todos los controles dan ✓ porque el grep nunca corrió**.
+
+---
+
+## Cobertura del spec
+
+Cada requerimiento de `docs/prompt-simplificacion.md`, y dónde cae.
+
+| Requerimiento | Estado | Dónde |
+|---|---|---|
+| Fase 0 · auditoría en 8 puntos | **Hecha**, con dos premisas del prompt refutadas: el repo sí usa el almacén del navegador, y son 10 páginas con 4 destinos, no 13 con 16 | Este plan + `CLAUDE.md` |
+| Fase 1 · árbol maestro-detalle con altas en contexto | **Ya existe** con otra forma: `modulo.html` (árbol de secciones + tablero de 5 pasos) y `alta-videos.html?m=&seccion=` | — |
+| Fase 1 · semántica `role="tree"`, flechas, `Home`/`End` | **Fuera de alcance**, justificado | «Fuera de alcance» |
+| Fase 1 · todo estado de URL alcanzable por control visible | **Ya existe** (`?escena=`, `?vista=`, `?tab=` tienen control) · lo re-exige D-20 | D-20 |
+| Fase 2 · el ID lo deriva el sistema, badge de solo lectura | **Ya existe** por R2 y R11 | — |
+| Fase 2 · ningún input de texto para el ID | **Parcial**: la secuencia sí es editable | **D-24** |
+| Fase 2 · no habilitar intercalado manual de secuencia | **Contradicho por el repo** | **D-24** |
+| Fase 2 · el ID no se reutiliza; la baja es lógica | **Ya existe** (`obsoleto`) | — |
+| Fase 3 · alta en tres decisiones | **Divergencia deliberada**: `alta-videos.html` es una grilla de lote de 6 columnas, porque nadie reserva 55 IDs de a uno. La reducción a tres decisiones aplica al alta unitaria, que en este repo no es el camino principal | **D-18** |
+| Fase 3 · metadata derivada a la vista | **Ya existe**: columna «ID que queda» + aside «Qué se crea» | — |
+| Fase 3 · ficha diferida en solapas | **Ya existe**: `video.html` con ficha, versiones, guión, preguntas, ubicaciones | — |
+| Fase 3 · checklist de completitud | **Ya existe**: `checklistDe()`, y D-1 fija que advierte, no bloquea | — |
+| Fase 4 · dos puertas de entrada | **Task 2** | Bloque A |
+| Fase 4 · bloque «lo que está esperando algo» | **Ya existe**: `franjaTrabajo()` en `modulos.html` | — |
+| Fase 4 · detectar el ID reservado con título parecido | **Sin resolver** | **D-25** |
+| Fase 5.a · acciones masivas | **Ya existe y va más lejos**: estado, cohorte y cola de regrabación en lote | — |
+| Fase 5.a · mover a otra sección | **Falta, y es lo más caro del prompt** | **D-22** |
+| Fase 5.b · pegado desde planilla con vista previa fila por fila | **Ya existe**: `importador.html` + `academia-import.js`, por archivo en vez de pegado | — |
+| Fase 5.b · mismo flujo para el banco de preguntas | **Contradicho por R13** | **D-19** |
+| Fase 5.b · fuente de verdad, marcada como bloqueante | **Sin resolver** | **D-23** |
+| Fase 6 · módulo inactivo no acepta videos nuevos | **La regla no tiene referente en este modelo** | **D-26** |
+| Fase 6 · sub-tema obligatorio con contador de huecos | **Ya existe**: el sub-tema *es* el título de la sección, y `seccionesDe()` da `faltan` por sección | — |
+| Fase 6 · banco como solapa del módulo | **Reubicar, nunca eliminar** | **D-20** |
+| Fase 6 · el paso siguiente como botón primario | **Ya existe** por módulo (`pasosDeModulo()`); por video queda en la ficha | — |
+| Microcopy · nombrar por la tarea | **Task 3** | Bloque A |
+| Piso · WCAG 2.1 AA, foco visible, 100 % teclado | **Ya existe** y se re-verifica en cada tarea | Batería, bloque 5 |
+| Piso · reordenamiento con botones además de arrastrar | **El arrastre ya se quitó**; los ↑ ↓ chocan con el orden derivado | **D-21** |
+| Piso · usar los tokens existentes | **Constraint global** | Global Constraints |
+| Piso · sin `localStorage` | **Cláusula vencida**: el repo lo usa en el motor por decisión de arquitectura | «Fuera de alcance» |
+| Piso · sidebar honesto | **Ya existe**: lo de fuera del MVP va `disabled` | — |
+| No hacer · framework, backend, SSO, YouTube, seguimiento staff | **Respetado** | Global Constraints |
+
+---
+
+## File Structure
+
+| Archivo | Responsabilidad | Tareas |
+|---|---|---|
+| `assets/js/academia-sim.js` | **Cálculo.** Nuevo derivado `sinLink()` + 2 controles nuevos en `auditar()`. No toca el DOM. | 1 |
+| `assets/js/render.js` | **Markup.** Nuevo helper `puertas()`. Solo arma HTML con lo que el motor resolvió. | 2 |
+| `src/input.css` | Sección 6 (lo propio del backoffice): clases de la tarjeta de puerta. | 2 |
+| `assets/css/academia.css` | Compilado versionado. Se recompila y commitea. | 2 |
+| `modulos.html` | Pantalla de inicio: monta las dos puertas arriba de la franja de trabajo. | 2 |
+| `alta-videos.html`, `alta-modulo.html`, `alta-seccion.html`, `banco.html` | Rótulos por tarea (microcopy). Solo texto visible. | 3 |
+| `design-system.html` | Tabla de decisiones abiertas (D-18 a D-26) + tabla de microcopy. | 3, Bloque B |
+| `CLAUDE.md` | Tabla de conteos de `verificar()` y contrato de URL. | 1, 2 |
+| `DESIGN-SYSTEM-EXTENSIONS.md` | Justificación de los tokens nuevos de la puerta. | 2 |
+
+---
+
+# BLOQUE A — desbloqueado
+
+No depende de ninguna decisión de producto. Se puede ejecutar hoy.
+
+---
+
+### Task 1: `sinLink()` — el derivado que sostiene la puerta «ya lo tengo grabado»
+
+La Fase 4 del prompt pide dos puertas de entrada, y la primera es «subir un video que ya tengo». En este repo eso **no es un alta**: el ID ya existe reservado (R11) y lo que falta es la versión con el link, que se carga en `video.html`. La puerta necesita saber *cuáles* son esos videos, y ese número no puede escribirse a mano.
+
+**Files:**
+- Modify: `assets/js/academia-sim.js` — agregar `sinLink()` junto a `colaDeEscritura()`, exportarla, y sumar 2 controles en `auditar()`
+- Modify: `CLAUDE.md` — tabla de reglas de negocio y tabla de conteos de `verificar()`
+
+**Interfaces:**
+- Consumes: `videos(escenaId)`, `versionesDe(video, escenaId)`, `rango(estado)`, `modulo(numero)`, `alcanzada(hito, escenaId)` — todas ya exportadas por `SIM`.
+- Produces: `SIM.sinLink(escenaId) → Array<video>`. Cada elemento es un video ya con estado derivado (la forma que devuelve `videos()`). Ordenado por `id` ascendente. La Task 2 consume exactamente esto.
+
+- [ ] **Step 1: escribir el control que falla**
+
+En `assets/js/academia-sim.js`, dentro de `auditar()`, inmediatamente después del bloque de controles de `colaDeEscritura` (buscar el control «La cola no lista videos que no llegaron a publicado»), agregar:
+
+```js
+    /* -- La puerta «ya lo tengo grabado» ---------------------------------
+       Dos cosas la pueden romper, y las dos ya pasaron en este repo:
+
+       · Contar un publicado como «sin link» mandaría a cargar un link que ya
+         está. En E6 hay 18 videos publicados que NO tienen versión vigente en
+         el dataset, así que definir la puerta por «no tiene versión» a secas
+         listaría 18 publicados. La condición es el ESTADO, no la versión.
+
+       · Contar los 55 IDs en E1 repetiría el bug que arregló `mapaCargadoEn`:
+         `videos()` devuelve los 55 en TODAS las escenas —la escena cambia el
+         estado, no la existencia—, así que sin el hito de reserva la escena
+         que se define como «nada cargado» ofrecería 54 videos para cargar. */
+    ["E1", "E2", "E3", "E4", "E5", "E6"].forEach(function (e) {
+      const lista = sinLink(e);
+      chequeo(
+        "Puerta · en " + e + " ningún publicado figura sin link",
+        lista.every(function (v) { return rango(v.estado) < rango("publicado"); }),
+        lista.filter(function (v) { return rango(v.estado) >= rango("publicado"); })
+          .map(function (v) { return v.id; }).join(", ")
+      );
+    });
+
+    chequeo(
+      "Puerta · en E1 no hay ningún video esperando link",
+      sinLink("E1").length === 0,
+      sinLink("E1").length + " videos ofrecidos en la escena «nada cargado»"
+    );
+```
+
+- [ ] **Step 2: correr y verificar que falla**
+
+```bash
+node -e 'global.window={};
+  ["academia-data","academia-agencias","academia-guiones","academia-preguntas","academia-sim"]
+    .forEach(f => require(process.cwd()+"/assets/js/"+f+".js"));
+  window.SIM.verificar()'
+```
+
+Esperado: `ReferenceError: sinLink is not defined`.
+
+- [ ] **Step 3: implementar `sinLink()`**
+
+En `assets/js/academia-sim.js`, inmediatamente antes de `function colaDeEscritura(`, agregar:
+
+```js
+  /* -- Los videos que esperan su link -------------------------------------
+     La unidad de trabajo es el VIDEO y el motivo es único: el ID ya está
+     reservado y todavía no tiene versión vigente. Es la puerta por la que
+     entra cualquiera del equipo, y es lo que hace que R11 deje de ser un
+     obstáculo: el alta no pide link porque cargar el link es OTRA tarea, con
+     su propia entrada.
+
+     Dos filtros, y ninguno es decorativo:
+
+     · `rango(estado) < rango("publicado")` — un publicado ya tiene su link
+       por definición. El dataset de E6 tiene publicados sin versión vigente,
+       así que preguntar por la versión en vez de por el estado listaría 18
+       videos publicados como pendientes.
+
+     · el hito de reserva del módulo — `videos()` devuelve los 55 en todas las
+       escenas, y sin esto E1 ofrecería 54 videos para cargar en la escena que
+       se define como «nada cargado». Es el mismo cierre que hace
+       `estadoDeCarga()` con `mapaCargadoEn`. */
+  function sinLink(escenaId) {
+    const esc = escenaId || escena;
+    return videos(esc).filter(function (v) {
+      if (rango(v.estado) >= rango("publicado")) return false;
+      const m = modulo(v.modulo);
+      const cargado = !m || !m.mapaCargadoEn || alcanzada(m.mapaCargadoEn, esc);
+      if (!cargado) return false;
+      return !versionesDe(v, esc).some(function (x) { return x.vigente; });
+    }).sort(function (a, b) { return a.id < b.id ? -1 : 1; });
+  }
+```
+
+Y en el objeto que devuelve la IIFE, agregar la línea en orden alfabético cerca de `sortear`:
+
+```js
+    sinLink: sinLink,
+```
+
+- [ ] **Step 4: correr y verificar que pasa, con los números esperados**
+
+```bash
+node -e 'global.window={};
+  ["academia-data","academia-agencias","academia-guiones","academia-preguntas","academia-sim"]
+    .forEach(f => require(process.cwd()+"/assets/js/"+f+".js"));
+  const S = window.SIM;
+  ["E1","E2","E3","E4","E5","E6"].forEach(e => console.log(e, S.sinLink(e).length));
+  const r = S.verificar();
+  console.log("controles:", r.controles.length, "| fallas:", r.fallas.length);
+  process.exit(r.ok ? 0 : 1)'
+```
+
+Esperado, exacto:
+
+```
+E1 0
+E2 54
+E3 46
+E4 43
+E5 18
+E6 0
+controles: 121 | fallas: 0
+```
+
+> `E2 54` y no 55 porque `BAK-M00.010` ya tiene versión vigente en el dataset desde el arranque. `E6 0` es correcto y es dato, no bug: en E6 los 55 videos están en `publicado`, `a regrabar` u `obsoleto`, así que ninguno espera link — y la Task 2 tiene que mostrar ese vacío con su motivo, no un link muerto.
+
+- [ ] **Step 5: correr la batería completa de regresión**
+
+Correr los 5 bloques de «Batería de regresión». Los controles suben de 122 a **129** con los siete JS cargados (6 por escena + 1 de E1).
+
+- [ ] **Step 6: actualizar `CLAUDE.md`**
+
+En la tabla «Las reglas de negocio, y dónde viven», agregar después de la fila de `colaDeEscritura()`:
+
+```markdown
+| **Los videos que esperan su link** | `sinLink()` — ID reservado y sin versión vigente, filtrado por estado anterior a `publicado` y por el hito de reserva del módulo. Es lo que hace que R11 deje de ser un obstáculo: el alta no pide link porque cargar el link es otra tarea |
+```
+
+Y en la tabla «Cuántos controles da `verificar()`», cambiar los cuatro números: **121** una pantalla común · **123** `importador.html` · **127** una de las 7 del flujo · **129** el script de node con los diez.
+
+- [ ] **Step 7: commit**
+
+```bash
+git add assets/js/academia-sim.js CLAUDE.md
+git commit -m "feat(motor): los videos que esperan su link son un derivado, no una cuenta a mano
+
+Es lo que sostiene la puerta «ya lo tengo grabado» de la Fase 4. Dos filtros
+que no son decorativos: el estado, porque en E6 hay 18 publicados sin version
+vigente en el dataset y preguntar por la version los listaria como pendientes;
+y el hito de reserva, porque videos() devuelve los 55 en todas las escenas y
+sin eso E1 ofreceria 54 videos en la escena que se define como «nada cargado».
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
+```
+
+---
+
+### Task 2: Las dos puertas, como franja del panel
+
+La Fase 4 pide una pantalla «¿Qué querés hacer?». **No se crea la pantalla.** El commit `00ba459` y `CLAUDE.md` registran que el «panel de obra» se eliminó justamente por informar sin dejar hacer, y que la pantalla de inicio pasó a ser `modulos.html`. Las dos puertas se montan **ahí**, arriba de la franja de trabajo que ya existe: se gana el efecto que buscaba la Fase 4 —que cada persona entre por donde su tarea tiene sentido— sin reintroducir la pantalla que se borró.
+
+**Files:**
+- Modify: `src/input.css` sección 6 — clases `.puertas`, `.puerta`, `.puerta-quien`
+- Modify: `assets/js/render.js` — helper `puertas()`, exportado
+- Modify: `modulos.html` — contenedor `[data-puertas]` en la franja de inicio + el montaje en el script inline
+- Modify: `assets/css/academia.css` — recompilado
+- Modify: `DESIGN-SYSTEM-EXTENSIONS.md`, `CLAUDE.md`
+
+**Interfaces:**
+- Consumes: `SIM.sinLink(escenaId)` de la Task 1 · `RENDER.pintar(sel, html)` · `RENDER.esc(s)` · `SIM.escena`.
+- Produces: `RENDER.puertas(lista) → string` donde `lista` es un array de `{titulo, bajada, quien, href, motivo}`. Si `href` es `null`, la puerta se pinta como `<div>` deshabilitado y **`motivo` es obligatorio** — es la regla de que un control apagado dice por qué.
+
+- [ ] **Step 1: escribir la prueba que falla**
+
+Banco de pruebas de un archivo, servido desde el mismo origen. Crear `/tmp/claude-1000/-home-mcecilialuna-Escritorio-SIGMMA-ACADEMIA-BACKLOG-academia-SIGMMA/43295c6c-4f5e-4968-99cd-9d71fcc52dff/scratchpad/puertas.html` y copiarlo a la raíz del repo como `_prueba-puertas.html` (se borra en el Step 6):
+
+```html
+<pre id="out"></pre><iframe id="f" width="1400" height="900"></iframe>
+<script>
+  const cargar = (u) => new Promise((r) => {
+    const f = document.getElementById("f");
+    f.onload = () => setTimeout(() => r(f.contentWindow), 350);
+    f.src = u;                        /* ¡sin `.html`! si no, se pierde el query */
+  });
+  const log = (s) => document.getElementById("out").textContent += s + "\n";
+
+  (async () => {
+    for (const e of ["E1", "E2", "E5", "E6"]) {
+      const w = await cargar("/modulos?escena=" + e);
+      const cont = w.document.querySelector("[data-puertas]");
+      if (!cont) { log(e + " · SIN CONTENEDOR"); continue; }
+      const activas = cont.querySelectorAll("a.puerta").length;
+      const apagadas = cont.querySelectorAll("div.puerta").length;
+      const conMotivo = Array.from(cont.querySelectorAll("div.puerta"))
+        .filter((d) => (d.textContent || "").trim().length > 40).length;
+      log(e + " · activas=" + activas + " apagadas=" + apagadas +
+          " apagadas-con-motivo=" + conMotivo);
+    }
+    log("FIN");
+  })();
+</script>
+```
+
+- [ ] **Step 2: correr y verificar que falla**
+
+```bash
+npm run serve &
+sleep 2
+google-chrome --headless=new --virtual-time-budget=6000 \
+  --dump-dom "http://localhost:4321/_prueba-puertas" 2>/dev/null \
+  | sed -n '/<pre id="out">/,/<\/pre>/p'
+```
+
+Esperado: las cuatro líneas dicen `SIN CONTENEDOR`.
+
+- [ ] **Step 3: los estilos**
+
+En `src/input.css`, al final de la **sección 6**, agregar:
+
+```css
+  /* Las dos puertas del panel. Son la Fase 4 del prompt de simplificación
+     SIN la pantalla que pedía: el hub «¿Qué querés hacer?» informaba y
+     derivaba, que es exactamente por lo que se eliminó el panel de obra.
+     Montadas en el inicio, dan el mismo efecto —cada persona entra por donde
+     su tarea tiene sentido— y no agregan un destino más al sidebar.
+
+     La apagada es un `div`, no un `a` sin `href`: un link sin destino igual
+     recibe foco y se lee como accionable. */
+  .puertas {
+    @apply grid grid-cols-2 gap-3 mb-4;
+  }
+  .puerta {
+    @apply block text-left border border-gray-300 rounded bg-white px-4 py-3 no-underline;
+  }
+  a.puerta:hover {
+    @apply border-brand bg-gray-50;
+  }
+  div.puerta {
+    @apply bg-gray-50 text-gray-600 cursor-not-allowed;
+  }
+  .puerta-titulo {
+    @apply block text-sm font-bold text-gray-900 mb-1;
+  }
+  div.puerta .puerta-titulo {
+    @apply text-gray-600;
+  }
+  .puerta-bajada {
+    @apply block text-xs text-gray-700 mb-2;
+  }
+  .puerta-quien {
+    @apply block text-2xs text-gray-600 border-t border-gray-200 pt-2;
+  }
+```
+
+> Antes de escribir estas clases, confirmá contra `src/input.css` que `border-brand`, `text-2xs`, `bg-gray-50`, `text-gray-600/700/900` y `border-gray-200/300` **existen en el `@theme`**. El `@theme` es cerrado: una clase que no está no rompe el build, simplemente no existe la regla y la pantalla sale mal en silencio. Si falta alguna, usá la que sí está — no agregues un token nuevo para esto.
+
+- [ ] **Step 4: el helper de markup**
+
+En `assets/js/render.js`, antes de `function franjaTrabajo(`, agregar:
+
+```js
+  /* Las dos puertas de entrada. El contrato: `href: null` significa que la
+     puerta no tiene adónde llevar, y entonces `motivo` es obligatorio y se
+     pinta en lugar de la bajada. Es la regla de que un control apagado dice
+     POR QUÉ: en E6 no hay ningún video esperando link, y una puerta que
+     lleva a una lista vacía es peor que una puerta apagada que lo explica. */
+  function puertas(lista) {
+    return lista.map(function (p) {
+      const cuerpo =
+        '<span class="puerta-titulo">' + esc(p.titulo) + "</span>" +
+        '<span class="puerta-bajada">' + esc(p.href ? p.bajada : p.motivo) + "</span>" +
+        '<span class="puerta-quien">' + esc(p.quien) + "</span>";
+      return p.href
+        ? '<a class="puerta" href="' + esc(p.href) + '">' + cuerpo + "</a>"
+        : '<div class="puerta" aria-disabled="true">' + cuerpo + "</div>";
+    }).join("");
+  }
+```
+
+Y en el objeto exportado, junto a `franjaTrabajo`:
+
+```js
+    puertas: puertas,
+```
+
+- [ ] **Step 5: el montaje en `modulos.html`**
+
+En `modulos.html`, en la franja de inicio, **antes** de `<div data-hito></div>` (línea 157), insertar:
+
+```html
+              <div class="puertas" data-puertas></div>
+```
+
+Y en el script inline, **antes** de `R.pintar("[data-hito]", R.hitoCard(hito));` (línea 410), insertar:
+
+```js
+        /* ── Las dos puertas ─────────────────────────────────────────────
+           Fase 4 del prompt de simplificación, sin su pantalla: el hub
+           informaba y derivaba, que es por lo que se eliminó el panel de obra.
+           Acá cada puerta lleva a la pantalla donde la tarea se hace. */
+        const esperandoLink = S.sinLink(esc);
+        R.pintar("[data-puertas]", R.puertas([
+          {
+            titulo: "Cargar el link de un video ya grabado",
+            bajada: "Hay " + esperandoLink.length +
+              (esperandoLink.length === 1 ? " video con su ID reservado" : " videos con su ID reservado") +
+              " esperando el link. Entrás a la ficha y cargás la versión.",
+            quien: "Cualquiera del equipo · no hace falta saber la estructura de antemano",
+            href: esperandoLink.length
+              ? "video.html?v=" + esperandoLink[0].id + (esc === "E5" ? "" : "&escena=" + esc)
+              : null,
+            motivo: "Ningún video está esperando link en este momento.",
+          },
+          {
+            titulo: "Reservar los IDs de lo que se va a grabar",
+            bajada: "Entra la estructura del mapa desde la planilla maestra. " +
+              "Los videos quedan en backlog, sin link, listos para guionar.",
+            quien: "Producción de contenido · el lote se pega de una vez",
+            href: "importador.html" + (esc === "E5" ? "" : "?escena=" + esc),
+            motivo: null,
+          },
+        ]));
+```
+
+> `esc` es la escena activa, ya declarada arriba en ese script (es la variable que usan `q` y los `href` de la franja). No la redeclares.
+
+- [ ] **Step 6: recompilar, correr la prueba y verificar que pasa**
+
+```bash
+npm run build
+google-chrome --headless=new --virtual-time-budget=6000 \
+  --dump-dom "http://localhost:4321/_prueba-puertas" 2>/dev/null \
+  | sed -n '/<pre id="out">/,/<\/pre>/p'
+```
+
+Esperado, exacto:
+
+```
+E1 · activas=1 apagadas=1 apagadas-con-motivo=1
+E2 · activas=2 apagadas=0 apagadas-con-motivo=0
+E5 · activas=2 apagadas=0 apagadas-con-motivo=0
+E6 · activas=1 apagadas=1 apagadas-con-motivo=1
+FIN
+```
+
+Después:
+
+```bash
+rm _prueba-puertas.html
+kill %1
+```
+
+- [ ] **Step 7: batería completa + accesibilidad de la pantalla**
+
+Correr los 5 bloques de «Batería de regresión». `cmp` del bloque 5 tiene que dar sin diferencias **después** del `npm run build`.
+
+Además, sobre `modulos.html`: un solo `<h1>`, jerarquía sin saltos, sin IDs duplicados, y los dos `.puerta` con nombre accesible. Al auditar el DOM volcado, **sacá primero los `<script>`**: el dump incluye su texto y los templates del render se cuentan como markup real.
+
+- [ ] **Step 8: documentar**
+
+En `DESIGN-SYSTEM-EXTENSIONS.md`, sección 6, agregar la entrada de `.puertas` / `.puerta` explicando que la apagada es un `div` y no un `a` sin `href`, y por qué.
+
+En `CLAUDE.md`, en el bullet «**El panel es la pantalla de inicio**», agregar al final:
+
+```markdown
+  Sobre esa franja se montaron las **dos puertas** de la Fase 4 del prompt de
+  simplificación —cargar el link de algo ya grabado, o reservar los IDs de lo
+  que se va a grabar—. Se montaron **ahí y no en una pantalla nueva**: un hub
+  «¿Qué querés hacer?» informa y deriva, que es exactamente por lo que se
+  eliminó el panel de obra.
+```
+
+- [ ] **Step 9: commit**
+
+```bash
+git add src/input.css assets/css/academia.css assets/js/render.js modulos.html \
+        DESIGN-SYSTEM-EXTENSIONS.md CLAUDE.md
+git commit -m "feat(panel): las dos puertas de entrada, sin la pantalla que pedian
+
+Fase 4 del prompt de simplificacion. El hub «¿Que queres hacer?» informaba y
+derivaba, que es por lo que se elimino el panel de obra: las dos puertas van
+en el inicio, donde cada una lleva a la pantalla en la que la tarea se hace.
+En E6 no hay ningun video esperando link, asi que esa puerta va apagada CON
+el motivo a la vista, y como div y no como link sin href.
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
+```
+
+---
+
+### Task 3: Microcopy por tarea
+
+La sección «Microcopy» del prompt pide nombrar por la tarea y no por la tabla. Hoy los rótulos son **de dominio** («Título», «Tag de plan», «Secuencia»), que no es lo mismo que de tabla, pero tampoco es la tarea.
+
+**Límite que no se cruza:** se cambia **solo texto visible**. `data-campo="secuencia"`, `data-estado`, `data-paso-estado` y los nombres de campo del dataset **no se tocan** — ese vocabulario se copia a desarrollo, y renombrarlo rompe el contrato con `academia-import.js` y con la materialización del overlay.
+
+**Files:**
+- Modify: `alta-videos.html` (encabezados de la grilla y `<label>` de destino)
+- Modify: `alta-modulo.html`, `alta-seccion.html`, `banco.html` (labels)
+- Modify: `design-system.html` (tabla de microcopy)
+
+**Interfaces:**
+- Consumes: nada. Es una tarea de texto.
+- Produces: nada que otra tarea consuma.
+
+- [ ] **Step 1: escribir el control que falla**
+
+En `design-system.html`, en la sección de vocabulario, agregar la tabla de equivalencias como **contrato verificable**:
+
+```html
+            <table class="table-dense" data-microcopy>
+              <caption class="sr-only">Rótulos por tarea, y el término de dominio que reemplazan</caption>
+              <thead>
+                <tr><th scope="col">Se ve</th><th scope="col">Reemplaza a</th><th scope="col">Dónde</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>¿Qué enseña este video?</td><td>Título</td><td>alta-videos, video</td></tr>
+                <tr><td>¿A qué planes aplica?</td><td>Tag de plan</td><td>alta-videos, alta-modulo</td></tr>
+                <tr><td>¿Visible para las agencias?</td><td>Estado activo / inactivo</td><td>modulo</td></tr>
+                <tr><td>Sub-tema del banco</td><td>Sección</td><td>banco, escritura</td></tr>
+                <tr><td>Reservar IDs <em>(ya estaba)</em></td><td>Guardar / Enviar</td><td>alta-videos</td></tr>
+              </tbody>
+            </table>
+```
+
+Y el control, en bash:
+
+```bash
+# Cada rótulo declarado en la tabla de microcopy existe en la pantalla que dice.
+grep -o '¿Qué enseña este video?' alta-videos.html   # → 1 línea
+grep -o '¿A qué planes aplica?'   alta-videos.html   # → 1 línea
+grep -c 'Reservar IDs'            alta-videos.html   # → ya da 3: es el control de no-regresión
+```
+
+- [ ] **Step 2: correr y verificar que falla**
+
+Los tres greps de arriba dan vacío.
+
+- [ ] **Step 3: aplicar los rótulos**
+
+En `alta-videos.html`, en el `<thead>` de la grilla (líneas 155-161), cambiar **solo** el texto de las celdas:
+
+```html
+                      <th scope="col" class="w-[90px]">Secuencia</th>
+                      <th scope="col" class="w-[140px]">ID que queda</th>
+                      <th scope="col" class="w-[170px]">Sección</th>
+                      <th scope="col">¿Qué enseña este video?</th>
+                      <th scope="col" class="w-[130px]">¿A qué planes aplica?</th>
+                      <th scope="col" class="w-[90px]">Cohorte</th>
+```
+
+> «Secuencia», «ID que queda» y «Sección» **se quedan como están**: los tres nombran algo que la persona ve y compara en la grilla, y «¿Qué número de orden le toca?» es más largo sin ser más claro. La regla es nombrar por la tarea cuando el término de dominio esconde la tarea, no reescribir todo.
+
+**El botón primario no se toca.** `alta-videos.html:102` ya dice `Reservar IDs`, y en `alta-videos.html:445-446` se re-rotula contando —«Reservar 4 IDs»—, que es mejor de lo que pide el prompt. El grep del Step 1 está ahí como control de **no regresión**: que una pasada de microcopy no lo empeore.
+
+En `alta-modulo.html`, línea 107 (`<h2 class="side-title" id="ident">Identidad</h2>`) queda: es un encabezado de zona, no un campo.
+
+- [ ] **Step 4: correr y verificar que pasa**
+
+Los dos primeros greps del Step 1 dan una línea cada uno; el tercero sigue dando `3`.
+
+- [ ] **Step 5: batería completa**
+
+Correr los 5 bloques. Atención al bloque 2: el rótulo nuevo no puede introducir `font-medium`/`font-semibold` ni una clase de paleta por defecto. Y correr el barrido headless de las 6 escenas × `alta-videos` para confirmar que la grilla sigue pintando.
+
+- [ ] **Step 6: commit**
+
+```bash
+git add alta-videos.html design-system.html
+git commit -m "feat(alta): los rotulos de la grilla nombran la tarea, no la columna
+
+Seccion «Microcopy» del prompt de simplificacion. Se cambia SOLO texto
+visible: data-campo, data-estado y los nombres del dataset se quedan, porque
+ese vocabulario se copia a desarrollo y renombrarlo romperia el contrato con
+el importador y con la materializacion del overlay. «Secuencia», «ID que
+queda» y «Seccion» tambien se quedan: nombran algo que se ve y se compara en
+la grilla, y la regla es nombrar por la tarea cuando el termino de dominio la
+esconde, no reescribir todo.
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
+```
+
+---
+
+# BLOQUE B — compuertas
+
+Nueve puntos donde el prompt contradice una decisión ya tomada y cableada. **Ninguno se implementa sin que la decisión esté resuelta y anotada en `design-system.html`.** Cada uno lleva la evidencia y la opción que recomiendo.
+
+El propio prompt lo pide así: *«Cuando una decisión dependa de producto y no de código, paralo y preguntá. No elijas por mí y sigas.»*
+
+### D-18 · ¿El alta pide el link cuando «ya lo tengo grabado»?
+
+- **Pide el prompt (Fase 3):** tercera decisión del alta = «ya lo tengo grabado» → pide link. El HTML modelo tiene `<input type="url" id="qlink">`.
+- **Dice el repo:** R11 — *«El alta nunca pide un link de YouTube: son IDs reservados»*, verificado por el grep `grep -nE '<(input|textarea)[^>]*(type="url"|link|youtu)' alta-videos.html importador.html`.
+- **Recomiendo: NO cambiar R11.** La Task 2 ya resolvió el problema que la Fase 3 quería resolver, y por la vía que el propio prompt propone en la Fase 4: separar las dos tareas en dos puertas. Un `type="url"` en el alta hace fallar un control de disciplina **y** vuelve el alta un formulario de dos modos.
+- **Si se decide lo contrario:** hay que modificar el grep de R11 para excluir el campo nuevo, y esa exclusión deja de proteger contra el caso que el grep existía para atrapar.
+
+### D-19 · ¿Las preguntas se importan desde planilla?
+
+- **Pide el prompt (Fase 5.b):** *«Mismo flujo para el banco de preguntas, con columnas distintas y `sub-tema` obligatorio.»*
+- **Dice el repo:** R13 — *«las preguntas no se importan nunca»*. Nacen del trabajo, en `escritura.html`, con `colaDeEscritura()` como cola por video.
+- **Recomiendo: NO importar preguntas.** El motivo de R13 sigue en pie: 438 de las 550 del dataset son relleno estructural precisamente porque escribir las reales es trabajo de contenido. Una vía de import las volvería a hacer parecer cargadas sin estarlo.
+- **Costo de decidir lo contrario:** `academia-import.js` gana un segundo formato de planilla, y `verificar()` necesita un control que garantice que ninguna pregunta importada quede con `subtema` que no sea una sección de su módulo.
+
+### D-20 · ¿`banco.html` pasa a ser solapa del módulo?
+
+- **Pide el prompt (Fase 6):** *«llevá `banco.html` a ser una solapa del módulo, no una pantalla suelta»*.
+- **Dice el repo:** `banco.html` es destino del sidebar **y** el paso 3 de `pasosDeModulo()`. `CLAUDE.md` advierte: *«El tablero y los bancos NO son destinos que se conserven por las dudas: son los pasos 2, 3 y 4. Sin ellos el módulo no llega a `activo`.»*
+- **Recomiendo: reubicar, nunca eliminar.** Se puede sumar el banco como solapa dentro de `modulo.html` conservando `banco.html?m=` como deep-link —el prompt lo permite explícitamente: *«cada estado alcanzable por URL debe ser alcanzable también por un control visible»*—. Es una tarea real de ~1 día. **No** entra en el Bloque A porque toca el paso 3 del tablero de cinco pasos y hay que rehacer el barrido headless de los 13 `banco?m=`.
+
+### D-21 · ¿El orden de una sección se desacopla de la secuencia?
+
+**Esta es la que el prompt pidió explícitamente que le avisara.**
+
+- **Pide el prompt (Fase 2):** *«Si hace falta cambiar el orden en que la agencia ve los videos, se usa el campo `orden`, que es independiente del ID. Si al auditar encontrás un caso donde esto no alcanza, avisame antes de implementar otra cosa.»* Y el HTML modelo ofrece «↑ Subir / ↓ Bajar» en la ficha de sección.
+- **El caso donde no alcanza, con evidencia:** `ordenDeSeccion()` en `academia-sim.js` devuelve **la secuencia más baja de los videos de la sección**, y solo cae al campo `orden` explícito cuando la sección **no tiene videos**. O sea: en las 31 secciones del dataset el campo `orden` **no se lee**. Mover una sección hacia arriba exigiría renumerar las secuencias de sus videos, y eso viola R2 (el ID sobrevive al regrabado). El comentario de `modulo.html:361` ya dejó los ↑ ↓ como pendiente.
+- **Recomiendo: no desacoplar.** El acoplamiento es deliberado y está documentado: *«Hace que ordenar la planilla por ID no pueda romper el syllabus»*, y está verificado por un control que reproduce las 31 secciones. Lo que corresponde es **decirlo en la pantalla**: donde hoy no hay nada, poner que el orden de la sección lo define el ID más bajo de sus videos. Un rótulo, no un gesto.
+
+### D-22 · ¿Se puede mover un video a otra sección?
+
+El prompt lo lista dentro de la Fase 5.a, la que llama *«lo más barato y lo que más alivia»*. **En este repo es lo más caro de todo el prompt.**
+
+- **Lo demás de la Fase 5.a ya está**, y va más lejos de lo que pide: `tablero.html:199-215` tiene barra de acciones en lote con cambiar estado, asignar cohorte y agregar a la cola de regrabación, sobre `UI.seleccionados()`, escribiendo en el overlay uno por video.
+- **Lo que falta es «mover a otra sección», y la evidencia de por qué es caro:**
+  - `seccionesDe()` arma cada sección desde `modulo.secciones[].videos` — **la sección posee sus videos**. El campo `seccion` del video es derivado al indexar, así que pisarlo por overlay **no lo mueve**.
+  - `EDITABLES = ["titulo", "cohorte", "duracion", "planes"]` — `seccion` no está, y `CLAUDE.md` es explícito: *«Escribir cualquier otro campo persiste el JSON pero ningún cálculo lo consume.»*
+  - Los mínimos de banco salen de `D.minimosDeSeccion(modulo)`, derivados de los videos de la sección: mover un video **cambia los mínimos de las dos secciones**, y con ellos las cadenas 3, 4 y 5 de `BAK-M30` y la `cuotaDeVideo()` de todos sus hermanos.
+  - Las preguntas se filtran por `p.subtema === s.titulo`. Un video movido **deja sus preguntas en la sección vieja**: la nueva lo cuenta con banco 0 y la vieja queda con preguntas cuyo `videoOrigen` ya no está ahí. Es la condición de huérfano exacta.
+- **Recomiendo el recorte:** habilitar mover **solo videos con 0 preguntas**, y para el resto dejar la acción deshabilitada con el motivo a la vista —«3 de los seleccionados tienen preguntas escritas: moverlos dejaría su banco fuera de sección»—. Eso evita extender dos contratos de overlay y es exactamente lo que manda la regla del botón que no hace nada. La migración de `subtema` queda como decisión aparte.
+
+### D-23 · Fuente de verdad: ¿manda el backoffice o manda el Google Sheets?
+
+El prompt la marca como **bloqueante** y no la resuelve: *«Si quedan las dos vivas en paralelo hay doble carga y divergencia garantizada. Es decisión de producto, no de código.»* Sigue abierta. Ninguna tarea del Bloque A depende de ella; **toda ampliación del importador sí**.
+
+### D-24 · ¿La secuencia se sigue pudiendo tipear?
+
+- **Pide el prompt (Fase 2):** *«Ningún formulario debe tener un input de texto para el ID»* y *«no habilites intercalado manual de secuencia»*.
+- **Dice el repo:** `alta-videos.html:368` tiene un `<input data-campo="secuencia">` editable por fila. Es deliberado: propone la próxima libre de 10 en 10, y `alta-videos.html:396-401` valida el duplicado nombrando el video que ya ocupa esa secuencia. La última fila de la semilla **propone a propósito una secuencia ya ocupada**, para que el error se vea sin provocarlo.
+- **Recomiendo: conservarlo, y anotar la excepción.** No es «tipear el ID»: la superficie y el módulo van con candado (R2) y lo editable es solo el tramo que decide dónde se intercala. Sacarlo obligaría a reservar los IDs siempre al final, y el mapa de contenido tiene huecos de secuencia a propósito —`BAK-M30` va 010, 020, 050 en su primera sección— que hoy se pueden reproducir y sin el campo no.
+- **Si se decide sacarlo:** hay que decidir antes cómo se cargan esos huecos, o el importador queda como única vía para reproducir el mapa real.
+
+### D-25 · ¿Cómo se detecta que un video «que ya tengo» es un ID ya reservado?
+
+- **Pide el prompt (Fase 4):** *«al entrar por “ya lo tengo grabado”, el sistema debe buscar si existe un ID reservado con título parecido y ofrecer completarlo en vez de crear un duplicado. Proponeme cómo detectarlo antes de implementarlo.»*
+- **Lo que la Task 2 ya resuelve sin detección:** la puerta no crea nada — lleva directo a la ficha de un video que **ya está** reservado y esperando link. Mientras la entrada sea esa, el duplicado no se puede producir.
+- **Cuándo hace falta igual:** si alguien entra por `alta-videos.html` y reserva un ID para algo que ya estaba reservado con otro título. Hoy eso lo atrapa la validación de secuencia duplicada, pero no la de **título** duplicado.
+- **Recomiendo, si se decide implementarlo:** comparar por título normalizado —minúsculas, sin tildes, sin signos, palabras ordenadas— **dentro del módulo**, no en los 55, y ofrecer la coincidencia como aviso que no bloquea, igual que hace D-1 con la checklist. Nada de distancia de edición: con 4 a 7 videos por módulo, un umbral difuso genera más falsos positivos que aciertos.
+
+### D-26 · «Un módulo inactivo no acepta videos nuevos» — la regla no tiene referente
+
+- **Pide el prompt:** está en la lista de *reglas de integridad duras* que dice que no se tocan, y la Fase 6 la quiere visible: *«el botón “agregar video” no existe; el nodo aparece atenuado con la leyenda de por qué»*. El HTML modelo lo muestra con `BAK-M35`.
+- **Dice el repo:** los estados de módulo son **`borrador` · `reservado` · `activo`**, no activo/inactivo. En E2 los 12 módulos están en `borrador` y en E6 los 12 están `activo`. **No existe un estado «inactivo después de haber estado activo»**: por D-4 la aptitud es una compuerta al activar, no una condición permanente.
+- **Consecuencia:** si `borrador` se tratara como «inactivo», ningún módulo aceptaría videos nunca —hay que poder cargarle videos justamente antes de activarlo—, y la Academia no se podría construir. La regla del prompt describe un estado que este modelo no tiene.
+- **Recomiendo: declarar la regla inaplicable y anotarlo**, en vez de agregar un estado `pausado` para sostenerla. Si en algún momento hace falta retirar un módulo ya activo, ahí se decide el estado nuevo — y ahí la regla recupera su referente.
+
+### Fuera de alcance, y por qué
+
+- **`role="tree"` con flechas y `Home`/`End`:** no hay un solo `role="tree"` en el repo (verificado). El árbol del prompt abarca los 12 módulos a la vez, y **por eso** necesita expandir/colapsar. El repo dividió eso a propósito en dos pantallas: `modulos.html` (los 11) y `modulo.html?m=` (uno, con sus 3 o 4 secciones). Ponerle semántica de widget de árbol a un esquema plano de cuatro nodos es ceremonia contra R6. **Recomiendo no hacerlo** y anotarlo como decisión cerrada.
+- **Escenas E1–E5:** el prompt dice *«no elimines el sistema de escenas E1–E5»*. Hoy son **E1–E6**. Nada que hacer: se conservó y se amplió.
+- **Vistas de seguimiento para staff:** el prompt las excluye y el repo ya las sacó por D-17. Coinciden.
+- **La cláusula «sin `localStorage` ni `sessionStorage`»** del piso de calidad está vencida: el repo los usa en el motor desde el cambio de arquitectura, con su justificación escrita. No se revierte.
+
+---
+
+## Orden de ejecución
+
+1. **Task 1** — `sinLink()` + controles. Sola, porque la Task 2 la consume.
+2. **Task 2** — las dos puertas. Depende de 1.
+3. **Task 3** — microcopy. Independiente; puede ir en paralelo a 1.
+4. **Compuertas D-18 a D-26** — resolver con María Cecilia, anotar en `design-system.html`, y recién entonces planificar las tareas que habiliten.
+
+Al terminar cada tarea: resumen de qué cambió, qué archivos se tocaron, y qué quedó dudoso. **Sin commit, merge ni push sin mostrar antes el resumen de pasos y esperar confirmación** — y el flujo de ramas y tickets SGM del equipo va por la skill `pushear-a-git`.

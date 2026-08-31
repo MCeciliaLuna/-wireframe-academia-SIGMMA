@@ -1,3 +1,6 @@
 node_modules/
 .DS_Store
 indicaciones/pdfs-guillermo/
+
+# Espacio de trabajo de los planes de ejecución. Es scratch: el registro es git.
+.superpowers/
