@@ -508,9 +508,21 @@
           triggerMover.removeAttribute("title");
           const modulo = S.modulo(seleccion[0].modulo);
           const secciones = modulo ? S.seccionesDe(modulo, esc) : [];
+          /* Las secciones donde YA está alguno de los seleccionados: moverlo
+             ahí no haría nada. Se muestran igual, deshabilitadas con el
+             motivo a la vista, en vez de sacarlas de la lista — con una
+             selección que cruza secciones, sacarlas dejaría un menú distinto
+             según quién se marcó, y eso es más difícil de leer que un botón
+             apagado. */
+          const ocupadas = {};
+          seleccion.forEach(function (v) { ocupadas[S.seccionEfectiva(v, esc)] = true; });
           R.pintar("[data-menu-secciones]", secciones.map(function (s) {
-            return '<button type="button" class="menu-item" role="menuitem" data-seccion-lote="' +
-              R.esc(s.titulo) + '">' + R.esc(s.titulo) + "</button>";
+            const yaAhi = !!ocupadas[s.titulo];
+            return '<button type="button" class="menu-item" role="menuitem"' +
+              (yaAhi
+                ? ' disabled title="Ya está en esta sección: moverlo acá no cambiaría nada."'
+                : ' data-seccion-lote="' + R.esc(s.titulo) + '"') +
+              '>' + R.esc(s.titulo) + "</button>";
           }).join(""));
         }
 

@@ -702,7 +702,15 @@ window.SIM = (function () {
   function seccionEfectiva(video, escenaId) {
     const esc = escenaId || escena;
     const cambio = anotado("videos", video.id, esc) || {};
-    return cambio.seccion || video.seccion;
+    /* El fallback resuelve por ID contra `porId` —el padrón SIN parchear—,
+       nunca contra `video.seccion` del objeto que llegó. Si a esta función le
+       pasan un video ya resuelto por `conEstado()`/`S.video()` en OTRA
+       escena, ese objeto ya trae `.seccion` parchado por esa escena (`seccion`
+       está en EDITABLES): usarlo acá devolvería la sección de una escena
+       distinta a la pedida. `porId` es la estructura del dataset, la misma
+       que ya usan `seccionesDe()` y los controles de las 5 cadenas. */
+    const estructural = porId[video.id] ? porId[video.id].seccion : video.seccion;
+    return cambio.seccion || estructural;
   }
 
   /* La compuerta de D-22, y vive acá y no en la pantalla: si la escribiera el
@@ -1869,6 +1877,25 @@ window.SIM = (function () {
         return !conPreguntas || !movible(v);
       }),
       "la compuerta de D-22 no está cerrada en el motor"
+    );
+
+    chequeo(
+      "Sección efectiva · el fallback resuelve por ID en el padrón estructural, no por el campo del objeto recibido",
+      todos().every(function (v) {
+        /* Como `seccion` entró a EDITABLES, un video ya resuelto por
+           `conEstado()`/`S.video()` en una escena trae `.seccion` parchado
+           por ESA escena. Pedirle a `seccionEfectiva()` la sección de OTRA
+           escena no puede caer en ese campo: tiene que resolver la
+           estructural por ID, sin importar qué objeto (crudo o ya resuelto)
+           haya llegado. Se simula el objeto «ya resuelto en otra escena» sin
+           tocar el overlay real: un clon con un `seccion` inventado alcanza
+           para exponer si el fallback confía en el campo o resuelve por ID. */
+        const crudo = porId[v.id];
+        const resueltoEnOtraEscena = Object.assign({}, v, { seccion: "seccion-inventada-de-otra-escena" });
+        return seccionEfectiva(crudo, escena) === v.seccion &&
+          seccionEfectiva(resueltoEnOtraEscena, escena) === v.seccion;
+      }),
+      "el derivado confía en video.seccion del objeto recibido en vez de resolver por ID"
     );
 
     const sinSecciones = bibliotecas.filter(function (m) {
