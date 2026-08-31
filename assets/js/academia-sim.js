@@ -315,7 +315,19 @@ window.SIM = (function () {
          literal a mano descartaba en silencio todo campo que la entidad trajera
          encima —el sello de importación, sin ir más lejos—, y la sección
          quedaba indistinguible de las demás. */
-      m.secciones.push(Object.assign({}, s, { videos: [], creadoEnOverlay: true }));
+      const nueva = Object.assign({}, s, { videos: [], creadoEnOverlay: true });
+      /* La sección entra EN la posición pedida, y la lista se renumera entera.
+         Antes era un `push` a secas y el `orden` viajaba tal cual, así que
+         pedir la posición 2 dejaba la sección ÚLTIMA y con el número de otra:
+         el árbol mostraba dos «2 ·». El desplegable que ofrecía «antes de
+         «Carga y proceso»» no cumplía ninguna de las dos cosas.
+
+         La regla queda: `orden` es la posición en el array, siempre, sin
+         huecos ni repetidos. Sin `orden` explícito, al final. */
+      const pedido = typeof s.orden === "number" ? s.orden : m.secciones.length + 1;
+      const donde = Math.max(0, Math.min(pedido - 1, m.secciones.length));
+      m.secciones.splice(donde, 0, nueva);
+      m.secciones.forEach(function (x, i) { x.orden = i + 1; });
     });
 
     nuevos.videos.forEach(function (v) {
