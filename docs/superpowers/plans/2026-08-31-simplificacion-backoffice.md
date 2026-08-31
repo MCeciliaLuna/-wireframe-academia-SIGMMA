@@ -738,3 +738,319 @@ El prompt la marca como **bloqueante** y no la resuelve: *«Si quedan las dos vi
 4. **Compuertas D-18 a D-26** — resolver con María Cecilia, anotar en `design-system.html`, y recién entonces planificar las tareas que habiliten.
 
 Al terminar cada tarea: resumen de qué cambió, qué archivos se tocaron, y qué quedó dudoso. **Sin commit, merge ni push sin mostrar antes el resumen de pasos y esperar confirmación** — y el flujo de ramas y tickets SGM del equipo va por la skill `pushear-a-git`.
+
+---
+
+# BLOQUE C — lo que habilitan las decisiones
+
+Las nueve decisiones del Bloque B quedaron **cerradas y anotadas** en `design-system.html` (D-18 a D-26) el 31/08/2026. Seis se cierran sin trabajo; **tres habilitan tarea**.
+
+| Decisión | Qué se resolvió | Trabajo |
+|---|---|---|
+| D-18 | El alta nunca pide el link — cerrada **por construcción** con las dos puertas | ninguno |
+| D-19 | Las preguntas no se importan; R13 se conserva | ninguno |
+| D-20 | El banco pasa a **solapa del módulo**, y `banco.html?m=` sigue como deep-link | **C3** |
+| D-21 | El orden de sección lo sigue dando el ID más bajo; falta el **rótulo** | **C1** |
+| D-22 | Mover un video se habilita **solo si no tiene preguntas** | **C2** |
+| D-23 | **Manda el backoffice**; el Sheets es el origen de la carga inicial | ninguno |
+| D-24 | La secuencia editable queda como excepción declarada | ninguno |
+| D-25 | La detección de duplicado no hace falta todavía | ninguno |
+| D-26 | «Módulo inactivo» no tiene referente; la regla queda inaplicable | ninguno |
+
+**Orden recomendado: C1 → C2 → C3.** C1 es barata y cierra D-21. **C2 va antes que C3 a propósito**, aunque sea más riesgosa: toca la pertenencia de un video a su sección en el motor, y `seccionesDe()` es justo lo que C3 va a consumir para pintar el banco. Hacerla primero significa que C3 se construye sobre la semántica final, y que si C2 sale peor de lo previsto se para **antes** de invertir en la tarea más grande.
+
+La **Batería de regresión** y las **Global Constraints** de este plan aplican tal cual. El baseline al abrir el Bloque C es **129 controles, 0 fallas**.
+
+---
+
+### Task C1: el rótulo del orden de sección (D-21)
+
+Hoy `modulo.html` pinta el título «Árbol de secciones» y **nada** que explique de dónde sale el orden. El campo `orden` explícito no se lee en ninguna de las 31 secciones, y los ↑ ↓ no tienen dónde escribir: la secuencia manda. Eso es deliberado y hay que decirlo, porque un orden que no se puede cambiar y no se explica se lee como un bug.
+
+**Files:**
+- Modify: `modulo.html` — un `<p class="hint">` debajo de `[data-arbol-titulo]` (hoy línea 120)
+- Modify: `CLAUDE.md` — la fila de `ordenDeSeccion()` en la tabla de reglas
+
+**Interfaces:**
+- Consumes: `SIM.ordenDeSeccion(seccion)` y `SIM.seccionesDe(modulo)`, ya existentes. No necesita nada nuevo del motor.
+- Produces: nada que otra tarea consuma.
+
+- [ ] **Step 1: escribir el control que falla**
+
+```bash
+grep -c 'la secuencia más baja' modulo.html      # → 1
+grep -c 'data-arbol-orden' modulo.html           # → 1
+```
+
+- [ ] **Step 2: correr y verificar que falla** — los dos dan `0`.
+
+- [ ] **Step 3: el rótulo**
+
+En `modulo.html`, inmediatamente después de `<h2 class="side-title !mb-0" data-arbol-titulo></h2>`, insertar:
+
+```html
+              <p class="hint !mt-0" data-arbol-orden>
+                Las secciones se ordenan por la <strong>secuencia más baja</strong> de sus videos, no
+                por un campo aparte. Para cambiar el orden se reserva el ID que corresponde: así
+                ordenar la planilla por ID no puede romper el syllabus.
+              </p>
+```
+
+> Solo se pinta en el árbol de secciones, **no** en la Ruta Esencial: ahí el orden lo da el recorrido del cohorte (R8) y la frase sería falsa. El script inline ya distingue los dos casos con `esRuta`, así que el rótulo se oculta en la rama de la Ruta.
+
+En el script inline, dentro de la rama `if (esRuta) { … }`, junto al `document.querySelector("[data-arbol-titulo]").textContent = …`, agregar:
+
+```js
+          document.querySelector("[data-arbol-orden]").hidden = true;
+```
+
+- [ ] **Step 4: correr y verificar que pasa** — los dos greps dan `1`, y el rótulo **no** aparece en la Ruta:
+
+```bash
+curl -s "http://localhost:4321/modulo?m=R01" | grep -c 'data-arbol-orden'     # → 1 (el nodo existe)
+google-chrome --headless=new --virtual-time-budget=6000 \
+  --dump-dom "http://localhost:4321/modulo?m=R01" 2>/dev/null \
+  | grep -o 'data-arbol-orden hidden\|hidden data-arbol-orden'                 # → una coincidencia
+```
+
+- [ ] **Step 5: batería completa** — los 5 bloques. El rótulo usa `hint`, que ya existe: el `cmp` del CSS no debería moverse.
+
+- [ ] **Step 6: `CLAUDE.md`** — en la fila de **Orden de una sección**, agregar al final: `La pantalla lo dice: el árbol de secciones lleva el rótulo de dónde sale ese orden, porque un orden que no se puede cambiar y no se explica se lee como un bug. En la Ruta no se pinta —ahí el orden lo da el cohorte (R8)—.`
+
+- [ ] **Step 7: commit**
+
+```bash
+git add modulo.html CLAUDE.md
+git commit -m "feat(modulo): el arbol dice de donde sale el orden de sus secciones
+
+Cierra D-21. El campo `orden` no se lee en ninguna de las 31 secciones: manda
+la secuencia mas baja de los videos, y es deliberado —hace que ordenar la
+planilla por ID no pueda romper el syllabus—. Faltaba decirlo: un orden que no
+se puede cambiar y no se explica se lee como un bug. En la Ruta no se pinta,
+porque ahi el orden lo da el recorrido del cohorte (R8).
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
+```
+
+---
+
+### Task C2: mover un video a otra sección, en lote (D-22)
+
+La barra de acciones en lote de `tablero.html` ya tiene cambiar estado, asignar cohorte y agregar a la cola. Falta **mover a otra sección**, habilitado solo para videos sin preguntas.
+
+**El nudo, y cómo se resuelve.** `seccionesDe()` arma cada sección desde `modulo.secciones[].videos` — la sección **posee** sus videos y el campo `seccion` del video es derivado al indexar. Así que pisar `v.seccion` por overlay **no lo mueve**. Y `minimosDeSeccion()` vive en `academia-data.js`, lee `s.videos.length` de la lista **estructural**, y su propio comentario dice «es la única puerta: nadie más reparte estos números».
+
+**Decisión de implementación, ya tomada:** los mínimos **no siguen** al video movido. Se quedan con el reparto estructural.
+- Motivo: hacerlos seguir obliga a mover el cálculo de mínimos al motor o a pasarle un override, y eso rompe la regla de que `academia-data.js` es DATO y no lógica — además de tocar sus 4 consumidores, dos de los cuales son los controles de las 5 cadenas.
+- Consecuencia declarada: la sección destino reparte su mínimo entre un video más. Lo **exigible** sigue siendo el mínimo por sección y el total por módulo no cambia; lo que se corre es `cuotaDeVideo()`, que el propio motor declara **orientativa**.
+- Y la restricción de D-22 lo mantiene inofensivo: solo se mueven videos con **0 preguntas**, así que ninguna pregunta queda huérfana de su sección.
+
+**Files:**
+- Modify: `assets/js/academia-sim.js` — `seccionesDe()` agrupa por la sección **efectiva**; `seccion` entra a los campos que el overlay consume; 3 controles nuevos
+- Modify: `tablero.html` — la acción en lote, con su compuerta y su motivo
+- Modify: `CLAUDE.md` — la tabla de campos del overlay y los conteos de controles
+
+**Interfaces:**
+- Consumes: `anotar("videos", id, campos)` · `seccionesDe(modulo, escena)` · `bancoDe(numero, escena)` · `UI.seleccionados()`.
+- Produces: `SIM.seccionEfectiva(video, escenaId) → string` (el título de la sección donde el video vive hoy: el parche del overlay si existe, y si no la sección estructural). C3 la consume para pintar el banco por sección.
+
+- [ ] **Step 1: escribir los tres controles que fallan**
+
+En `auditar()`, después del control «Ningún video sin sección»:
+
+```js
+    /* -- Mover un video de sección (D-22) --------------------------------
+       Los tres controles cubren la invariante de R12 extendida al movimiento,
+       y la compuerta que la hace cierta. Sin el tercero, la restricción de
+       D-22 sería una promesa de la pantalla y no una propiedad del motor. */
+    chequeo(
+      "Sección efectiva · sin overlay coincide con la estructural en los 55",
+      videos().every(function (v) { return seccionEfectiva(v) === v.seccion; }),
+      "el derivado se despegó del dataset limpio"
+    );
+
+    chequeo(
+      "Sección efectiva · siempre devuelve una sección real del módulo",
+      videos().every(function (v) {
+        const m = modulosPorNumero[v.modulo];
+        return !m || m.secciones.some(function (s) { return s.titulo === seccionEfectiva(v); });
+      }),
+      "algún video quedó apuntando a una sección que su módulo no tiene"
+    );
+
+    chequeo(
+      "Mover · ningún video con preguguntas es movible",
+      videos().every(function (v) {
+        const conPreguntas = padronPreguntas().filter(function (p) {
+          return p.videoOrigen === v.id;
+        }).length > 0;
+        return !conPreguntas || !movible(v);
+      }),
+      "la compuerta de D-22 no está cerrada en el motor"
+    );
+```
+
+> **Ojo:** el nombre del tercer control tiene un typo a propósito en esta redacción del plan —`preguguntas`— para que se vea el punto: **copiá el texto del control revisándolo, no en piloto automático.** Escribilo bien: `"Mover · ningún video con preguntas es movible"`. Y si al implementar encontrás cualquier otro dato de este plan que no cierre contra el árbol, **avisá antes de adaptarlo**: en este plan ya hubo siete números y snippets mal.
+
+- [ ] **Step 2: correr y verificar que falla** — `ReferenceError: seccionEfectiva is not defined`.
+
+- [ ] **Step 3: el motor**
+
+Tres cambios en `assets/js/academia-sim.js`:
+
+1. Agregar `"seccion"` a `EDITABLES` (hoy `["titulo", "cohorte", "duracion", "planes"]`), con el comentario de por qué es distinto de los otros cuatro: los otros son atributos del video, este es **pertenencia**, y hay una compuerta encima.
+
+2. Declarar las dos funciones nuevas, antes de `seccionesDe`:
+
+```js
+  /* -- Dónde vive hoy un video ---------------------------------------------
+     La sección la POSEE el dataset —`modulo.secciones[].videos`— y el campo
+     `seccion` del video es derivado al indexar. Mover un video es entonces lo
+     único del overlay que cambia una pertenencia y no un atributo, así que
+     tiene su propio derivado y su propia compuerta.
+
+     Los mínimos NO siguen al video movido: los reparte `minimosDeSeccion()`,
+     que es dato y lee la lista estructural. Lo exigible sigue siendo el mínimo
+     por sección y el total del módulo no cambia; lo que se corre es la cuota
+     por video, que este motor ya declara orientativa. */
+  function seccionEfectiva(video, escenaId) {
+    const esc = escenaId || escena;
+    const cambio = anotado("videos", video.id, esc) || {};
+    return cambio.seccion || video.seccion;
+  }
+
+  /* La compuerta de D-22, y vive acá y no en la pantalla: si la escribiera el
+     tablero, sería una promesa de la interfaz en vez de una propiedad del
+     motor, y `verificar()` no podría auditarla. */
+  function movible(video, escenaId) {
+    const esc = escenaId || escena;
+    return padronPreguntas().filter(function (p) {
+      return p.videoOrigen === video.id && alcanzada(p.creadaEn, esc);
+    }).length === 0;
+  }
+```
+
+3. En `seccionesDe()`, donde hoy dice `const vs = s.videos.map(…)`, agrupar por la sección efectiva sobre **todos** los videos del módulo en vez de sobre `s.videos`. La lista de secciones sigue saliendo de `modulo.secciones` —el orden y los mínimos no se tocan—; lo que cambia es qué videos caen en cada una.
+
+Exportar `seccionEfectiva` y `movible` junto a `seccionesDe`.
+
+- [ ] **Step 4: correr y verificar que pasa**
+
+```bash
+node -e 'global.window={};
+  ["academia-data","academia-agencias","academia-guiones","academia-preguntas","academia-sim","academia-import","academia-guia"]
+    .forEach(f => require(process.cwd()+"/assets/js/"+f+".js"));
+  const S = window.SIM, r = S.verificar();
+  console.log("controles:", r.controles.length, "| fallas:", r.fallas.length);
+  r.fallas.forEach(f => console.log("  FALLA:", f));
+  /* las 5 cadenas de BAK-M30 no se movieron */
+  const secs = S.seccionesDe(S.modulo(30));
+  console.log("cadena 1:", secs.reduce((a,s)=>a+s.total,0));
+  console.log("cadena 4:", secs.reduce((a,s)=>a+s.minimoBanco,0));
+  process.exit(r.ok ? 0 : 1)'
+```
+
+Esperado: **132 controles, 0 fallas**, `cadena 1: 28` y `cadena 4: 50` — los mismos números que hoy, porque sin overlay nada se movió.
+
+- [ ] **Step 5: la acción en lote**
+
+En `tablero.html`, en la `.bulk-bar`, agregar el dropdown «Mover a otra sección» siguiendo **exactamente** el patrón de los dos que ya están (`data-dropdown` + `data-dropdown-trigger` + `[data-menu-…]`). Dos cosas propias:
+
+- El menú se puebla con las secciones del módulo de los videos seleccionados. **Si la selección cruza módulos, la acción va deshabilitada** con el motivo: mover entre módulos cambiaría el ID, y el ID no cambia nunca (R2).
+- Si alguno de los seleccionados tiene preguntas, la acción va deshabilitada y el `title` dice cuántos y por qué: `"3 de los seleccionados tienen preguntas escritas: moverlos dejaría su banco fuera de sección"`. Es la regla del botón que no hace nada, y el veredicto lo da `S.movible()`, no la pantalla.
+
+El handler reusa `enLote({ seccion: titulo })`, que ya existe.
+
+- [ ] **Step 6: probar el movimiento de verdad**
+
+Con el banco de pruebas del iframe, en E5 sobre `BAK-M30`: seleccionar un video sin preguntas, moverlo, y verificar que **aparece en la sección destino y desaparece de la de origen**, que el total de videos del módulo no cambia, y que el mínimo de banco del módulo sigue en 50. Después `?reset=1` y confirmar que vuelve.
+
+- [ ] **Step 7: batería completa + `CLAUDE.md`**
+
+Actualizar: la tabla de campos que el overlay consume (agregar `seccion`, con la compuerta), la tabla de reglas de negocio (`seccionEfectiva()` y `movible()`), y los cuatro conteos de controles, que pasan a **124 · 126 · 130 · 132**.
+
+- [ ] **Step 8: commit**
+
+```bash
+git add assets/js/academia-sim.js tablero.html CLAUDE.md
+git commit -m "feat(tablero): mover un video a otra seccion, en lote y solo si no tiene preguntas
+
+Cierra D-22. Era lo mas caro del prompt y no lo mas barato: la seccion POSEE
+sus videos, asi que mover uno no es pisar un atributo sino cambiar una
+pertenencia. Va con su propio derivado, su propia compuerta en el motor —no en
+la pantalla, o verificar() no podria auditarla— y tres controles.
+
+Los minimos NO siguen al video movido: los reparte minimosDeSeccion(), que es
+dato y lee la lista estructural. Lo exigible sigue siendo el minimo por seccion
+y el total del modulo no cambia; lo que se corre es la cuota por video, que el
+motor ya declara orientativa.
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
+```
+
+---
+
+### Task C3: el banco, como solapa del módulo (D-20)
+
+`modulo.html` **no tiene solapas hoy** — el patrón vive en `video.html`, con `data-tabs="paneles"`, `role="tablist"`, `data-tab` y `aria-controls`, y `ui.js` ya le cablea las flechas. Esta tarea lo introduce en el módulo por primera vez.
+
+**Lo que no se toca:** `banco.html` **sigue existiendo** y sigue siendo el paso 3 de `pasosDeModulo()`. Es deep-link, y el prompt lo permite explícitamente: cada estado alcanzable por URL tiene que ser alcanzable también por un control visible. Borrarlo dejaría al módulo sin poder llegar a `activo`.
+
+**Files:**
+- Modify: `modulo.html` — el `tablist` con dos solapas, los dos paneles, y `?tab=`
+- Modify: `assets/js/render.js` — si el resumen del banco necesita un helper propio; reusar los de `banco.html` antes de escribir uno nuevo
+- Modify: `index.html` — el índice canónico de URLs
+- Modify: `CLAUDE.md` — el contrato de URL (`?tab=` pasa a leerlo también `modulo.html`)
+- Modify: `design-system.html` — la fila D-20 pasa de «pendiente de implementación» a describir dónde quedó
+
+**Interfaces:**
+- Consumes: `SIM.resumenModulo(modulo)` · `SIM.seccionesDe(modulo)` · `SIM.configEvaluacion(modulo)` · `SIM.seccionEfectiva()` de C2 · los helpers de render que ya usa `banco.html`.
+- Produces: nada que otra tarea consuma.
+
+- [ ] **Step 1: escribir los controles que fallan**
+
+```bash
+grep -c 'role="tablist"' modulo.html                                    # → 1
+curl -s "http://localhost:4321/modulo?m=30&tab=banco" | grep -c 'panel-banco'   # → ≥1
+curl -s "http://localhost:4321/banco?m=30" | grep -c '<h1'              # → 1 (sigue vivo)
+```
+
+- [ ] **Step 2: correr y verificar que falla** — el primero da `0`.
+
+- [ ] **Step 3: las solapas**
+
+Copiar el patrón de `video.html:116-125` **literal**, cambiando solo los valores: dos solapas, `data-tab="contenido"` (default) y `data-tab="banco"`, con `aria-controls="panel-contenido"` y `aria-controls="panel-banco"`. El árbol de secciones y el tablero de cinco pasos van dentro del panel de contenido; el resumen del banco por sección, en el otro.
+
+> **No dupliques el cálculo del banco.** `banco.html` ya lo resuelve con `resumenModulo()` y `seccionesDe()`; si su markup no está en un helper de `render.js`, extraelo ahí y que **las dos pantallas lo usen**. Dos redacciones del mismo resumen es exactamente el defecto que este repo evita, y la de la solapa sería la que se queda vieja.
+
+- [ ] **Step 4: `?tab=` en `modulo.html`**
+
+Leerlo con `UI.param("tab")`, default `contenido`, y aceptar solo `contenido` · `banco`. Un valor que la pantalla no maqueta **avisa** — regla 2 de las escenas: nunca mostrar otro panel con el rótulo cambiado.
+
+- [ ] **Step 5: correr y verificar que pasa** — los tres controles del Step 1, más el recorrido headless de los **13** `modulo?m=` × las dos solapas, todos 200 y sin errores de consola.
+
+- [ ] **Step 6: batería completa**
+
+Atención a dos bloques: el `cmp` del CSS —las clases `tabs`/`tab` ya existen, pero si agregás algo nuevo hay que recompilar— y los **10 sidebars idénticos**, porque `modulo.html` es una de las diez.
+
+- [ ] **Step 7: la documentación de URL**
+
+`index.html` es el índice canónico y hay que agregar las dos URLs nuevas. En `CLAUDE.md`, la fila de `?tab=` pasa a decir que `modulo.html` también lo lee, con sus dos valores. En `design-system.html`, actualizar la fila **D-20**.
+
+- [ ] **Step 8: commit**
+
+```bash
+git add modulo.html assets/js/render.js index.html CLAUDE.md design-system.html
+git commit -m "feat(modulo): el banco entra como solapa, y el deep-link se conserva
+
+Cierra D-20. La relacion «las preguntas son del modulo, no del video» se
+entiende por ubicacion en vez de explicarse. banco.html sigue vivo como
+deep-link —el prompt exige que todo estado alcanzable por URL lo sea tambien
+por un control visible— y sigue siendo el paso 3 de pasosDeModulo(): borrarlo
+dejaria al modulo sin poder llegar a activo.
+
+Primeras solapas de modulo.html: el patron se copio de video.html, que ya lo
+tenia cableado en ui.js.
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
+```
