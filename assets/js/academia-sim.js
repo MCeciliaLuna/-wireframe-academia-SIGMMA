@@ -1202,6 +1202,35 @@ window.SIM = (function () {
      que no preguntan por SIGMMA. */
   const MOTIVOS = ["sin preguntas", "bajo cuota", "a revisar"];
 
+  /* -- Los videos que esperan su link -------------------------------------
+     La unidad de trabajo es el VIDEO y el motivo es único: el ID ya está
+     reservado y todavía no tiene versión vigente. Es la puerta por la que
+     entra cualquiera del equipo, y es lo que hace que R11 deje de ser un
+     obstáculo: el alta no pide link porque cargar el link es OTRA tarea, con
+     su propia entrada.
+
+     Dos filtros, y ninguno es decorativo:
+
+     · `rango(estado) < rango("publicado")` — un publicado ya tiene su link
+       por definición. El dataset de E6 tiene publicados sin versión vigente,
+       así que preguntar por la versión en vez de por el estado listaría 18
+       videos publicados como pendientes.
+
+     · el hito de reserva del módulo — `videos()` devuelve los 55 en todas las
+       escenas, y sin esto E1 ofrecería 54 videos para cargar en la escena que
+       se define como «nada cargado». Es el mismo cierre que hace
+       `estadoDeCarga()` con `mapaCargadoEn`. */
+  function sinLink(escenaId) {
+    const esc = escenaId || escena;
+    return todos(esc).filter(function (v) {
+      if (rango(v.estado) >= rango("publicado")) return false;
+      const m = modulosPorNumero[v.modulo];
+      const cargado = !m || !m.mapaCargadoEn || alcanzada(m.mapaCargadoEn, esc);
+      if (!cargado) return false;
+      return !versionesDe(v, esc).some(function (x) { return x.vigente; });
+    }).sort(function (a, b) { return a.id < b.id ? -1 : 1; });
+  }
+
   function colaDeEscritura(escenaId, moduloNumero) {
     const esc = escenaId || escena;
 
@@ -1772,6 +1801,34 @@ window.SIM = (function () {
     chequeo("La cola no lista videos que no llegaron a publicado",
       colaMal.length === 0, colaMal.slice(0, 3).join(", "));
 
+    /* -- La puerta «ya lo tengo grabado» ---------------------------------
+       Dos cosas la pueden romper, y las dos ya pasaron en este repo:
+
+       · Contar un publicado como «sin link» mandaría a cargar un link que ya
+         está. En E6 hay 18 videos publicados que NO tienen versión vigente en
+         el dataset, así que definir la puerta por «no tiene versión» a secas
+         listaría 18 publicados. La condición es el ESTADO, no la versión.
+
+       · Contar los 55 IDs en E1 repetiría el bug que arregló `mapaCargadoEn`:
+         `videos()` devuelve los 55 en TODAS las escenas —la escena cambia el
+         estado, no la existencia—, así que sin el hito de reserva la escena
+         que se define como «nada cargado» ofrecería 54 videos para cargar. */
+    ["E1", "E2", "E3", "E4", "E5", "E6"].forEach(function (e) {
+      const lista = sinLink(e);
+      chequeo(
+        "Puerta · en " + e + " ningún publicado figura sin link",
+        lista.every(function (v) { return rango(v.estado) < rango("publicado"); }),
+        lista.filter(function (v) { return rango(v.estado) >= rango("publicado"); })
+          .map(function (v) { return v.id; }).join(", ")
+      );
+    });
+
+    chequeo(
+      "Puerta · en E1 no hay ningún video esperando link",
+      sinLink("E1").length === 0,
+      sinLink("E1").length + " videos ofrecidos en la escena «nada cargado»"
+    );
+
     /* -- Panel de carga -----------------------------------------------------
        `videosEsperados` es una DECLARACIÓN —cuántos videos va a tener el
        módulo— y la cantidad de videos es un HECHO. Hoy coinciden, y ahí está el
@@ -2102,6 +2159,7 @@ window.SIM = (function () {
     operacion: operacion,
 
     /* Evaluación */
+    sinLink: sinLink,
     sortear: sortear,
 
     /* Agregados */

@@ -187,10 +187,10 @@ Seis de sus siete controles se saltean donde no está cargado.
 
 | Dónde | Controles |
 |---|---|
-| Una pantalla común | **114** |
-| `importador.html` | **116** |
-| Una de las 7 del flujo | **120** |
-| El script de node de abajo, con los diez | **122** |
+| Una pantalla común | **121** |
+| `importador.html` | **123** |
+| Una de las 7 del flujo | **127** |
+| El script de node de abajo, con los diez | **129** |
 
 **Ojo con el orden de ejecución.** Los `<script src>` van al final del `<body>`, así que el script
 inline corre durante el parseo y el `renderIcons()` de `icons.js` hidrata lo generado en el
@@ -341,6 +341,7 @@ Todas en `academia-sim.js`. Ninguna en el HTML.
 | **Orden de una sección** | `ordenDeSeccion()` — la secuencia más baja de sus videos. Verificado: reproduce las 31 del dataset. Hace que ordenar la planilla por ID no pueda romper el syllabus. Una sección recién creada no tiene videos, así que ahí manda su `orden` explícito |
 | **Cuota de preguntas de un video** | `cuotaDeVideo()` — el mínimo de su sección repartido entre sus videos. **Orientativa:** lo exigible sigue siendo el mínimo por sección. **No es 10 parejo: va de 5 a 20** |
 | **Cola de escritura** | `colaDeEscritura()` — la unidad de trabajo es el VIDEO. Tres motivos en orden de urgencia: `sin preguntas` · `bajo cuota` · `a revisar`. **No lista lo que todavía no se publicó** |
+| **Los videos que esperan su link** | `sinLink()` — ID reservado y sin versión vigente, filtrado por estado anterior a `publicado` y por el hito de reserva del módulo. Es lo que hace que R11 deje de ser un obstáculo: el alta no pide link porque cargar el link es otra tarea |
 | ID de la próxima pregunta | `proximoIdPregunta()` — se deriva del banco, no del reloj. Lo usan el modal del banco y la sesión de escritura |
 | **Dónde quedó la guía** | No es una regla nueva. La etapa es el paso `en curso` de `pasosDeModulo()` y, dentro de ella, el control vigente es **el primero que no está listo**. La guía **no guarda progreso**, así que no puede desincronizarse si el módulo avanza desde otra pantalla o otra sesión |
 | **«¿Este control está completo?»** | No vive en el motor: la guía lo **lee del DOM** que la pantalla ya pintó — `aria-invalid`, `[data-*-error]`, y el `disabled` + `title` del botón primario. Reimplementarlo daría dos redacciones para la misma regla, y la de la guía sería la que se queda vieja |
