@@ -118,6 +118,11 @@
           <div id="detalle" class="layout-panel" hidden>
             <div class="flex flex-col gap-[10px]">
               <h2 class="side-title !mb-0" data-arbol-titulo></h2>
+              <p class="hint !mt-0" data-arbol-orden>
+                Las secciones se ordenan por la secuencia más baja de sus videos, no
+                por un campo aparte. Para cambiar el orden se reserva el ID que corresponde: así
+                ordenar la planilla por ID no puede romper el syllabus.
+              </p>
               <div data-arbol></div>
               <button type="button" class="placeholder-box !py-3 text-xs" data-agregar-seccion hidden>
                 <span class="icon icon-sm" data-icon="plus"></span> agregar sección
@@ -349,6 +354,7 @@
           });
           document.querySelector("[data-arbol-titulo]").textContent =
             "Los " + r.totalVideos + " videos que referencia · en orden de recorrido";
+          document.querySelector("[data-arbol-orden]").hidden = true;
           R.pintar("[data-arbol]", cohortes.map(function (c, i) {
             return R.seccionRuta(c, i, {
               escena: e === "E5" ? null : e,
