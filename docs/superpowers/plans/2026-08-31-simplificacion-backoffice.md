@@ -848,7 +848,7 @@ La barra de acciones en lote de `tablero.html` ya tiene cambiar estado, asignar 
 - Y la restricción de D-22 lo mantiene inofensivo: solo se mueven videos con **0 preguntas**, así que ninguna pregunta queda huérfana de su sección.
 
 **Files:**
-- Modify: `assets/js/academia-sim.js` — `seccionesDe()` agrupa por la sección **efectiva**; `seccion` entra a los campos que el overlay consume; 3 controles nuevos
+- Modify: `assets/js/academia-sim.js` — `seccionesDe()` agrupa por la sección **efectiva**; `seccion` entra a los campos que el overlay consume; 4 controles nuevos
 - Modify: `tablero.html` — la acción en lote, con su compuerta y su motivo
 - Modify: `CLAUDE.md` — la tabla de campos del overlay y los conteos de controles
 
@@ -862,7 +862,7 @@ En `auditar()`, después del control «Ningún video sin sección»:
 
 ```js
     /* -- Mover un video de sección (D-22) --------------------------------
-       Los tres controles cubren la invariante de R12 extendida al movimiento,
+       Los cuatro controles cubren la invariante de R12 extendida al movimiento,
        y la compuerta que la hace cierta. Sin el tercero, la restricción de
        D-22 sería una promesa de la pantalla y no una propiedad del motor. */
     chequeo(
@@ -878,6 +878,18 @@ En `auditar()`, después del control «Ningún video sin sección»:
         return !m || m.secciones.some(function (s) { return s.titulo === seccionEfectiva(v); });
       }),
       "algún video quedó apuntando a una sección que su módulo no tiene"
+    );
+
+    chequeo(
+      "Sección efectiva · los videos de cada sección salen ordenados por secuencia",
+      modulos.filter(function (m) { return m.tipo === "biblioteca"; }).every(function (m) {
+        return seccionesDe(m).every(function (s) {
+          return s.videos.every(function (v, i) {
+            return i === 0 || v.secuencia >= s.videos[i - 1].secuencia;
+          });
+        });
+      }),
+      "alguna sección devolvió sus videos desordenados"
     );
 
     chequeo(
@@ -932,7 +944,11 @@ Tres cambios en `assets/js/academia-sim.js`:
   }
 ```
 
-3. En `seccionesDe()`, donde hoy dice `const vs = s.videos.map(…)`, agrupar por la sección efectiva sobre **todos** los videos del módulo en vez de sobre `s.videos`. La lista de secciones sigue saliendo de `modulo.secciones` —el orden y los mínimos no se tocan—; lo que cambia es qué videos caen en cada una.
+3. En `seccionesDe()` —hoy **línea 700**, `const vs = s.videos.map(…)`— agrupar por la sección efectiva sobre **todos** los videos del módulo en vez de sobre `s.videos`. La lista de secciones sigue saliendo de `modulo.secciones` —el orden y los mínimos no se tocan—; lo que cambia es qué videos caen en cada una.
+
+> **Y hay que ORDENAR por secuencia, explícitamente.** Es la trampa de este paso y está verificada: `videosDe()` devuelve el padrón, que va **sección por sección**, no globalmente por secuencia. En `BAK-M30` sale `10 · 20 · 50 · 30 · 40 · 60 · 70`. Así que filtrar la lista plana por sección efectiva **sin ordenar** deja el video movido en la posición de su sección **original**. El caso real, medido: mover `.050` de «Carga y proceso» a «Plata: margen e impuestos» da **`50 · 30 · 40`** en vez de `30 · 40 · 50`. Ordená el resultado por `secuencia` ascendente y el problema desaparece.
+
+> **Dato que NO hay que arreglar en esta tarea, pero conviene conocer:** `seccionesDe()` devuelve `orden: s.orden` —el campo del **dataset**—, no `ordenDeSeccion(s)`. Si un movimiento cambia la secuencia mínima de una sección, el número que la pantalla muestra y el que el derivado calcularía pueden discrepar. No lo toques acá: el control que audita las 31 secciones corre sobre el dataset limpio y sigue en verde. Anotalo en tu informe si lo ves.
 
 Exportar `seccionEfectiva` y `movible` junto a `seccionesDe`.
 
@@ -952,7 +968,7 @@ node -e 'global.window={};
   process.exit(r.ok ? 0 : 1)'
 ```
 
-Esperado: **132 controles, 0 fallas**, `cadena 1: 28` y `cadena 4: 50` — los mismos números que hoy, porque sin overlay nada se movió.
+Esperado: **133 controles, 0 fallas**, `cadena 1: 28` y `cadena 4: 50` — los mismos números que hoy, porque sin overlay nada se movió.
 
 - [ ] **Step 5: la acción en lote**
 
@@ -969,7 +985,7 @@ Con el banco de pruebas del iframe, en E5 sobre `BAK-M30`: seleccionar un video 
 
 - [ ] **Step 7: batería completa + `CLAUDE.md`**
 
-Actualizar: la tabla de campos que el overlay consume (agregar `seccion`, con la compuerta), la tabla de reglas de negocio (`seccionEfectiva()` y `movible()`), y los cuatro conteos de controles, que pasan a **124 · 126 · 130 · 132**.
+Actualizar: la tabla de campos que el overlay consume (agregar `seccion`, con la compuerta), la tabla de reglas de negocio (`seccionEfectiva()` y `movible()`), y los cuatro conteos de controles, que pasan a **125 · 127 · 131 · 133**.
 
 - [ ] **Step 8: commit**
 
