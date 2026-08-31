@@ -567,6 +567,13 @@ npx tailwindcss -i ./src/input.css -o /tmp/chk.css --minify
 cmp /tmp/chk.css assets/css/academia.css                            # → sin diferencias
 ```
 
+> **`docs/` está excluido del escaneo, y tiene que seguir estándolo.** Tailwind v4 escanea
+> el proyecto entero por su cuenta: los `@source` de `src/input.css` **suman, no reemplazan**.
+> Los planes de ejecución citan nombres de clase dentro de bloques de código, así que sin el
+> `@source not "../docs/**"` **editar un documento cambia el CSS compilado** y este control se
+> pone rojo por una cita. Se probó `source(none)` para hacer autoritativa la lista de `@source`
+> y es demasiado: borra ocho reglas que el compilado publica hoy.
+
 > **Una clase que no compila no avisa: se ignora.** El `@theme` es cerrado, así que pedir
 > `text-2xl` o `bg-blue-500` no rompe el build — simplemente no existe la regla. Si tocás el
 > markup, el control de arriba es lo único que separa «recompilé» de «se ve raro y no sé por qué».

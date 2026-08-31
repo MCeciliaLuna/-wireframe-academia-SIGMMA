@@ -26,6 +26,14 @@
 @source "../assets/js/*.js";
 @source "../src/partials/*.html";
 
+/* `docs/` NO es markup: son el prompt de simplificación, su wireframe de
+   referencia y los planes de ejecución. Tailwind v4 escanea el proyecto entero
+   por su cuenta —los `@source` de arriba SUMAN, no reemplazan—, y los planes
+   citan nombres de clase dentro de bloques de código. Sin esta línea, editar un
+   documento cambia el CSS compilado y el control de `cmp` se pone rojo por una
+   cita. */
+@source not "../docs/**";
+
 /* ---------------------------------------------------------------------------
    1 · Fuentes — archivos locales copiados de web-2026/public/fonts
    Solo existen los pesos 400 y 700. No usar 500/600: el browser los sintetiza.
