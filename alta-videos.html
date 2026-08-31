@@ -377,10 +377,10 @@
                 return '<option value="' + R.esc(sec.titulo) + '"' +
                   (sec.titulo === f.seccion ? " selected" : "") + ">" + R.esc(sec.titulo) + "</option>";
               }).join("") + "</select></td>" +
-              '<td><label class="sr-only" for="t' + idx + '">Título fila ' + idx + "</label>" +
+              '<td><label class="sr-only" for="t' + idx + '">¿Qué enseña este video? fila ' + idx + "</label>" +
               '<input class="cell-input" id="t' + idx + '" data-campo="titulo" value="' +
                 R.esc(f.titulo) + '" placeholder="título del video" /></td>' +
-              '<td><label class="sr-only" for="p' + idx + '">Plan fila ' + idx + "</label>" +
+              '<td><label class="sr-only" for="p' + idx + '">¿A qué planes aplica? fila ' + idx + "</label>" +
               '<input class="cell-input" id="p' + idx + '" data-campo="planes" value="' +
                 R.esc(f.planes) + '" /></td>' +
               '<td><label class="sr-only" for="c' + idx + '">Cohorte fila ' + idx + "</label>" +
