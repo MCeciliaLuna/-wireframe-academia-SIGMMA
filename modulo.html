@@ -356,11 +356,18 @@
             });
           }).join(""));
         } else {
-          document.querySelector("[data-arbol-titulo]").textContent =
-            "Árbol de secciones · arrastrar para reordenar";
+          /* El título decía «· arrastrar para reordenar» y el gesto no existía:
+             no hay un solo `draggable` en el repo, y el propio `src/input.css`
+             lo admitía en el comentario del asa. Prometer una interacción que
+             no está es el mismo bug que un botón que no hace nada. Los ↑ ↓
+             llegan con la edición de secciones. */
+          document.querySelector("[data-arbol-titulo]").textContent = "Árbol de secciones";
           const secciones = S.seccionesDe(modulo);
           R.pintar("[data-arbol]", secciones.map(function (s, i) {
-            return R.seccionArbol(s, i, { escena: e === "E5" ? null : e });
+            return R.seccionArbol(s, i, {
+              escena: e === "E5" ? null : e,
+              modulo: modulo.numero,
+            });
           }).join(""));
           const agregar = document.querySelector("[data-agregar-seccion]");
           agregar.hidden = false;

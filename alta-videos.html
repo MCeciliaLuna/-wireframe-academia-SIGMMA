@@ -91,14 +91,14 @@
       <div class="main-col">
         <header class="page-head">
           <div>
-            <div class="breadcrumb"><a href="modulos.html?escena=E2">Contenido / Módulos</a> / Reservar IDs</div>
+            <div class="breadcrumb" data-breadcrumb></div>
             <h1 class="page-title">
               Reservar IDs de video
               <span class="chip chip-meta">alta masiva</span>
             </h1>
           </div>
           <div class="page-actions">
-            <a href="modulos.html?escena=E2" class="btn btn-bordered btn-sm">Cancelar</a>
+            <a href="modulos.html" class="btn btn-bordered btn-sm" data-cancelar>Cancelar</a>
             <button type="button" class="btn btn-primary btn-sm" data-reservar>Reservar IDs</button>
           </div>
         </header>
@@ -240,6 +240,10 @@
         /* Se puede llegar desde el detalle de un módulo, que ya sabe cuál es.
            La Ruta no lleva videos propios: los referencia (R8). */
         const mPedido = (S.param("m") || "").toUpperCase();
+        /* Y desde una SECCIÓN de ese árbol, que además sabe cuál. Se guarda en
+           una variable mutable, no en una constante: al cambiar de módulo la
+           sección deja de aplicar y hay que soltarla. */
+        let seccionPedida = S.param("seccion");
         const candidatos = S.modulos.filter(function (m) { return m.tipo !== "ruta"; });
         const inicial = candidatos.some(function (m) { return String(m.numero) === mPedido; })
           ? mPedido : String(candidatos[0].numero);
@@ -282,15 +286,31 @@
              el error de duplicado se vea sin tener que provocarlo. Un módulo sin
              ninguna ocupada no tiene error que mostrar. */
           const choque = usadas.length ? usadas[usadas.length - 1] : null;
-          /* Con una sola sección no hay nada que elegir: se precarga y el
-             desplegable queda como confirmación, no como decisión. */
-          const secciones = (S.modulo(n) || {}).secciones || [];
-          const inicial = secciones.length === 1 ? secciones[0].titulo : "";
+          const arranque = seccionInicial(n);
           lote = [];
           for (let i = 0; i < FILAS; i++) {
             const ultima = i === FILAS - 1;
-            lote.push(fila(ultima && choque ? choque : desde + i * PASO, inicial));
+            lote.push(fila(ultima && choque ? choque : desde + i * PASO, arranque));
           }
+        }
+
+        /* Con qué sección arrancan las filas. Dos fuentes, en orden: la que vino
+           por `?seccion=` —se llega desde el árbol del módulo, que ya sabe
+           cuál— y, si no, la única que tenga el módulo.
+
+           La regla vieja era SOLO la segunda, y era letra muerta: ninguno de los
+           11 módulos de biblioteca tiene una sola sección —van de 2 a 4—, así
+           que las cuatro filas arrancaban siempre en «— elegir —» y el botón
+           arrancaba siempre apagado con «Elegí la sección de cada fila».
+
+           El `<select>` de la columna se mantiene, y eso es a propósito: un lote
+           de grabación cruza secciones, porque el cohorte agrupa por escenario y
+           no por sección. Precargar no es atar. */
+        function seccionInicial(n) {
+          const secciones = (S.modulo(n) || {}).secciones || [];
+          const hay = secciones.some(function (s) { return s.titulo === seccionPedida; });
+          if (seccionPedida && hay) return seccionPedida;
+          return secciones.length === 1 ? secciones[0].titulo : "";
         }
 
         /* `seccionPrevia` es el caso frecuente: se cargan varios videos seguidos
@@ -496,10 +516,31 @@
           inpDesde.setAttribute("value", v);
         }
 
-        function rehacer() { sugerir(); semilla(); pintar(); }
+        /* El encabezado sigue al módulo elegido. Estaba escrito a mano y clavado
+           en `?escena=E2`, así que entrando desde el régimen «Cancelar» mandaba
+           al Mes 1: los datos de una escena no pueden filtrarse en otra. Y el
+           breadcrumb no nombraba el módulo, que es justo el contexto del lote. */
+        function pintarContexto() {
+          const m = S.modulo(numero());
+          if (!m) return;
+          const esc = S.escena;
+          const aModulos = "modulos.html" + (esc === "E5" ? "" : "?escena=" + esc);
+          const volver = "modulo.html?m=" + m.numero + (esc === "E5" ? "" : "&escena=" + esc);
+          R.pintar("[data-breadcrumb]",
+            '<a href="' + aModulos + '">Contenido / Módulos</a> / ' +
+            '<a href="' + volver.replace("&", "&amp;") + '">' + m.codigo + "</a> / Reservar IDs");
+          document.querySelector("[data-cancelar]").setAttribute("href", volver);
+        }
+
+        function rehacer() { sugerir(); semilla(); pintar(); pintarContexto(); }
         rehacer();
 
-        selMod.addEventListener("change", rehacer);
+        selMod.addEventListener("change", function () {
+          /* Otro módulo, otras secciones: la que vino por URL deja de aplicar.
+             Sin esto, dos módulos con una sección homónima se contagiarían. */
+          seccionPedida = null;
+          rehacer();
+        });
         /* La superficie también recompone el lote: solo BAK tiene módulos
            mapeados, así que elegir otra cambia qué IDs se pueden reservar.
            Antes no tenía `change` y elegir FRT no alteraba nada. */

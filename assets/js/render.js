@@ -412,11 +412,15 @@ window.RENDER = (function () {
 
     /* Una acción por paso. `motivo` vacío = habilitada. */
     const acciones = [
+      /* R11: acá no se sube nada. El destino reserva IDs —nacen en `backlog`,
+         sin link y sin versión—, y el link de YouTube se carga meses después,
+         al publicar. El rótulo decía «Subir video» y era el único del repo que
+         lo decía, justo sobre la pantalla que tiene prohibido el campo de link. */
       {
-        icono: "film", rotulo: "Subir video",
+        icono: "film", rotulo: "Reservar IDs",
         href: "alta-videos.html?m=" + m.numero + amp,
         motivo: x.creados >= x.esperados && x.publicados === x.creados
-          ? "Los " + x.esperados + " videos del módulo ya están publicados."
+          ? "Los " + x.esperados + " videos que declara el mapa ya están creados y publicados."
           : "",
       },
       {
@@ -549,7 +553,6 @@ window.RENDER = (function () {
     }
     return (
       '<div class="tree-row"' + (o.actual ? ' aria-current="true"' : "") + ">" +
-      '<span class="grip" aria-hidden="true">⠿</span>' +
       '<span class="row-id">' + (o.actual ? "<strong>" + esc(v.id) + "</strong>" : esc(v.id)) + "</span>" +
       '<span class="row-title"><a href="video.html?v=' + esc(v.id) + q + '">' +
         esc(v.titulo) + "</a></span>" +
@@ -574,14 +577,26 @@ window.RENDER = (function () {
         aRevisar: suyas.filter(function (p) { return p.estado === "a revisar"; }).length,
       });
     }).join("");
+    /* La puerta de la sección a sus videos. Antes no existía: para reservar un
+       ID había que salir al panel de módulos o al tablero, y el paso «Videos»
+       del tablero ofrece «Ir al tablero» —no «Reservar IDs»— en cuanto el mapa
+       está completo, que en E2 a E6 son los 11 módulos. El lote sigue pudiendo
+       cruzar secciones; esta acción solo precarga la que se venía mirando. */
+    const agregar = o.modulo
+      ? '<a class="ml-auto inline-flex items-center gap-1 text-2xs font-normal" href="alta-videos.html?m=' +
+        esc(String(o.modulo)) + "&amp;seccion=" + esc(encodeURIComponent(s.titulo)) +
+        (o.escena ? "&amp;escena=" + esc(o.escena) : "") +
+        '" title="Reservar IDs de video en «' + esc(s.titulo) + '»">' +
+        '<span class="icon icon-sm" data-icon="plus"></span>agregar video</a>'
+      : "";
     return (
       '<section class="tree-section" aria-labelledby="' + id + '">' +
       '<div class="tree-head">' +
-      '<span class="grip" aria-hidden="true">⠿</span>' +
       '<span id="' + id + '">' + s.orden + " · " + esc(s.titulo) + "</span>" +
       '<span class="chip chip-meta">' + s.videos.length +
         (s.videos.length === 1 ? " video" : " videos") + "</span>" +
       chipPreg +
+      agregar +
       "</div>" + filas +
       "</section>"
     );

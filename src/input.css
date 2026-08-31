@@ -2381,15 +2381,6 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  /* Asa de arrastre. El reordenamiento no está implementado (es maquetación):
-     el asa comunica la afordancia sin prometer el gesto. */
-  .grip {
-    font-family: var(--font-mono);
-    color: var(--color-gray-600);
-    cursor: grab;
-    user-select: none;
-  }
-
   /* -- Panel lateral de apoyo ----------------------------------------------- */
   .side-card {
     padding: 12px;
