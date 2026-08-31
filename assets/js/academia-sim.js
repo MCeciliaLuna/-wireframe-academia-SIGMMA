@@ -2134,6 +2134,7 @@ window.SIM = (function () {
     ordenDeSeccion: ordenDeSeccion,
     cuotaDeVideo: cuotaDeVideo,
     colaDeEscritura: colaDeEscritura,
+    sinLink: sinLink,
     estadoDeCarga: estadoDeCarga,
     resumenDeCarga: resumenDeCarga,
     pasosDeModulo: pasosDeModulo,
@@ -2159,7 +2160,6 @@ window.SIM = (function () {
     operacion: operacion,
 
     /* Evaluación */
-    sinLink: sinLink,
     sortear: sortear,
 
     /* Agregados */

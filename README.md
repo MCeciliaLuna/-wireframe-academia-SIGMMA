@@ -145,7 +145,7 @@ solapa del video; escribirlo pasa a ser trabajo de contenido fuera del backoffic
 `modulo.html?m=30&escena=E6`
 
 **Medir el uso quedó fuera del MVP** (D-17): las tres pantallas que lo mostraban salieron. El dato
-sigue en el dataset y **R10 sigue custodiado por el motor** —15 de los 122 controles verifican que no
+sigue en el dataset y **R10 sigue custodiado por el motor** —15 de los 129 controles verifican que no
 haya operación antes de E6—, pero ya no hay pantalla que lo muestre.
 
 ### Los cinco flujos
@@ -312,7 +312,7 @@ Salieron ocho pantallas con el recorte del MVP: la biblioteca de videos, la cola
 hoja de cohorte, el editor de guión, el uso de la Academia, el listado y el detalle de agencias, y
 superficies y planes. **El motor y el dataset quedaron intactos** —`academia-agencias.js` y
 `academia-guiones.js` siguen cargando, porque `modulos.html` usa `operacion()` y `escritura.html` usa
-`guionDe()`—, así que los **122 controles** de `verificar()` siguen en verde. Ver D-17.
+`guionDe()`—, así que los **129 controles** de `verificar()` siguen en verde. Ver D-17.
 
 **El sidebar está duplicado en las 10 páginas de app**, a propósito: así los `.html` se abren con
 doble click. La versión canónica es `src/partials/app-shell.html`, y cada copia está delimitada por
@@ -418,7 +418,7 @@ A las 9 reglas no negociables de la primera tanda se suman dos:
   importador usan `data-paso-estado`, así que no hay colisión.
 - **Las 5 cadenas de `BAK-M30`** siguen cerrando en régimen: 28 / 20 / 30 / 50 / 10.
 - **R10:** el uso solo existe donde hay uso. Medirlo quedó fuera del MVP, así que ya no hay pantalla
-  que lo muestre, pero la regla vive en el motor: 15 de los 122 controles verifican que no haya
+  que lo muestre, pero la regla vive en el motor: 15 de los 129 controles verifican que no haya
   operación antes de E6. **R11:** ninguna pantalla de alta tiene campo de link de YouTube.
 - **Los 6 estados vacíos** de las pantallas ya maquetadas, cada uno con su explicación y una sola
   acción posible.

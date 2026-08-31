@@ -42,7 +42,7 @@ con una **academia completa simulada**. Cuatro bloques de trabajo:
   > **El motor y el dataset no se tocaron.** `modulos.html` sigue usando `operacion()` para el
   > hito de E6 y `escritura.html` usa `guionDe()`, así que borrar las pantallas **no habilita**
   > borrar sus datos: `academia-agencias.js` y `academia-guiones.js` siguen cargando, y los 15
-  > controles de R10 siguen midiendo. Que los **122 controles** sigan en verde es la red que
+  > controles de R10 siguen midiendo. Que los **129 controles** sigan en verde es la red que
   > dice que el recorte no rompió nada.
 
 **Ya no es solo maquetación, ni solo navegación.** No hay backend, ni API, ni videos reales, ni SSO.
@@ -479,7 +479,7 @@ Modelarlo así garantiza que el banco no pueda achicarse entre escenas: `0 → 1
 
 ## Verificación
 
-### 1 · `SIM.verificar()` — 122 controles
+### 1 · `SIM.verificar()` — 129 controles
 
 Reemplaza los greps manuales de coherencia numérica. Corre en la consola del navegador o en node.
 **Cargá también `academia-import.js` y `academia-guia.js`**, o los controles que dependen de ellos
@@ -539,7 +539,7 @@ grep -n "fetch(\|XMLHttpRequest" assets/js/*.js *.html              # → vacío
 grep -ln "localStorage" assets/js/*.js                              # → academia-sim.js
 
 # R10 · el uso solo existe donde hay uso. Ya no hay pantalla que lo muestre —medirlo
-#       quedó fuera del MVP—, pero la regla sigue viva en el motor: 15 de los 122
+#       quedó fuera del MVP—, pero la regla sigue viva en el motor: 15 de los 129
 #       controles verifican que no haya operación antes de E6.
 # R11 · ninguna pantalla de alta pide un link
 grep -nE '<(input|textarea)[^>]*(type="url"|link|youtu)' alta-videos.html importador.html  # → vacío
@@ -549,7 +549,7 @@ grep -nE '<(input|textarea)[^>]*(type="url"|link|youtu)' alta-videos.html import
 # Ningún link apunta a una pantalla que no existe. Es el control que faltaba, y el
 # recorte del MVP es lo que lo hizo evidente: un href a un archivo borrado NO da error
 # en ningún lado —el 404 llega recién cuando alguien lo clickea— y `verificar()` audita
-# el dato, no la navegación, así que los 122 controles siguen en verde igual.
+# el dato, no la navegación, así que los 129 controles siguen en verde igual.
 # Se excluye `planes.html`, que es web.sigmma.net y es externo, y `app-shell.html`, que
 # es el partial y no se sirve. Anclar a `href` es lo que evita el falso positivo de
 # `f.html`, que en render.js es el acceso a una propiedad y no un nombre de archivo.
