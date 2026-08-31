@@ -374,29 +374,29 @@ En `src/input.css`, al final de la **sección 6**, agregar:
     @apply grid grid-cols-2 gap-3 mb-4;
   }
   .puerta {
-    @apply block text-left border border-gray-300 rounded bg-white px-4 py-3 no-underline;
+    @apply block text-left border border-line rounded bg-white px-4 py-3 no-underline;
   }
   a.puerta:hover {
-    @apply border-brand bg-gray-50;
+    @apply border-primary-light bg-surface;
   }
   div.puerta {
-    @apply bg-gray-50 text-gray-600 cursor-not-allowed;
+    @apply bg-surface text-ink-soft cursor-not-allowed;
   }
   .puerta-titulo {
-    @apply block text-sm font-bold text-gray-900 mb-1;
+    @apply block text-sm font-bold text-ink mb-1;
   }
   div.puerta .puerta-titulo {
-    @apply text-gray-600;
+    @apply text-ink-soft;
   }
   .puerta-bajada {
-    @apply block text-xs text-gray-700 mb-2;
+    @apply block text-xs text-ink-soft mb-2;
   }
   .puerta-quien {
-    @apply block text-2xs text-gray-600 border-t border-gray-200 pt-2;
+    @apply block text-2xs text-ink-soft border-t border-line pt-2;
   }
 ```
 
-> Antes de escribir estas clases, confirmá contra `src/input.css` que `border-brand`, `text-2xs`, `bg-gray-50`, `text-gray-600/700/900` y `border-gray-200/300` **existen en el `@theme`**. El `@theme` es cerrado: una clase que no está no rompe el build, simplemente no existe la regla y la pantalla sale mal en silencio. Si falta alguna, usá la que sí está — no agregues un token nuevo para esto.
+> **Los nombres de clase de este bloque están verificados uno por uno contra el `@theme`** — se compiló un archivo sonda que los usa y se comprobó que Tailwind emite cada regla. Escribilos **verbatim**. La primera redacción de este plan usaba `border-brand` y `bg-gray-50`, y **ninguna de las dos existe**: el `@theme` es cerrado, así que no rompen el build — simplemente no existe la regla y la puerta sale sin borde de hover y sin fondo, en silencio. Los nombres correctos son los semánticos que ya usa el repo: `border-line`, `border-primary-light`, `bg-surface`, `text-ink`, `text-ink-soft`. **No agregues ningún token nuevo al `@theme` para esta tarea.**
 
 - [ ] **Step 4: el helper de markup**
 
@@ -573,7 +573,7 @@ Y el control, en bash:
 # Cada rótulo declarado en la tabla de microcopy existe en la pantalla que dice.
 grep -o '¿Qué enseña este video?' alta-videos.html   # → 1 línea
 grep -o '¿A qué planes aplica?'   alta-videos.html   # → 1 línea
-grep -c 'Reservar IDs'            alta-videos.html   # → ya da 3: es el control de no-regresión
+grep -c 'Reservar IDs'            alta-videos.html   # → ya da 5: es el control de no-regresión
 ```
 
 - [ ] **Step 2: correr y verificar que falla**
@@ -601,7 +601,7 @@ En `alta-modulo.html`, línea 107 (`<h2 class="side-title" id="ident">Identidad<
 
 - [ ] **Step 4: correr y verificar que pasa**
 
-Los dos primeros greps del Step 1 dan una línea cada uno; el tercero sigue dando `3`.
+Los dos primeros greps del Step 1 dan una línea cada uno; el tercero sigue dando `5`.
 
 - [ ] **Step 5: batería completa**
 
