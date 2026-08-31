@@ -287,6 +287,7 @@ agrega una pantalla o un estado.
 | `?m=` | Cualquiera de los 13: `0`, `10`, `20` … `95`, `R01` |
 | `?v=` | Cualquiera de los 55: `BAK-M30.050`. También lo lee `escritura.html`, que es **por video** |
 | `?tab=` | `ficha` (default) · `versiones` · `guion` · `preguntas` · `ubicaciones` |
+| `?tab=` | También lo lee `modulo.html` (D-20): `contenido` (default) · `banco`. Un valor que no es ninguno de los dos avisa en vez de mostrar otra vista con el rótulo cambiado |
 | `?vista=` | `tabla` (default) · `kanban` — tablero |
 | `?escena=` | `E1` … `E6` — sin parámetro, `E5` |
 | `?paso=` | `1` · `2` · `resultado` — importador. **Ya no hay pasos 3 ni 4** |

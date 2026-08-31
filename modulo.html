@@ -109,35 +109,59 @@
             <div class="mt-8 flex gap-2" data-vacio-acciones></div>
           </div>
 
-          <!-- Los cinco pasos esenciales del módulo, en un solo lugar. El ciclo
-               dura MESES —entre declarar las secciones y escribir las preguntas
-               hay un rodaje entero—, así que no es un asistente: es un estado
-               que se consulta el día 1 y también el día 90. -->
-          <div class="mb-[14px]" data-pasos hidden></div>
-
-          <div id="detalle" class="layout-panel" hidden>
-            <div class="flex flex-col gap-[10px]">
-              <h2 class="side-title !mb-0" data-arbol-titulo></h2>
-              <p class="hint !mt-0" data-arbol-orden>
-                Las secciones se ordenan por la <strong>secuencia más baja</strong> de sus videos, no
-                por un campo aparte. Para cambiar el orden se reserva el ID que corresponde: así
-                ordenar la planilla por ID no puede romper el syllabus.
-              </p>
-              <div data-arbol></div>
-              <button type="button" class="placeholder-box !py-3 text-xs" data-agregar-seccion hidden>
-                <span class="icon icon-sm" data-icon="plus"></span> agregar sección
+          <!-- Las preguntas son del MÓDULO, no del video: por eso el banco
+               entra acá como solapa y no como pantalla aparte (D-20).
+               `banco.html?m=` sigue viva como deep-link — es el paso 3 de
+               `pasosDeModulo()`, y sin ella el módulo no puede llegar a
+               `activo`. -->
+          <p class="hint !mt-0" data-tab-invalido hidden></p>
+          <div id="detalle" hidden>
+            <div class="tabs" role="tablist" aria-label="Vistas del módulo" data-tabs="paneles">
+              <button type="button" class="tab" role="tab" data-tab="contenido" aria-selected="true" aria-controls="panel-contenido" id="tab-contenido">Contenido</button>
+              <button type="button" class="tab" role="tab" data-tab="banco" aria-selected="false" aria-controls="panel-banco" id="tab-banco">
+                Banco de preguntas <span class="chip chip-meta" data-n-banco></span>
               </button>
             </div>
 
-            <!-- Panel de apoyo. Contesta «¿por qué no puedo activar el módulo?»
-                 sin que haya que ir a buscarlo a otra pantalla. -->
-            <aside class="sticky top-0 flex flex-col gap-3">
-              <div data-aptitud></div>
-              <div class="side-card">
-                <h2 class="side-title">Atajos</h2>
-                <ul class="flex flex-col gap-2 text-xs" data-atajos></ul>
+            <div data-panels="paneles" class="pt-[14px]">
+              <div id="panel-contenido" role="tabpanel" aria-labelledby="tab-contenido" data-panel="contenido" tabindex="0">
+                <!-- Los cinco pasos esenciales del módulo, en un solo lugar. El
+                     ciclo dura MESES —entre declarar las secciones y escribir
+                     las preguntas hay un rodaje entero—, así que no es un
+                     asistente: es un estado que se consulta el día 1 y también
+                     el día 90. -->
+                <div class="mb-[14px]" data-pasos hidden></div>
+
+                <div class="layout-panel">
+                  <div class="flex flex-col gap-[10px]">
+                    <h2 class="side-title !mb-0" data-arbol-titulo></h2>
+                    <p class="hint !mt-0" data-arbol-orden>
+                      Las secciones se ordenan por la <strong>secuencia más baja</strong> de sus videos, no
+                      por un campo aparte. Para cambiar el orden se reserva el ID que corresponde: así
+                      ordenar la planilla por ID no puede romper el syllabus.
+                    </p>
+                    <div data-arbol></div>
+                    <button type="button" class="placeholder-box !py-3 text-xs" data-agregar-seccion hidden>
+                      <span class="icon icon-sm" data-icon="plus"></span> agregar sección
+                    </button>
+                  </div>
+
+                  <!-- Panel de apoyo. Contesta «¿por qué no puedo activar el módulo?»
+                       sin que haya que ir a buscarlo a otra pantalla. -->
+                  <aside class="sticky top-0 flex flex-col gap-3">
+                    <div data-aptitud></div>
+                    <div class="side-card">
+                      <h2 class="side-title">Atajos</h2>
+                      <ul class="flex flex-col gap-2 text-xs" data-atajos></ul>
+                    </div>
+                  </aside>
+                </div>
               </div>
-            </aside>
+
+              <div id="panel-banco" role="tabpanel" aria-labelledby="tab-banco" data-panel="banco" tabindex="0" hidden>
+                <div data-banco-resumen></div>
+              </div>
+            </div>
           </div>
         </main>
       </div>
@@ -187,6 +211,11 @@
 
         const r = S.resumenModulo(modulo);
         const esRuta = modulo.tipo === "ruta";
+        /* Se calcula acá, antes de saber si el módulo tiene contenido, porque
+           la solapa de banco (D-20) la necesita igual que el árbol de
+           contenido: la Ruta no tiene secciones propias (R8), así que le
+           corresponde la lista vacía. */
+        const secciones = esRuta ? [] : S.seccionesDe(modulo);
 
         /* ── Encabezado ─────────────────────────────────────────────────── */
         R.pintar("[data-breadcrumb]",
@@ -368,7 +397,6 @@
              no está es el mismo bug que un botón que no hace nada. Los ↑ ↓
              llegan con la edición de secciones. */
           document.querySelector("[data-arbol-titulo]").textContent = "Árbol de secciones";
-          const secciones = S.seccionesDe(modulo);
           R.pintar("[data-arbol]", secciones.map(function (s, i) {
             return R.seccionArbol(s, i, {
               escena: e === "E5" ? null : e,
@@ -437,6 +465,35 @@
              '<li><a href="banco.html?m=' + modulo.numero + amp +
                '&amp;config=1">Configuración de evaluación ›</a></li>'];
         R.pintar("[data-atajos]", atajos.join(""));
+
+        /* ── La solapa de banco (D-20) ─────────────────────────────────────
+           Las preguntas son del módulo, no del video: por eso viven acá y no
+           en una pantalla propia. `banco.html?m=` sigue existiendo como
+           deep-link —es el paso 3 de `pasosDeModulo()`— así que el resumen de
+           esta solapa reusa el mismo cálculo (`resumenModulo`, `seccionesDe`)
+           y el mismo helper de sección (`R.seccionBanco`) que esa pantalla:
+           dos redacciones del mismo resumen es el defecto que este repo
+           evita. */
+        document.querySelector("[data-n-banco]").textContent =
+          r.banco.vigentes + " / " + (r.banco.configurada ? r.banco.minimo : "—");
+        R.pintar("[data-banco-resumen]", R.resumenBancoModulo(modulo, r, secciones, {
+          escena: e === "E5" ? null : e,
+        }));
+
+        /* ── `?tab=` ────────────────────────────────────────────────────────
+           Solo dos vistas maquetadas: `contenido` (default) y `banco`. Un
+           valor que la pantalla no maqueta avisa en vez de mostrar otra cosa
+           con el rótulo cambiado (regla 2 de las escenas, aplicada acá al
+           mismo contrato de URL). `UI.js` ya cablea el conmutador de solapas
+           sobre `?tab=`; acá solo se agrega el aviso cuando el valor pedido
+           no es ninguna de las dos. */
+        const tabPedido = S.param("tab");
+        if (tabPedido && ["contenido", "banco"].indexOf(tabPedido) === -1) {
+          const aviso = document.querySelector("[data-tab-invalido]");
+          aviso.hidden = false;
+          aviso.innerHTML = "<strong>«" + R.esc(tabPedido) + "»</strong> no es una vista de esta " +
+            "pantalla: se muestra <strong>Contenido</strong>.";
+        }
       })();
     </script>
   </body>

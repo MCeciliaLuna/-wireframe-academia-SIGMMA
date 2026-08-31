@@ -773,6 +773,75 @@ window.RENDER = (function () {
     );
   }
 
+  /* -- Resumen del banco, para la solapa de módulo (D-20) ------------------
+     `banco.html` sigue siendo el deep-link con la carga completa —escribir,
+     filtrar, configurar, sortear—; esto es el resumen de solo lectura que
+     contesta «¿cómo viene el banco?» sin salir de `modulo.html`. Reusa
+     `seccionBanco()` para el detalle por sección: es el mismo cálculo
+     (`resumenModulo`, `seccionesDe`) que ya resuelve `banco.html`, así que no
+     hay una segunda redacción que se pueda desactualizar. */
+  function resumenBancoModulo(modulo, r, secciones, opciones) {
+    const o = opciones || {};
+    const q = o.escena ? "&amp;escena=" + esc(o.escena) : "";
+    const hrefBanco = "banco.html?m=" + esc(String(modulo.numero)) + q;
+    const b = r.banco;
+
+    if (r.esRuta) {
+      return (
+        '<div class="side-card side-card-strong">' +
+        '<h2 class="side-title">Banco derivado (R8)</h2>' +
+        '<p class="mt-2 text-sm text-gray-700">La Ruta Esencial no tiene banco propio: ' +
+        '<strong>hereda</strong> preguntas de los videos que referencia, uno por uno. ' +
+        "Vigentes <strong>" + b.vigentes + "</strong> de " +
+        (b.configurada ? "<strong>" + b.minimo + "</strong>" : "<strong>—</strong>") + ".</p>" +
+        '<a href="' + hrefBanco + '" class="btn btn-bordered btn-sm mt-3">' +
+        '<span class="icon icon-sm" data-icon="help-circle"></span>Ver los bancos de origen</a>' +
+        "</div>"
+      );
+    }
+
+    if (r.publicados === 0) {
+      return (
+        '<div class="placeholder-box !py-14">' +
+        '<span class="placeholder-icon" data-icon="help-circle"></span>' +
+        '<h2 class="text-h4">Todavía no corresponde escribir preguntas</h2>' +
+        '<p class="mt-3 max-w-[62ch] text-base text-gray-700">' +
+        '<span class="font-mono">' + esc(modulo.codigo) + "</span> no tiene ningún video " +
+        "publicado, así que su banco está en <strong>0</strong>. La pregunta se escribe " +
+        "<em>después</em> de grabar el video, para que use el mismo lenguaje y el mismo " +
+        "ejemplo que se ve en pantalla." +
+        "</p>" +
+        "</div>"
+      );
+    }
+
+    const minimo = b.configurada ? b.minimo : null;
+    const pct = minimo ? Math.round((b.vigentes / minimo) * 100) : 0;
+
+    return (
+      '<div class="flex flex-col gap-[14px]">' +
+      /* R4: el contador se ve SIEMPRE, no aparece como error al final. */
+      '<section class="side-card side-card-strong flex items-center gap-6" aria-labelledby="lbl-resumen-banco">' +
+      "<div>" +
+      '<h2 class="side-title" id="lbl-resumen-banco">Banco vigente / mínimo exigido</h2>' +
+      '<p class="counter-big"><b>' + b.vigentes + "</b><span>/ " + (minimo || "—") + "</span></p>" +
+      "</div>" +
+      '<div class="flex-1"><div class="progress"><span style="width: ' +
+      Math.min(100, pct) + '%"></span></div></div>' +
+      '<dl class="flex gap-5 border-l border-dashed border-line-strong pl-5">' +
+      '<div><dt class="side-title !mb-1">A revisar</dt><dd class="metric-value metric-value-sm ' +
+      'text-error-dark">' + b.aRevisar + "</dd></div>" +
+      '<div><dt class="side-title !mb-1">Borradores</dt><dd class="metric-value metric-value-sm">' +
+      b.borradores + "</dd></div>" +
+      "</dl>" +
+      '<a href="' + hrefBanco + '" class="btn btn-primary btn-sm">' +
+      '<span class="icon icon-sm" data-icon="help-circle"></span>Ir al banco completo</a>' +
+      "</section>" +
+      secciones.map(function (s, i) { return seccionBanco(s, i); }).join("") +
+      "</div>"
+    );
+  }
+
   function filaPregunta(p, opciones) {
     const o = opciones || {};
     const clase = p.estado === "a revisar" ? "chip-alerta"
@@ -920,6 +989,7 @@ window.RENDER = (function () {
     aptitudCard: aptitudCard,
     filaPregunta: filaPregunta,
     seccionBanco: seccionBanco,
+    resumenBancoModulo: resumenBancoModulo,
     guiaEstado: guiaEstado,
     guiaPopover: guiaPopover,
     guiaBarra: guiaBarra,
