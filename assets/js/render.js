@@ -360,6 +360,23 @@ window.RENDER = (function () {
      Va en una fila y no en una tarjeta: cuatro números que se leen de un
      vistazo, no un panel de texto que hay que ponerse a leer. Cada uno lleva a
      donde se resuelve; el que no tiene adónde llevar no es un link. */
+  /* Las dos puertas de entrada. El contrato: `href: null` significa que la
+     puerta no tiene adónde llevar, y entonces `motivo` es obligatorio y se
+     pinta en lugar de la bajada. Es la regla de que un control apagado dice
+     POR QUÉ: en E6 no hay ningún video esperando link, y una puerta que
+     lleva a una lista vacía es peor que una puerta apagada que lo explica. */
+  function puertas(lista) {
+    return lista.map(function (p) {
+      const cuerpo =
+        '<span class="puerta-titulo">' + esc(p.titulo) + "</span>" +
+        '<span class="puerta-bajada">' + esc(p.href ? p.bajada : p.motivo) + "</span>" +
+        '<span class="puerta-quien">' + esc(p.quien) + "</span>";
+      return p.href
+        ? '<a class="puerta" href="' + esc(p.href) + '">' + cuerpo + "</a>"
+        : '<div class="puerta" aria-disabled="true">' + cuerpo + "</div>";
+    }).join("");
+  }
+
   function franjaTrabajo(items) {
     return items.map(function (i) {
       const valor = i.href
@@ -884,6 +901,7 @@ window.RENDER = (function () {
     hitoCard: hitoCard,
     filaModulo: filaModulo,
     franjaTrabajo: franjaTrabajo,
+    puertas: puertas,
     tarjetaModulo: tarjetaModulo,
     tableroPasos: tableroPasos,
     estadoBanco: estadoBanco,

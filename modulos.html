@@ -154,6 +154,7 @@
                  módulo: en qué momento está la Academia —el hito, que es el único
                  texto del prototipo que no se puede calcular— y qué hay que hacer
                  hoy cruzando los 11. -->
+            <div class="puertas" data-puertas></div>
             <div data-hito></div>
             <section class="side-card" aria-labelledby="lbl-trabajo">
               <div class="flex flex-wrap items-start gap-x-10 gap-y-3">
@@ -288,6 +289,36 @@
           }
           return;
         }
+
+        /* ── Las dos puertas ─────────────────────────────────────────────
+           Fase 4 del prompt de simplificación, sin su pantalla: el hub
+           informaba y derivaba, que es por lo que se eliminó el panel de obra.
+           Acá cada puerta lleva a la pantalla donde la tarea se hace. Va
+           ANTES del corte de E1: también en el día 0 hay que poder reservar
+           los IDs, así que las dos puertas no pueden quedar detrás del
+           placeholder que cubre el resto de la franja. */
+        const esperandoLink = S.sinLink(esc);
+        R.pintar("[data-puertas]", R.puertas([
+          {
+            titulo: "Cargar el link de un video ya grabado",
+            bajada: "Hay " + esperandoLink.length +
+              (esperandoLink.length === 1 ? " video con su ID reservado" : " videos con su ID reservado") +
+              " esperando el link. Entrás a la ficha y cargás la versión.",
+            quien: "Cualquiera del equipo · no hace falta saber la estructura de antemano",
+            href: esperandoLink.length
+              ? "video.html?v=" + esperandoLink[0].id + (esc === "E5" ? "" : "&escena=" + esc)
+              : null,
+            motivo: "Ningún video está esperando link en este momento.",
+          },
+          {
+            titulo: "Reservar los IDs de lo que se va a grabar",
+            bajada: "Entra la estructura del mapa desde la planilla maestra. " +
+              "Los videos quedan en backlog, sin link, listos para guionar.",
+            quien: "Producción de contenido · el lote se pega de una vez",
+            href: "importador.html" + (esc === "E5" ? "" : "?escena=" + esc),
+            motivo: null,
+          },
+        ]));
 
         if (esc === "E1") return; /* El día 0 lo cubre su placeholder. */
 

@@ -29,6 +29,12 @@ con una **academia completa simulada**. Cuatro bloques de trabajo:
   > la pantalla borrada no se nombra en ningún lado —ni para contar que se borró—. Si algún
   > día hace falta citarla, hay que decidir primero cómo se excluye la cita del control.
 
+  Sobre esa franja se montaron las **dos puertas** de la Fase 4 del prompt de
+  simplificación —cargar el link de algo ya grabado, o reservar los IDs de lo
+  que se va a grabar—. Se montaron **ahí y no en una pantalla nueva**: un hub
+  «¿Qué querés hacer?» informa y deriva, que es exactamente por lo que se
+  eliminó el panel de obra.
+
 - **Recorte al alcance del MVP** — **10 pantallas** y **4 destinos vivos** en el sidebar. El
   MVP es **crear y ver módulos**, así que salieron ocho pantallas y tres grupos enteros del
   menú: seguimiento de uso, detalle por agencia, superficies y planes, biblioteca de videos,

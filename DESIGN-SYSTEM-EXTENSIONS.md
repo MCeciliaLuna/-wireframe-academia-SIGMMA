@@ -533,6 +533,23 @@ checkbox sea real y se opere con teclado.
 
 ---
 
+### `.puertas` · `.puerta` · `.puerta-titulo` · `.puerta-bajada` · `.puerta-quien`
+
+**Por qué.** La Fase 4 del prompt de simplificación pedía una pantalla «¿Qué querés hacer?». No se
+creó: es el mismo defecto del «panel de obra» que se eliminó, informar y derivar sin dejar hacer. Las
+dos puertas se montan en la franja de inicio de `modulos.html` y dan el mismo efecto —cada persona
+entra por donde su tarea tiene sentido— sin sumar un destino más al sidebar.
+
+**Decisión.** La puerta apagada es un **`<div>`, no un `<a>` sin `href`**: un link sin destino igual
+recibe foco y se lee como accionable, y eso es justo lo que la regla de «un botón que no hace nada es
+un bug» prohíbe. Cuando `href` es `null`, `motivo` es obligatorio y se pinta en el lugar de la
+bajada, así el control apagado dice **por qué** en vez de quedar mudo.
+
+**Tokens.** `border-line`, `border-primary-light` (hover), `bg-surface`, `bg-white`, `text-ink`,
+`text-ink-soft`, `rounded-md` — todos ya existentes en el `@theme`, no se agregó ninguno.
+
+---
+
 ## La guía paso por paso — 5 piezas
 
 ### `.guia-velo` · `.guia-foco`
