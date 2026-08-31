@@ -865,13 +865,13 @@ En `auditar()`, después del control «Ningún video sin sección»:
        D-22 sería una promesa de la pantalla y no una propiedad del motor. */
     chequeo(
       "Sección efectiva · sin overlay coincide con la estructural en los 55",
-      videos().every(function (v) { return seccionEfectiva(v) === v.seccion; }),
+      todos().every(function (v) { return seccionEfectiva(v) === v.seccion; }),
       "el derivado se despegó del dataset limpio"
     );
 
     chequeo(
       "Sección efectiva · siempre devuelve una sección real del módulo",
-      videos().every(function (v) {
+      todos().every(function (v) {
         const m = modulosPorNumero[v.modulo];
         return !m || m.secciones.some(function (s) { return s.titulo === seccionEfectiva(v); });
       }),
@@ -879,8 +879,8 @@ En `auditar()`, después del control «Ningún video sin sección»:
     );
 
     chequeo(
-      "Mover · ningún video con preguguntas es movible",
-      videos().every(function (v) {
+      "Mover · ningún video con preguntas es movible",
+      todos().every(function (v) {
         const conPreguntas = padronPreguntas().filter(function (p) {
           return p.videoOrigen === v.id;
         }).length > 0;
