@@ -890,7 +890,7 @@ En `auditar()`, después del control «Ningún video sin sección»:
     );
 ```
 
-> **Ojo:** el nombre del tercer control tiene un typo a propósito en esta redacción del plan —`preguguntas`— para que se vea el punto: **copiá el texto del control revisándolo, no en piloto automático.** Escribilo bien: `"Mover · ningún video con preguntas es movible"`. Y si al implementar encontrás cualquier otro dato de este plan que no cierre contra el árbol, **avisá antes de adaptarlo**: en este plan ya hubo siete números y snippets mal.
+> **Ojo:** este plan ya cometió **dos veces** el mismo error —escribir `videos(esc)` y `modulo(v.modulo)`, que dentro de la IIFE **no existen**: son claves del objeto exportado—. Los nombres internos son **`todos()`** y **`modulosPorNumero[]`**, y así están escritos arriba. Copiá el bloque revisándolo, no en piloto automático. Y si al implementar encontrás cualquier otro dato de este plan que no cierre contra el árbol, **avisá antes de adaptarlo**: en este plan ya hubo ocho números y snippets mal.
 
 - [ ] **Step 2: correr y verificar que falla** — `ReferenceError: seccionEfectiva is not defined`.
 
