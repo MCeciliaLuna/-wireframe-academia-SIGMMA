@@ -690,6 +690,51 @@
                 <td><strong>El alcance del MVP es crear y ver módulos</strong> <span class="chip chip-publicado">cerrada</span></td>
                 <td><strong>Diez pantallas y cuatro destinos vivos.</strong> Quedan las cuatro de creación —importador, alta de módulo, de sección y de videos—, las tres de visualización —módulos, módulo y video— y las tres que <em>son</em> los pasos 2, 3 y 4 del módulo: tablero, banco y escritura. Estas últimas no se conservan por las dudas: sin ellas el módulo no llega a <code class="font-mono text-xs">activo</code>. Salieron ocho pantallas —biblioteca de videos, cola de regrabación, hoja de cohorte, editor de guión, uso de la Academia, agencias, detalle de agencia, y superficies y planes—. <strong>Regla nueva del sidebar:</strong> los destinos fuera del alcance van como <code class="font-mono text-xs">span aria-disabled</code>, como los que nunca se maquetaron, pero <strong>un grupo cuyos destinos están todos deshabilitados no se muestra</strong> — dejar Pipeline, Seguimiento y Administración enteros en gris hacía que el 70 % del menú fuera ruido, y eso contradice R6. El motor y el dataset no se tocaron: los 129 controles siguen en verde, que es lo que dice que el recorte no rompió nada.</td>
               </tr>
+              <tr>
+                <td class="font-mono text-xs">D-18</td>
+                <td><strong>El alta nunca pide el link, y dejó de ser un problema</strong> <span class="chip chip-publicado">cerrada</span></td>
+                <td>La Fase 3 del prompt de simplificación pedía que «ya lo tengo grabado» pidiera el link en el alta. <strong>R11 se conserva intacta</strong>, y la decisión se cerró <em>por construcción</em>: la Fase 4 del mismo prompt propone la salida —separar las dos tareas en dos puertas— y eso es lo que se construyó en el panel. Cargar el link no es un alta: el ID ya está reservado y lo que falta es la versión, que se carga en la ficha. El grep que verifica que ninguna pantalla de alta pida un link sigue en verde.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">D-19</td>
+                <td><strong>Las preguntas no se importan nunca</strong> <span class="chip chip-publicado">cerrada</span></td>
+                <td>La Fase 5.b pedía el mismo flujo de planilla para el banco. <strong>R13 se conserva.</strong> El motivo sigue en pie y es visible en el propio dataset: 438 de las 550 preguntas son relleno estructural, precisamente porque escribir las reales es trabajo de contenido y no de carga. Una vía de importación las volvería a hacer <em>parecer</em> cargadas sin estarlo, que es justo lo que la interfaz hoy se ocupa de desmentir. Las preguntas nacen del trabajo, en la sesión de escritura, con <code class="font-mono text-xs">colaDeEscritura()</code> como cola por video.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">D-20</td>
+                <td><strong>El banco pasa a ser solapa del módulo, y el deep-link se conserva</strong> <span class="chip chip-publicado">cerrada</span></td>
+                <td>La Fase 6 pedía que el banco dejara de ser una pantalla suelta. Entra como <strong>solapa de <code class="font-mono text-xs">modulo.html</code></strong>, y <code class="font-mono text-xs">banco.html?m=</code> sigue vivo como deep-link, porque el prompt exige que todo estado alcanzable por URL lo sea también por un control visible. <strong>Reubicar, nunca eliminar:</strong> el banco es el paso 3 de <code class="font-mono text-xs">pasosDeModulo()</code> y sin él el módulo no llega a <code class="font-mono text-xs">activo</code>. Pendiente de implementación.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">D-21</td>
+                <td><strong>El orden de una sección lo sigue dando el ID más bajo de sus videos</strong> <span class="chip chip-publicado">cerrada</span></td>
+                <td>El prompt pedía usar el campo <code class="font-mono text-xs">orden</code> para reordenar, y avisar si aparecía un caso donde no alcanzara. <strong>Apareció, y es este:</strong> <code class="font-mono text-xs">ordenDeSeccion()</code> devuelve la secuencia más baja de los videos de la sección y solo cae al campo explícito cuando la sección está vacía — y las <strong>31 de 31</strong> secciones del dataset tienen videos, así que ese campo <strong>no se lee nunca</strong>. Mover una sección hacia arriba exigiría renumerar las secuencias de sus videos, y eso viola R2. El acoplamiento es deliberado: hace que ordenar la planilla por ID no pueda romper el syllabus. Lo que falta no es un gesto sino un <strong>rótulo</strong>: decir en la pantalla, donde hoy no hay nada, de dónde sale ese orden. Pendiente de implementación.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">D-22</td>
+                <td><strong>Mover un video a otra sección se habilita solo si no tiene preguntas</strong> <span class="chip chip-publicado">cerrada</span></td>
+                <td>La Fase 5.a lo listaba como «lo más barato»; en este repo es <strong>lo más caro del prompt</strong>. <code class="font-mono text-xs">seccionesDe()</code> arma cada sección desde <code class="font-mono text-xs">modulo.secciones[].videos</code> —la sección posee sus videos, el campo <code class="font-mono text-xs">seccion</code> del video es derivado—, las preguntas se filtran por <code class="font-mono text-xs">subtema === s.titulo</code>, y los mínimos salen de los videos de la sección: en <code class="font-mono text-xs">BAK-M30</code> por una tabla fija indexada por <em>título</em>, y en los otros diez repartidos por cantidad de videos. O sea que la misma operación tendría dos comportamientos. <strong>Se habilita para videos con 0 preguntas</strong>, y para el resto la acción va deshabilitada con el motivo a la vista. Pendiente de implementación.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">D-23</td>
+                <td><strong>Manda el backoffice; el Sheets es el origen de la carga inicial</strong> <span class="chip chip-publicado">cerrada</span></td>
+                <td>El prompt la marcaba como <strong>bloqueante</strong> y no la resolvía. El mapa entra <strong>una vez</strong> por el importador y desde ahí el tablero de Google Sheets deja de ser la fuente editable: todo cambio posterior de estado, link, duración, versión, guión y preguntas ocurre en el backoffice. Es lo que el motor ya asumía —el overlay persiste cambios que la planilla no conoce— y lo que evita la divergencia garantizada de tener las dos vías vivas en paralelo. Consecuencia operativa: hay que avisarle al equipo que el Sheets pasa a ser histórico.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">D-24</td>
+                <td><strong>La secuencia se sigue pudiendo tipear en el alta, y es una excepción declarada</strong> <span class="chip chip-publicado">cerrada</span></td>
+                <td>La Fase 2 pedía que ningún formulario tuviera un input de texto para el ID y que no hubiera intercalado manual. <strong>Se conserva el campo</strong>, y no contradice el espíritu de R2: la superficie y el módulo van con candado, y lo editable es solo el tramo que decide dónde se intercala. El motivo es el dato real: el mapa de contenido tiene huecos de secuencia a propósito —<code class="font-mono text-xs">BAK-M30</code> va 010, 020, 050 en su primera sección— y sin el campo no se pueden reproducir. La última fila del lote propone a propósito una secuencia ya ocupada, para que el error de duplicado se vea sin tener que provocarlo.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">D-25</td>
+                <td><strong>La detección de duplicado por título no hace falta todavía</strong> <span class="chip chip-publicado">cerrada</span></td>
+                <td>La Fase 4 la pedía y aclaraba que se propusiera el método antes de implementarla. <strong>La puerta que se construyó no crea nada:</strong> lleva a la ficha de un video que ya está reservado, así que por esa vía el duplicado no puede producirse. El riesgo queda solo si alguien reserva un ID nuevo para algo ya reservado con otro título, y ahí la validación de secuencia duplicada ya avisa nombrando el video que la ocupa. Si aparece el caso real, el método acordado es comparar título normalizado <strong>dentro del módulo</strong> —minúsculas, sin tildes, sin signos, palabras ordenadas— y ofrecer la coincidencia como aviso que no bloquea. Nada de distancia de edición: con 4 a 7 videos por módulo da más falsos positivos que aciertos.</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-xs">D-26</td>
+                <td><strong>«Un módulo inactivo no acepta videos nuevos» no tiene referente en este modelo</strong> <span class="chip chip-publicado">cerrada</span></td>
+                <td>El prompt la traía como regla de integridad dura. Los estados de módulo acá son <code class="font-mono text-xs">borrador</code> · <code class="font-mono text-xs">reservado</code> · <code class="font-mono text-xs">activo</code>: <strong>no existe «inactivo después de haber estado activo»</strong>, porque por D-4 la aptitud es una compuerta al activar y no una condición permanente. Y si <code class="font-mono text-xs">borrador</code> se tratara como inactivo, ningún módulo aceptaría videos nunca —hay que poder cargarle videos justamente antes de activarlo—, así que la Academia no se podría construir. <strong>La regla queda declarada inaplicable.</strong> Si algún día hace falta retirar un módulo ya activo, ahí se decide el estado nuevo y la regla recupera su referente.</td>
+              </tr>
             </tbody>
           </table>
         </div>
