@@ -374,7 +374,7 @@ En `src/input.css`, al final de la **sección 6**, agregar:
     @apply grid grid-cols-2 gap-3 mb-4;
   }
   .puerta {
-    @apply block text-left border border-line rounded bg-white px-4 py-3 no-underline;
+    @apply block text-left border border-line rounded-md bg-white px-4 py-3 no-underline;
   }
   a.puerta:hover {
     @apply border-primary-light bg-surface;
@@ -396,7 +396,9 @@ En `src/input.css`, al final de la **sección 6**, agregar:
   }
 ```
 
-> **Los nombres de clase de este bloque están verificados uno por uno contra el `@theme`** — se compiló un archivo sonda que los usa y se comprobó que Tailwind emite cada regla. Escribilos **verbatim**. La primera redacción de este plan usaba `border-brand` y `bg-gray-50`, y **ninguna de las dos existe**: el `@theme` es cerrado, así que no rompen el build — simplemente no existe la regla y la puerta sale sin borde de hover y sin fondo, en silencio. Los nombres correctos son los semánticos que ya usa el repo: `border-line`, `border-primary-light`, `bg-surface`, `text-ink`, `text-ink-soft`. **No agregues ningún token nuevo al `@theme` para esta tarea.**
+> **Los nombres de clase de este bloque están verificados uno por uno contra el `@theme`** — se compiló un archivo sonda que los usa y se comprobó que Tailwind emite cada regla. Escribilos **verbatim**.
+>
+> **Y cuidado con cómo se verifica.** La primera sonda de este plan usó `grep '\.rounded\b'` y dio OK, pero matcheaba `.rounded-md`: el guion es límite de palabra, así que `\b` no separa una clase de sus variantes. `rounded` **no existe** —el `@theme` mata el radio DEFAULT con `--radius-*: initial` y solo define `sm/md/lg/xl`—, y el radio correcto es `rounded-md`, el mismo `--radius-md` que usa `.side-card`. Ese caso sí falla ruidoso, porque `@apply` con una clase desconocida es error de build; los que fallan en silencio son los de color. La primera redacción de este plan usaba `border-brand` y `bg-gray-50`, y **ninguna de las dos existe**: el `@theme` es cerrado, así que no rompen el build — simplemente no existe la regla y la puerta sale sin borde de hover y sin fondo, en silencio. Los nombres correctos son los semánticos que ya usa el repo: `border-line`, `border-primary-light`, `bg-surface`, `text-ink`, `text-ink-soft`. **No agregues ningún token nuevo al `@theme` para esta tarea.**
 
 - [ ] **Step 4: el helper de markup**
 
@@ -435,7 +437,9 @@ En `modulos.html`, en la franja de inicio, **antes** de `<div data-hito></div>` 
               <div class="puertas" data-puertas></div>
 ```
 
-Y en el script inline, **antes** de `R.pintar("[data-hito]", R.hitoCard(hito));` (línea 410), insertar:
+Y en el script inline, **antes de la línea `if (esc === "E1") return;`** (hoy línea 323), insertar:
+
+> **Ojo con el punto de montaje, que es lo único delicado de esta tarea.** `modulos.html` tiene un `return` temprano para E1 —«el día 0 lo cubre su placeholder»— y está **antes** de `R.pintar("[data-hito]", …)`. Si el bloque de las puertas se monta ahí, en E1 no se pinta nada y la prueba del Step 6 da `activas=0 apagadas=0` en vez de `1/1`. Las puertas tienen que quedar **arriba de ese `return`**: en el día 0 la puerta de reservar IDs es justamente la que tiene que estar.
 
 ```js
         /* ── Las dos puertas ─────────────────────────────────────────────
