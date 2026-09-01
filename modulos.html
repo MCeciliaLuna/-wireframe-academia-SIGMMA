@@ -64,12 +64,14 @@
             </a>
             <span class="nav-item" aria-disabled="true">
               <span class="icon" data-icon="film"></span>Biblioteca de videos
+              <span class="ml-auto text-2xs font-normal text-gray-600" data-motivo>fuera del alcance del MVP</span>
             </span>
             <a href="tablero.html" class="nav-item">
               <span class="icon" data-icon="columns"></span>Tablero de producción
             </a>
             <span class="nav-item" aria-disabled="true">
               <span class="icon" data-icon="refresh"></span>Cola de regrabación
+              <span class="ml-auto text-2xs font-normal text-gray-600" data-motivo>fuera del alcance del MVP</span>
             </span>
           </div>
 
@@ -80,6 +82,7 @@
             </a>
             <span class="nav-item" aria-disabled="true">
               <span class="icon" data-icon="settings"></span>Configuración
+              <span class="ml-auto text-2xs font-normal text-gray-600" data-motivo>se configura en el banco</span>
             </span>
           </div>
 
@@ -90,6 +93,7 @@
             </a>
             <span class="nav-item" aria-disabled="true">
               <span class="icon" data-icon="grid"></span>Matriz perfil × módulo
+              <span class="ml-auto text-2xs font-normal text-gray-600" data-motivo>no hay perfiles en el dataset</span>
             </span>
           </div>
         </nav>
@@ -719,8 +723,13 @@
               (esperandoLink.length === 1 ? " ID reservado" : " IDs reservados") +
               " todavía sin link. Si ya tenés el archivo, entrás a la ficha y cargás la versión.",
             quien: "Cualquiera del equipo · no hace falta saber la estructura de antemano",
+            /* Con `?tab=versiones`: la puerta aterriza en la solapa donde SE
+               CARGA el link, no en la ficha para que haya que buscarla. Es un
+               clic de los cuatro que tiene la tarea, y el más fácil de perder
+               —el destino ya sabía a qué venía. */
             href: esperandoLink.length
-              ? "video.html?v=" + esperandoLink[0].id + (esc === "E5" ? "" : "&escena=" + esc)
+              ? "video.html?v=" + esperandoLink[0].id + "&tab=versiones" +
+                (esc === "E5" ? "" : "&escena=" + esc)
               : null,
             motivo: motivoSinLink,
           },

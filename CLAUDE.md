@@ -311,6 +311,47 @@ con una **academia completa simulada**. Cuatro bloques de trabajo:
   > intactos) y el importador **no rechaza el lote entero por una fila mala** (2 ok / 1 error en
   > el mismo archivo).
 
+- **Las 10 preguntas de verificación, medidas** — Fase 6 y cierre del rediseño. Los números
+  salen de un banco de pruebas que hace clicks reales y **cuenta cada uno**, no de una
+  estimación leyendo el código.
+
+  | | Pregunta | Medido | Objetivo |
+  |---|---|---|---|
+  | 1 | Clics de la Tarea 1 | **4** | ≤ 4 ✓ |
+  | 2 | Pantallas de la Tarea 1 | **2** (`modulos` + `video`) | 2 ✓ |
+  | 3 | Pantallas de la Tarea 3 | **2** (`modulos` + `modulo`) | 1 ✗ |
+  | 4 | Clics de la Tarea 5 | **2 + una casilla por video** | 3 + 8 ✓ |
+  | 5 | Clics del inicio a resolver un pendiente | **1**, con la solapa correcta abierta | 1 ✓ |
+  | 6 | Estados solo por URL | **ninguno** | ninguno ✓ |
+  | 7 | Controles visibles que no llevan a nada | **ninguno** | ninguno ✓ |
+  | 8 | Padre en un desplegable | **en ninguna** vía que la app ofrece | ninguna ✓ |
+  | 9 | Acciones que aterrizan en el inicio | **ninguna** | ninguna ✓ |
+  | 10 | Tarea 1 solo con teclado | **sí** | sí ✓ |
+
+  **Nueve de diez.** La 3 queda en 2 y está explicado más arriba: la navegación que sobra es
+  entrar al objeto recién creado, que es lo que la **regla 6 exige**.
+
+  > **La medición encontró dos cosas que la lectura no.** La puerta de «cargar el link» aterrizaba
+  > en la ficha y no en la solapa de versiones: un clic de los cuatro, y el más fácil de perder
+  > porque el destino ya sabía a qué venía. Y **los cuatro destinos inertes del sidebar estaban
+  > presentes y mudos** en las 21 URLs auditadas — el motivo vivía en un comentario del HTML, que
+  > nadie ve. Eso contradecía la regla insignia del repo, «un control que no se puede ejecutar va
+  > deshabilitado con el motivo a la vista»; ahora cada uno lo lleva escrito al lado, marcado con
+  > `data-motivo` para que se pueda auditar.
+
+  > **Y dos falsos positivos de la propia medición, que valen como advertencia:** `\bid="` matchea
+  > también `data-id="` y daba 55 IDs duplicados inexistentes —hay que anclar con
+  > `(?<![-\w])id="`—, y medir «apagado y mudo» solo por `title` o `aria-describedby` daba 84
+  > casos que sí decían su motivo, en texto. Un control **oculto** tampoco cuenta: la pregunta es
+  > por lo que la persona ve, así que la métrica filtra por `offsetParent` y por `hidden` en toda
+  > la cadena de ancestros.
+
+  > **El foco después de guardar una versión no vuelve al disparador, y no es un defecto.**
+  > `closeModal()` lo devuelve siempre que el nodo siga en el DOM, pero guardar llama a
+  > `UI.recargar()`: tras una recarga completa el foco en el `<body>` es el comportamiento normal
+  > del navegador. Lo que sí se conserva es el `?tab=versiones`, así que la pantalla vuelve donde
+  > estaba.
+
   **T6 · reordenar queda pendiente y bloqueado.** Mover ya está —en el tablero y en el árbol, con
   `movible()` de compuerta—, y cruzar módulos la interfaz lo **impide** en vez de avisar, que es
   más estricto que lo que pide el flujo y correcto por R2. Lo que no se puede hacer sin una

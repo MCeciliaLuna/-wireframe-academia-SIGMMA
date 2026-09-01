@@ -780,8 +780,14 @@ window.RENDER = (function () {
          botón, porque activar/desactivar vive en el encabezado (D-4). */
       (o.sinBoton
         ? ""
+        /* El motivo está a la vista, justo arriba, en `#aptitud-motivo`. Pero
+           «a la vista» no alcanza para quien navega con lector de pantalla: sin
+           el `aria-describedby` el botón se anuncia apagado y sin explicación,
+           que es la mitad del defecto que la regla del repo persigue. Es el
+           mismo vínculo que ya lleva el botón del paso 5. */
         : '<button type="button" class="btn btn-primary btn-sm btn-block mt-3"' +
-          (ap.apto ? "" : " disabled") + ">" + esc(o.accion || "Activar módulo") + "</button>") +
+          (ap.apto ? "" : ' disabled aria-describedby="aptitud-motivo"') + ">" +
+          esc(o.accion || "Activar módulo") + "</button>") +
       "</div>"
     );
   }
