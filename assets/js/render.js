@@ -590,6 +590,25 @@ window.RENDER = (function () {
        que es donde vive el flujo link → «Traer datos» → confirmar (R1); no se
        duplica el modal acá. El que ya tiene versión vigente no la ofrece: no
        habría nada que cargar. */
+    /* Subir y bajar. Solo botones, sin arrastrar: el flujo lo pide como
+       alternativa opcional y el repo ya quitó una vez el rótulo «arrastrar para
+       reordenar» porque el gesto no existía. Prometerlo de nuevo sería el mismo
+       error.
+
+       Se apagan en los extremos y lo DICEN: el primero no puede subir. Un botón
+       apagado y mudo se lee como roto —es la regla insignia del repo—. */
+    const reordenar = o.reordenable
+      ? '<span class="inline-flex gap-1">' +
+        '<button type="button" class="link-quiet" data-subir="' + esc(v.id) + '"' +
+        (o.primero ? ' disabled title="Ya es el primero de su sección."' : '') +
+        ' aria-label="Subir ' + esc(v.id) + ' en su sección">' +
+        '<span class="icon icon-sm" data-icon="chevron-up"></span></button>' +
+        '<button type="button" class="link-quiet" data-bajar="' + esc(v.id) + '"' +
+        (o.ultimo ? ' disabled title="Ya es el último de su sección."' : '') +
+        ' aria-label="Bajar ' + esc(v.id) + ' en su sección">' +
+        '<span class="icon icon-sm" data-icon="chevron-down"></span></button>' +
+        "</span>"
+      : "";
     const cargar = o.sinLink
       ? '<a class="text-2xs font-normal" href="video.html?v=' + esc(v.id) + q +
         '&amp;tab=versiones" title="Este ID todavía no tiene link">cargar link</a>'
@@ -623,6 +642,7 @@ window.RENDER = (function () {
       chipEstado(v.estado) +
       chipPreg +
       cargar +
+      reordenar +
       "</div>"
     );
   }
@@ -633,13 +653,19 @@ window.RENDER = (function () {
     const chipPreg = s.aRevisar && s.vigentes === 0
       ? '<span class="chip chip-alerta">' + s.total + " preguntas · todas a revisar</span>"
       : '<span class="chip chip-outline">' + s.total + " preguntas</span>";
-    const filas = s.videos.map(function (v) {
+    const filas = s.videos.map(function (v, i2) {
       const suyas = s.preguntas.filter(function (p) { return p.videoOrigen === v.id; });
       return filaVideoArbol(v, {
         escena: o.escena,
         actual: o.actual === v.id,
         nuevo: o.nuevo === v.id,
         seleccionable: !!o.seleccionable,
+        /* Quién es primero y último lo sabe la sección, no la fila: por eso el
+           veredicto se pasa desde acá y `filaVideoArbol` no vuelve a mirar la
+           lista. Con una sola fila no hay nada que reordenar. */
+        reordenable: !!o.reordenable && s.videos.length > 1,
+        primero: i2 === 0,
+        ultimo: i2 === s.videos.length - 1,
         /* El veredicto lo da el motor —`sinLink()`— y llega resuelto en un
            conjunto: render.js no lo calcula ni lo consulta por fila. */
         sinLink: !!(o.sinLink && o.sinLink[v.id]),

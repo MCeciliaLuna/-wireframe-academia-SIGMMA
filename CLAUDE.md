@@ -352,14 +352,41 @@ con una **academia completa simulada**. Cuatro bloques de trabajo:
   > del navegador. Lo que sí se conserva es el `?tab=versiones`, así que la pantalla vuelve donde
   > estaba.
 
-  **T6 · reordenar queda pendiente y bloqueado.** Mover ya está —en el tablero y en el árbol, con
-  `movible()` de compuerta—, y cruzar módulos la interfaz lo **impide** en vez de avisar, que es
-  más estricto que lo que pide el flujo y correcto por R2. Lo que no se puede hacer sin una
-  decisión es **reordenar**: el orden de una sección es DERIVADO (`ordenDeSeccion()` — la
-  secuencia más baja de sus videos), así que unos ↑↓ obligan a reasignar secuencias, y la
-  secuencia es parte del ID, que R2 declara permanente. Las dos salidas —renumerar, o sumar un
-  campo `orden` propio al video— rompen una regla cableada o el modelo de datos que el propio
-  flujo dice no tocar.
+- **Reordenar sin tocar el ID** — cierra T6, la última tarea abierta del rediseño.
+
+  El orden de dictado y el orden de reserva de IDs no son la misma cosa: un video grabado después
+  puede tener que verse antes. Hasta acá el orden lo daba la secuencia y **no había forma de
+  cambiarlo**.
+
+  Las dos salidas eran renumerar o sumar un campo, y **se eligió el campo**: renumerar habría
+  reasignado secuencias, y la secuencia es parte del ID, que R2 declara permanente. Ahora el
+  overlay puede llevar un `orden` propio y `ordenEfectivo()` lo prefiere sobre la secuencia
+  cuando existe.
+
+  > **No son dos fuentes de verdad, y ese es el punto.** Es el mismo patrón que
+  > `seccionEfectiva()`: un parche **opcional** con la estructura como fallback. El dataset no se
+  > tocó —los 55 videos siguen sin el campo—, y hay un control que exige que **sin overlay el
+  > orden efectivo sea la secuencia en los 55**. Si ese control se pusiera rojo, el campo habría
+  > dejado de ser un parche.
+
+  Los ↑↓ van en la fila, se apagan en los extremos **y dicen por qué**, y no aparecen en una
+  sección de un solo video. **Solo botones, sin arrastrar:** el flujo lo pide como alternativa
+  opcional, y este repo ya quitó una vez el rótulo «arrastrar para reordenar» porque el gesto no
+  existía — prometerlo de nuevo sería el mismo error. El foco sigue al video que se movió, o
+  reordenar con el teclado deja el foco en la nada en cada paso.
+
+  > **Reordenar no lleva compuerta**, a diferencia de mover: no cambia el ID ni la pertenencia,
+  > así que no hay preguntas que puedan quedar fuera de sección. Y **reordenar videos no mueve la
+  > sección**: `ordenDeSeccion()` sigue saliendo de la secuencia mínima, que es del ID. Hay un
+  > control para eso.
+
+  Medido: bajar `BAK-M10.030` en «Configurar el file» da `040, 030, 050` con el ID y la secuencia
+  **intactos** (30 sigue siendo 30), la sección intacta, el orden de las secciones sin moverse, el
+  cambio visible sin recargar, persistente al recargar y borrado por `?reset=1`.
+
+  **Mover ya estaba** —en el tablero y en el árbol, con `movible()` de compuerta— y cruzar módulos
+  la interfaz lo **impide** en vez de avisar, que es más estricto que lo que pide el flujo y
+  correcto por R2.
 
 **Ya no es solo maquetación, ni solo navegación.** No hay backend, ni API, ni videos reales, ni SSO.
 Pero **sí hay capa de datos, reglas de negocio derivadas, mutaciones y persistencia en
@@ -503,10 +530,10 @@ Seis de sus siete controles se saltean donde no está cargado.
 
 | Dónde | Controles |
 |---|---|
-| Una pantalla común | **126** |
-| `importador.html` | **128** |
-| Una de las 7 del flujo | **132** |
-| El script de node de abajo, con los diez | **134** |
+| Una pantalla común | **130** |
+| `importador.html` | **132** |
+| Una de las 7 del flujo | **136** |
+| El script de node de abajo, con los diez | **138** |
 
 **Ojo con el orden de ejecución.** Los `<script src>` van al final del `<body>`, así que el script
 inline corre durante el parseo y el `renderIcons()` de `icons.js` hidrata lo generado en el
@@ -683,6 +710,8 @@ Todas en `academia-sim.js`. Ninguna en el HTML.
 | **«¿Este control está completo?»** | No vive en el motor: la guía lo **lee del DOM** que la pantalla ya pintó — `aria-invalid`, `[data-*-error]`, y el `disabled` + `title` del botón primario. Reimplementarlo daría dos redacciones para la misma regla, y la de la guía sería la que se queda vieja |
 | **Dónde vive hoy un video (D-22)** | `seccionEfectiva(video, escenaId)` — el parche del overlay si existe **y nombra una sección real del módulo del video**, y si no la sección estructural (resuelta por ID, nunca por el campo del objeto recibido). La validación es lo que sostiene R12 aunque alguien escriba en el overlay sin pasar por la compuerta de la pantalla. La sección la POSEE el dataset, así que mover un video es la única mutación del overlay que cambia una pertenencia y no un atributo |
 | **La compuerta de mover un video (D-22)** | `movible(video, escenaId)` — cierra en 0 preguntas ya alcanzadas para ese video. Vive en el motor y no en la pantalla, o `verificar()` no podría auditarla |
+| **En qué orden va un video dentro de su sección** | `ordenEfectivo(video, escenaId)` — el `orden` del overlay si existe, y si no la **secuencia**. El orden de dictado y el de reserva de IDs no son la misma cosa: un video grabado después puede tener que verse antes. Mismo patrón que `seccionEfectiva()`: un parche opcional con la estructura como fallback, **no** un segundo campo que haya que mantener al día |
+| **Reordenar dos videos** | `permutar(video, vecino, escenaId)` — devuelve el par de `anotar()` que intercambia sus órdenes. **Intercambia, no desplaza la lista**: el cambio queda acotado a dos entidades. No lleva compuerta —a diferencia de mover— porque no cambia ni el ID ni la pertenencia: lo único que no se puede es sacar un video de los extremos, y eso lo dice la posición |
 
 > **`RENDER.tableroPasos()` acepta `acciones`, un mapa por id de paso.** La pantalla pone su
 > propio control donde la acción no es navegar: activar el módulo es una mutación, y agregar
@@ -732,8 +761,8 @@ Las secciones se armaban con un literal y perdían todo lo demás; ya no.
 | `videos` | `{codigoModulo, seccion, secuencia, titulo, cohorte, duracion, planes}` — **`seccion` por título** | por `secuencia` |
 | `cohortes` | `{id, nombre, prioridad, escenario}` | por `id` |
 
-Qué campos se leen del overlay, y nada más: `estado` y `visible` de un video, los cinco de
-`EDITABLES` (título, cohorte, duración, planes, **sección**), `versiones`, `guion`, el `estado` de un
+Qué campos se leen del overlay, y nada más: `estado` y `visible` de un video, los seis de
+`EDITABLES` (título, cohorte, duración, planes, **sección**, **orden**), `versiones`, `guion`, el `estado` de un
 módulo y su `evaluacion`, el `estado` de una pregunta, y el `entorno` de un cohorte. **Escribir
 cualquier otro campo persiste el JSON pero ningún cálculo lo consume.**
 
@@ -832,7 +861,7 @@ Modelarlo así garantiza que el banco no pueda achicarse entre escenas: `0 → 1
 
 ## Verificación
 
-### 1 · `SIM.verificar()` — 134 controles
+### 1 · `SIM.verificar()` — 138 controles
 
 Reemplaza los greps manuales de coherencia numérica. Corre en la consola del navegador o en node.
 **Cargá también `academia-import.js` y `academia-guia.js`**, o los controles que dependen de ellos
@@ -863,6 +892,12 @@ Y los seis de los flujos de alta: **que el orden de sección derivado de la secu
 las 31 del dataset** · que ningún video quede sin sección · que ningún módulo de biblioteca quede sin
 secciones · que la cuota por video sume el mínimo de su sección · que la cola no liste videos que no
 llegaron a `publicado` · y la **ida y vuelta de la plantilla**.
+
+Y los cuatro del orden dentro de la sección: **que sin overlay el orden efectivo sea la
+secuencia en los 55** —es el que sostiene que el campo siga siendo un parche y no una segunda
+fuente de verdad— · que cada sección salga ordenada por el orden efectivo · que `permutar()`
+intercambie sin perder ninguna posición · y que reordenar un video **no mueva su sección**,
+porque el orden de la sección sale de la secuencia mínima y no del efectivo.
 
 Y los cinco de mover un video de sección (D-22): **que `seccionEfectiva()` coincida con la sección
 estructural en los 55 sin overlay** · que siempre devuelva una sección real del módulo del video ·

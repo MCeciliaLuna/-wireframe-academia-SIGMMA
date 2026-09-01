@@ -443,7 +443,9 @@ window.SIM = (function () {
      overlay sin pasar por esa compuerta igual queda cubierto, porque
      `seccionEfectiva()` valida el título contra las secciones del módulo del
      propio video antes de aceptar el parche. */
-  const EDITABLES = ["titulo", "cohorte", "duracion", "planes", "seccion"];
+  /* `orden` es el sexto, y es distinto de los cinco primeros por lo mismo que
+     `seccion`: no describe al video, describe DÓNDE está. Ver `ordenEfectivo()`. */
+  const EDITABLES = ["titulo", "cohorte", "duracion", "planes", "seccion", "orden"];
 
   function conEstado(video, escenaId) {
     const esc = escenaId || escena;
@@ -768,9 +770,12 @@ window.SIM = (function () {
       (porSeccion[t] = porSeccion[t] || []).push(v);
     });
     return modulo.secciones.map(function (s, i) {
+      /* Ordena por el orden EFECTIVO, no por la secuencia: es lo que hace que
+         reordenar se vea. Sin overlay los dos coinciden —`ordenEfectivo()` cae
+         en la secuencia—, así que el árbol de los 55 sale igual que antes. */
       const vs = (porSeccion[s.titulo] || [])
         .slice()
-        .sort(function (a, b) { return a.secuencia - b.secuencia; });
+        .sort(function (a, b) { return ordenEfectivo(a, esc) - ordenEfectivo(b, esc); });
       const ps = b.filter(function (p) { return p.subtema === s.titulo; });
       const vigentes = ps.filter(function (p) { return p.estado === "vigente"; }).length;
       const min = minimos[i] || { banco: 0, sorteo: 0 };
@@ -801,6 +806,48 @@ window.SIM = (function () {
 
      Una sección recién creada todavía no tiene videos de los que derivar nada,
      así que ahí manda el `orden` explícito que trae la entidad. */
+  /* -- El orden de un video dentro de su sección ----------------------------
+     El orden lo DERIVA la secuencia, que es parte del ID: `BAK-M30.050` va
+     después de `BAK-M30.040` y eso no se negocia (R2 — el ID sobrevive al
+     regrabado, así que reasignar secuencias para reordenar está prohibido).
+
+     Pero el orden de dictado y el orden de reserva de IDs no son la misma cosa:
+     un video grabado después puede tener que verse antes. Por eso el overlay
+     puede llevar un `orden` propio, y este derivado lo prefiere cuando existe.
+
+     Es el mismo patrón que `seccionEfectiva()`: un parche opcional con la
+     estructura como fallback, no un segundo campo que haya que mantener al día.
+     Sin overlay, `ordenEfectivo()` devuelve la secuencia y todo se comporta
+     igual que antes — hay un control de `verificar()` que lo exige en los 55.
+
+     El valor es comparativo, no un índice: se usa para ordenar, así que alcanza
+     con que respete el orden relativo. No hay que renumerar a nadie. */
+  function ordenEfectivo(video, escenaId) {
+    const esc = escenaId || escena;
+    const parche = anotado("videos", video.id, esc);
+    if (parche && typeof parche.orden === "number") return parche.orden;
+    return video.secuencia;
+  }
+
+  /* Reordenar es seguro SIEMPRE, a diferencia de mover: no cambia el ID ni la
+     pertenencia, así que no hay preguntas que puedan quedar fuera de sección y
+     no hace falta compuerta. Lo único que no se puede es sacar un video de los
+     extremos, y eso lo dice la posición, no una regla.
+
+     Devuelve el par de `anotar()` que hay que aplicar: el video y su vecino
+     intercambian su orden efectivo. Intercambiar y no desplazar la lista entera
+     es lo que mantiene el cambio acotado a dos entidades del overlay. */
+  function permutar(video, vecino, escenaId) {
+    const esc = escenaId || escena;
+    const a = ordenEfectivo(video, esc);
+    const b = ordenEfectivo(vecino, esc);
+    /* Con los dos en el mismo valor —imposible hoy, pero un overlay escrito a
+       mano podría— el intercambio no haría nada y el botón se leería como roto:
+       se separan por un paso mínimo alrededor del valor común. */
+    if (a === b) return [{ id: video.id, orden: b - 1 }, { id: vecino.id, orden: b }];
+    return [{ id: video.id, orden: b }, { id: vecino.id, orden: a }];
+  }
+
   function ordenDeSeccion(seccion) {
     const vs = (seccion && seccion.videos) || [];
     if (!vs.length) {
@@ -1887,6 +1934,77 @@ window.SIM = (function () {
       "alguna sección devolvió sus videos desordenados"
     );
 
+    /* ── Reordenar (el campo `orden` del video) ────────────────────────────
+       Cuatro controles. El primero es el que sostiene la decisión de fondo: sin
+       overlay, el orden efectivo TIENE que ser la secuencia. Si dejara de serlo,
+       el campo habría pasado de ser un parche opcional a una segunda fuente de
+       verdad, que es exactamente lo que se evitó al no renumerar. */
+    chequeo(
+      "Orden · sin overlay el efectivo es la secuencia en los 55",
+      todos().every(function (v) { return ordenEfectivo(v) === v.secuencia; }),
+      "el orden dejó de derivarse de la secuencia sin que nadie lo reordene"
+    );
+
+    chequeo(
+      "Orden · cada sección sale ordenada por el orden efectivo",
+      catalogo().filter(function (m) { return m.tipo === "biblioteca"; }).every(function (m) {
+        return seccionesDe(m).every(function (sc) {
+          for (let i = 1; i < sc.videos.length; i++) {
+            if (ordenEfectivo(sc.videos[i - 1]) > ordenEfectivo(sc.videos[i])) return false;
+          }
+          return true;
+        });
+      }),
+      "alguna sección devolvió sus videos fuera del orden efectivo"
+    );
+
+    /* Permutar intercambia: los dos valores salen cruzados y ninguno se pierde.
+       Es lo que garantiza que reordenar no pueda dejar dos videos en la misma
+       posición ni abrir un hueco. */
+    chequeo(
+      "Orden · permutar intercambia y no pierde ninguna posición",
+      catalogo().filter(function (m) { return m.tipo === "biblioteca"; }).every(function (m) {
+        return seccionesDe(m).every(function (sc) {
+          if (sc.videos.length < 2) return true;
+          const a = sc.videos[0];
+          const b = sc.videos[1];
+          const par = permutar(a, b);
+          const antes = [ordenEfectivo(a), ordenEfectivo(b)].sort(function (x, y) { return x - y; });
+          const despues = par.map(function (x) { return x.orden; }).sort(function (x, y) { return x - y; });
+          return par.length === 2 &&
+            par[0].id === a.id && par[1].id === b.id &&
+            antes[0] === despues[0] && antes[1] === despues[1];
+        });
+      }),
+      "permutar no está intercambiando los dos órdenes"
+    );
+
+    /* Y lo que NO tiene que cambiar: reordenar videos dentro de una sección no
+       puede mover la sección de lugar. El orden de la sección sale de la
+       secuencia mínima —que es del ID y no se toca—, no del orden efectivo. */
+    chequeo(
+      "Orden · reordenar un video no mueve su sección",
+      catalogo().filter(function (m) { return m.tipo === "biblioteca"; }).every(function (m) {
+        return seccionesDe(m).every(function (sc) {
+          if (!sc.videos.length) return true;
+          /* `ordenDeSeccion()` tiene que seguir saliendo de la SECUENCIA mínima
+             —que es parte del ID y no se toca— y no del orden efectivo. Si
+             saliera del efectivo, reordenar el primer video de una sección la
+             movería de lugar en el módulo, y reordenar dentro de una sección no
+             es reordenar las secciones.
+
+             Se compara contra la secuencia mínima, no contra `s.orden`: aquel es
+             la posición (1, 2, 3) y esto es la secuencia (10, 20, 30) — son dos
+             escalas y compararlas fue el primer intento de este control. */
+          const minSecuencia = sc.videos.reduce(function (min, v) {
+            return v.secuencia < min ? v.secuencia : min;
+          }, sc.videos[0].secuencia);
+          return ordenDeSeccion(sc) === minSecuencia;
+        });
+      }),
+      "el orden de una sección dejó de salir de la secuencia mínima"
+    );
+
     chequeo(
       "Mover · ningún video con preguntas es movible",
       todos().every(function (v) {
@@ -2290,6 +2408,8 @@ window.SIM = (function () {
     seccionEfectiva: seccionEfectiva,
     movible: movible,
     ordenDeSeccion: ordenDeSeccion,
+    ordenEfectivo: ordenEfectivo,
+    permutar: permutar,
     cuotaDeVideo: cuotaDeVideo,
     colaDeEscritura: colaDeEscritura,
     sinLink: sinLink,

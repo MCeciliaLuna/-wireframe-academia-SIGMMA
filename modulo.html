@@ -758,6 +758,7 @@
           cablearAltaSeccion();
           cablearAltaVideo();
           cablearLoteArbol();
+          cablearReordenar();
           pintarVisibilidad();
           marcarSeccionNueva();
           marcarVideoNuevo();
@@ -783,11 +784,74 @@
               sinLink: esperanLink,
               nuevo: S.param("nuevov"),
               seleccionable: true,
+              reordenable: true,
             });
           }).join(""));
           /* Las filas son nuevas: la selección múltiple captura los checkboxes
              una sola vez, así que sin esto deja de responder sin decir por qué. */
           if (window.UI && window.UI.rebind) window.UI.rebind();
+        }
+
+        /* ── Reordenar dentro de la sección ───────────────────────────────
+           El orden de dictado y el orden de reserva de IDs no son la misma cosa:
+           un video grabado después puede tener que verse antes. Hasta acá el
+           orden lo daba la secuencia y no había forma de cambiarlo.
+
+           NO se renumera nada: la secuencia es parte del ID y el ID es
+           permanente (R2). Lo que se guarda es un `orden` propio en el overlay,
+           que `ordenEfectivo()` prefiere sobre la secuencia cuando existe —el
+           mismo patrón de `seccionEfectiva()`, un parche opcional con la
+           estructura como fallback—.
+
+           Se intercambia con el vecino en vez de desplazar la lista entera: el
+           cambio queda acotado a dos entidades y el resto de la sección no se
+           toca. El motor lo resuelve en `permutar()`, para que `verificar()`
+           pueda auditarlo.
+
+           Va por delegación, como el resto: el árbol se repinta y los botones
+           cableados dejarían de existir. */
+        function cablearReordenar() {
+          document.addEventListener("click", function (ev) {
+            const b = ev.target.closest("[data-subir], [data-bajar]");
+            if (!b || b.disabled) return;
+            const id = b.dataset.subir || b.dataset.bajar;
+            const delta = b.dataset.subir !== undefined ? -1 : 1;
+
+            /* El vecino sale de la sección donde el video vive HOY, con el orden
+               que se está viendo: pedirlo al dataset daría el vecino de antes de
+               mover o de reordenar. */
+            const sec = S.seccionesDe(modulo).filter(function (sc) {
+              return sc.videos.some(function (v) { return v.id === id; });
+            })[0];
+            if (!sec) return;
+            const i = sec.videos.findIndex(function (v) { return v.id === id; });
+            const vecino = sec.videos[i + delta];
+            if (!vecino) return;
+
+            S.permutar(sec.videos[i], vecino, e).forEach(function (x) {
+              S.anotar("videos", x.id, { orden: x.orden });
+            });
+            pintarArbol();
+            avisar((delta === -1 ? "Subió " : "Bajó ") + id + " en «" + sec.titulo + "».");
+            /* El foco sigue al video que se movió, en su botón nuevo: sin esto,
+               reordenar con el teclado deja el foco en la nada y hay que volver
+               a buscar la fila en cada paso. */
+            const otra = document.querySelector(
+              '[' + (delta === -1 ? "data-subir" : "data-bajar") + '="' + id + '"]');
+            if (otra && !otra.disabled) otra.focus();
+            else {
+              const fila = document.querySelector('[data-arbol] [data-id="' + id + '"]');
+              if (fila) fila.focus();
+            }
+          });
+        }
+
+        /* El aviso del árbol, compartido: lo usan el lote y el reordenado. */
+        function avisar(texto) {
+          const aviso = document.querySelector("[data-arbol-aviso]");
+          if (!aviso) return;
+          aviso.hidden = false;
+          aviso.textContent = texto;
         }
 
         /* ── Acciones en lote sobre el árbol ──────────────────────────────
@@ -796,7 +860,6 @@
            para que `verificar()` pueda auditarla, nunca en la pantalla. */
         function cablearLoteArbol() {
           const barra = document.getElementById("bulk-arbol");
-          const aviso = document.querySelector("[data-arbol-aviso]");
           const menuEstados = document.querySelector("[data-arbol-estados]");
           const triggerMover = document.querySelector("[data-arbol-mover]");
           const menuSecciones = document.querySelector("[data-arbol-secciones]");
@@ -806,10 +869,7 @@
               R.esc(est) + '">' + R.esc(est) + "</button>";
           }).join(""));
 
-          function decir(texto) {
-            aviso.hidden = false;
-            aviso.textContent = texto;
-          }
+          const decir = avisar;
 
           /* Terminada la acción, la selección se limpia: dejarla puesta invita a
              aplicar la siguiente sobre un conjunto que ya se procesó. */
