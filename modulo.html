@@ -63,7 +63,7 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Evaluación</span>
-            <a href="banco.html?m=30" class="nav-item">
+            <a href="modulo.html?m=30&amp;tab=banco" class="nav-item">
               <span class="icon" data-icon="help-circle"></span>Bancos de preguntas
             </a>
             <span class="nav-item" aria-disabled="true">
@@ -1152,8 +1152,13 @@
            evita. */
         document.querySelector("[data-n-banco]").textContent =
           r.banco.vigentes + " / " + (r.banco.configurada ? r.banco.minimo : "—");
+        /* La cola sale del motor —`colaDeEscritura()`, acotada a este módulo— y
+           es lo que convierte la solapa de un informe en un lugar de trabajo:
+           antes decía cómo venía el banco y para hacer algo con la respuesta
+           había que irse a `banco.html`. */
         R.pintar("[data-banco-resumen]", R.resumenBancoModulo(modulo, r, secciones, {
           escena: e === "E5" ? null : e,
+          cola: esRuta ? [] : S.colaDeEscritura(e, modulo.numero),
         }));
 
         /* ── `?tab=` ────────────────────────────────────────────────────────

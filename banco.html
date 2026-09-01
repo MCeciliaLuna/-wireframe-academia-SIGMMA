@@ -63,7 +63,7 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Evaluación</span>
-            <a href="banco.html?m=30" aria-current="page" class="nav-item">
+            <a href="modulo.html?m=30&amp;tab=banco" aria-current="page" class="nav-item">
               <span class="icon" data-icon="help-circle"></span>Bancos de preguntas
             </a>
             <span class="nav-item" aria-disabled="true">
@@ -824,18 +824,12 @@
             ? "Preguntas escritas contra el video, sin contar el relleno estructural. Es la que dice cuánto trabajo queda de verdad."
             : "Preguntas vigentes contra la cuota de su sección. Es la que habilita la aptitud del módulo.");
 
-          R.pintar("[data-cola-lista]", cola.map(function (f) {
-            const hechas = porContenido ? f.escritas : f.vigentes;
-            const rev = f.motivo === "a revisar";
-            return '<li class="flex items-center gap-2">' +
-              '<span class="row-id">' + f.video.id + "</span>" +
-              '<span class="flex-1">' + R.esc(f.video.titulo) + "</span>" +
-              '<span class="chip ' + (rev ? "chip-alerta" : "chip-outline") + '">' + f.motivo + "</span>" +
-              '<span class="meta w-[64px] shrink-0 text-right">' +
-                (rev ? f.aRevisar + " a revisar" : hechas + " de " + f.cuota) + "</span>" +
-              '<a href="escritura.html?v=' + f.video.id + (q ? "&amp;escena=" + e : "") + '">' +
-              (rev ? "revisar" : "escribir") + " ›</a></li>";
-          }).join(""));
+          /* El markup lo emite `render.js`: la solapa del banco en `modulo.html`
+             muestra la misma cola, y dos copias serían dos redacciones. */
+          R.pintar("[data-cola-lista]", R.colaEscritura(cola, {
+            escena: q ? e : null,
+            porContenido: porContenido,
+          }));
         }
 
         document.querySelectorAll("[data-deuda-modo]").forEach(function (b) {

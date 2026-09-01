@@ -190,6 +190,43 @@ con una **academia completa simulada**. Cuatro bloques de trabajo:
   > de alta** —dos controles de `verificar()` lo auditan—. Sería un contador que nunca puede
   > pasar de cero.
 
+- **El banco se trabaja desde el módulo** — Fase 3 del rediseño.
+
+  La solapa del banco contestaba «¿cómo viene?» y, para hacer algo con la respuesta, había que
+  irse a `banco.html`. Ahora lleva **la cola de escritura del módulo** —`colaDeEscritura()`
+  acotada a él—: qué falta, video por video, con el motivo (`sin preguntas` · `bajo cuota` ·
+  `a revisar`), el faltante contra la cuota y el link a su sesión. Más «empezar por» al primero
+  de la cola y las **secciones en cero marcadas con su propio chip**.
+
+  > **Una sección en cero no es una que va atrasada:** bloquea la evaluación entera, porque el
+  > sorteo exige preguntas de las cuatro y sin ninguna no hay de dónde sacarlas. Por eso lleva
+  > marca propia y no solo el «faltan N» de las demás.
+
+  > **No hay tercera vía, y es la decisión de R13.** Las preguntas **no se importan nunca**: se
+  > escriben después de grabar cada video, con su lenguaje y su ejemplo. Las dos vías son la cola
+  > por video y el modal de a una del banco completo.
+
+  El markup de la cola se movió a `render.js` (`colaEscritura`): estaba escrito a mano dentro de
+  `banco.html`, y dos copias del mismo markup son dos redacciones de la misma regla — la segunda
+  es la que se queda vieja.
+
+  **El sidebar entra por el módulo.** «Bancos de preguntas» apuntaba a `banco.html?m=30`: una
+  pantalla suelta con un `?m=` por default, que es exactamente lo que el criterio del flujo
+  prohíbe —no se llega a un banco sin saber de qué módulo es—. Ahora va a
+  `modulo.html?m=30&tab=banco`, donde el módulo está en el `h1` y en la miga de pan.
+  `banco.html` sigue viva: es la carga completa, y se entra desde la solapa y desde los atajos.
+
+  **El importador dice dónde quedó cada cosa.** Antes el resultado contaba cuántas entidades se
+  crearon; ahora desglosa **por módulo** —videos y secciones que entraron en cada uno— con link
+  al árbol de cada uno.
+
+  > **El resumen no se reemplazó por el árbol, y es a propósito.** Un lote toca varios módulos a
+  > la vez, así que no hay UN árbol al que aterrizar, y elegir uno sería arbitrario. Además el
+  > resumen es lo único que ofrece **deshacer** y el **log**, que el árbol no tiene. El desglose
+  > se arma sobre los videos creados y no sobre los módulos creados: un alta incremental sobre
+  > módulos que ya existían no crea ninguno, y ahí la lista quedaba vacía justo cuando más hace
+  > falta.
+
 **Ya no es solo maquetación, ni solo navegación.** No hay backend, ni API, ni videos reales, ni SSO.
 Pero **sí hay capa de datos, reglas de negocio derivadas, mutaciones y persistencia en
 `localStorage`**. Eso revierte a propósito una decisión de la tanda 1 (ver «El cambio de

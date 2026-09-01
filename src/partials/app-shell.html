@@ -23,7 +23,14 @@
 
         · Módulos               → la pantalla de inicio
         · Tablero de producción → el paso 2 del módulo, donde el video se publica
-        · Bancos de preguntas   → los pasos 3 y 4, config por modal y escritura
+        · Bancos de preguntas   → los pasos 3 y 4. Entra POR EL MÓDULO
+                                  (`modulo.html?m=30&tab=banco`), no por
+                                  `banco.html` a secas: el criterio del flujo
+                                  es que no se llega a un banco sin saber de
+                                  qué módulo es, y una pantalla suelta con un
+                                  `?m=` por default no lo dice. `banco.html`
+                                  sigue viva como la carga completa, y se
+                                  entra desde la solapa y desde los atajos
         · Ruta Esencial         → modulo.html?m=R01
 
      Y cuatro deshabilitados, cada uno con su motivo:
@@ -90,7 +97,7 @@
 
     <div class="nav-group">
       <span class="nav-group-title">Evaluación</span>
-      <a href="banco.html?m=30" class="nav-item">
+      <a href="modulo.html?m=30&amp;tab=banco" class="nav-item">
         <span class="icon" data-icon="help-circle"></span>Bancos de preguntas
       </a>
       <span class="nav-item" aria-disabled="true">

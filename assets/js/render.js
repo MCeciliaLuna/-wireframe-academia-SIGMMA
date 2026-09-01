@@ -798,6 +798,13 @@ window.RENDER = (function () {
     const faltan = s.faltan
       ? ' <span class="text-error-dark">· faltan ' + s.faltan + "</span>"
       : "";
+    /* Una sección en cero no es «una que va atrasada»: es una que bloquea la
+       evaluación entera, porque el sorteo exige preguntas de las cuatro y sin
+       ninguna no hay de dónde sacarlas. Por eso lleva su propia marca y no
+       solamente el «faltan N» que llevan las demás. */
+    const enCero = s.vigentes === 0
+      ? '<span class="chip chip-alerta">sin preguntas vigentes</span>'
+      : "";
     const indicadores = s.minimoBanco
       ? "banco mínimo " + s.minimoBanco + faltan + " · mínimo por sorteo " + s.minimoSorteo
       : "sin mínimo configurado";
@@ -816,10 +823,40 @@ window.RENDER = (function () {
       '<div class="tree-head">' +
       '<span id="' + id + '">Sección ' + s.orden + " · " + esc(s.titulo) + "</span>" +
       '<span class="chip chip-meta">' + s.vigentes + " vigentes de " + s.total + "</span>" +
+      enCero +
       '<span class="text-2xs text-gray-600">' + indicadores + "</span>" +
       "</div>" + filas + cola +
       "</section>"
     );
+  }
+
+  /* -- La cola de escritura ------------------------------------------------
+     Qué falta escribir, video por video, con el motivo y el faltante. Vivía
+     escrito a mano dentro de `banco.html`; se movió acá cuando la solapa del
+     módulo tuvo que mostrar la misma cosa. Dos copias del mismo markup son dos
+     redacciones de la misma regla, y la segunda es la que se queda vieja.
+
+     `porContenido` es el modo de la deuda: contar lo escrito de verdad o contar
+     lo vigente. La decisión es de la pantalla; acá solo se pinta. */
+  function colaEscritura(cola, opciones) {
+    const o = opciones || {};
+    const q = o.escena ? "&amp;escena=" + esc(o.escena) : "";
+    if (!cola.length) {
+      return '<li class="text-gray-600">' +
+        esc(o.vacio || "No queda nada por escribir en este módulo.") + "</li>";
+    }
+    return cola.slice(0, o.tope || cola.length).map(function (f) {
+      const hechas = o.porContenido ? f.escritas : f.vigentes;
+      const rev = f.motivo === "a revisar";
+      return '<li class="flex items-center gap-2">' +
+        '<span class="row-id">' + esc(f.video.id) + "</span>" +
+        '<span class="flex-1">' + esc(f.video.titulo) + "</span>" +
+        '<span class="chip ' + (rev ? "chip-alerta" : "chip-outline") + '">' + esc(f.motivo) + "</span>" +
+        '<span class="meta w-[64px] shrink-0 text-right">' +
+          (rev ? f.aRevisar + " a revisar" : hechas + " de " + f.cuota) + "</span>" +
+        '<a href="escritura.html?v=' + esc(f.video.id) + q + '">' +
+        (rev ? "revisar" : "escribir") + " ›</a></li>";
+    }).join("");
   }
 
   /* -- Resumen del banco, para la solapa de módulo (D-20) ------------------
@@ -883,9 +920,40 @@ window.RENDER = (function () {
       '<div><dt class="side-title !mb-1">Borradores</dt><dd class="metric-value metric-value-sm">' +
       b.borradores + "</dd></div>" +
       "</dl>" +
-      '<a href="' + hrefBanco + '" class="btn btn-primary btn-sm">' +
-      '<span class="icon icon-sm" data-icon="help-circle"></span>Ir al banco completo</a>' +
+      '<a href="' + hrefBanco + '" class="btn btn-bordered btn-sm">' +
+      '<span class="icon icon-sm" data-icon="help-circle"></span>Ver el banco completo</a>' +
       "</section>" +
+
+      /* Las dos vías de carga, ACÁ. Antes esta solapa contestaba «¿cómo viene el
+         banco?» y para hacer algo con la respuesta había que irse a
+         `banco.html`. Son dos y son las que el repo tiene: la cola por video
+         —donde la unidad de trabajo es el video y el motivo dice qué le pasa— y
+         el modal de a una, que vive en el banco completo.
+
+         Las preguntas NO se importan (R13): se escriben después de grabar cada
+         video, con su lenguaje y su ejemplo. Por eso no hay una tercera vía. */
+      '<section class="side-card" aria-labelledby="lbl-cola-modulo">' +
+      '<div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">' +
+      '<h2 class="side-title !mb-0" id="lbl-cola-modulo">Qué falta escribir</h2>' +
+      '<span class="text-2xs text-gray-600">la unidad de trabajo es el video, ' +
+      "y el motivo dice qué le pasa a cada uno</span>" +
+      (o.cola && o.cola.length
+        ? '<a class="ml-auto text-2xs" href="escritura.html?v=' + esc(o.cola[0].video.id) + q +
+          '">Empezar por ' + esc(o.cola[0].video.id) + " ›</a>"
+        : "") +
+      "</div>" +
+      '<ul class="mt-3 flex flex-col gap-2 text-xs">' +
+      colaEscritura(o.cola || [], {
+        escena: o.escena,
+        tope: 8,
+        vacio: "Nada pendiente: todos los videos publicados llegan a su cuota.",
+      }) +
+      "</ul>" +
+      (o.cola && o.cola.length > 8
+        ? '<p class="foot-note">y ' + (o.cola.length - 8) + " más, en el banco completo.</p>"
+        : "") +
+      "</section>" +
+
       secciones.map(function (s, i) { return seccionBanco(s, i); }).join("") +
       "</div>"
     );
@@ -1038,6 +1106,7 @@ window.RENDER = (function () {
     aptitudCard: aptitudCard,
     filaPregunta: filaPregunta,
     seccionBanco: seccionBanco,
+    colaEscritura: colaEscritura,
     resumenBancoModulo: resumenBancoModulo,
     guiaEstado: guiaEstado,
     guiaPopover: guiaPopover,

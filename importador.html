@@ -63,7 +63,7 @@
 
           <div class="nav-group">
             <span class="nav-group-title">Evaluación</span>
-            <a href="banco.html?m=30" class="nav-item">
+            <a href="modulo.html?m=30&amp;tab=banco" class="nav-item">
               <span class="icon" data-icon="help-circle"></span>Bancos de preguntas
             </a>
             <span class="nav-item" aria-disabled="true">
@@ -302,6 +302,17 @@
               </div>
             </div>
 
+            <!-- DÓNDE quedó cada cosa, no solo cuántas. El criterio del flujo es
+                 que lo importado se vea en el árbol y no en un resumen aparte; con
+                 un lote que toca varios módulos a la vez no hay UN árbol al que
+                 aterrizar, así que el resultado dice en cuál cayó cada video y
+                 lleva ahí en un clic. El resumen se queda porque es lo único que
+                 ofrece deshacer y el log — dos cosas que el árbol no tiene. -->
+            <section class="side-card" data-bloque-destinos hidden aria-labelledby="lbl-destinos">
+              <h2 class="side-title" id="lbl-destinos">Dónde quedaron</h2>
+              <ul class="flex flex-col gap-2 text-xs" data-destinos></ul>
+            </section>
+
             <div class="alert alert-info !text-xs">
               <span class="icon" data-icon="info"></span>
               <span>
@@ -525,6 +536,36 @@
 
           $("[data-ir-tablero]").href = "tablero.html" + q;
           $("[data-ir-modulos]").href = "modulos.html" + q;
+
+          /* El desglose por módulo. Se arma sobre los videos creados y no sobre
+             `mods`, que son solo los módulos que el lote CREÓ: un alta
+             incremental sobre módulos que ya existían no crea ninguno y ahí el
+             desglose quedaba vacío justo cuando más hace falta. */
+          const porModulo = {};
+          creados.forEach(function (v) {
+            (porModulo[v.codigoModulo] = porModulo[v.codigoModulo] || []).push(v);
+          });
+          const codigos = Object.keys(porModulo).sort();
+          $("[data-bloque-destinos]").hidden = codigos.length === 0;
+          R.pintar("[data-destinos]", codigos.map(function (codigo) {
+            const m = S.modulos.filter(function (x) { return x.codigo === codigo; })[0];
+            const vs = porModulo[codigo];
+            const secs = {};
+            vs.forEach(function (v) { secs[v.seccion] = true; });
+            const nSecs = Object.keys(secs).length;
+            return '<li class="flex items-center gap-2">' +
+              '<span class="row-id">' + R.esc(codigo) + "</span>" +
+              '<span class="flex-1">' + R.esc(m ? m.titulo : "") + "</span>" +
+              '<span class="chip chip-meta">' + vs.length +
+                (vs.length === 1 ? " video" : " videos") + "</span>" +
+              '<span class="chip chip-outline">' + nSecs +
+                (nSecs === 1 ? " sección" : " secciones") + "</span>" +
+              (m
+                ? '<a href="modulo.html?m=' + R.esc(String(m.numero)) +
+                  (e === "E5" ? "" : "&amp;escena=" + R.esc(e)) + '">ver en el árbol ›</a>'
+                : "") +
+              "</li>";
+          }).join(""));
 
           const puede = I.sePuedeDeshacer(sello);
           const btn = $("[data-deshacer]");
