@@ -606,7 +606,11 @@ window.RENDER = (function () {
       ? '<input type="checkbox" aria-label="Seleccionar ' + esc(v.id) + '" />'
       : "";
     return (
-      '<div class="tree-row data-[selected=true]:bg-info-bg"' +
+      /* `tabindex="-1"` de arranque: `UI.bindArbolTeclado()` promueve una sola
+         fila a `0` para que Tab entre al árbol una vez y las flechas se muevan
+         adentro. Sin el atributo puesto acá, la fila no es focusable y la flecha
+         no tiene a dónde ir. */
+      '<div class="tree-row data-[selected=true]:bg-info-bg" tabindex="-1"' +
         (o.actual ? ' aria-current="true"' : "") +
         (o.nuevo ? ' data-nuevo="1"' : "") +
         (o.seleccionable ? ' data-bulk-row data-id="' + esc(v.id) + '"' : "") +
@@ -901,6 +905,21 @@ window.RENDER = (function () {
         "publicado, así que su banco está en <strong>0</strong>. La pregunta se escribe " +
         "<em>después</em> de grabar el video, para que use el mismo lenguaje y el mismo " +
         "ejemplo que se ve en pantalla." +
+        "</p>" +
+        /* La consecuencia, que faltaba: un banco en cero no es solo trabajo
+           pendiente, es la razón por la que el módulo no se puede activar. Sin
+           decirlo, el estado vacío se lee como «acá no hay nada que hacer».
+
+           Y NO se ofrecen las dos vías de carga acá, aunque el flujo las pida
+           para el banco en cero: con cero videos publicados no hay a quién
+           escribirle una pregunta, y un botón que abre una cola vacía es
+           exactamente el control muerto que este repo trata como bug. Las vías
+           aparecen solas —en la cola de esta misma solapa— en cuanto hay un
+           video publicado. */
+        '<p class="mt-4 max-w-[62ch] text-sm text-ink-soft">' +
+        "Mientras el banco esté en cero <strong>el módulo no se puede evaluar</strong>, y sin " +
+        "evaluación no cumple la aptitud para activarse. El camino no es escribir preguntas " +
+        "ahora: es publicar el primer video." +
         "</p>" +
         "</div>"
       );

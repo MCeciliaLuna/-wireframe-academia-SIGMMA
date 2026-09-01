@@ -258,6 +258,59 @@ con una **academia completa simulada**. Cuatro bloques de trabajo:
   > «agregar video» ni «en lote». Ahora es `!= null`. Verificado en los 12: cada sección ofrece
   > las dos.
 
+- **El teclado, y el último estado que solo se alcanzaba por URL** — Fase 5 del rediseño.
+
+  **El selector de escena existe.** `?escena=` era el único estado del prototipo sin un control
+  en ninguna de las 10 pantallas de app: se cambiaba escribiendo en la barra de direcciones o
+  volviendo a `index.html`, que es el índice del prototipo y no la aplicación. Ahora hay un
+  desplegable con las seis, y cada opción **reescribe la query que ya estaba** — un `?m=`, un
+  `?v=` o un `?tab=` sobreviven al cambio, porque el punto es ver *esta* pantalla en otro
+  momento, no volver al principio. `E5` va sin parámetro, que es la convención.
+
+  > **Vive en el sidebar, no en una barra superior.** El flujo pide «barra superior», y este
+  > layout no tiene: el sidebar es lo único idéntico en las 10 pantallas y lo único que **no se
+  > repinta** —`.page-actions` se regenera en varias, y un control ahí desaparecería al mutar—.
+  > Y es donde ya vive el otro selector global, el de superficie, con este mismo componente.
+
+  **El árbol se navega con el teclado.** Flechas arriba y abajo entre filas, `Home` y `End` a los
+  extremos, `Enter` abre la ficha —usando el link que ya está, sin reimplementar la navegación— y
+  `Espacio` marca y desmarca la fila. Va por delegación y con el `tabindex` administrado en el
+  momento: el árbol se repinta tras cada mutación, y unos listeners capturados dejarían de
+  responder sin decir por qué. `rebind()` vuelve a sembrar el punto de entrada.
+
+  > **Una sola fila queda en el orden de tabulación** y el resto sale de él, que es el patrón de
+  > un árbol: `Tab` entra y sale del widget, las flechas se mueven adentro. Con las siete filas en
+  > el `Tab`, pasar de largo un módulo pedía siete pulsaciones.
+
+  > **No lleva `role="tree"`, a propósito.** El patrón ARIA de árbol pide nodos plegables y acá
+  > las secciones son encabezados fijos. Declarar el rol sin cumplirlo le prometería a un lector
+  > de pantalla un widget que no está — el mismo error que el rótulo «arrastrar para reordenar»
+  > sobre un gesto que no existía. Las flechas laterales tampoco se ofrecen: no hay qué abrir.
+
+  **La búsqueda sin resultados dice qué se buscó.** Antes mostraba «0 resultados» y una lista
+  vacía: «no hay nada» y «nada coincide con esto» son conclusiones distintas, y sin explicación se
+  lee la primera. Ahora nombra los criterios —el texto y las facetas, combinados— y ofrece
+  limpiarlos, con el foco de vuelta en el buscador.
+
+  > El gancho `[data-filtro-vacio]` **existía en `ui.js` desde antes y ninguna pantalla lo
+  > declaraba**: era código que no corría nunca. Ahora lo declaran `tablero.html` y
+  > `modulos.html`, y el limpiar vive en `ui.js` porque el estado de los filtros vive ahí — la
+  > pantalla no lo puede resetear sin duplicarlo.
+
+  **El banco en cero dice la consecuencia:** que sin banco el módulo no se puede evaluar y no
+  cumple la aptitud para activarse. Sin eso, el estado vacío se leía como «acá no hay nada que
+  hacer».
+
+  > **Y no ofrece las dos vías de carga ahí, aunque el flujo las pida.** Con cero videos
+  > publicados no hay a quién escribirle una pregunta, y un botón que abre una cola vacía es el
+  > control muerto que este repo trata como bug. Las vías aparecen solas —en la cola de esa misma
+  > solapa— en cuanto hay un video publicado.
+
+  > **Dos cosas del flujo de teclado ya estaban, y se verificaron en vez de suponerse:** el
+  > buscador **no pierde el cursor** al filtrar (filtra ocultando, no repintando — foco y posición
+  > intactos) y el importador **no rechaza el lote entero por una fila mala** (2 ok / 1 error en
+  > el mismo archivo).
+
   **T6 · reordenar queda pendiente y bloqueado.** Mover ya está —en el tablero y en el árbol, con
   `movible()` de compuerta—, y cruzar módulos la interfaz lo **impide** en vez de avisar, que es
   más estricto que lo que pide el flujo y correcto por R2. Lo que no se puede hacer sin una

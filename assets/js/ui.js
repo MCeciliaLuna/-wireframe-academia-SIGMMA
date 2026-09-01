@@ -317,8 +317,50 @@ window.UI = (function () {
         if (conteo) {
           conteo.textContent = visibles + (visibles === 1 ? " resultado" : " resultados");
         }
-        const vacio = document.querySelector("[data-filtro-vacio]");
-        if (vacio) vacio.hidden = visibles !== 0;
+        /* El vacío de búsqueda: dice QUÉ se buscó y ofrece deshacerlo. Una
+           lista vacía sin explicación se lee como «no hay nada», que es una
+           conclusión distinta de «nada coincide con esto». El gancho existía en
+           `ui.js` desde antes y ninguna pantalla lo declaraba: era código que no
+           corría nunca. */
+        const vacio = barra.parentNode.querySelector("[data-filtro-vacio]") ||
+          document.querySelector("[data-filtro-vacio]");
+        if (vacio) {
+          vacio.hidden = visibles !== 0;
+          if (visibles === 0) {
+            const criterios = [];
+            if (texto) criterios.push('el texto «<strong>' + texto + "</strong>»");
+            Object.keys(estado).forEach(function (clave) {
+              if (!estado[clave]) return;
+              criterios.push(clave + " «<strong>" + estado[clave] + "</strong>»");
+            });
+            const donde = vacio.querySelector("[data-filtro-vacio-texto]");
+            if (donde) {
+              donde.innerHTML = criterios.length
+                ? "Nada coincide con " + (criterios.length === 1
+                    ? criterios[0]
+                    : criterios.slice(0, -1).join(", ") + " y " + criterios[criterios.length - 1]) + "."
+                : "No hay nada que mostrar con los filtros puestos.";
+            }
+          }
+        }
+      }
+
+      /* Limpiar: vuelve todo a «todos» y vacía el buscador. Va acá y no en la
+         pantalla porque el estado de los filtros vive acá — la pantalla no lo
+         puede resetear sin duplicarlo. */
+      function limpiar() {
+        if (buscar) buscar.value = "";
+        Object.keys(estado).forEach(function (clave) {
+          estado[clave] = "";
+          const pill = barra.querySelector('[data-filtro-pill="' + clave + '"]');
+          if (pill) {
+            const etiqueta = pill.dataset.filtroEtiqueta || clave;
+            pill.firstChild.textContent = etiqueta + ": todos ";
+            pill.dataset.active = "false";
+          }
+        });
+        aplicar();
+        if (buscar) buscar.focus();
       }
 
       barra.querySelectorAll("[data-filtro-menu]").forEach(function (menu) {
@@ -344,6 +386,11 @@ window.UI = (function () {
       });
 
       if (buscar) buscar.addEventListener("input", aplicar);
+      const botonLimpiar = (barra.parentNode.querySelector("[data-filtro-limpiar]") ||
+        document.querySelector("[data-filtro-limpiar]"));
+      if (botonLimpiar && !yaCableado(botonLimpiar, "Limpiar")) {
+        botonLimpiar.addEventListener("click", limpiar);
+      }
       filtrosActivos[destino] = aplicar;
       aplicar();
     });
@@ -693,6 +740,53 @@ window.UI = (function () {
       el.setAttribute("data-escena-actual", actual);
     });
 
+    /* El SELECTOR de escena, no solo el rótulo. Era el último estado del
+       prototipo alcanzable únicamente escribiendo en la barra de direcciones:
+       `?escena=` no tenía un control en ninguna de las 10 pantallas de app —solo
+       en `index.html`, que es el índice del prototipo y no la aplicación—.
+
+       Vive en el sidebar y no en una barra superior porque este layout no tiene
+       barra superior: el sidebar es lo único idéntico en las 10 pantallas y lo
+       único que no se repinta —`.page-actions` se regenera en varias, y un
+       control ahí desaparecería al mutar—. Y es donde ya vive el otro selector
+       global, el de superficie, con este mismo componente.
+
+       Cada opción reescribe la query que ya estaba en vez de armarla de cero,
+       así un `?m=`, un `?v=` o un `?tab=` sobreviven al cambio de escena: el
+       punto del selector es ver ESTA pantalla en otro momento, no volver al
+       principio. Y se concatena a mano con `encodeURIComponent`, no con
+       `URLSearchParams`, que codifica el espacio como `+` —`S.param()` lee con
+       `decodeURIComponent` y no lo traduce. */
+    const cajaEscena = document.querySelector("[data-escena-picker]");
+    if (cajaEscena) {
+      const rotulo = cajaEscena.querySelector("[data-escena-actual-rotulo]");
+      if (rotulo) rotulo.innerHTML = "<strong>" + actual + "</strong> · " + info.titulo;
+
+      const menu = cajaEscena.querySelector("[data-dropdown-menu]");
+      if (menu) {
+        const ids = Object.keys(ESCENAS).sort(function (a, b) {
+          return ESCENAS[a].orden - ESCENAS[b].orden;
+        });
+        menu.innerHTML = ids.map(function (id) {
+          const e = ESCENAS[id];
+          /* La escena default no lleva parámetro: es lo que hace que el link
+             más común quede limpio, y es la convención del repo. */
+          const partes = window.location.search.replace(/^\?/, "").split("&")
+            .filter(function (x) {
+              const k = x.split("=")[0];
+              return x && k !== "escena" && k !== "reset";
+            });
+          if (id !== ESCENA_DEFAULT) partes.push("escena=" + encodeURIComponent(id));
+          const archivo = window.location.pathname.split("/").pop() || "modulos.html";
+          const href = archivo + (partes.length ? "?" + partes.join("&") : "");
+          return '<a href="' + href + '" class="menu-item" role="menuitem"' +
+            (id === actual ? ' aria-current="true"' : "") + ">" +
+            "<strong>" + id + "</strong> · " + e.titulo +
+            '<span class="block text-2xs text-gray-600">' + e.detalle + "</span></a>";
+        }).join("");
+      }
+    }
+
     /* Los links que quieran conservar la escena la llevan sola. */
     if (actual !== ESCENA_DEFAULT) {
       document.querySelectorAll("[data-escena-keep]").forEach(function (a) {
@@ -705,6 +799,95 @@ window.UI = (function () {
     document.documentElement.setAttribute("data-escena-actual", actual);
   }
 
+  /* -- Navegación del árbol con el teclado ----------------------------------
+     Flechas arriba y abajo entre filas, Home y End a los extremos, Enter para
+     abrir el detalle de la fila. Es un `tree` de un solo nivel visible —las
+     secciones son encabezados, no nodos plegables—, así que las flechas
+     laterales no tienen qué abrir ni cerrar: ofrecerlas y que no hicieran nada
+     sería la misma promesa vacía que un botón que no responde.
+
+     Va por DELEGACIÓN y con `tabindex` administrado en el momento, no cableado
+     fila por fila: el árbol se repinta después de cada mutación, y unos
+     listeners capturados dejarían de responder sin decir por qué.
+
+     Una sola fila queda en el orden de tabulación (`tabindex="0"`) y el resto
+     sale de él: es el patrón de un `tree`, donde Tab entra y sale del widget y
+     las flechas se mueven adentro. Con todas las filas en el Tab, recorrer un
+     módulo de 7 videos pedía 7 tabs para llegar al panel de al lado. */
+  function bindArbolTeclado() {
+    const arbol = document.querySelector("[data-arbol-teclado]");
+    if (!arbol) return;
+
+    const filas = function () {
+      return Array.prototype.slice.call(arbol.querySelectorAll(".tree-row"));
+    };
+
+    /* El punto de entrada: la fila marcada como actual si hay una, y si no la
+       primera. Se recalcula porque el repintado devuelve nodos nuevos. */
+    function sincronizar() {
+      const todas = filas();
+      if (!todas.length) return;
+      const yaHay = todas.some(function (f) { return f.getAttribute("tabindex") === "0"; });
+      if (yaHay) return;
+      const actual = todas.filter(function (f) {
+        return f.getAttribute("aria-current") === "true" || f.dataset.nuevo === "1";
+      })[0];
+      todas.forEach(function (f) { f.setAttribute("tabindex", "-1"); });
+      (actual || todas[0]).setAttribute("tabindex", "0");
+    }
+
+    function mover(desde, delta) {
+      const todas = filas();
+      const i = todas.indexOf(desde);
+      if (i === -1) return;
+      const destino = todas[Math.min(todas.length - 1, Math.max(0, i + delta))];
+      if (!destino || destino === desde) return;
+      todas.forEach(function (f) { f.setAttribute("tabindex", "-1"); });
+      destino.setAttribute("tabindex", "0");
+      destino.focus();
+    }
+
+    function extremo(cual) {
+      const todas = filas();
+      if (!todas.length) return;
+      const destino = cual === "inicio" ? todas[0] : todas[todas.length - 1];
+      todas.forEach(function (f) { f.setAttribute("tabindex", "-1"); });
+      destino.setAttribute("tabindex", "0");
+      destino.focus();
+    }
+
+    arbol.addEventListener("keydown", function (ev) {
+      const fila = ev.target.closest(".tree-row");
+      if (!fila || fila !== ev.target) return; /* dentro de un input o un link, manda él */
+      if (ev.key === "ArrowDown") { ev.preventDefault(); mover(fila, 1); }
+      else if (ev.key === "ArrowUp") { ev.preventDefault(); mover(fila, -1); }
+      else if (ev.key === "Home") { ev.preventDefault(); extremo("inicio"); }
+      else if (ev.key === "End") { ev.preventDefault(); extremo("fin"); }
+      else if (ev.key === "Enter") {
+        /* Enter abre el detalle de la fila: es el link del título, que ya
+           existe. La navegación no se reimplementa acá. */
+        const link = fila.querySelector(".row-title a");
+        if (link) { ev.preventDefault(); link.click(); }
+      } else if (ev.key === " ") {
+        /* Espacio marca y desmarca, como en cualquier lista con casillas. */
+        const casilla = fila.querySelector('input[type="checkbox"]');
+        if (casilla) {
+          ev.preventDefault();
+          casilla.checked = !casilla.checked;
+          casilla.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      }
+    });
+
+    /* El repintado devuelve filas sin `tabindex`: se vuelve a sembrar en cada
+       `rebind()`, que es lo que la pantalla ya llama tras mutar. */
+    arbol.addEventListener("focusin", sincronizar);
+    sincronizar();
+    arbolSembrar = sincronizar;
+  }
+
+  let arbolSembrar = null;
+
   /* -- Arranque ------------------------------------------------------------- */
   function init() {
     bindEscena();
@@ -716,6 +899,7 @@ window.UI = (function () {
     bindViewSwitch();
     bindBulkSelect();
     bindFilters();
+    bindArbolTeclado();
   }
 
   /* Volver a cablear lo que depende de las FILAS y no de la tabla.
@@ -728,6 +912,9 @@ window.UI = (function () {
     bindBulkSelect();
     bindCounters();
     refiltrar();
+    /* El árbol repintado trae filas sin `tabindex`, así que hay que volver a
+       sembrar el punto de entrada del teclado. */
+    if (arbolSembrar) arbolSembrar();
   }
 
   /* Recargar la pantalla después de una mutación que la cambia entera.
