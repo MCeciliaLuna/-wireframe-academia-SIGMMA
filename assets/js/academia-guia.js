@@ -145,32 +145,40 @@ window.GUIA = (function () {
     {
       id: "secciones",
       titulo: "Secciones",
+      /* La etapa se mudó de `alta-seccion.html` al árbol de `modulo.html`: el
+         alta pasó a ser en línea, y la guía tiene que enseñar el camino que la
+         app ofrece, no el que ofrecía antes. `alta-seccion.html` sigue viva como
+         deep-link, pero ya no es donde ocurre el trabajo.
+
+         El módulo padre dejó de ser un control —lo da el `?m=` de la pantalla—,
+         y en su lugar entra la nota sobre el botón que abre el alta, que es el
+         primer gesto de la etapa. Siguen siendo cuatro. */
       campos: [
         {
-          pantalla: "alta-seccion.html", ancla: "#mod", tipo: "campo", requerido: false,
-          titulo: "Módulo padre",
-          detalle: "Viene elegido desde el módulo del que se llegó. Solo lista los de " +
-            "<b>biblioteca</b>: la Ruta Esencial no tiene secciones propias y el reservado no " +
-            "tiene contenido.",
+          pantalla: "modulo.html", ancla: "[data-agregar-seccion]", tipo: "nota",
+          titulo: "Agregar una sección",
+          detalle: "Abre el alta <b>acá mismo, debajo del árbol</b>. El módulo padre no se " +
+            "pregunta: es el de esta pantalla, y queda a la vista todo el tiempo.",
         },
         {
-          pantalla: "alta-seccion.html", ancla: "#nom", tipo: "campo", requerido: true,
+          pantalla: "modulo.html", ancla: "#fs-nom", tipo: "campo", requerido: true,
+          error: "[data-fs-error]",
           titulo: "Nombre de la sección",
           detalle: "Es el <b>sub-tema con el que se etiquetan las preguntas</b> del banco, y por " +
             "eso conviene que nombre un concepto. De acá sale la exigencia de cobertura: si el " +
             "módulo tiene cuatro secciones, la evaluación garantiza preguntas de las cuatro.",
         },
         {
-          pantalla: "alta-seccion.html", ancla: "#orden", tipo: "campo", requerido: false,
+          pantalla: "modulo.html", ancla: "#fs-orden", tipo: "campo", requerido: false,
           titulo: "Orden dentro del módulo",
           detalle: "Cada opción nombra la sección que quedaría después, así que se ve dónde cae " +
             "sin tener que contar. Por defecto va al final.",
         },
         {
-          pantalla: "alta-seccion.html", ancla: "[data-crear]", tipo: "boton",
+          pantalla: "modulo.html", ancla: "[data-fs-crear]", tipo: "boton",
           titulo: "Crear la sección",
-          detalle: "Vuelve al detalle del módulo con la sección ya en el árbol, lista para " +
-            "colgarle videos.",
+          detalle: "La sección queda en el árbol, marcada como nueva y con el foco puesto en su " +
+            "acción de agregar video: es lo único que se puede hacer con una sección vacía.",
         },
       ],
     },

@@ -57,6 +57,139 @@ con una **academia completa simulada**. Cuatro bloques de trabajo:
   > controles de R10 siguen midiendo. Que los **129 controles** sigan en verde es la red que
   > dice que el recorte no rompió nada.
 
+- **El alta entra donde está el contexto** — primer paso del rediseño de flujo de
+  `docs/interfaces-prompt.md`. **Crear una sección dejó de ser una pantalla:** el árbol de
+  `modulo.html` la da de alta **en línea**, y el módulo padre no se pregunta porque lo da el
+  `?m=` de la pantalla. Antes, para completar una sola tarea de estructura había que salir del
+  módulo, volver a elegirlo en un desplegable —que preguntaba algo que la pantalla anterior ya
+  sabía— y volver.
+
+  Al guardar, la sección queda **marcada en el árbol, centrada y con el foco puesto en su
+  «agregar video»**, que es lo único que se puede hacer con una sección vacía. `Enter` guarda,
+  `Escape` cancela y devuelve el foco al control que abrió el alta.
+
+  El alta se ofrece en **dos lugares y son el mismo formulario**: el **paso 1** del tablero, que
+  dice *qué* hay que hacer, y el **pie del árbol**, que es *dónde* se hace. Es el criterio que el
+  repo ya usaba con activar el módulo — si solo respondiera uno de los dos, el otro se leería
+  como roto. El click va por **delegación en el documento**, no cableado al botón: el tablero de
+  pasos se vuelve a pintar al activar o desactivar, y el botón que había quedado cableado deja
+  de existir.
+
+  **Los dos estados vacíos también resuelven adentro.** El **ID reservado** y el módulo sin
+  secciones ofrecían «crear la primera» mandando a otra pantalla, que es el callejón que este
+  rediseño vino a sacar. Ahora el formulario **se muda debajo del mensaje** —se mueve el nodo,
+  no se duplica el markup: hay un solo formulario y un solo juego de IDs, que es al que apunta
+  la guía—.
+
+  > **La condición del reservado mira las SECCIONES, no el tipo.** El estado vacío es dato, no
+  > tipo: en cuanto se le declara la primera sección, el reservado deja de estar vacío y sigue
+  > por el camino de cualquier otro —árbol y los cinco pasos—. `pasosDeModulo()` ya lo resuelve
+  > sin tocarle nada: devuelve «secciones · en curso», que es exactamente el trabajo que
+  > corresponde. Con la condición atada al tipo, la sección recién creada quedaba invisible y la
+  > pantalla seguía diciendo que no había ninguna.
+
+  > **`alta-seccion.html` no se borró.** Sigue viva y sigue funcionando como deep-link; lo que
+  > cambió es que ya no es el camino que la app ofrece. Por eso el conteo de pantallas no se
+  > movió y el control de los 10 sidebars sigue midiendo diez.
+
+  La etapa «Secciones» de la guía se mudó con el trabajo: sus cuatro controles apuntan ahora a
+  `modulo.html`. Enseñar el camino viejo mientras la app ofrece otro es peor que la
+  duplicación — y el control «la guía cubre las cinco etapas» no lo habría detectado, porque
+  mide etapas, no pantallas.
+
+  **Reservar un video también dejó de ser una pantalla.** Cada sección del árbol ofrece **dos
+  vías, y las dos están a la vista**: «agregar video» abre el alta en línea —el caso de a uno,
+  que es el frecuente— y «en lote» lleva a la planilla, que es el de volumen. El padre no se
+  elige: el módulo lo da el `?m=` y la sección, el nodo desde donde se abrió. ID, sección,
+  superficie, módulo y planes van en **solo lectura** (R2), y la secuencia sale de la primera
+  libre de 10 en 10 — **la misma regla que usa el lote**, o dos altas del mismo video darían
+  IDs distintos según por dónde se entró.
+
+  `Reservar y cargar otro` recarga —hay que materializar— y vuelve con el formulario abierto en
+  la misma sección y el ID siguiente ya calculado.
+
+  > **R11 se respeta y por eso son dos acciones y no una.** El alta **no tiene campo de link**:
+  > el video nace en `backlog`, sin versión. Cargar el link es otra tarea, meses después, y
+  > tiene su propia acción **en la fila del video** —«cargar link», que lleva a la solapa de
+  > versiones de su ficha, donde vive el flujo link → «Traer datos» → confirmar (R1)—. El modal
+  > no se duplica. La fila la ofrece solo si el motor dice que ese video espera link: el
+  > veredicto es `sinLink()`, resuelto una vez para todo el árbol y pasado como conjunto, no
+  > recalculado por fila.
+
+  > **La etapa «Videos» de la guía NO se mudó, y es a propósito.** Sus diez controles enseñan la
+  > planilla, y la planilla **sigue siendo un camino que la app ofrece** —el link «en lote» de
+  > cada sección—. Es la diferencia con el alta de sección, donde la pantalla vieja dejó de
+  > ofrecerse por completo: ahí la guía enseñaba un camino muerto, acá enseña uno de los dos
+  > vivos. Queda pendiente decidir si suma un control para la vía de a uno.
+
+  **Y crear el módulo también.** Los tres CTAs de `modulos.html` —el del encabezado, el de una
+  superficie vacía y el «a mano» del día 0— abren un alta **en línea**, y el formulario **se muda
+  al contenedor visible**: en FRT/CRM y en E1 el listado está oculto, así que aparece bajo el
+  mensaje que explica por qué está vacío. La superficie no se pregunta: la da el `?sup=`.
+
+  Pide **dos cosas, y las dos son estructurales**: el nombre del módulo y el de su primera
+  sección. La sección no es un campo de conveniencia — **R12 no deja un módulo de biblioteca sin
+  secciones**, y dejarla «para después» permite que una pestaña cerrada a mitad de camino deje
+  uno inválido. Lo demás se hereda: `biblioteca`, los tres planes —9 de los 11 los tienen—, el
+  orden al final y el estado inactivo. Para una ruta, un ID reservado o planes acotados está
+  `alta-modulo.html`, que sigue viva y **se ofrece dentro del propio formulario** como salida.
+
+  > **La numeración es POR SUPERFICIE.** `BAK-M30` y `FRT-M30` son dos módulos distintos, así que
+  > el próximo número se calcula sobre los de la superficie activa y el duplicado se chequea por
+  > **código**, no por número. Contando los 13 de BAK, una superficie vacía proponía «M100»
+  > cuando lo que corresponde es «M00».
+
+  > **Pendiente conocido, y es del contrato, no de esta pantalla:** `?m=` viaja como **número**,
+  > así que `modulo.html?m=30` es ambiguo el día que exista un módulo con el mismo número en dos
+  > superficies. `alta-modulo.html` aterriza igual desde siempre. Resolverlo es pasar `?m=` a
+  > código, que toca el contrato de URL y las 10 pantallas — no se hizo acá.
+
+- **El lote entra al árbol, y los pendientes llevan al lugar exacto** — Fase 2 del rediseño.
+
+  **Marcar N videos a regrabar ya no obliga a salir del módulo.** El árbol de `modulo.html` tiene
+  casillas, barra de acciones al pie y «marcar todos»: cambiar el estado de los 7 videos de un
+  módulo son **7 casillas + 2 clics**, sin abrir una sola ficha. El cambio se ve **en el mismo
+  árbol, sin recargar ni navegar** —`anotar()` parcha una entidad que ya existe, así que basta
+  repintar; es `crear()` el que obliga a recargar—, se avisa con el conteo en un `role="status"`,
+  y **la selección se limpia al terminar**: dejarla puesta invita a aplicar la acción siguiente
+  sobre un conjunto ya procesado. (El tablero la conserva, y ahí está bien: es una mesa de
+  trabajo, no el detalle de un módulo.)
+
+  > **El mecanismo es el MISMO de `ui.js`, generalizado — no una segunda implementación.** Estaba
+  > atado a `table` / `tbody` / `tr`, y el árbol está hecho de `div`. Ahora la raíz es cualquier
+  > `[data-bulk]`; lo único que se pide de la fila es que lleve su **`data-id`**, que es lo que
+  > `seleccionados()` ya leía. Fuera de una tabla, la fila se marca con `data-bulk-row` y el
+  > «marcar todas» con `data-bulk-all`. Ese control **se busca fuera de la raíz**: la lista se
+  > repinta entera después de cada mutación, así que uno que viviera adentro desaparecería con
+  > ella —en una tabla vive en el `thead` por el mismo motivo—.
+
+  > **El fondo de la fila marcada no tocó `src/input.css`.** El estilo de fila seleccionada
+  > existía solo para `.table-dense tbody tr`. En vez de sumar una regla al design system, la
+  > fila del árbol declara `data-[selected=true]:bg-info-bg` en su markup: reusa el token que ya
+  > está —el mismo `info-bg` de `aria-current`— sin agregar ninguno. Hay que **recompilar y
+  > commitear el CSS**, porque es una clase nueva en el compilado.
+
+  > **La Ruta no lleva casillas** (R8): referencia videos que viven en otro módulo, así que
+  > marcarlos y cambiarles el estado desde ahí operaría sobre copias que no son suyas. La
+  > compuerta de mover sigue siendo `movible()` **en el motor**, para que `verificar()` la audite.
+
+  **Y la franja del panel dejó de mandar a un listado.** Tres de sus cinco contadores llevaban a
+  `tablero.html` —55 filas donde había que volver a encontrar el video del que hablaba el
+  número—. Ahora cada uno lleva **al objeto y a la solapa donde ese trabajo se hace**: a guionar
+  → `?tab=guion`, a regrabar → `?tab=versiones`, sin preguntas → la sesión de escritura, y el
+  nuevo **«módulos con banco corto»** —con el conteo, que el flujo pide explícito— → el módulo
+  con `?tab=banco` abierta. Un clic, no tres.
+
+  > **Llevar al primero de la cola no es llevar a uno al azar.** Acá el número no nombra un
+  > objeto que la persona ya tiene en la cabeza —ese era el problema de la puerta de «cargar el
+  > link»—, nombra una cola de trabajo, y la cola se empieza por algún lado. Es el patrón que el
+  > repo ya usaba con «publicados sin pregunta». Un contador en cero sigue sin fingir link.
+
+  > **«Módulos sin sub-temas definidos» no se construyó, y no es un olvido.** Traducido al
+  > vocabulario del repo es «módulos sin secciones», y **R12 lo hace imposible en las tres vías
+  > de alta** —dos controles de `verificar()` lo auditan—. Sería un contador que nunca puede
+  > pasar de cero.
+
 **Ya no es solo maquetación, ni solo navegación.** No hay backend, ni API, ni videos reales, ni SSO.
 Pero **sí hay capa de datos, reglas de negocio derivadas, mutaciones y persistencia en
 `localStorage`**. Eso revierte a propósito una decisión de la tanda 1 (ver «El cambio de
@@ -295,6 +428,9 @@ agrega una pantalla o un estado.
 | `?sup=` | También lo lee `alta-modulo.html`, para arrancar en la superficie que se venía mirando |
 | `?m=` | También lo leen `alta-seccion.html` y `alta-videos.html`, para precargar el módulo padre |
 | `?seccion=` | El **título** de una sección del `?m=`, URL-encodeado — `alta-videos.html?m=30&seccion=Carga%20y%20proceso`. Precarga esa sección en todas las filas del lote. Lo emite cada sección del árbol de `modulo.html`. **Precargar no es atar:** la columna «Sección» sigue estando y el lote sigue pudiendo cruzar secciones, porque el cohorte agrupa por escenario. Si el título no existe en el módulo, se ignora; al cambiar de módulo, se suelta |
+| `?nueva=` | El **título** de la sección recién creada, URL-encodeado — `modulo.html?m=30&nueva=Cierre%20de%20caja`. La marca en el árbol, la centra y le pone el foco en «agregar video». **Lo emite el alta en línea, no se tipea.** Si el título no existe en el módulo, se ignora — mismo criterio que `?seccion=` |
+| `?nuevov=` | El **ID** del video recién reservado — `modulo.html?m=30&nuevov=BAK-M30.080`. Marca su fila en el árbol, la centra y le pone el foco en «cargar link», que es lo que sigue. Lo emite el alta en línea |
+| `?otro=` | El **título** de una sección, URL-encodeado. Reabre el alta de video ahí, con el ID siguiente ya calculado — es lo que hace «Reservar y cargar otro». Va junto con `?nuevov=`, nunca solo |
 | `?v=` | `escritura.html?v=BAK-M30.050` — la sesión de escritura de preguntas de un video |
 | `?config=1` | Abre la configuración de evaluación — `banco.html` |
 | `?guia=` | `1` abre la guía paso por paso sobre el `?m=` de la pantalla · `0` la cierra **y suprime el auto-arranque**, para compartir un link sin ella. Solo en las 7 pantallas del flujo |
@@ -304,6 +440,17 @@ agrega una pantalla o un estado.
 > **Después de mutar, recargá con `UI.recargar()`, nunca con `location.reload()`.** Descarta
 > `reset=1` de la URL: recargar con ese parámetro puesto borra el cambio que se acaba de guardar, y
 > el usuario ve que no pasó nada.
+
+> **No armes la query con `URLSearchParams` si `S.param()` la va a leer.** `searchParams.set()`
+> codifica el espacio como `+` y `S.param()` lee con `decodeURIComponent`, que **no** traduce el
+> `+`: el valor llega como `Cierre+de+caja`, no resuelve a nada y el efecto se pierde **en
+> silencio**, sin error en ningún lado. Se arma concatenando con `encodeURIComponent`, que da `%20`.
+> Es la convención de `?seccion=` y de `?nueva=`.
+>
+> Y si la pantalla se recarga a sí misma después de mutar, **reescribí la query que ya estaba** en
+> vez de armarla de cero: un `?guia=0` o un `?tab=` son deep-links que alguien eligió, y perderlos
+> al guardar es cambiarle la pantalla por debajo. El patrón está en `modulo.html`, en el alta de
+> sección.
 
 `design-system.html` tiene la tabla de **decisiones abiertas**, que hay que mantener sincronizada.
 
@@ -365,6 +512,13 @@ Todas en `academia-sim.js`. Ninguna en el HTML.
 | **«¿Este control está completo?»** | No vive en el motor: la guía lo **lee del DOM** que la pantalla ya pintó — `aria-invalid`, `[data-*-error]`, y el `disabled` + `title` del botón primario. Reimplementarlo daría dos redacciones para la misma regla, y la de la guía sería la que se queda vieja |
 | **Dónde vive hoy un video (D-22)** | `seccionEfectiva(video, escenaId)` — el parche del overlay si existe **y nombra una sección real del módulo del video**, y si no la sección estructural (resuelta por ID, nunca por el campo del objeto recibido). La validación es lo que sostiene R12 aunque alguien escriba en el overlay sin pasar por la compuerta de la pantalla. La sección la POSEE el dataset, así que mover un video es la única mutación del overlay que cambia una pertenencia y no un atributo |
 | **La compuerta de mover un video (D-22)** | `movible(video, escenaId)` — cierra en 0 preguntas ya alcanzadas para ese video. Vive en el motor y no en la pantalla, o `verificar()` no podría auditarla |
+
+> **`RENDER.tableroPasos()` acepta `acciones`, un mapa por id de paso.** La pantalla pone su
+> propio control donde la acción no es navegar: activar el módulo es una mutación, y agregar
+> una sección abre el alta en línea ahí mismo. El motor **igual declara su `accion` con
+> destino** —es lo que hace que el paso siga teniendo sentido desde `verificar()` y desde
+> cualquier pantalla que no inyecte nada—. Antes era un caso especial cableado al id
+> `activacion`; generalizarlo evitó sumar un segundo.
 
 ### Mutar el overlay
 

@@ -528,9 +528,16 @@ window.RENDER = (function () {
            control y su única compuerta es su propio «Siguiente». Ese fue el
            cierre de D-16 —se probó apagar los controles de la app y se
            descartó—, y es lo que deja este tablero con su regla intacta. */
+        /* La pantalla puede poner su propio control para un paso, por id. Lo
+           necesita cuando la acción no es navegar: activar el módulo es una
+           mutación, y agregar una sección abre el alta en línea ahí mismo. El
+           motor igual declara su `accion` con destino —es lo que hace que el
+           paso siga teniendo sentido desde `verificar()` y desde cualquier
+           pantalla que no inyecte nada. */
         const apagado = !p.accion || !!p.motivo;
-        const accion = p.id === "activacion" && o.activacion
-          ? o.activacion
+        const propia = o.acciones && o.acciones[p.id];
+        const accion = propia
+          ? propia
           : p.accion
             ? (apagado
               ? '<button type="button" class="btn btn-bordered btn-sm btn-block" disabled title="' +
@@ -577,13 +584,41 @@ window.RENDER = (function () {
     } else {
       chipPreg = '<span class="chip chip-outline">0 preg.</span>';
     }
+    /* «Cargar link» es la otra mitad de R11: el video nace como ID reservado y
+       sin versión, así que la acción que lo saca de ese estado tiene que estar
+       ofrecida donde el video se ve. Lleva a la solapa de versiones de su ficha,
+       que es donde vive el flujo link → «Traer datos» → confirmar (R1); no se
+       duplica el modal acá. El que ya tiene versión vigente no la ofrece: no
+       habría nada que cargar. */
+    const cargar = o.sinLink
+      ? '<a class="text-2xs font-normal" href="video.html?v=' + esc(v.id) + q +
+        '&amp;tab=versiones" title="Este ID todavía no tiene link">cargar link</a>'
+      : "";
+    /* La casilla de selección en lote. Va solo si la pantalla la pide: el árbol
+       de la Ruta referencia videos que viven en otro módulo (R8), así que ahí
+       marcar y cambiar el estado en lote operaría sobre copias que no son suyas.
+
+       `data-id` y `data-bulk-row` son el contrato que `UI` necesita para que la
+       selección múltiple funcione fuera de una tabla; el fondo de la fila
+       marcada sale de los tokens que ya existen —el mismo `info-bg` que usa
+       `aria-current`—, declarado acá y no en `src/input.css`, que no se toca. */
+    const casilla = o.seleccionable
+      ? '<input type="checkbox" aria-label="Seleccionar ' + esc(v.id) + '" />'
+      : "";
     return (
-      '<div class="tree-row"' + (o.actual ? ' aria-current="true"' : "") + ">" +
+      '<div class="tree-row data-[selected=true]:bg-info-bg"' +
+        (o.actual ? ' aria-current="true"' : "") +
+        (o.nuevo ? ' data-nuevo="1"' : "") +
+        (o.seleccionable ? ' data-bulk-row data-id="' + esc(v.id) + '"' : "") +
+        ' data-estado="' + esc(v.estado) + '">' +
+      casilla +
       '<span class="row-id">' + (o.actual ? "<strong>" + esc(v.id) + "</strong>" : esc(v.id)) + "</span>" +
       '<span class="row-title"><a href="video.html?v=' + esc(v.id) + q + '">' +
         esc(v.titulo) + "</a></span>" +
+      (o.nuevo ? '<span class="chip chip-meta">nuevo</span>' : "") +
       chipEstado(v.estado) +
       chipPreg +
+      cargar +
       "</div>"
     );
   }
@@ -599,6 +634,11 @@ window.RENDER = (function () {
       return filaVideoArbol(v, {
         escena: o.escena,
         actual: o.actual === v.id,
+        nuevo: o.nuevo === v.id,
+        seleccionable: !!o.seleccionable,
+        /* El veredicto lo da el motor —`sinLink()`— y llega resuelto en un
+           conjunto: render.js no lo calcula ni lo consulta por fila. */
+        sinLink: !!(o.sinLink && o.sinLink[v.id]),
         preguntas: suyas.length,
         aRevisar: suyas.filter(function (p) { return p.estado === "a revisar"; }).length,
       });
@@ -606,14 +646,23 @@ window.RENDER = (function () {
     /* La puerta de la sección a sus videos. Antes no existía: para reservar un
        ID había que salir al panel de módulos o al tablero, y el paso «Videos»
        del tablero ofrece «Ir al tablero» —no «Reservar IDs»— en cuanto el mapa
-       está completo, que en E2 a E6 son los 11 módulos. El lote sigue pudiendo
-       cruzar secciones; esta acción solo precarga la que se venía mirando. */
+       está completo, que en E2 a E6 son los 11 módulos.
+
+       Son DOS vías y las dos están a la vista, porque son dos trabajos
+       distintos: «agregar video» abre el alta en línea acá mismo —el caso de a
+       uno, que es el frecuente— y «en lote» lleva a la planilla, que es el caso
+       de volumen. Obligar a pasar por una para llegar a la otra sería el rodeo
+       que este árbol vino a sacar. El lote sigue pudiendo cruzar secciones;
+       precargar la que se venía mirando no es atarlo a ella. */
     const agregar = o.modulo
-      ? '<a class="ml-auto inline-flex items-center gap-1 text-2xs font-normal" href="alta-videos.html?m=' +
+      ? '<button type="button" class="ml-auto inline-flex items-center gap-1 text-2xs font-normal"' +
+        ' data-agregar-video data-seccion="' + esc(s.titulo) + '"' +
+        ' title="Reservar un ID de video en «' + esc(s.titulo) + '»">' +
+        '<span class="icon icon-sm" data-icon="plus"></span>agregar video</button>' +
+        '<a class="text-2xs font-normal" href="alta-videos.html?m=' +
         esc(String(o.modulo)) + "&amp;seccion=" + esc(encodeURIComponent(s.titulo)) +
         (o.escena ? "&amp;escena=" + esc(o.escena) : "") +
-        '" title="Reservar IDs de video en «' + esc(s.titulo) + '»">' +
-        '<span class="icon icon-sm" data-icon="plus"></span>agregar video</a>'
+        '" title="Reservar varios IDs de una, desde la planilla">en lote</a>'
       : "";
     return (
       '<section class="tree-section" aria-labelledby="' + id + '">' +

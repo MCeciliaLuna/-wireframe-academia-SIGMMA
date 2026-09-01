@@ -497,22 +497,48 @@ window.UI = (function () {
     activar(param(clave) || opciones[0].dataset.view);
   }
 
-  /* -- Selección múltiple de tabla ------------------------------------------
+  /* -- Selección múltiple ---------------------------------------------------
      Marca las filas y muestra la barra de acciones en lote con el conteo. La
      acción en sí la ejecuta la pantalla, leyendo `UI.seleccionados()`.
 
-     Las filas se consultan en vivo y no se guardan en un array: la tabla se
+     Las filas se consultan en vivo y no se guardan en un array: la lista se
      re-pinta después de cada mutación, y una lista capturada dejaría a «marcar
-     todas» operando sobre checkboxes que ya no están en el documento. */
+     todas» operando sobre checkboxes que ya no están en el documento.
+
+     NO es solo de tabla. Estaba atado a `table` / `tbody` / `tr`, y el árbol de
+     secciones de `modulo.html` está hecho de `div`: duplicar el mecanismo ahí
+     habría dado dos implementaciones de la misma cosa, y la segunda sería la
+     que se queda vieja. Ahora la raíz es cualquier `[data-bulk]`, y lo único
+     que se pide de la marca es que **la fila lleve su `data-id`** — que es lo
+     que `seleccionados()` ya leía. En una tabla la fila es el `tr` y el «marcar
+     todas» vive en el `thead`; fuera de una tabla, la fila se marca con
+     `data-bulk-row` y el «marcar todas» con `data-bulk-all`. */
+  function ambitoBulk() {
+    const raiz = document.querySelector("[data-bulk]");
+    if (!raiz) return null;
+    const esTabla = raiz.tagName === "TABLE";
+    return {
+      raiz: raiz,
+      barra: document.getElementById(raiz.dataset.bulk),
+      /* El «marcar todas» se busca FUERA de la raíz cuando no es una tabla: la
+         lista se repinta entera después de cada mutación, así que un control que
+         viviera adentro desaparecería con ella. En una tabla vive en el `thead`,
+         que por lo mismo tampoco se repinta. Buscándolo dentro de la raíz, el
+         del árbol no se encontraba y marcar todas no hacía nada — sin error. */
+      todos: esTabla
+        ? raiz.querySelector("thead input[type=checkbox]")
+        : document.querySelector("[data-bulk-all]"),
+      selFila: esTabla ? "tbody input[type=checkbox]" : "[data-bulk-row] input[type=checkbox]",
+    };
+  }
+
   function bindBulkSelect() {
-    const tabla = document.querySelector("table[data-bulk]");
-    if (!tabla) return;
-    const barra = document.getElementById(tabla.dataset.bulk);
-    const todos = tabla.querySelector("thead input[type=checkbox]");
+    const ambito = ambitoBulk();
+    if (!ambito) return;
+    const barra = ambito.barra;
+    const todos = ambito.todos;
     const filas = function () {
-      return Array.prototype.slice.call(
-        tabla.querySelectorAll("tbody input[type=checkbox]")
-      );
+      return Array.prototype.slice.call(ambito.raiz.querySelectorAll(ambito.selFila));
     };
 
     function pintar() {
@@ -521,7 +547,10 @@ window.UI = (function () {
         return c.checked;
       });
       actuales.forEach(function (c) {
-        c.closest("tr").dataset.selected = c.checked ? "true" : "false";
+        /* `[data-id]` es el contrato: en una tabla lo lleva el `tr`, en el árbol
+           la fila del video. Buscar `tr` a secas fallaba fuera de una tabla. */
+        const fila = c.closest("[data-id]");
+        if (fila) fila.dataset.selected = c.checked ? "true" : "false";
       });
       if (barra) {
         barra.hidden = marcados.length === 0;
@@ -565,14 +594,14 @@ window.UI = (function () {
   /* Los IDs de las filas marcadas. Es lo que le permite a una pantalla ejecutar
      una acción en lote sin volver a recorrer el DOM a mano. */
   function seleccionados() {
-    const tabla = document.querySelector("table[data-bulk]");
-    if (!tabla) return [];
+    const ambito = ambitoBulk();
+    if (!ambito) return [];
     return Array.prototype.slice
-      .call(tabla.querySelectorAll("tbody input[type=checkbox]"))
+      .call(ambito.raiz.querySelectorAll(ambito.selFila))
       .filter(function (c) { return c.checked; })
       .map(function (c) {
-        const tr = c.closest("tr");
-        return tr && tr.dataset.id;
+        const fila = c.closest("[data-id]");
+        return fila && fila.dataset.id;
       })
       .filter(Boolean);
   }

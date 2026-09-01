@@ -140,10 +140,171 @@
                       por un campo aparte. Para cambiar el orden se reserva el ID que corresponde: así
                       ordenar la planilla por ID no puede romper el syllabus.
                     </p>
-                    <div data-arbol></div>
+                    <!-- Acciones en lote SOBRE EL ÁRBOL. Antes esto solo existía
+                         en el tablero, así que marcar 8 videos a regrabar
+                         obligaba a salir del módulo, encontrarlos entre los 55 y
+                         volver. El mecanismo es el MISMO de `ui.js` —no hay una
+                         segunda implementación—: lo que cambió es que dejó de
+                         estar atado a `table` / `tbody` / `tr`.
+
+                         La barra va al PIE de la columna del árbol, no arriba:
+                         aparece donde terminó de marcar, sin correr el árbol
+                         hacia abajo al aparecer. -->
+                    <div class="flex items-center gap-2" data-arbol-jefe hidden>
+                      <label class="flex items-center gap-2 text-2xs text-gray-600">
+                        <input type="checkbox" data-bulk-all />
+                        marcar todos los videos del módulo
+                      </label>
+                    </div>
+                    <div data-arbol data-bulk="bulk-arbol"></div>
+
+                    <div class="bulk-bar" id="bulk-arbol" hidden>
+                      <strong data-bulk-count>0 seleccionados</strong>
+                      <div class="relative" data-dropdown>
+                        <button type="button" class="btn btn-bordered btn-sm" data-dropdown-trigger aria-expanded="false" aria-haspopup="true">
+                          Cambiar estado <span class="icon icon-sm" data-icon="chevron-down"></span>
+                        </button>
+                        <div class="menu" role="menu" data-dropdown-menu hidden data-arbol-estados></div>
+                      </div>
+                      <div class="relative" data-dropdown>
+                        <button type="button" class="btn btn-bordered btn-sm" data-dropdown-trigger data-arbol-mover aria-expanded="false" aria-haspopup="true">
+                          Mover a otra sección <span class="icon icon-sm" data-icon="chevron-down"></span>
+                        </button>
+                        <div class="menu" role="menu" data-dropdown-menu hidden data-arbol-secciones></div>
+                      </div>
+                      <button type="button" class="link-quiet ml-auto" data-bulk-clear>limpiar selección</button>
+                    </div>
+
+                    <!-- El aviso con el conteo, después de la acción. El cambio se
+                         ve en los chips del árbol, pero «se ve» no es «se avisa»:
+                         con 8 videos marcados entre 55, el resultado hay que
+                         poder leerlo sin buscarlo fila por fila. -->
+                    <p class="hint !mt-0" role="status" data-arbol-aviso hidden></p>
                     <button type="button" class="placeholder-box !py-3 text-xs" data-agregar-seccion hidden>
                       <span class="icon icon-sm" data-icon="plus"></span> agregar sección
                     </button>
+
+                    <!-- Alta de sección EN LÍNEA, en el árbol y sin cambiar de
+                         pantalla. Antes este botón navegaba a `alta-seccion.html`:
+                         para completar UNA tarea de estructura había que salir del
+                         módulo, elegirlo otra vez en un desplegable —el desplegable
+                         preguntaba algo que la pantalla anterior ya sabía— y volver.
+
+                         El módulo padre NO es un campo: viene dado por el `?m=` de
+                         la pantalla, y está a la vista en el título y en la miga de
+                         pan durante todo el alta.
+
+                         `alta-seccion.html` sigue existiendo y sigue funcionando:
+                         quedó como deep-link, no como el camino que la app ofrece. -->
+                    <section class="tree-section" data-form-seccion hidden aria-labelledby="fs-t">
+                      <div class="tree-head">
+                        <span id="fs-t">Nueva sección en <span class="font-mono" data-fs-modulo></span></span>
+                        <span class="ml-auto text-2xs font-normal text-gray-600" data-fs-cuantas></span>
+                      </div>
+                      <div class="flex flex-col gap-3 p-4">
+                        <div class="field">
+                          <label class="label" for="fs-nom">Nombre</label>
+                          <input class="input !h-9 !text-xs" id="fs-nom" type="text"
+                                 placeholder="Estados y plantillas" aria-describedby="fs-hint" />
+                          <p class="hint" id="fs-hint">
+                            Es el sub-tema con el que se etiquetan las preguntas del banco: conviene
+                            que nombre un concepto, no una pantalla.
+                          </p>
+                          <!-- El motivo va EN el campo que lo causó, no en un resumen
+                               arriba de todo. Es además de donde la guía lee el
+                               veredicto: no lo reimplementa. -->
+                          <p class="error-text mt-2" data-fs-error hidden></p>
+                        </div>
+
+                        <div class="field">
+                          <label class="label" for="fs-orden">Orden dentro del módulo</label>
+                          <select class="select !h-9 !text-xs" id="fs-orden"></select>
+                          <p class="hint">
+                            Una sección recién creada todavía no tiene videos, así que acá manda
+                            esta posición. En cuanto tenga videos, el orden pasa a salir de la
+                            secuencia más baja de todos ellos.
+                          </p>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                          <button type="button" class="btn btn-primary btn-sm" data-fs-crear disabled>
+                            Crear sección
+                          </button>
+                          <button type="button" class="btn btn-bordered btn-sm" data-fs-cancelar>
+                            Cancelar
+                          </button>
+                          <span class="ml-auto text-2xs text-gray-600">Enter guarda · Esc cancela</span>
+                        </div>
+                      </div>
+                    </section>
+
+                    <!-- Alta de VIDEO en línea. Se muda a la sección donde se
+                         pidió, así que el padre no se elige: lo da el lugar del
+                         árbol. Superficie, módulo, sección, ID y planes van en
+                         solo lectura — R2: la identidad del video no se edita, y
+                         el ID sobrevive al regrabado.
+
+                         R11: acá NO hay campo de link. El video nace como ID
+                         reservado, en `backlog` y sin versión; cargar el link es
+                         otra tarea, meses después, y tiene su propia acción en
+                         la fila del árbol. Cohorte y duración también se
+                         difieren: entran en la ficha, que es la vista completa.
+
+                         El markup vive una sola vez y se MUEVE al nodo que lo
+                         pidió — un solo juego de IDs, que es al que apunta la
+                         guía. -->
+                    <div data-form-video hidden>
+                      <div class="flex flex-col gap-3 p-4">
+                        <div class="field">
+                          <label class="label" for="fv-tit">Qué enseña el video</label>
+                          <input class="input !h-9 !text-xs" id="fv-tit" type="text"
+                                 placeholder="Emitir un voucher" aria-describedby="fv-hint" />
+                          <!-- No lleva `error-text`: en este alta no hay error
+                               posible. El título vacío apaga el botón con su
+                               motivo —es un campo sin empezar, no un campo mal—
+                               y la secuencia sale de la primera libre, así que
+                               no puede chocar. Dejar un `[data-fv-error]` que
+                               nunca se muestra sería markup muerto, y la guía lo
+                               leería como un veredicto que nadie escribe. -->
+                          <p class="hint" id="fv-hint">
+                            Lo único que hay que escribir. Todo lo demás lo hereda de dónde está.
+                          </p>
+                        </div>
+
+                        <dl class="flex flex-col gap-2">
+                          <div class="meter-row">
+                            <dt>ID que le toca</dt>
+                            <dd class="meter-value font-mono" data-fv-id></dd>
+                          </div>
+                          <div class="meter-row">
+                            <dt>Sección</dt><dd data-fv-seccion></dd>
+                          </div>
+                          <div class="meter-row">
+                            <dt>Superficie y módulo</dt><dd data-fv-modulo></dd>
+                          </div>
+                          <div class="meter-row">
+                            <dt>Planes heredados</dt><dd data-fv-planes></dd>
+                          </div>
+                          <div class="meter-row">
+                            <dt>Estado con el que nace</dt>
+                            <dd><span class="chip chip-backlog">backlog</span></dd>
+                          </div>
+                        </dl>
+
+                        <div class="flex items-center gap-2">
+                          <button type="button" class="btn btn-primary btn-sm" data-fv-crear disabled>
+                            Reservar el ID
+                          </button>
+                          <button type="button" class="btn btn-bordered btn-sm" data-fv-otro disabled>
+                            Reservar y cargar otro
+                          </button>
+                          <button type="button" class="btn btn-bordered btn-sm" data-fv-cancelar>
+                            Cancelar
+                          </button>
+                          <span class="ml-auto text-2xs text-gray-600">Enter guarda · Esc cancela</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   <!-- Panel de apoyo. Contesta «¿por qué no puedo activar el módulo?»
@@ -248,28 +409,57 @@
           R.pintar("[data-chips]", chips);
         }
 
-        /* ── El módulo reservado no tiene contenido ───────────────────────── */
-        if (modulo.tipo === "reservado") {
+        /* ── El módulo reservado, mientras siga vacío ──────────────────────
+           La condición mira las SECCIONES, no el tipo. El estado vacío es dato,
+           no tipo: en cuanto se le declara la primera sección el módulo dejó de
+           estar vacío, y sigue por el camino de cualquier otro —árbol y los
+           cinco pasos—. `pasosDeModulo()` ya lo resuelve sin tocarle nada:
+           devuelve «secciones · en curso», que es exactamente el trabajo que
+           corresponde. Con la condición atada al tipo, la sección recién creada
+           quedaba invisible y la pantalla seguía diciendo que no había ninguna.
+
+           Y el texto ya no dice que no va a tener secciones «hasta que la
+           funcionalidad se libere»: eso contradecía al botón que está justo
+           abajo. Declarar la estructura antes de que exista el producto es
+           precisamente para lo que sirve un ID reservado. */
+        if (modulo.tipo === "reservado" && secciones.length === 0) {
           R.pintar("[data-acciones]",
-            '<a href="alta-seccion.html?m=' + modulo.numero + amp +
-            '" class="btn btn-bordered btn-sm">' +
-            '<span class="icon" data-icon="plus"></span>Agregar sección</a>');
+            '<a href="tablero.html' + q + '" class="btn btn-bordered btn-sm">' +
+            '<span class="icon" data-icon="columns"></span>Ver el tablero</a>');
           vacio("Este módulo es un ID reservado",
             "<span class=\"font-mono\">" + modulo.codigo + "</span> existe en el mapa para que el " +
             "pipeline pueda mirar hacia adelante, pero <strong>el producto todavía no está " +
-            "desarrollado</strong>. No tiene secciones ni videos, y no los va a tener hasta que la " +
-            "funcionalidad se libere.",
-            '<a href="tablero.html' + q + '" class="btn btn-bordered btn-sm">Ver el tablero</a>');
+            "desarrollado</strong>. Todavía no tiene secciones ni videos. Se le puede declarar la " +
+            "estructura desde ahora: los IDs se reservan antes de que haya nada que grabar.",
+            '<button type="button" class="btn btn-primary btn-sm" data-agregar-seccion hidden>' +
+            '<span class="icon" data-icon="plus"></span>Agregar la primera sección</button>');
+
+          /* El alta se muda debajo del mensaje: acá no hay árbol donde ponerla
+             en línea, y el mensaje es lo que explica por qué el módulo está
+             vacío. Se MUEVE el nodo, no se duplica el markup: hay un solo
+             formulario en la pantalla, con un solo juego de IDs, y es el mismo
+             al que apunta la guía. */
+          const caja = document.querySelector("[data-form-seccion]");
+          document.getElementById("contenido").appendChild(caja);
+          cablearAltaSeccion();
           return;
         }
 
-        /* ── Sin secciones todavía ──────────────────────────────────────── */
-        if (!esRuta && modulo.secciones.length === 0) {
+        /* ── Sin secciones todavía ────────────────────────────────────────
+           Hoy es inalcanzable —R12 no deja que ninguna de las tres vías de alta
+           cree un módulo de biblioteca sin secciones, y `verificar()` lo audita
+           en el dataset—, pero se resuelve igual que el reservado: ofreciendo
+           crear la primera acá mismo. Un estado vacío cuya única salida es irse
+           a otra pantalla es el callejón que este rediseño vino a sacar. */
+        if (!esRuta && secciones.length === 0) {
           vacio("Este módulo no tiene secciones",
             "Un módulo agrupa sus videos en secciones, y la sección es además la unidad sobre la que " +
             "se exige cobertura de preguntas. Sin al menos una, no hay dónde colgar los videos.",
-            '<a href="alta-seccion.html?m=' + modulo.numero + amp +
-            '" class="btn btn-primary btn-sm">Crear la primera sección</a>');
+            '<button type="button" class="btn btn-primary btn-sm" data-agregar-seccion hidden>' +
+            '<span class="icon" data-icon="plus"></span>Crear la primera sección</button>');
+          document.getElementById("contenido")
+            .appendChild(document.querySelector("[data-form-seccion]"));
+          cablearAltaSeccion();
           return;
         }
 
@@ -315,6 +505,16 @@
             const cajaPasos = document.querySelector("[data-pasos]");
             cajaPasos.hidden = false;
             R.pintar("[data-pasos]", R.tableroPasos(S.pasosDeModulo(modulo, e), {
+              acciones: {
+              /* El paso 1 abre el alta en línea, no navega: el motor declara su
+                 destino a `alta-seccion.html` y sigue siendo válido, pero esta
+                 pantalla tiene el formulario adentro y mandar afuera para volver
+                 es el rodeo que el rediseño vino a sacar. Lleva el mismo
+                 `data-agregar-seccion` que el pie del árbol, y los dos quedan
+                 cableados: si solo respondiera uno, el otro se leería como roto. */
+              secciones: '<button type="button" class="btn ' +
+                (S.pasosDeModulo(modulo, e)[0].hecho ? "btn-bordered" : "btn-primary") +
+                ' btn-sm btn-block" data-agregar-seccion>Agregar sección</button>',
               activacion: rr.estado === "activo"
                 ? '<button type="button" class="btn btn-bordered btn-sm btn-block" data-desactivar>Desactivar</button>'
                 : '<button type="button" class="btn btn-primary btn-sm btn-block" data-activar' +
@@ -325,6 +525,7 @@
                     R.esc(aa.faltan.length ? "Faltan " + aa.faltan.join(", ") + "."
                       : aa.aRevisar + " preguntas a revisar bloquean la activación.") + '"') + ">" +
                   accionActivar + "</button>",
+              },
             }));
           }
 
@@ -397,17 +598,492 @@
              no está es el mismo bug que un botón que no hace nada. Los ↑ ↓
              llegan con la edición de secciones. */
           document.querySelector("[data-arbol-titulo]").textContent = "Árbol de secciones";
-          R.pintar("[data-arbol]", secciones.map(function (s, i) {
+          /* El conjunto de los que esperan link se resuelve UNA vez para todo
+             el árbol, no una por fila: `sinLink()` recorre los 55 y lee el
+             overlay en cada llamada. */
+          pintarArbol();
+          document.querySelector("[data-arbol-jefe]").hidden = false;
+          cablearAltaSeccion();
+          cablearAltaVideo();
+          cablearLoteArbol();
+          marcarSeccionNueva();
+          marcarVideoNuevo();
+        }
+
+        /* ── El árbol, en una función ─────────────────────────────────────
+           Se pinta desde acá y no en línea porque después de una acción en lote
+           hay que volver a pintarlo: el prompt pide que el resultado se vea en el
+           mismo árbol, sin recargar ni navegar. `anotar()` parcha una entidad que
+           ya existe, así que no hace falta materializar — a diferencia de
+           `crear()`, que sí obliga a recargar. */
+        function pintarArbol() {
+          /* El conjunto de los que esperan link se resuelve UNA vez para todo
+             el árbol, no una por fila: `sinLink()` recorre los 55 y lee el
+             overlay en cada llamada. */
+          const esperanLink = {};
+          S.sinLink(e).forEach(function (v) { esperanLink[v.id] = true; });
+          const vivas = S.seccionesDe(modulo);
+          R.pintar("[data-arbol]", vivas.map(function (s, i) {
             return R.seccionArbol(s, i, {
               escena: e === "E5" ? null : e,
               modulo: modulo.numero,
+              sinLink: esperanLink,
+              nuevo: S.param("nuevov"),
+              seleccionable: true,
             });
           }).join(""));
-          const agregar = document.querySelector("[data-agregar-seccion]");
-          agregar.hidden = false;
-          agregar.addEventListener("click", function () {
-            window.location.href = "alta-seccion.html?m=" + modulo.numero +
-              (e === "E5" ? "" : "&escena=" + e);
+          /* Las filas son nuevas: la selección múltiple captura los checkboxes
+             una sola vez, así que sin esto deja de responder sin decir por qué. */
+          if (window.UI && window.UI.rebind) window.UI.rebind();
+        }
+
+        /* ── Acciones en lote sobre el árbol ──────────────────────────────
+           Los siete estados y el destino de «mover» salen del motor, igual que en
+           el tablero: la compuerta de mover es `movible()`, que vive en el motor
+           para que `verificar()` pueda auditarla, nunca en la pantalla. */
+        function cablearLoteArbol() {
+          const barra = document.getElementById("bulk-arbol");
+          const aviso = document.querySelector("[data-arbol-aviso]");
+          const menuEstados = document.querySelector("[data-arbol-estados]");
+          const triggerMover = document.querySelector("[data-arbol-mover]");
+          const menuSecciones = document.querySelector("[data-arbol-secciones]");
+
+          R.pintar("[data-arbol-estados]", S.ESTADOS.map(function (est) {
+            return '<button type="button" class="menu-item" role="menuitem" data-est="' +
+              R.esc(est) + '">' + R.esc(est) + "</button>";
+          }).join(""));
+
+          function decir(texto) {
+            aviso.hidden = false;
+            aviso.textContent = texto;
+          }
+
+          /* Terminada la acción, la selección se limpia: dejarla puesta invita a
+             aplicar la siguiente sobre un conjunto que ya se procesó. */
+          function limpiar() {
+            document.querySelectorAll("[data-arbol] input[type=checkbox]").forEach(function (c) {
+              c.checked = false;
+            });
+            const todos = document.querySelector("[data-bulk-all]");
+            if (todos) { todos.checked = false; todos.indeterminate = false; }
+            barra.hidden = true;
+          }
+
+          function enLote(campos, contar) {
+            const ids = window.UI.seleccionados();
+            if (!ids.length) return;
+            ids.forEach(function (id) { S.anotar("videos", id, campos); });
+            pintarArbol();
+            pintarAptitud();
+            limpiar();
+            decir(contar(ids.length));
+          }
+
+          menuEstados.addEventListener("click", function (ev) {
+            const b = ev.target.closest("[data-est]");
+            if (!b) return;
+            const est = b.dataset.est;
+            enLote({ estado: est }, function (n) {
+              return n + (n === 1 ? " video pasó" : " videos pasaron") + " a «" + est + "»." +
+                (est === "a regrabar" || est === "obsoleto"
+                  ? " Sus preguntas vigentes quedaron «a revisar»."
+                  : "");
+            });
+          });
+
+          /* El menú de mover depende de la selección —a diferencia de estado, que
+             vale para cualquier video—, así que se repuebla en cada cambio. */
+          function actualizarMover() {
+            const ids = window.UI.seleccionados();
+            const sel = ids.map(function (id) { return S.video(id, e); }).filter(Boolean);
+            triggerMover.disabled = false;
+            triggerMover.title = "";
+            R.pintar("[data-arbol-secciones]", "");
+            if (!sel.length) return;
+
+            const conPreguntas = sel.filter(function (v) { return !S.movible(v, e); });
+            if (conPreguntas.length) {
+              triggerMover.disabled = true;
+              triggerMover.title = conPreguntas.length + " de los seleccionados tienen preguntas " +
+                "escritas: moverlos dejaría su banco fuera de sección.";
+              return;
+            }
+            const efectivas = sel.map(function (v) { return S.seccionEfectiva(v, e); });
+            R.pintar("[data-arbol-secciones]", S.seccionesDe(modulo).map(function (sc) {
+              const todosAhi = efectivas.every(function (t) { return t === sc.titulo; });
+              return '<button type="button" class="menu-item" role="menuitem" data-dest="' +
+                R.esc(sc.titulo) + '"' + (todosAhi ? " disabled" : "") + ">" +
+                R.esc(sc.titulo) + (todosAhi ? " · ya están acá" : "") + "</button>";
+            }).join(""));
+          }
+
+          menuSecciones.addEventListener("click", function (ev) {
+            const b = ev.target.closest("[data-dest]");
+            if (!b || b.disabled) return;
+            const dest = b.dataset.dest;
+            enLote({ seccion: dest }, function (n) {
+              return n + (n === 1 ? " video se movió" : " videos se movieron") +
+                " a «" + dest + "».";
+            });
+          });
+
+          /* La selección cambia por click en una casilla o por «marcar todos», y
+             el menú de destino tiene que reflejarla en los dos casos. Va por
+             delegación porque las filas se repintan. */
+          document.addEventListener("change", function (ev) {
+            if (ev.target.matches("[data-arbol] input[type=checkbox], [data-bulk-all]")) {
+              actualizarMover();
+            }
+          });
+          actualizarMover();
+        }
+
+        /* ── Alta de sección en línea ─────────────────────────────────────
+           El módulo padre no se pregunta: es el `?m=` de esta pantalla. Las dos
+           reglas de validación son las mismas que las de `alta-seccion.html`
+           —nombre presente y no repetido dentro del módulo—, y el motivo se
+           pinta en el campo, que es de donde la guía lee el veredicto. */
+        function cablearAltaSeccion() {
+          const caja = document.querySelector("[data-form-seccion]");
+          const nom = document.getElementById("fs-nom");
+          const orden = document.getElementById("fs-orden");
+          const crear = document.querySelector("[data-fs-crear]");
+          const cancelar = document.querySelector("[data-fs-cancelar]");
+          const error = document.querySelector("[data-fs-error]");
+
+          /* Los disparadores se buscan cada vez, no se guardan: el tablero de
+             pasos se vuelve a pintar al activar o desactivar el módulo, y el
+             botón del paso 1 que había quedado cableado deja de existir. Por eso
+             el click va por delegación en el documento —sobrevive a cualquier
+             repintado— y el mostrar/ocultar se resuelve sobre la lista viva. */
+          const disparadores = function () {
+            return Array.prototype.slice.call(
+              document.querySelectorAll("[data-agregar-seccion]"));
+          };
+          let desde = null;
+
+          disparadores().forEach(function (b) { b.hidden = false; });
+          document.querySelector("[data-fs-modulo]").textContent = modulo.codigo;
+          document.querySelector("[data-fs-cuantas]").textContent =
+            secciones.length + (secciones.length === 1 ? " sección hoy" : " secciones hoy");
+
+          /* Las posiciones posibles son las que existen más una al final. Cada
+             opción nombra la sección que quedaría después: así se ve dónde cae
+             sin tener que contar. */
+          R.pintar("#fs-orden", secciones.map(function (s, i) {
+            return '<option value="' + (i + 1) + '">' + (i + 1) + " — antes de «" +
+              R.esc(s.titulo) + "»</option>";
+          }).concat([
+            /* «Al final» no significa nada cuando no hay ninguna todavía: en un
+               módulo vacío la única posición posible es la primera, y decirlo
+               así evita que la persona busque el final de una lista de cero. */
+            '<option value="' + (secciones.length + 1) + '" selected>' +
+            (secciones.length + 1) +
+            (secciones.length ? " — al final" : " — la primera") + "</option>",
+          ]).join(""));
+
+          function validar() {
+            const nombre = nom.value.trim();
+            const repetida = secciones.some(function (s) {
+              return s.titulo.toLowerCase() === nombre.toLowerCase();
+            });
+            const motivo = !nombre
+              ? "Falta el nombre de la sección."
+              : repetida
+                ? modulo.codigo + " ya tiene una sección con ese nombre."
+                : "";
+            /* Un nombre vacío todavía no es un error: es un campo sin empezar.
+               Marcarlo en rojo apenas se abre el formulario sería acusar a la
+               persona de algo que no hizo. */
+            const invalido = !!nombre && !!motivo;
+            nom.setAttribute("aria-invalid", invalido ? "true" : "false");
+            error.hidden = !invalido;
+            error.textContent = motivo;
+            crear.disabled = !!motivo;
+            crear.title = motivo;
+            return !motivo;
+          }
+
+          /* La misma acción se ofrece en dos lugares —el paso 1 del tablero, que
+             dice QUÉ hay que hacer, y el pie del árbol, que es DONDE se hace—, y
+             las dos abren el mismo formulario. Es el criterio que el repo ya usa
+             con activar el módulo: si solo respondiera uno de los dos, el otro
+             se leería como roto. */
+          function abrirForm(boton) {
+            desde = boton;
+            caja.hidden = false;
+            disparadores().forEach(function (b) { b.hidden = true; });
+            validar();
+            nom.focus();
+          }
+
+          /* Cancelar devuelve el foco al control desde donde se abrió: si el
+             foco se queda en un elemento que se acaba de ocultar, quien navega
+             con teclado vuelve al principio del documento. */
+          function cerrarForm() {
+            caja.hidden = true;
+            disparadores().forEach(function (b) { b.hidden = false; });
+            nom.value = "";
+            validar();
+            if (desde && document.contains(desde)) desde.focus();
+          }
+
+          function guardar() {
+            if (!validar()) return;
+            const titulo = nom.value.trim();
+            S.crear("secciones", {
+              codigoModulo: modulo.codigo,
+              orden: Number(orden.value),
+              titulo: titulo,
+            });
+            /* Lo creado se fusiona al cargar, en el paso de materialización, así
+               que hay que recargar en vez de re-indexar. `nueva` es lo que hace
+               que la sección recién creada se distinga al volver: sin eso, el
+               árbol se repinta y no hay forma de saber cuál de las cinco es.
+
+               La query se arma con `encodeURIComponent`, no con
+               `URLSearchParams`: aquel codifica el espacio como `%20` y este
+               como `+`, y `S.param()` lee con `decodeURIComponent`, que NO
+               traduce el `+`. Con `searchParams.set` el título viajaba como
+               «Cierre+de+caja», no resolvía a ninguna sección y el resaltado se
+               perdía en silencio. Es la misma convención que usa `?seccion=`.
+
+               Se reescribe la query que ya estaba en vez de armarla de cero, así
+               un `?guia=0` o un `?tab=` sobreviven al alta: son deep-links que
+               alguien eligió, y perderlos al guardar es cambiarle la pantalla
+               por debajo. `reset` sí se descarta a propósito —recargar con ese
+               parámetro puesto borraría la sección que se acaba de crear— y el
+               `nueva` anterior también, o quedarían dos. */
+            const partes = window.location.search.replace(/^\?/, "").split("&")
+              .filter(function (p) {
+                const k = p.split("=")[0];
+                return p && k !== "reset" && k !== "nueva";
+              });
+            partes.push("nueva=" + encodeURIComponent(titulo));
+            window.location.replace("modulo.html?" + partes.join("&"));
+          }
+
+          document.addEventListener("click", function (ev) {
+            const b = ev.target.closest("[data-agregar-seccion]");
+            if (b) abrirForm(b);
+          });
+          cancelar.addEventListener("click", cerrarForm);
+          crear.addEventListener("click", guardar);
+          nom.addEventListener("input", validar);
+
+          /* Enter guarda y Escape cancela, en todo el formulario. El `select` de
+             orden se saltea el Enter a propósito: en varios navegadores abre la
+             lista, y guardar mientras se elige la posición sería guardar la
+             posición anterior. */
+          caja.addEventListener("keydown", function (ev) {
+            if (ev.key === "Escape") {
+              ev.preventDefault();
+              cerrarForm();
+            } else if (ev.key === "Enter" && ev.target !== orden) {
+              ev.preventDefault();
+              guardar();
+            }
+          });
+        }
+
+        /* ── Alta de video en línea ───────────────────────────────────────
+           Ni el módulo ni la sección se preguntan: el módulo lo da el `?m=` y la
+           sección, el nodo del árbol desde donde se abrió. La secuencia sale de
+           la primera libre del módulo, de 10 en 10, que es la misma regla que
+           usa el lote — si las dos calcularan distinto, dos altas del mismo
+           video darían IDs distintos según por dónde se entró. */
+        function cablearAltaVideo() {
+          const PASO = 10;
+          const caja = document.querySelector("[data-form-video]");
+          const tit = document.getElementById("fv-tit");
+          const crear = document.querySelector("[data-fv-crear]");
+          const otro = document.querySelector("[data-fv-otro]");
+          const cancelar = document.querySelector("[data-fv-cancelar]");
+          let seccion = null;
+          let desde = null;
+
+          const tres = function (n) { return String(n).padStart(3, "0"); };
+
+          /* La primera secuencia libre del módulo. Se recalcula en cada apertura
+             y no se guarda: entre dos altas hay una recarga —la materialización
+             corre una sola vez, al cargar— y el número tiene que contar lo que
+             se acaba de crear. */
+          function proximaSecuencia() {
+            const usadas = S.videosDe(modulo.numero, e).map(function (v) { return v.secuencia; });
+            let x = PASO;
+            while (usadas.indexOf(x) !== -1) x += PASO;
+            return x;
+          }
+
+          function validar() {
+            const motivo = tit.value.trim() ? "" : "Falta decir qué enseña el video.";
+            crear.disabled = !!motivo;
+            otro.disabled = !!motivo;
+            crear.title = motivo;
+            otro.title = motivo;
+            return !motivo;
+          }
+
+          function abrirForm(boton) {
+            seccion = boton.dataset.seccion;
+            desde = boton;
+            const seq = proximaSecuencia();
+
+            /* Se muda al nodo de la sección que lo pidió: el formulario aparece
+               DONDE está el trabajo, no arriba ni en un modal. */
+            boton.closest(".tree-section").appendChild(caja);
+            caja.hidden = false;
+            document.querySelectorAll("[data-agregar-video]").forEach(function (b) {
+              b.hidden = true;
+            });
+
+            document.querySelector("[data-fv-id]").textContent =
+              modulo.codigo + "." + tres(seq);
+            document.querySelector("[data-fv-seccion]").textContent = seccion;
+            document.querySelector("[data-fv-modulo]").textContent =
+              "BAK · Backoffice / " + modulo.titulo;
+            document.querySelector("[data-fv-planes]").textContent =
+              (modulo.planes || []).join(" · ") || "ninguno";
+
+            validar();
+            tit.focus();
+          }
+
+          function cerrarForm() {
+            caja.hidden = true;
+            document.querySelectorAll("[data-agregar-video]").forEach(function (b) {
+              b.hidden = false;
+            });
+            tit.value = "";
+            validar();
+            if (desde && document.contains(desde)) desde.focus();
+          }
+
+          /* `seguir` es «Reservar y cargar otro»: recarga igual que el otro
+             botón —hay que materializar— pero deja pedido que el formulario se
+             reabra en la misma sección, con el ID siguiente ya calculado. */
+          function guardar(seguir) {
+            if (!validar()) return;
+            const seq = proximaSecuencia();
+            S.crear("videos", {
+              codigoModulo: modulo.codigo,
+              seccion: seccion,
+              secuencia: seq,
+              titulo: tit.value.trim(),
+              /* R11: nace en `backlog`, sin link y sin versión. Cohorte y
+                 duración se difieren a la ficha: no hacen falta para reservar. */
+              cohorte: null,
+              duracion: null,
+              planes: modulo.planes || null,
+            });
+            const partes = window.location.search.replace(/^\?/, "").split("&")
+              .filter(function (x) {
+                const k = x.split("=")[0];
+                return x && k !== "reset" && k !== "nueva" && k !== "nuevov" && k !== "otro";
+              });
+            partes.push("nuevov=" + encodeURIComponent(modulo.codigo + "." + tres(seq)));
+            if (seguir) partes.push("otro=" + encodeURIComponent(seccion));
+            window.location.replace("modulo.html?" + partes.join("&"));
+          }
+
+          /* Delegación, por lo mismo que el alta de sección: el árbol se
+             repinta y los botones cableados dejan de existir. */
+          document.addEventListener("click", function (ev) {
+            const b = ev.target.closest("[data-agregar-video]");
+            if (b) abrirForm(b);
+          });
+          cancelar.addEventListener("click", cerrarForm);
+          crear.addEventListener("click", function () { guardar(false); });
+          otro.addEventListener("click", function () { guardar(true); });
+          tit.addEventListener("input", validar);
+
+          caja.addEventListener("keydown", function (ev) {
+            if (ev.key === "Escape") {
+              ev.preventDefault();
+              cerrarForm();
+            } else if (ev.key === "Enter") {
+              ev.preventDefault();
+              guardar(false);
+            }
+          });
+
+          /* «Reservar y cargar otro» pidió volver abierto en su sección. */
+          const reabrir = S.param("otro");
+          if (reabrir) {
+            const boton = Array.prototype.slice.call(
+              document.querySelectorAll("[data-agregar-video]")
+            ).filter(function (b) { return b.dataset.seccion === reabrir; })[0];
+            if (boton) abrirForm(boton);
+          }
+        }
+
+        /* El video recién reservado. Mismo criterio que `?nueva=`: si el ID no
+           resuelve a ninguna fila del árbol se ignora, sin error. */
+        function marcarVideoNuevo() {
+          const id = S.param("nuevov");
+          if (!id) return;
+          const fila = document.querySelector('[data-arbol] .tree-row[data-nuevo="1"]');
+          if (!fila) return;
+          fila.scrollIntoView({ block: "center" });
+          /* Si el formulario quedó abierto por «cargar otro», el foco es suyo:
+             la persona está escribiendo el siguiente, no mirando el anterior. */
+          if (S.param("otro")) return;
+          const cargar = fila.querySelector("a[href*=\"tab=versiones\"]");
+          if (!cargar) return;
+          document.addEventListener("DOMContentLoaded", function () {
+            const libre = document.activeElement;
+            if (!libre || libre === document.body) cargar.focus();
+          });
+        }
+
+        /* La sección recién creada, al volver del alta. El `?nueva=` es un
+           título, no un índice: la sección puede haber caído en cualquier
+           posición. Si no resuelve a ninguna sección del módulo se ignora, que
+           es el mismo criterio que usa `?seccion=` en `alta-videos.html`. */
+        function marcarSeccionNueva() {
+          const titulo = S.param("nueva");
+          if (!titulo) return;
+          const i = secciones.findIndex(function (s) { return s.titulo === titulo; });
+          if (i === -1) return;
+
+          const nodo = document.querySelectorAll("[data-arbol] .tree-section")[i];
+          if (!nodo) return;
+          /* El chip va DESPUÉS del título, no al principio de la cabecera: ahí
+             se leía «nueva 5 · Cierre de caja» y se comía el número de orden,
+             que es justamente lo que hay que poder verificar de un vistazo
+             cuando se acaba de elegir la posición.
+
+             Y va con `chip-meta`, no con `chip-publicado`: los siete chips de
+             color son el vocabulario de los estados de producción, y en este
+             árbol conviven con las filas de video que los usan con ese
+             significado. Un chip verde que dice «nueva» al lado de uno verde que
+             dice «publicado» se lee como un estado más.
+
+             `aria-current` no tiene estilo propio para `.tree-section` —darle
+             uno sería tocar el design system, que está fuera del alcance—, pero
+             marca cuál es igual para quien navega con lector de pantalla, y deja
+             el enganche puesto por si se decide pintarlo. */
+          nodo.setAttribute("aria-current", "true");
+          const rotulo = nodo.querySelector(".tree-head > span:first-child");
+          rotulo.insertAdjacentHTML("afterend", '<span class="chip chip-meta">nueva</span>');
+          nodo.scrollIntoView({ block: "center" });
+
+          /* El paso siguiente, ofrecido y con el foco puesto: una sección recién
+             creada está vacía, y lo único que se puede hacer con ella es darle
+             videos.
+
+             El foco se pone en el `DOMContentLoaded` y solo si nadie más lo
+             tomó. Este código corre durante el parseo, antes de que la guía se
+             auto-arranque, así que ponerlo acá y a secas lo perdía igual: la
+             guía abre su popover después y se lo lleva. Y está bien que se lo
+             lleve —al crear la sección el módulo pasó al paso «Videos», que es
+             lo que la guía ya está señalando—, así que la pantalla cede en vez
+             de pelear. */
+          const siguiente = nodo.querySelector(".tree-head [data-agregar-video]");
+          if (!siguiente) return;
+          document.addEventListener("DOMContentLoaded", function () {
+            const libre = document.activeElement;
+            if (!libre || libre === document.body) siguiente.focus();
           });
         }
 

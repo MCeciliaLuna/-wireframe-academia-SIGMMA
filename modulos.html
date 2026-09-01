@@ -102,13 +102,88 @@
             <button type="button" class="btn btn-bordered btn-sm" data-exportar>
               <span class="icon" data-icon="download"></span>Exportar
             </button>
-            <a href="alta-modulo.html" class="btn btn-primary btn-sm" data-nuevo-modulo>
+            <button type="button" class="btn btn-primary btn-sm" data-nuevo-modulo>
               <span class="icon" data-icon="plus"></span>Nuevo módulo
-            </a>
+            </button>
           </div>
         </header>
 
         <main id="contenido" class="page-body">
+          <!-- Alta de MÓDULO en línea. Es el tercer eslabón del rediseño: con
+               esto, crear un módulo con secciones y videos no cambia de pantalla
+               más que una vez, y esa vez es entrar al objeto recién creado —que
+               es lo que el flujo PIDE, no un rodeo.
+
+               Pide dos cosas y las dos son estructurales: el nombre del módulo y
+               el de su primera sección. La sección no es un extra: **R12 no deja
+               un módulo de biblioteca sin secciones**, y garantizarlo por flujo
+               —«creá el módulo y después la sección»— no lo garantiza: si alguien
+               cierra la pestaña en el medio, queda un módulo inválido. Pedirla
+               acá lo hace estructural.
+
+               Todo lo demás es solo lectura y se hereda: tipo `biblioteca`, los
+               tres planes —9 de los 11 módulos los tienen—, el orden al final y
+               el estado inactivo. Para una ruta, un ID reservado o planes
+               acotados está el alta completa, que sigue viva y se ofrece acá
+               mismo como salida. -->
+          <section class="side-card" data-form-modulo hidden aria-labelledby="fm-t">
+            <div class="flex flex-col gap-3">
+              <div class="flex items-baseline gap-2">
+                <h2 class="side-title !mb-0" id="fm-t">Nuevo módulo en</h2>
+                <span class="chip chip-meta font-mono" data-fm-sup></span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div class="field">
+                  <label class="label" for="fm-nom">Nombre del módulo</label>
+                  <input class="input !h-9 !text-xs" id="fm-nom" type="text" placeholder="Tráfico" />
+                </div>
+                <div class="field">
+                  <label class="label" for="fm-num">ID</label>
+                  <input class="input !h-9 font-mono !text-xs" id="fm-num" type="text" />
+                  <p class="hint">Lo propone el sistema, de 10 en 10. Se puede cambiar antes de crear;
+                    después no, porque el ID es permanente (R2).</p>
+                  <!-- El único error posible de este alta: un ID ya tomado. El
+                       nombre y la sección vacíos apagan el botón con su motivo,
+                       que es distinto —un campo sin empezar no es un campo mal—,
+                       así que no llevan su propio `error-text`: uno que nunca se
+                       muestra es markup muerto, y la guía lo leería como un
+                       veredicto que nadie escribe. -->
+                  <p class="error-text mt-2" data-fm-error-num hidden></p>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="label" for="fm-sec">Su primera sección</label>
+                <input class="input !h-9 !text-xs" id="fm-sec" type="text" placeholder="Asignación de móviles" />
+                <p class="hint">
+                  Un módulo sin secciones no tiene dónde colgar los videos, y la sección es además
+                  la unidad sobre la que se exige cobertura de preguntas. Las demás se agregan
+                  después, en el árbol del módulo.
+                </p>
+              </div>
+
+              <dl class="flex flex-col gap-2">
+                <div class="meter-row"><dt>Tipo</dt><dd>biblioteca</dd></div>
+                <div class="meter-row"><dt>Planes</dt><dd data-fm-planes></dd></div>
+                <div class="meter-row"><dt>Orden</dt><dd data-fm-orden></dd></div>
+                <div class="meter-row">
+                  <dt>Nace</dt><dd><span class="chip chip-meta">inactivo</span></dd>
+                </div>
+              </dl>
+
+              <div class="flex items-center gap-2">
+                <button type="button" class="btn btn-primary btn-sm" data-fm-crear disabled>
+                  Crear el módulo
+                </button>
+                <button type="button" class="btn btn-bordered btn-sm" data-fm-cancelar>Cancelar</button>
+                <a class="ml-auto text-2xs" href="alta-modulo.html" data-fm-completa>
+                  ¿Una ruta, un ID reservado o planes acotados? Alta completa ›
+                </a>
+              </div>
+            </div>
+          </section>
+
           <!-- Estado vacío: superficies FRT y CRM todavía no tienen módulos
                mapeados. Se muestra con ?sup=FRT o ?sup=CRM. -->
           <div id="vacio" class="placeholder-box" hidden>
@@ -118,9 +193,9 @@
               El mapa de contenido de <strong id="vacio-sup">FRT</strong> está sin cargar. Cuando se
               defina la currícula, los módulos se dan de alta acá.
             </p>
-            <a href="alta-modulo.html" class="btn btn-bordered mt-6" data-nuevo-modulo>
+            <button type="button" class="btn btn-bordered mt-6" data-nuevo-modulo>
               <span class="icon" data-icon="plus"></span>Crear el primer módulo
-            </a>
+            </button>
           </div>
 
           <!-- ══════════════ E1 · DÍA 0 · SISTEMA VACÍO ══════════════
@@ -139,7 +214,7 @@
                 <span class="icon" data-icon="layers"></span>Importar el mapa de contenido
               </a>
               <p class="mt-4 text-xs text-ink-soft">
-                O <a href="alta-modulo.html">crear el primer módulo a mano</a>.
+                O <button type="button" class="link-quiet" data-nuevo-modulo>crear el primer módulo a mano</button>.
               </p>
             </div>
           </div>
@@ -271,12 +346,192 @@
            que no es un error del sistema sino la gobernanza pendiente. */
         const sup = (S.param("sup") || "BAK").toUpperCase();
 
-        /* El alta arranca en la superficie que se está mirando: llegar a ella
-           desde el vacío de FRT y tener que elegir FRT otra vez es preguntar
-           algo que la pantalla anterior ya sabía. */
-        document.querySelectorAll("[data-nuevo-modulo]").forEach(function (a) {
-          if (sup !== "BAK") a.setAttribute("href", "alta-modulo.html?sup=" + sup);
-        });
+        /* ── Alta de módulo en línea ───────────────────────────────────────
+           Pide el nombre del módulo y el de su primera sección, y nada más. La
+           sección es requisito estructural, no un campo de conveniencia: R12 no
+           deja un módulo de biblioteca sin secciones, y dejarla «para después»
+           permite que una pestaña cerrada a mitad de camino deje uno inválido.
+
+           El ID lo propone el sistema —el siguiente múltiplo de 10 libre— y se
+           puede corregir antes de crear, con validación de duplicado contra el
+           padrón real. Después no: el ID es permanente (R2). */
+        function cablearAltaModulo() {
+          const PASO = 10;
+          const caja = document.querySelector("[data-form-modulo]");
+          const nom = document.getElementById("fm-nom");
+          const num = document.getElementById("fm-num");
+          const sec = document.getElementById("fm-sec");
+          const crear = document.querySelector("[data-fm-crear]");
+          const cancelar = document.querySelector("[data-fm-cancelar]");
+          const errNum = document.querySelector("[data-fm-error-num]");
+          const PLANES = ["Professional", "Business", "Corporate"];
+          let desde = null;
+
+          const numeroDe = function () {
+            const m = /(\d+)/.exec(num.value || "");
+            return m ? Number(m[1]) : NaN;
+          };
+          const codigoDe = function () {
+            const n = numeroDe();
+            return isNaN(n) ? null : sup + "-M" + String(n).padStart(2, "0");
+          };
+
+          /* Los módulos de ESTA superficie. La numeración es por superficie
+             —`BAK-M30` y `FRT-M30` son dos módulos distintos—, así que contar los
+             13 de BAK para proponer el próximo de FRT proponía «M100» sobre una
+             superficie vacía, donde el primero tiene que ser «M00». */
+          function delaSuperficie() {
+            return S.modulos.filter(function (m) {
+              return typeof m.codigo === "string" && m.codigo.indexOf(sup + "-M") === 0;
+            });
+          }
+
+          /* El siguiente múltiplo de 10 después del más alto tomado. No busca los
+             intersticios libres —05, 15, 25— a propósito: el orden curricular lo
+             da el número, y proponer «M05» metería el módulo nuevo antes del
+             primero sin que nadie lo haya pedido. En una superficie sin módulos
+             arranca en 0, que es donde arranca BAK. */
+          function proximoNumero() {
+            const tomados = delaSuperficie()
+              .map(function (m) { return m.numero; })
+              .filter(function (x) { return typeof x === "number"; });
+            if (!tomados.length) return 0;
+            const tope = Math.max.apply(null, tomados);
+            let x = Math.ceil((tope + 1) / PASO) * PASO;
+            while (tomados.indexOf(x) !== -1) x += PASO;
+            return x;
+          }
+
+          function proximoOrden() {
+            const ordenes = delaSuperficie()
+              .map(function (m) { return m.orden; })
+              .filter(function (x) { return typeof x === "number"; });
+            return (ordenes.length ? Math.max.apply(null, ordenes) : 0) + 1;
+          }
+
+          /* Un campo vacío es un campo sin empezar, no un campo mal: apaga el
+             botón con su motivo, pero no se marca en rojo. Lo que sí se marca es
+             un ID que ya existe, porque eso sí es un dato incorrecto. */
+          function validar() {
+            const nombre = nom.value.trim();
+            const seccion = sec.value.trim();
+            const n = numeroDe();
+            const codigo = codigoDe();
+            /* El duplicado se chequea por CÓDIGO y no por número, que es lo
+               correcto: `FRT-M30` es libre aunque `BAK-M30` exista. */
+            const duplicado = !!codigo && S.modulos.some(function (m) {
+              return m.codigo === codigo;
+            });
+
+            errNum.hidden = !duplicado;
+            errNum.textContent = duplicado
+              ? codigo + " ya existe. El ID es permanente, así que no se puede reasignar."
+              : "";
+            num.setAttribute("aria-invalid", duplicado ? "true" : "false");
+
+            const motivo = !nombre ? "Falta el nombre del módulo."
+              : isNaN(n) ? "Escribí el número del módulo, por ejemplo M100."
+              : duplicado ? codigo + " ya existe."
+              : !seccion ? "Falta el nombre de la primera sección."
+              : "";
+            crear.disabled = !!motivo;
+            crear.title = motivo;
+            return !motivo;
+          }
+
+          function abrirForm(boton) {
+            desde = boton;
+            /* Se muda al contenedor visible: en FRT/CRM y en el día 0 el listado
+               está oculto, y el formulario tiene que aparecer bajo el mensaje que
+               explica por qué está vacío —no dentro de una caja escondida. */
+            const anfitrion = boton.closest(".placeholder-box");
+            if (anfitrion) anfitrion.insertAdjacentElement("afterend", caja);
+            caja.hidden = false;
+            document.querySelectorAll("[data-nuevo-modulo]").forEach(function (b) {
+              b.hidden = true;
+            });
+            document.querySelector("[data-fm-sup]").textContent = sup;
+            document.querySelector("[data-fm-planes]").textContent = PLANES.join(" · ");
+            document.querySelector("[data-fm-orden]").textContent = proximoOrden() + " — al final";
+            /* Con el padding puesto: el campo decía «M0» y el ID que se creaba
+               era «FRT-M00». Que el campo muestre otra cosa que el ID final es
+               chico y es exactamente el tipo de detalle que hace dudar de si el
+               sistema entendió. */
+            num.value = "M" + String(proximoNumero()).padStart(2, "0");
+            validar();
+            nom.focus();
+          }
+
+          function cerrarForm() {
+            caja.hidden = true;
+            document.querySelectorAll("[data-nuevo-modulo]").forEach(function (b) {
+              b.hidden = false;
+            });
+            nom.value = "";
+            sec.value = "";
+            validar();
+            if (desde && document.contains(desde)) desde.focus();
+          }
+
+          function guardar() {
+            if (!validar()) return;
+            const n = numeroDe();
+            const codigo = codigoDe();
+            const seccion = sec.value.trim();
+            S.crear("modulos", {
+              numero: n,
+              codigo: codigo,
+              titulo: nom.value.trim(),
+              tipo: "biblioteca",
+              orden: proximoOrden(),
+              planes: PLANES,
+              activadoEn: null,
+              secciones: [],
+            });
+            /* La sección va DESPUÉS del módulo: la materialización la ubica
+               colgando de su `codigoModulo`, así que el módulo tiene que existir
+               primero. */
+            S.crear("secciones", { codigoModulo: codigo, titulo: seccion, orden: 1 });
+
+            /* Al módulo recién creado, con su sección ya marcada y el foco en
+               «agregar video»: es el paso siguiente y, a la vez, la prueba de que
+               quedó creado. `?nueva=` se arma con `encodeURIComponent` y no con
+               `URLSearchParams`, que codifica el espacio como `+` —y `S.param()`
+               lee con `decodeURIComponent`, que no lo traduce. */
+            window.location.href = "modulo.html?m=" + n +
+              (esc === "E5" ? "" : "&escena=" + esc) +
+              "&nueva=" + encodeURIComponent(seccion);
+          }
+
+          /* Delegación: los tres CTAs viven en contenedores distintos y alguno
+             puede estar oculto por escena o por superficie. */
+          document.addEventListener("click", function (ev) {
+            const b = ev.target.closest("[data-nuevo-modulo]");
+            if (b) abrirForm(b);
+          });
+          cancelar.addEventListener("click", cerrarForm);
+          crear.addEventListener("click", guardar);
+          [nom, num, sec].forEach(function (el) { el.addEventListener("input", validar); });
+          caja.addEventListener("keydown", function (ev) {
+            if (ev.key === "Escape") {
+              ev.preventDefault();
+              cerrarForm();
+            } else if (ev.key === "Enter") {
+              ev.preventDefault();
+              guardar();
+            }
+          });
+        }
+
+        /* El alta ya no navega: los tres CTAs abren el formulario en línea, que
+           lee la superficie de esta pantalla. Lo que sí conserva el `?sup=` es la
+           salida al alta completa —llegar a ella desde el vacío de FRT y tener
+           que elegir FRT otra vez es preguntar algo que la pantalla ya sabía. */
+        if (sup !== "BAK") {
+          document.querySelector("[data-fm-completa]")
+            .setAttribute("href", "alta-modulo.html?sup=" + sup);
+        }
+        cablearAltaModulo();
 
         if (sup !== "BAK") {
           document.getElementById("listado").hidden = true;
@@ -458,27 +713,75 @@
 
         /* La franja transversal. Cada contador lleva a donde se resuelve; el
            que no tiene adónde llevar no es un link. */
+        /* ── La franja: cada pendiente al lugar donde se resuelve ─────────
+           Antes tres de los cinco contadores llevaban a `tablero.html`, que es un
+           listado general de 55 filas: al llegar había que volver a encontrar el
+           video del que hablaba el número. Ahora cada uno lleva **al objeto y a
+           la solapa donde ESE trabajo se hace**, que es lo que convierte un
+           tablero de números en una lista de tareas.
+
+           Llevar al primero de la cola no es lo mismo que llevar a uno al azar:
+           acá el número no nombra un objeto que la persona ya tiene en la cabeza
+           —eso era el problema de la puerta de «cargar el link»—, nombra una cola
+           de trabajo, y la cola se empieza por algún lado. Es el patrón que el
+           repo ya usaba con «publicados sin pregunta».
+
+           Los dos del cohorte siguen sin destino: su hoja está fuera del MVP.
+           Siguen siendo dato derivado y se muestran; lo que no hacen es fingir
+           un link. */
+        const sufijo = esc === "E5" ? "" : "&escena=" + esc;
+        /* Las LISTAS, no los conteos: `aGuionar` y `aRegrabar` ya existen más
+           arriba y son números. Acá hace falta el primero de cada cola para
+           saber a qué video llevar. */
+        const colaRegrabar = videos.filter(function (v) { return v.estado === "a regrabar"; });
+        const colaGuion = videos.filter(function (v) { return v.estado === "backlog"; });
+
+        /* Los módulos que no llegan a su mínimo de banco. El conteo va en el
+           valor —el prompt lo pide explícito— y el destino es el módulo con la
+           solapa del banco abierta, que es donde se ve el desglose por sección. */
+        const bancoCorto = S.modulos.filter(function (m) {
+          if (m.tipo !== "biblioteca") return false;
+          const b = S.resumenModulo(m).banco;
+          return b.configurada && b.vigentes < b.minimo;
+        });
+
         R.pintar("[data-trabajo]", R.franjaTrabajo([
-          /* Los dos del cohorte quedaron sin destino: su hoja está fuera del
-             MVP. Siguen siendo dato derivado y se muestran; lo que no hacen es
-             fingir un link. */
           { etiqueta: "Cohorte activo",
             valor: cohorte ? cohorte.id + " " + cohorte.nombre : "ninguno en curso",
             href: null },
           { etiqueta: "Grabados del cohorte",
             valor: cohorte ? cohorte.grabados + " / " + cohorte.total : "—",
             ok: cohorte ? cohorte.grabados === cohorte.total : undefined },
+          /* El trabajo es escribir el guión, así que la solapa correcta es la
+             del guión — no el tablero, donde hay que buscarlo de nuevo. */
           { etiqueta: "Videos a guionar", valor: aGuionar,
-            href: aGuionar ? "tablero.html" + q : null },
+            href: colaGuion.length
+              ? "video.html?v=" + colaGuion[0].id + "&tab=guion" + sufijo
+              : null },
           /* Métrica de CONSTRUCCIÓN, no de uso: mostrarla acá no toca R10. */
           { etiqueta: "Publicados sin pregunta",
             valor: deuda.length,
             ok: deuda.length === 0,
-            href: deuda.length ? "escritura.html?v=" + deuda[0].id + (esc === "E5" ? "" : "&escena=" + esc) : null },
+            href: deuda.length ? "escritura.html?v=" + deuda[0].id + sufijo : null },
+          /* Un video a regrabar se resuelve cargando la versión nueva: la solapa
+             es «versiones», que es donde vive ese flujo (R1). */
           { etiqueta: "En cola de regrabación",
             valor: conteo["a regrabar"],
             ok: conteo["a regrabar"] === 0,
-            href: conteo["a regrabar"] ? "tablero.html" + q : null },
+            href: colaRegrabar.length
+              ? "video.html?v=" + colaRegrabar[0].id + "&tab=versiones" + sufijo
+              : null },
+          { etiqueta: "Módulos con banco corto",
+            valor: bancoCorto.length
+              ? bancoCorto.length + " · faltan " + bancoCorto.reduce(function (a, m) {
+                  const b = S.resumenModulo(m).banco;
+                  return a + (b.minimo - b.vigentes);
+                }, 0) + " preguntas"
+              : 0,
+            ok: bancoCorto.length === 0,
+            href: bancoCorto.length
+              ? "modulo.html?m=" + bancoCorto[0].numero + "&tab=banco" + sufijo
+              : null },
         ]));
 
         /* La Ruta, aparte y rotulada como derivada (R8). Sus dos barras son las

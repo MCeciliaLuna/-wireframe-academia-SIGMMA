@@ -91,8 +91,14 @@
               <tr><td class="font-mono text-xs">V02</td><td>Importador — <strong>paso 2, revisar lo que se va a crear</strong></td><td><a href="importador.html?paso=2" class="font-mono text-xs">?paso=2</a></td></tr>
               <tr><td class="font-mono text-xs">V02</td><td>Importador — resultado <span class="text-2xs text-ink-soft">(pide <span class="font-mono">?sello=</span> de una importación real)</span></td><td><a href="importador.html?paso=resultado" class="font-mono text-xs">?paso=resultado</a></td></tr>
               <tr><td class="font-mono text-xs">V03</td><td>Listado de módulos — vacío</td><td><a href="modulos.html?escena=E1" class="font-mono text-xs">modulos.html?escena=E1</a></td></tr>
-              <tr><td class="font-mono text-xs">V04</td><td>Alta de módulo</td><td><a href="alta-modulo.html" class="font-mono text-xs">alta-modulo.html</a></td></tr>
-              <tr><td class="font-mono text-xs">V05</td><td>Alta de sección</td><td><a href="alta-seccion.html" class="font-mono text-xs">alta-seccion.html</a></td></tr>
+              <tr><td class="font-mono text-xs">V04</td><td>Alta de módulo <strong>en línea</strong> <span class="text-2xs text-ink-soft">(desde «Nuevo módulo»; pide nombre y primera sección — R12)</span></td><td><a href="modulos.html" class="font-mono text-xs">modulos.html</a></td></tr>
+              <tr><td class="font-mono text-xs">—</td><td>El alta en línea sobre una superficie vacía <span class="text-2xs text-ink-soft">(el formulario se muda bajo el mensaje)</span></td><td><a href="modulos.html?sup=FRT" class="font-mono text-xs">modulos.html?sup=FRT</a></td></tr>
+              <tr><td class="font-mono text-xs">—</td><td>Alta de módulo completa <span class="text-2xs text-ink-soft">(ruta, ID reservado o planes acotados)</span></td><td><a href="alta-modulo.html" class="font-mono text-xs">alta-modulo.html</a></td></tr>
+              <tr><td class="font-mono text-xs">V05</td><td>Alta de sección <strong>en línea</strong>, en el árbol del módulo <span class="text-2xs text-ink-soft">(el padre lo da el <span class="font-mono">?m=</span>, no un desplegable)</span></td><td><a href="modulo.html?m=30" class="font-mono text-xs">modulo.html?m=30</a></td></tr>
+              <tr><td class="font-mono text-xs">—</td><td>Sección recién creada — marcada en el árbol y con el foco en «agregar video»</td><td><a href="modulo.html?m=30&amp;nueva=Carga%20y%20proceso" class="font-mono text-xs">modulo.html?m=30&amp;nueva=…</a></td></tr>
+              <tr><td class="font-mono text-xs">—</td><td>Alta de video <strong>en línea</strong>, bajo su sección <span class="text-2xs text-ink-soft">(sin campo de link — R11; el lote sigue en «en lote»)</span></td><td><a href="modulo.html?m=30" class="font-mono text-xs">modulo.html?m=30</a></td></tr>
+              <tr><td class="font-mono text-xs">—</td><td>Video recién reservado — marcado en el árbol y con el foco en «cargar link»</td><td><a href="modulo.html?m=30&amp;nuevov=BAK-M30.050" class="font-mono text-xs">modulo.html?m=30&amp;nuevov=…</a></td></tr>
+              <tr><td class="font-mono text-xs">—</td><td>Alta de sección como pantalla suelta <span class="text-2xs text-ink-soft">(deep-link; ya no es el camino que ofrece la app)</span></td><td><a href="alta-seccion.html" class="font-mono text-xs">alta-seccion.html</a></td></tr>
               <tr><td class="font-mono text-xs">—</td><td>Módulo sin secciones</td><td><a href="modulo.html?m=30&amp;escena=E1" class="font-mono text-xs">modulo.html?m=30&amp;escena=E1</a></td></tr>
               <tr><td class="font-mono text-xs">—</td><td>Tablero sin videos</td><td><a href="tablero.html?escena=E1" class="font-mono text-xs">tablero.html?escena=E1</a></td></tr>
             </tbody>
@@ -296,7 +302,7 @@
             </p>
             <p class="mt-3 text-xs">
               <a href="alta-modulo.html?guia=1">9 controles del alta</a> →
-              <a href="alta-seccion.html?m=30&amp;guia=1">4 de la sección</a> →
+              <a href="modulo.html?m=30&amp;guia=1">4 de la sección</a> →
               <a href="alta-videos.html?m=30&amp;guia=1">10 del lote</a> →
               <a href="banco.html?m=50&amp;escena=E2&amp;guia=1">5 de la evaluación</a> →
               <a href="escritura.html?v=BAK-M30.050&amp;guia=1">5 de la pregunta</a> →
