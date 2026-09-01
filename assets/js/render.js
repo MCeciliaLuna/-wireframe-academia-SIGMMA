@@ -654,7 +654,12 @@ window.RENDER = (function () {
        de volumen. Obligar a pasar por una para llegar a la otra sería el rodeo
        que este árbol vino a sacar. El lote sigue pudiendo cruzar secciones;
        precargar la que se venía mirando no es atarlo a ella. */
-    const agregar = o.modulo
+    /* `!= null` y no truthiness: el número del primer módulo es **0**, que es
+       falsy, así que `BAK-M00` se quedaba sin las dos acciones de la sección
+       —«agregar video» y «en lote»— y era el único árbol del repo que no las
+       ofrecía. Preexistente: el `o.modulo ?` viene del commit que sumó la
+       entrada por sección, y no se notó porque el módulo 0 es el único caso. */
+    const agregar = o.modulo != null
       ? '<button type="button" class="ml-auto inline-flex items-center gap-1 text-2xs font-normal"' +
         ' data-agregar-video data-seccion="' + esc(s.titulo) + '"' +
         ' title="Reservar un ID de video en «' + esc(s.titulo) + '»">' +

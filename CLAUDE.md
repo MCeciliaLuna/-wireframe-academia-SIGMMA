@@ -227,6 +227,46 @@ con una **academia completa simulada**. Cuatro bloques de trabajo:
   > módulos que ya existían no crea ninguno, y ahí la lista quedaba vacía justo cuando más hace
   > falta.
 
+- **Desactivar dice qué deja de verse** — Fase 4 del rediseño.
+
+  Desactivar un módulo pasa por un modal que muestra **la consecuencia antes de confirmar**:
+  cuántos videos visibles en el Front se caen (R3 — solo `publicado` y `a regrabar`; el obsoleto
+  nunca), la evaluación con su umbral y las secciones del syllabus. El cálculo va al abrir el
+  modal y no al pintar el paso 5, porque el módulo puede haber cambiado en el medio —un lote de
+  «a regrabar» sobre el árbol mueve las preguntas vigentes— y una advertencia con un número
+  viejo es peor que ninguna.
+
+  > **El umbral es ACIERTOS por intento, no un porcentaje.** `configEvaluacion()` declara
+  > `porIntento` y `umbral`: son «8 de 10», no «8 %». Y no vive en el `banco` de
+  > `resumenModulo()`, que no lo tiene.
+
+  > **Activar NO lleva modal**, a propósito: su compuerta es la aptitud, que ya está a la vista
+  > con sus cuatro criterios y su motivo. Pedir dos confirmaciones para la acción que el flujo
+  > entero viene a habilitar sería un obstáculo, no un control.
+
+  El árbol de un módulo inactivo **lo dice**: antes el de uno activo y el de uno en borrador se
+  veían exactamente igual.
+
+  > **Y el botón de agregar video NO se saca, contra lo que pide el flujo.** El documento asume
+  > que un módulo inactivo no acepta contenido, pero en este modelo «inactivo» es `borrador`, que
+  > es el estado en el que el módulo **se construye**: nace ahí y se activa recién en el paso 5.
+  > Sacar el alta dejaría al flujo sin poder empezar ninguno. Lo que faltaba no era esconder la
+  > acción sino explicar el estado, y eso es lo que hace el aviso.
+
+  > **Bug preexistente que salió acá:** `seccionArbol` decidía con `o.modulo ?` y el número del
+  > primer módulo es **0**, que es falsy — así que `BAK-M00` era el único árbol del repo sin
+  > «agregar video» ni «en lote». Ahora es `!= null`. Verificado en los 12: cada sección ofrece
+  > las dos.
+
+  **T6 · reordenar queda pendiente y bloqueado.** Mover ya está —en el tablero y en el árbol, con
+  `movible()` de compuerta—, y cruzar módulos la interfaz lo **impide** en vez de avisar, que es
+  más estricto que lo que pide el flujo y correcto por R2. Lo que no se puede hacer sin una
+  decisión es **reordenar**: el orden de una sección es DERIVADO (`ordenDeSeccion()` — la
+  secuencia más baja de sus videos), así que unos ↑↓ obligan a reasignar secuencias, y la
+  secuencia es parte del ID, que R2 declara permanente. Las dos salidas —renumerar, o sumar un
+  campo `orden` propio al video— rompen una regla cableada o el modelo de datos que el propio
+  flujo dice no tocar.
+
 **Ya no es solo maquetación, ni solo navegación.** No hay backend, ni API, ni videos reales, ni SSO.
 Pero **sí hay capa de datos, reglas de negocio derivadas, mutaciones y persistencia en
 `localStorage`**. Eso revierte a propósito una decisión de la tanda 1 (ver «El cambio de

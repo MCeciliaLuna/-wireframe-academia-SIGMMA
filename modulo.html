@@ -156,6 +156,11 @@
                         marcar todos los videos del módulo
                       </label>
                     </div>
+                    <!-- Que el módulo no esté visible para las agencias es lo
+                         primero que hay que saber al mirar su contenido: sin
+                         esto, el árbol de un módulo activo y el de uno en
+                         borrador se ven exactamente igual. -->
+                    <p class="alert alert-info !text-xs" data-arbol-inactivo hidden></p>
                     <div data-arbol data-bulk="bulk-arbol"></div>
 
                     <div class="bulk-bar" id="bulk-arbol" hidden>
@@ -325,6 +330,49 @@
             </div>
           </div>
         </main>
+      </div>
+    </div>
+
+    <!-- ══════════════ MODAL · DESACTIVAR EL MÓDULO ══════════════
+         La consecuencia se ve ANTES de confirmar. Desactivar no es una acción
+         de construcción: es sacar contenido de circulación, y qué deja de verse
+         del lado de la agencia no se puede deducir mirando el botón.
+
+         Va en modal y no como texto fijo al lado del botón porque el número hay
+         que calcularlo en el momento —el módulo puede haber cambiado desde que
+         se pintó el paso 5— y porque una advertencia permanente sobre una acción
+         que casi nunca se usa es ruido en una pantalla de densidad alta (R6).
+
+         Activar NO lleva modal: su compuerta es la aptitud, que ya está a la
+         vista con sus cuatro criterios y su motivo. Pedir dos confirmaciones
+         para la acción que el flujo entero viene a habilitar sería un obstáculo,
+         no un control. -->
+    <div class="modal" id="m-desactivar" hidden>
+      <div class="modal-overlay"></div>
+      <div class="modal-panel modal-panel-dismissible" role="dialog" aria-modal="true"
+           aria-labelledby="m-desactivar-t">
+        <button type="button" class="modal-close" data-modal-close aria-label="Cerrar">
+          <span class="icon" data-icon="x"></span>
+        </button>
+        <h2 class="text-h5" id="m-desactivar-t">Desactivar <span data-des-codigo class="font-mono"></span></h2>
+        <p class="mt-2 text-sm text-ink-soft">
+          El módulo deja de estar disponible para las agencias. No se borra nada: el contenido, el
+          banco y el avance de quien ya lo cursó quedan como están.
+        </p>
+
+        <div class="side-card side-card-strong mt-5">
+          <h3 class="side-title">Qué deja de verse</h3>
+          <dl class="flex flex-col gap-2" data-des-consecuencia></dl>
+        </div>
+
+        <p class="hint" data-des-nota></p>
+
+        <div class="mt-6 flex justify-end gap-2">
+          <button type="button" class="btn btn-bordered btn-sm" data-modal-close>Cancelar</button>
+          <button type="button" class="btn btn-primary btn-sm" data-des-confirmar>
+            Desactivar el módulo
+          </button>
+        </div>
       </div>
     </div>
 
@@ -549,14 +597,66 @@
               repintarEstado();
             });
           }
+          /* Desactivar pasa por el modal: la consecuencia se ve antes de
+             confirmar. El cálculo va acá y no al pintar el paso 5 porque el
+             módulo puede haber cambiado en el medio —un lote de «a regrabar»
+             sobre el árbol mueve las preguntas vigentes— y una advertencia con
+             un número viejo es peor que ninguna. */
           const desactivar = document.querySelector("[data-desactivar]");
           if (desactivar) {
-            desactivar.addEventListener("click", function () {
-              S.anotar("modulos", modulo.codigo, { estado: "borrador" });
-              repintarEstado();
-            });
+            desactivar.addEventListener("click", abrirDesactivar);
           }
         }
+
+        /* ── La consecuencia de desactivar ────────────────────────────────
+           Qué deja de ver una agencia: los videos visibles en el Front (R3 — solo
+           `publicado` y `a regrabar`; el obsoleto nunca) y la evaluación, que
+           solo cuenta si está configurada. Los números salen del motor, no de la
+           pantalla. */
+        function abrirDesactivar() {
+          const rr = S.resumenModulo(modulo);
+          const visibles = S.videosDe(modulo.numero, e).filter(function (v) {
+            return S.visibleEnFront(v, e);
+          });
+          const b = rr.banco;
+          const cfg = S.configEvaluacion(modulo, e);
+
+          document.querySelector("[data-des-codigo]").textContent = modulo.codigo;
+
+          const fila = function (rotulo, valor) {
+            return '<div class="meter-row"><dt>' + rotulo + "</dt>" +
+              '<dd class="meter-value">' + valor + "</dd></div>";
+          };
+          R.pintar("[data-des-consecuencia]",
+            fila("Videos visibles en el Front", visibles.length +
+              (visibles.length === 1 ? " video" : " videos")) +
+            /* El umbral es ACIERTOS por intento, no un porcentaje: la config
+               declara `porIntento` y `umbral`, y son «8 de 10», no «8 %». Vive
+               en `configEvaluacion()`, no en el banco del resumen. */
+            fila("Evaluación", cfg.configurada
+              ? b.vigentes + " preguntas vigentes · se aprueba con " +
+                cfg.umbral + " de " + cfg.porIntento
+              : "sin configurar") +
+            fila("Secciones del syllabus", secciones.length +
+              (secciones.length === 1 ? " sección" : " secciones")));
+
+          /* Un módulo activo SIN nada visible es un caso real y hay que decirlo:
+             desactivarlo no le saca nada a nadie, y una advertencia genérica
+             haría dudar de una acción que no tiene consecuencia. */
+          R.pintar("[data-des-nota]", visibles.length
+            ? "Quien esté cursándolo pierde el acceso, pero su avance queda guardado: si el " +
+              "módulo se reactiva, sigue donde estaba."
+            : "Este módulo no tiene ningún video visible en el Front, así que desactivarlo no " +
+              "le saca nada a ninguna agencia.");
+
+          window.UI.showModal(document.getElementById("m-desactivar"));
+        }
+
+        document.querySelector("[data-des-confirmar]").addEventListener("click", function () {
+          S.anotar("modulos", modulo.codigo, { estado: "borrador" });
+          window.UI.closeModal();
+          repintarEstado();
+        });
 
         /* Lo único que cambia al activar: los chips, las acciones y la tarjeta
            de aptitud —que es donde vive el botón duplicado—. El árbol de
@@ -565,6 +665,34 @@
           pintarChips();
           pintarAcciones();
           pintarAptitud();
+          pintarVisibilidad();
+        }
+
+        /* El aviso del árbol. Se pinta con el estado y no una sola vez, porque
+           activar y desactivar ocurren sin recargar. */
+        function pintarVisibilidad() {
+          const caja = document.querySelector("[data-arbol-inactivo]");
+          if (!caja || esRuta) return;
+          const activo = S.resumenModulo(modulo).estado === "activo";
+          caja.hidden = activo;
+          if (activo) return;
+          const visibles = S.videosDe(modulo.numero, e).filter(function (v) {
+            return S.visibleEnFront(v, e);
+          }).length;
+          /* El botón de agregar video NO se saca, y es deliberado: en este modelo
+             «inactivo» es `borrador`, que es el estado en el que el módulo SE
+             CONSTRUYE —nace ahí y se activa recién en el paso 5—. Sacar el alta
+             dejaría al flujo sin poder empezar ninguno. Lo que faltaba era
+             decirlo, y eso es lo que hace este aviso. */
+          R.pintar("[data-arbol-inactivo]",
+            '<span class="icon" data-icon="info"></span><span><strong>Las agencias no ven este ' +
+            "módulo.</strong> Está en borrador, que es el estado en el que se carga: se le pueden " +
+            "agregar secciones y videos igual, y " +
+            (visibles === 0
+              ? "nada de lo que tiene llegaría al Front hasta activarlo."
+              : "los " + visibles + (visibles === 1 ? " video que estaría" : " videos que estarían") +
+                " visibles en el Front esperan la activación.") +
+            "</span>");
         }
 
         /* ── El árbol ───────────────────────────────────────────────────── */
@@ -606,6 +734,7 @@
           cablearAltaSeccion();
           cablearAltaVideo();
           cablearLoteArbol();
+          pintarVisibilidad();
           marcarSeccionNueva();
           marcarVideoNuevo();
         }
