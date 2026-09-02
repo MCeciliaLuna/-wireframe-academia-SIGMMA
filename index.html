@@ -207,15 +207,22 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 
 .top{
   background:var(--surface);border-bottom:1px solid var(--line-soft);
-  padding:16px 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+  padding:10px 24px;display:flex;align-items:center;flex-wrap:wrap;
+  /* El gap de 24 valía entre columnas; entre renglones era un margen de landing. */
+  column-gap:24px;row-gap:8px;
 }
 .crumb{font-size:14px;color:var(--muted);min-width:0;font-family:var(--serif-alt)}
 .crumb b{color:var(--ink);font-weight:700;font-family:var(--sans)}
 .topctl{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .topctl>span{font-size:14px;font-weight:700;color:var(--g700)}
+/* Un renglón propio y no más: es contexto del prototipo, no contenido de la
+   pantalla. `min-width:100%` es lo que lo baja de fila — con solo `width:100%`
+   el `max-width` lo dejaba caber al lado del control segmentado, recortado.
+   Donde el ancho no alcanza, el texto completo queda en el `title`. */
 .escena-note{
-  width:100%;font-size:14px;color:var(--muted);padding-top:8px;
-  font-family:var(--serif-alt);max-width:100ch;
+  flex:1 0 100%;min-width:100%;font-size:13px;color:var(--muted);padding-top:6px;
+  font-family:var(--serif-alt);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 
 /* Control segmentado: hereda el tratamiento del link activo de §5.5. */
@@ -235,16 +242,18 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
    2 · TIPOGRAFÍA  —  el tramo bajo de §3.2, calibrado a panel interno
    ========================================================================= */
 
+/* El aire lateral es el del documento; el vertical, el de una herramienta:
+   arriba manda el breadcrumb, no un margen de landing. */
 .wrap{padding:16px;max-width:1280px}
-@media (min-width:768px){ .wrap{padding:32px} .topbar-in{padding:0 32px} }
-@media (min-width:1024px){ .wrap{padding:48px} .topbar-in{padding:0 48px} }
+@media (min-width:768px){ .wrap{padding:20px 32px} .topbar-in{padding:0 32px} }
+@media (min-width:1024px){ .wrap{padding:24px 32px} .topbar-in{padding:0 48px} }
 
 /* Headings del flujo de contenido. Fluidos entre 375 y 1440 (§6.3 pide mínimo y
    máximo por nivel), y un escalón por debajo de la vista agencia: en el listado
    de módulos el título es la pantalla, acá compite con una tabla de 50 filas. */
 .wrap>h1,.wrap>.row h1{
-  font-size:clamp(1.75rem,1.6rem + .65vw,2rem);   /* 28 → 32 */
-  font-weight:700;line-height:1.2;letter-spacing:-.02em;margin:0 0 12px;color:var(--ink);
+  font-size:clamp(1.25rem,1.18rem + .35vw,1.375rem);  /* 20 → 22 */
+  font-weight:700;line-height:1.2;letter-spacing:-.02em;margin:0 0 4px;color:var(--ink);
 }
 .wrap>h2{
   font-size:clamp(1.375rem,1.28rem + .4vw,1.625rem); /* 22 → 26 */
@@ -261,8 +270,8 @@ h2{font-size:18px;font-weight:700;line-height:1.25;letter-spacing:-.01em;margin:
 h3{font-size:14px;font-weight:700;line-height:1.3;margin:0 0 8px;color:var(--indigo-mid)}
 
 .lede{
-  font-family:var(--serif-alt);font-size:15px;line-height:1.6;
-  color:var(--g700);margin:0 0 24px;max-width:78ch;
+  font-family:var(--serif-alt);font-size:13px;line-height:1.5;
+  color:var(--g700);margin:0 0 16px;max-width:96ch;
 }
 p{margin:0 0 16px}
 a{color:var(--primary);text-decoration:none;transition:color var(--t-hover) var(--ease)}
@@ -436,54 +445,41 @@ input[type=checkbox],input[type=radio]{
 /* Panel: el contenedor genérico. Radio 12 por §4.2. */
 .card{background:var(--surface-sunk);border:1px solid var(--line);border-radius:var(--r-xl)}
 
-/* Card de contenido (§5.2): radio 16, media arriba de 200px, alto mínimo 382. */
-.doors{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px}
-.door{
-  text-align:left;background:var(--surface-sunk);
-  border:1px solid var(--line);border-radius:var(--r-xl);
-  padding:0;display:flex;flex-direction:column;width:100%;min-height:382px;overflow:hidden;
+/* Tile de acción: la card de contenido de §5.2 traída a densidad de panel.
+   La banda de media de 200px era decorativa y se llevaba el 42 % del alto del
+   hub; el gesto de marca no se pierde, se muda al cuadro del glifo. Lo que
+   §5.2 sí conserva literal es el hover: borde azul + wash celeste al 10 %,
+   sin elevación. */
+.actgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.act{
+  display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;
+  background:var(--surface-sunk);border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:12px 14px;
   transition:border-color var(--t-hover) var(--ease),background var(--t-hover) var(--ease);
 }
-.door-media{
-  display:block;position:relative;height:200px;flex:none;
-  background:var(--brand-surface);overflow:hidden;
+.act .glyph{
+  flex:none;width:32px;height:32px;border-radius:var(--r);
+  background:var(--brand-surface);color:#fff;overflow:hidden;position:relative;
+  display:flex;align-items:center;justify-content:center;
 }
-/* Textura de puntos de §5.9, sin depender de un asset. */
-.door-media::after{
-  content:"";position:absolute;inset:0;
-  background-image:radial-gradient(rgba(255,255,255,.3) 1px,transparent 1px);
-  background-size:12px 12px;
-}
-.door-media svg{
-  position:absolute;left:24px;bottom:24px;width:56px;height:56px;
-  color:#fff;z-index:1;
-}
-.door-body{display:flex;flex-direction:column;flex:1;padding:24px}
-.door .kicker{
-  font-family:var(--serif-alt);font-size:14px;color:var(--muted);
-  margin-bottom:8px;display:block;
-}
-.door strong{
-  display:block;font-size:18px;font-weight:700;line-height:1.2;letter-spacing:-.015em;
-  color:var(--indigo-mid);margin-bottom:8px;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+.act .glyph svg{width:18px;height:18px;position:relative;z-index:1}
+.act .txt{min-width:0}
+.act b{
+  display:block;font-size:14px;font-weight:700;line-height:1.25;letter-spacing:-.01em;
+  color:var(--indigo-mid);
   transition:color var(--t-hover) var(--ease);
 }
-.door p{
-  font-family:var(--serif-alt);margin:0 0 24px;color:var(--g700);font-size:14px;max-width:44ch;flex:none;
+.act .d{
+  display:block;font-family:var(--serif-alt);font-size:12px;line-height:1.4;
+  color:var(--g700);margin-top:2px;
 }
-.door .who{
-  font-family:var(--serif-alt);font-size:14px;color:var(--muted);
-  border-top:1px solid var(--line-soft);padding-top:16px;display:block;margin-top:auto;
-  transition:color var(--t-hover) var(--ease);
-}
-/* Hover firma de §5.2: borde azul + wash celeste al 10 %, sin elevación. */
-.door:hover:not(.locked){border-color:var(--primary-hover);background:var(--sky-tint)}
-.door:hover:not(.locked) strong,.door:hover:not(.locked) .who{color:var(--primary-hover)}
-.door.locked{opacity:.5;cursor:not-allowed}
-/* Las cards de rol reusan .doors pero no tienen media: no heredan el alto. */
-.door-flat{min-height:0;padding:24px;background:var(--surface-sunk);cursor:default}
-.door-flat:hover{border-color:var(--line);background:var(--surface-sunk)}
+.act .tag{margin-top:6px}
+.act:hover:not(.locked){border-color:var(--primary-hover);background:var(--sky-tint)}
+.act:hover:not(.locked) b{color:var(--primary-hover)}
+.act.locked{opacity:.55;cursor:not-allowed}
+/* Las cards de rol reusan la grilla pero no son accionables: sin glifo ni hover. */
+.act-flat{cursor:default;flex-direction:column;gap:2px}
+.act-flat:hover{border-color:var(--line);background:var(--surface-sunk)}
 
 /* Chip de estado, relleno con punto (§5.3) */
 .chip{
@@ -524,22 +520,34 @@ input[type=checkbox],input[type=radio]{
    6 · HUB  —  tiles de métrica y lista de pendientes
    ========================================================================= */
 
-.mini{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:24px}
-.stat{background:var(--surface-sunk);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px}
+.mini{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+.stat{background:var(--surface-sunk);border:1px solid var(--line);border-radius:var(--r-lg);padding:12px 14px}
 .stat b{
   display:block;font-family:var(--mono);font-variant-numeric:tabular-nums;
-  font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1.1;color:var(--indigo);
+  font-size:22px;font-weight:700;letter-spacing:-.03em;line-height:1.1;color:var(--indigo);
 }
-.stat span{font-family:var(--serif-alt);font-size:14px;color:var(--muted);display:block;margin-top:8px}
+.stat span{font-family:var(--serif-alt);font-size:12px;line-height:1.35;color:var(--muted);display:block;margin-top:2px}
+/* La métrica que pide una acción no puede leerse igual que las que solo informan. */
+.stat.warn{border-color:var(--warning-border);background:var(--warning-bg)}
+.stat.warn b{color:var(--warning)}
+.stat.warn span{color:var(--warning)}
 
 .tasklist{list-style:none;margin:0;padding:0}
 .tasklist li{
-  display:flex;align-items:center;gap:16px;padding:16px 24px;
+  display:flex;align-items:center;gap:12px;padding:8px 16px;
   border-bottom:1px solid var(--line-soft);font-size:14px;
 }
 .tasklist li:last-child{border-bottom:0}
-.tasklist .grow{flex:1;min-width:0}
-.tasklist .sub{font-family:var(--serif-alt);color:var(--muted);font-size:14px}
+/* Un renglón por pendiente: el motivo va al lado del título, no debajo. */
+.tasklist .grow{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tasklist .sub{font-family:var(--serif-alt);color:var(--muted);font-size:13px}
+.tasklist .sub::before{content:" · ";color:var(--line-ctl)}
+.tasklist .more{font-family:var(--serif-alt);color:var(--muted);font-size:13px}
+.taskhead{
+  padding:10px 16px;border-bottom:1px solid var(--line-soft);
+  display:flex;align-items:center;gap:8px;
+}
+.taskhead h3{margin:0}
 
 /* ============================================================================
    7 · CONSTRUCTOR  —  árbol + panel de detalle
@@ -895,21 +903,23 @@ body.notes-off .note{display:none}
   .rail{display:none}
   .split{grid-template-columns:1fr}
   .treecol{border-right:0;border-bottom:1px solid var(--line)}
-  .doors,.mini{grid-template-columns:1fr}
+  .actgrid{grid-template-columns:repeat(2,1fr)}
+  .mini{grid-template-columns:repeat(3,1fr)}
   .detail{overflow:visible}
   .dhead,.dbody,.tabs{padding-left:24px;padding-right:24px}
   /* Los headings ya bajan solos: la escala es fluida entre 375 y 1440. */
   .wrap>h2{margin-top:24px}
   .score .big{font-size:32px}
-  .stat b{font-size:24px}
+  .stat b{font-size:20px}
   .topbar-meta{gap:16px}
 }
 @media (max-width:767px){
-  .door strong,.emptynote b,.qcard .qe,.n-mod .label,.modcard .body b,.agencyhead b{font-size:15px}
+  .emptynote b,.qcard .qe,.n-mod .label,.modcard .body b,.agencyhead b{font-size:15px}
   .score .big{font-size:28px}
   .btn{width:100%}
   .row>.btn{width:auto;flex:1 1 auto}
   .mini{grid-template-columns:1fr 1fr}
+  .actgrid{grid-template-columns:1fr}
   .steps{flex-direction:column}
   .step{border-right:0;border-bottom:1px solid var(--line-soft)}
   .topbar-meta{display:none}
@@ -1567,7 +1577,8 @@ function crearModulo({sup,id,name,tag,perfiles,orden,seccion,videos}){
    SHELL
    ============================================================ */
 function render(){
-  $('#escenaNote').textContent=ESCENAS[S.escena].note+'  ·  Actuando como '+ROLES[S.rol].n+': '+ROLES[S.rol].d;
+  const nota=ESCENAS[S.escena].note+'  ·  Actuando como '+ROLES[S.rol].n+'.';
+  $('#escenaNote').textContent=nota; $('#escenaNote').title=nota;
   document.querySelectorAll('.seg[data-esc]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.esc===S.escena)));
   document.querySelectorAll('.seg[data-rol]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.rol===S.rol)));
   document.querySelectorAll('.railitem[data-go]').forEach(b=>b.setAttribute('aria-current',String(b.dataset.go===S.screen)));
@@ -1591,34 +1602,43 @@ function render(){
 /* ============================================================
    HUB
    ============================================================ */
-/* Glifos de las cuatro puertas del hub. Cada uno dice lo que hace la puerta:
+/* Glifos de las cuatro acciones del hub. Cada uno dice lo que hace la accion:
    el cuadro de video, las cuatro opciones con una correcta, el arbol de
-   estructura y el checklist de publicacion. */
-const DOORART={
- tengo:`<span class="door-media"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="9" width="42" height="30" rx="4"/><path d="M3 17h42"/><path d="M20 24.5v9l8-4.5z" fill="currentColor" stroke="none"/></svg></span>`,
- preguntas:`<span class="door-media"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="17" height="17" rx="3" fill="currentColor" stroke="none"/><rect x="27" y="4" width="17" height="17" rx="3"/><rect x="4" y="27" width="17" height="17" rx="3"/><rect x="27" y="27" width="17" height="17" rx="3"/></svg></span>`,
- estructura:`<span class="door-media"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="17" y="3" width="14" height="10" rx="2"/><rect x="2" y="35" width="14" height="10" rx="2"/><rect x="32" y="35" width="14" height="10" rx="2"/><path d="M24 13v11M9 35V24h30v11"/></svg></span>`,
- publicar:`<span class="door-media"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l4 4 6-7"/><path d="M3 27l4 4 6-7"/><circle cx="8" cy="40" r="4.5"/><path d="M20 12h25M20 28h25M20 40h16"/></svg></span>`
+   estructura y el checklist de publicacion.
+
+   Van dentro del cuadro de 32px, dibujados a 18. Igual que en `.icon`, el
+   trazo efectivo es nominal x px / lado del viewBox: sobre la grilla de 48 a
+   18px de caja hace falta un nominal de 4 para dar los 1,5px de trazo. */
+const ACTART={
+ tengo:`<span class="glyph"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="9" width="42" height="30" rx="4"/><path d="M3 17h42"/><path d="M20 24.5v9l8-4.5z" fill="currentColor" stroke="none"/></svg></span>`,
+ preguntas:`<span class="glyph"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4" aria-hidden="true"><rect x="4" y="4" width="17" height="17" rx="3" fill="currentColor" stroke="none"/><rect x="27" y="4" width="17" height="17" rx="3"/><rect x="4" y="27" width="17" height="17" rx="3"/><rect x="27" y="27" width="17" height="17" rx="3"/></svg></span>`,
+ estructura:`<span class="glyph"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" aria-hidden="true"><rect x="17" y="3" width="14" height="10" rx="2"/><rect x="2" y="35" width="14" height="10" rx="2"/><rect x="32" y="35" width="14" height="10" rx="2"/><path d="M24 13v11M9 35V24h30v11"/></svg></span>`,
+ /* El checklist baja de tres filas a dos: a 18px la tercera era una hairline. */
+ publicar:`<span class="glyph"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13l4 4 8-8"/><path d="M4 31l4 4 8-8"/><path d="M23 15h21M23 33h21"/></svg></span>`
 };
+
+/* Las cuatro acciones, en orden de frecuencia real de uso. La linea de rol
+   solo aparece cuando bloquea: repetida en las cuatro no informaba nada. */
+const ACCIONES=[
+ ['tengo','editar','Subir un video que ya tengo','Lo más frecuente. Pegás el link y elegís en qué parte de la Academia va.'],
+ ['preguntas','editar','Cargar preguntas de un módulo','Escribís o pegás el banco. Cada una con su tema, que es lo que evita el sesgo.'],
+ ['estructura','editar','Crear un módulo o una sección','Da de alta la estructura donde después van los videos.'],
+ ['publicar','publicar','Publicar un módulo','Checklist en vez de interruptor: qué falta para que una agencia pueda hacerlo.']
+];
 
 function viewHub(){
   const w=el('div','wrap');
   const mods=modsVis();
   w.innerHTML=`<h1>¿Qué querés hacer?</h1><p class="lede">Elegí por la tarea, no por la tabla. El sistema se ocupa de los IDs, la superficie y el orden.</p>`;
-  const d=el('div','doors');
-  d.innerHTML=`
-   <button class="door${can('editar')?'':' locked'}" data-door="tengo">${DOORART.tengo}<span class="door-body"><span class="kicker">Lo más frecuente</span><strong>Subir un video que ya tengo</strong>
-     <p>Pegás el link, elegís en qué parte de la Academia va y listo. Tres datos, nada más.</p>
-     <span class="who">${can('editar')?'Rol Contenido o Publicación':'Bloqueado para el rol '+ROLES[S.rol].n}</span></span></button>
-   <button class="door${can('editar')?'':' locked'}" data-door="preguntas">${DOORART.preguntas}<span class="door-body"><span class="kicker">Evaluación</span><strong>Cargar preguntas de un módulo</strong>
-     <p>Escribís las preguntas del banco o pegás la planilla. Cada una con su tema, que es lo que hace que el examen no salga sesgado.</p>
-     <span class="who">${can('editar')?'Rol Contenido o Publicación':'Bloqueado para el rol '+ROLES[S.rol].n}</span></span></button>
-   <button class="door${can('editar')?'':' locked'}" data-door="estructura">${DOORART.estructura}<span class="door-body"><span class="kicker">Arranque y expansión</span><strong>Crear un módulo o una sección</strong>
-     <p>Da de alta la estructura donde después van los videos. Es el primer paso de una Academia vacía y el de cada superficie nueva.</p>
-     <span class="who">${can('editar')?'Rol Contenido o Publicación':'Bloqueado para el rol '+ROLES[S.rol].n}</span></span></button>
-   <button class="door${can('publicar')?'':' locked'}" data-door="publicar">${DOORART.publicar}<span class="door-body"><span class="kicker">Antes de salir a producción</span><strong>Publicar un módulo</strong>
-     <p>Checklist en vez de interruptor: te dice exactamente qué falta para que una agencia pueda hacerlo.</p>
-     <span class="who">${can('publicar')?'Rol Publicación · registra quién publicó y cuándo':'Bloqueado: requiere rol Publicación'}</span></span></button>`;
+
+  const d=el('div','actgrid');
+  d.innerHTML=ACCIONES.map(([k,perm,titulo,desc])=>{
+    const ok=can(perm);
+    const motivo=perm==='publicar'?'Requiere rol Publicación':'Bloqueado para el rol '+ROLES[S.rol].n;
+    return `<button class="act${ok?'':' locked'}" data-door="${k}">${ACTART[k]}<span class="txt"><b>${esc(titulo)}</b>
+      <span class="d">${esc(desc)}</span>
+      ${ok?'':`<span class="tag warn">${esc(motivo)}</span>`}</span></button>`;
+  }).join('');
   w.appendChild(d);
 
   if(!mods.length){
@@ -1639,34 +1659,38 @@ function viewHub(){
    <div class="stat"><b>${pub}</b><span>publicados</span></div>
    <div class="stat"><b>${sinG}</b><span>sin grabar</span></div>
    <div class="stat"><b>${regr}</b><span>a regrabar</span></div>
-   <div class="stat"><b>${bloq}</b><span>módulos trabados para publicar</span></div>`;
+   <div class="stat${bloq?' warn':''}"><b>${bloq}</b><span>módulos trabados para publicar</span></div>`;
   w.appendChild(mini);
 
-  const card=el('div','card');
-  card.innerHTML=`<div style="padding:16px 24px;border-bottom:1px solid var(--line-soft)"><h3 style="margin:0">Lo que está esperando algo</h3><p class="hint" style="margin:4px 0 0">Cada ítem lleva directo al lugar donde se resuelve, con el nodo ya seleccionado.</p></div>`;
-  const ul=el('ul','tasklist');
   const items=[];
   mods.forEach(m=>{
     const c=subtemasEnCero(m), n=activas(m).filter(q=>q.estado==='activa').length;
-    if(!m.secciones.length) items.push([m.id+' no tiene secciones','Sin al menos una sección no se le pueden cargar videos','Agregar sección','sec',m.id]);
-    else if(m.subtemas.length===0&&!m.enPrep) items.push([m.id+' no tiene temas definidos','Sin temas el banco no se puede validar ni publicar','Definir temas','subtemas',m.id]);
-    else if(c>0&&n>0) items.push([m.id+' tiene '+c+' tema'+(c>1?'s':'')+' sin cubrir','Bloquea la publicación: el sorteo podría dejar afuera un concepto central','Ir al banco','banco',m.id]);
+    if(!m.secciones.length) items.push([m.id+' no tiene secciones','sin al menos una sección no se le pueden cargar videos','Agregar sección','sec',m.id]);
+    else if(m.subtemas.length===0&&!m.enPrep) items.push([m.id+' no tiene temas definidos','sin temas el banco no se puede validar ni publicar','Definir temas','subtemas',m.id]);
+    else if(c>0&&n>0) items.push([m.id+' tiene '+c+' tema'+(c>1?'s':'')+' sin cubrir','bloquea la publicación: el sorteo podría dejar afuera un concepto central','Ir al banco','banco',m.id]);
     else if(n>0&&n<m.params.objetivo) items.push([m.id+' · banco incompleto',n+' de '+m.params.objetivo+' preguntas cargadas','Completar banco','banco',m.id]);
   });
   mods.forEach(m=>m.secciones.forEach((s,si)=>s.videos.forEach(v=>{
     if(embebido(m,v)==='falla') items.push([m.id+'.'+v.seq+' tiene el embebido roto','YouTube no permite embeberlo: la agencia vería "video no disponible"','Revisar video','vid',m.id,si,v.seq]);
   })));
-  if(regr) items.push([regr+' videos marcados a regrabar','Cambió el producto y quedaron viejos','Ver la cola','regr']);
-  items.slice(0,6).forEach(it=>{
+  if(regr) items.push([regr+' videos marcados a regrabar','cambió el producto y quedaron viejos','Ver la cola','regr']);
+
+  const card=el('div','card');
+  card.innerHTML=`<div class="taskhead"><h3>Lo que está esperando algo</h3><span class="idbadge">${items.length}</span></div>`;
+  const ul=el('ul','tasklist');
+  const TOPE=6;
+  items.slice(0,TOPE).forEach(it=>{
     const li=el('li');
     const dg=it[3]==='vid'?`data-jump="vid|${it[4]}|${it[5]}|${it[6]}"`:(it[3]==='regr'?`data-jump="regr"`:`data-jump="${it[3]}|${it[4]}"`);
-    li.innerHTML=`<span class="grow"><b>${esc(it[0])}</b><br><span class="sub">${esc(it[1])}</span></span><button class="btn btn-sm" ${dg}>${esc(it[2])}</button>`;
+    li.innerHTML=`<span class="grow"><b>${esc(it[0])}</b><span class="sub">${esc(it[1])}</span></span><button class="btn btn-sm" ${dg}>${esc(it[2])}</button>`;
     ul.appendChild(li);
   });
+  /* El corte era silencioso: un pendiente que no se lista es un pendiente que no existe. */
+  if(items.length>TOPE) ul.appendChild(el('li','','<span class="grow"><span class="more">Hay '+(items.length-TOPE)+' pendiente'+(items.length-TOPE>1?'s':'')+' más en la estructura.</span></span><button class="btn btn-sm" data-go="constructor">Ver la estructura</button>'));
   if(!items.length) ul.appendChild(el('li','','<span class="grow">Nada pendiente en esta escena.</span>'));
   card.appendChild(ul);
   w.appendChild(card);
-  w.appendChild(el('div','note v3','<b>Ajuste v3 ·</b> Las cuatro puertas se habilitan según el rol: con rol Consulta las cuatro quedan atenuadas y el hub se vuelve un tablero de lectura. Cambiá el rol arriba a la derecha para verlo.'));
+  w.appendChild(el('div','note v3','<b>Ajuste v3 ·</b> Las cuatro acciones se habilitan según el rol: con rol Consulta las cuatro quedan atenuadas y el hub se vuelve un tablero de lectura. Cambiá el rol arriba a la derecha para verlo.'));
   return w;
 }
 
@@ -1765,10 +1789,11 @@ function viewRoles(){
      `<td style="text-align:center">${PERMS[a[1]].includes(r)?'<span class="ok"><span class="icon icon-sm" data-icon="check-circle"></span></span>':'<span style="color:var(--line-ctl)">–</span>'}</td>`).join('')}</tr>`).join('')+'</tbody>';
   tw.appendChild(tb);w.appendChild(tw);
 
-  const cards=el('div','doors');cards.style.marginTop='16px';
-  cards.innerHTML=Object.keys(ROLES).map(r=>`<div class="door door-flat" style="cursor:default">
-     <span class="kicker">${S.rol===r?'rol actual':'rol'}</span><strong>${esc(ROLES[r].n)}</strong>
-     <p>${esc(ROLES[r].d)}</p><span class="who">Típicamente: ${esc(ROLES[r].quien)}</span></div>`).join('');
+  const cards=el('div','actgrid');cards.style.gridTemplateColumns='repeat(3,1fr)';cards.style.marginTop='16px';
+  cards.innerHTML=Object.keys(ROLES).map(r=>`<div class="act act-flat">
+     <b>${esc(ROLES[r].n)}${S.rol===r?' <span class="tag">rol actual</span>':''}</b>
+     <span class="d">${esc(ROLES[r].d)}</span>
+     <span class="d">Típicamente: ${esc(ROLES[r].quien)}</span></div>`).join('');
   w.appendChild(cards);
 
   w.appendChild(el('div','banner warn','<span class="icon" data-icon="alert-triangle"></span><div><b>Dos definiciones pendientes.</b> Primero: dónde se asignan los roles — ¿en el ABM de usuarios de sigmma.net o en un ABM propio de la Academia? Segundo: si un mismo usuario puede tener dos roles a la vez (el caso real es M. Luna, que carga contenido y también publica). Recomendación: rol único por usuario, y que Publicación incluya todo lo de Contenido, como está acá.</div>'));
