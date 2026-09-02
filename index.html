@@ -782,6 +782,7 @@ tr[data-warn="true"]:hover td{background:#fdf3dc}
 .modcard.lock{opacity:.6}
 .modcard.lock .num{color:var(--muted)}
 .vidline{font-size:16px;color:var(--g700);padding:4px 0}
+.vidline.off{color:var(--muted)}
 
 /* Cadena de desbloqueo */
 .chain{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px;margin-top:8px}
@@ -966,138 +967,151 @@ const porque=k=>can(k)?'':'Tu rol ('+ROLES[S.rol].n+') no puede hacerlo. Requier
 /* ============================================================
    DATOS
    ============================================================ */
+/* Parámetros globales que el prototipo lee y el backoffice tiene que exponer.
+   Se declaran ANTES del dato porque initMod toma de acá los valores por defecto
+   del módulo: una sola fuente para las dos superficies. */
+const GLOBAL={umbralVisto:80,metodoVisto:'posición',preguntasIntento:10,umbralAprob:8,
+  bancoObjetivo:50,bancoMinimo:30,
+  soporte:'WhatsApp · +54 9 381 555-0100',zona:'ART (UTC-3)'};
+
 const DATA=[
  {id:'BAK-M00',name:'Fundamentos',tag:'P+B',perfiles:[...PERFILES],orden:10,
   resumen:'Qué es SIGMMA y cómo moverse por el sistema.',descripcion:'Qué es SIGMMA y cómo moverse por el sistema.',
-  subtemas:['Concepto','Ciclo 360','Principios','Navegación'],
-  secciones:[{name:'Concepto y navegación',videos:[
+  secciones:[
+   {id:'BAK-M00.S1',name:'La lógica del sistema',videos:[
     {seq:'010',t:'Qué es SIGMMA: el sistema operativo de la agencia',p:'P1',c:'C01',dur:'3:40'},
-    {seq:'020',t:'El ciclo 360° de la operación turística',p:'P2',c:'C04',dur:'4:10'},
-    {seq:'030',t:'Los 7 principios y los procesos atomizados',p:'P2',c:'C04',dur:'4:30'},
-    {seq:'040',t:'Navegación: ingreso, menú, último file, rueda de progreso',p:'P1',c:'C01',dur:'3:20'}]}]},
+    {seq:'020',t:'El ciclo 360° de la operación turística: cliente, prestador y utilidad',p:'P2',c:'C04',dur:'4:10'},
+    {seq:'030',t:'Los 7 principios y los procesos atomizados',p:'P2',c:'C04',dur:'4:30'}]},
+   {id:'BAK-M00.S2',name:'Moverse por SIGMMA',videos:[
+    {seq:'040',t:'Navegación: ingreso, menú, botones, último file y rueda de progreso',p:'P1',c:'C01',dur:'3:20'}]}]},
 
  {id:'BAK-M10',name:'File',tag:'P+B',perfiles:[...PERFILES],orden:20,
   resumen:'El file: el contenedor de toda la operación.',descripcion:'El file: el contenedor de toda la operación.',
-  subtemas:['Búsqueda','Alta de file','Monedas','Estados','Salida grupal'],
   secciones:[
-   {name:'Alta y búsqueda',videos:[
-    {seq:'010',t:'Buscar file (número, filtros, por nombre)',p:'P1',c:'C02',dur:'2:40'},
-    {seq:'020',t:'Crear y editar file: tipo de servicio, individual vs grupal',p:'P1',c:'C02',dur:'4:50'},
-    {seq:'030',t:'Moneda de registro vs moneda de documento',p:'P1',c:'C02',dur:'3:00'}]},
-   {name:'Datos y estados',videos:[
-    {seq:'040',t:'Datos del file: nombre, destino IATA, fechas, segmentación',p:'P2',c:'C05',dur:'3:50'},
-    {seq:'050',t:'Estados del file (automáticos y manuales, cerrar file)',p:'P2',c:'C05',dur:'4:00'},
-    {seq:'060',t:'Salida grupal: vincular files e informe de salida',p:'P3',c:'C13',dur:'4:40'},
-    {seq:'070',t:'Duplicar file (funcionalidad discontinuada)',p:'P3',c:'—',dur:'',archivado:true}]}]},
+   {id:'BAK-M10.S1',name:'Encontrar y crear un file',videos:[
+    {seq:'010',t:'Buscar file: número, filtros y por nombre',p:'P1',c:'C02',dur:'2:40'},
+    {seq:'020',t:'Crear y editar un file: tipo de servicio, individual vs. grupal',p:'P1',c:'C02',dur:'4:50'},
+    {seq:'070',t:'Duplicar file (funcionalidad discontinuada)',p:'P3',c:'—',dur:'',archivado:true}]},
+   {id:'BAK-M10.S2',name:'Configurar el file',videos:[
+    {seq:'030',t:'Moneda de registro vs. moneda de documento',p:'P1',c:'C02',dur:'3:00'},
+    {seq:'040',t:'Datos del file: nombre, destino IATA, fechas y segmentación',p:'P2',c:'C05',dur:'3:50'},
+    {seq:'050',t:'Estados del file: automáticos, manuales y cierre',p:'P2',c:'C05',dur:'4:00'}]},
+   {id:'BAK-M10.S3',name:'Files grupales',videos:[
+    {seq:'060',t:'Salida grupal: vincular files e informe de salida',p:'P3',c:'C13',dur:'4:40'}]}]},
 
  {id:'BAK-M20',name:'Entidades: clientes, pasajeros, proveedores',tag:'P+B',perfiles:[...PERFILES],orden:30,
   resumen:'Clientes, pasajeros y proveedores: quién es quién.',descripcion:'Clientes, pasajeros y proveedores: quién es quién.',
-  subtemas:['Cliente','Cliente vs Pasajero','Pasajero','Proveedor','Importación'],
   secciones:[
-   {name:'Clientes y pasajeros',videos:[
-    {seq:'010',t:'Cargar cliente: físico vs jurídico, autocompletar por ARCA/CUIT',p:'P1',c:'C02',dur:'4:40'},
-    {seq:'020',t:'Cliente: solapas (documentación, tarjetas, clasificación)',p:'P2',c:'C06',dur:'4:20'},
-    {seq:'030',t:'Cliente vs Pasajero (el concepto que más se confunde)',p:'P1',c:'C02',dur:'3:00'},
-    {seq:'040',t:'Cargar pasajero: pax principal, agregar a base de clientes',p:'P1',c:'C02',dur:'3:30'}]},
-   {name:'Proveedores e importación',videos:[
-    {seq:'050',t:'Proveedor: turístico y no turístico',p:'P2',c:'C06',dur:'3:10'},
-    {seq:'060',t:'Importar base de clientes y proveedores desde Excel',p:'P2',c:'C06',dur:'4:30'}]}]},
+   {id:'BAK-M20.S1',name:'Clientes',videos:[
+    {seq:'010',t:'Cargar un cliente: físico vs. jurídico y autocompletado por ARCA/CUIT',p:'P1',c:'C02',dur:'4:40'},
+    {seq:'020',t:'Cliente: solapas de documentación, tarjetas, clasificación y adjuntos',p:'P2',c:'C06',dur:'4:20'}]},
+   {id:'BAK-M20.S2',name:'Cliente vs. pasajero',videos:[
+    {seq:'030',t:'Cliente vs. pasajero: el concepto que más se confunde',p:'P1',c:'C02',dur:'3:00'},
+    {seq:'040',t:'Cargar un pasajero: pax principal y alta en la base de clientes',p:'P1',c:'C02',dur:'3:30'}]},
+   {id:'BAK-M20.S3',name:'Proveedores y carga masiva',videos:[
+    {seq:'050',t:'Proveedor turístico y no turístico',p:'P2',c:'C06',dur:'3:10'},
+    {seq:'060',t:'Importar la base de clientes y proveedores desde Excel',p:'P2',c:'C06',dur:'4:30'}]}]},
 
  {id:'BAK-M30',name:'Voucher / Servicios',tag:'P+B',perfiles:[...PERFILES],orden:40,
   resumen:'El voucher: cargar y procesar un servicio.',descripcion:'El voucher: cargar y procesar un servicio.',
-  subtemas:['Concepto de voucher','Carga','Margen','Impuestos','Procesar','Estados','Modelos'],
   secciones:[
-   {name:'Voucher y cobro',videos:[
+   {id:'BAK-M30.S1',name:'Qué es y cómo se carga',videos:[
     {seq:'010',t:'Qué es el voucher: perfil operativo y administrativo',p:'P1',c:'C03',dur:'3:00'},
-    {seq:'020',t:'Cargar voucher: tipo, subtipo, proveedor',p:'P1',c:'C03',dur:'4:50'},
-    {seq:'050',t:'Procesar el voucher: impacto en la cuenta del proveedor',p:'P1',c:'C03',dur:'2:40'}]},
-   {name:'Margen e impuestos',videos:[
-    {seq:'030',t:'Margen: comisión vs utilidad',p:'P2',c:'C07',dur:'4:00'},
-    {seq:'040',t:'Conceptos impositivos e IVA; separar aéreo de terrestre',p:'P2',c:'C07',dur:'4:40'}]},
-   {name:'Estados y plantillas',videos:[
-    {seq:'060',t:'Estados del voucher y cotización',p:'P3',c:'C12',dur:'3:30'},
+    {seq:'020',t:'Cargar un voucher: tipo, subtipo y proveedor',p:'P1',c:'C03',dur:'4:50'}]},
+   {id:'BAK-M30.S2',name:'Los números del voucher',videos:[
+    {seq:'030',t:'Margen: comisión vs. utilidad',p:'P2',c:'C07',dur:'4:00'},
+    {seq:'040',t:'Conceptos impositivos e IVA: separar aéreo exento de terrestre',p:'P2',c:'C07',dur:'4:40'}]},
+   {id:'BAK-M30.S3',name:'Procesar e impactar',videos:[
+    {seq:'050',t:'Procesar el voucher: impacto en la cuenta del proveedor',p:'P1',c:'C03',dur:'2:40'},
+    {seq:'060',t:'Estados del voucher y cotización',p:'P3',c:'C12',dur:'3:30'}]},
+   {id:'BAK-M30.S4',name:'Reutilizar',videos:[
     {seq:'070',t:'Modelos: armar plantillas de venta reutilizables',p:'P3',c:'C12',dur:'4:20'}]}]},
 
  {id:'BAK-M35',name:'Tráfico / asignación de butaca',tag:'P+B',perfiles:[...PERFILES],orden:45,
   resumen:'Asignación de butaca y tráfico.',descripcion:'Asignación de butaca y tráfico.',enPrep:true,
   subtemas:[],
-  secciones:[{name:'Asignación de butaca',videos:[
+  secciones:[
+   {id:'BAK-M35.S1',name:'Asignación de butaca',videos:[
     {seq:'010',t:'Tráfico: asignación de butaca',p:'P3',c:'—',dur:'',durEst:'4:00'}]}]},
 
  {id:'BAK-M40',name:'Cobranzas / Recibos',tag:'P+B',perfiles:[...PERFILES],orden:50,
   resumen:'Cobrar: recibos, valores y cuenta corriente.',descripcion:'Cobrar: recibos, valores y cuenta corriente.',
-  subtemas:['Modos de recibo','Valores','Moneda','Devolución','Cuenta corriente'],
   secciones:[
-   {name:'Recibos',videos:[
+   {id:'BAK-M40.S1',name:'Emitir el recibo',videos:[
     {seq:'010',t:'Recibo: modos indicado, automático y detallado',p:'P1',c:'C03',dur:'4:50'},
-    {seq:'020',t:'Valores: efectivo, transferencia, tarjeta y de tercero',p:'P2',c:'C08',dur:'4:10'},
+    {seq:'020',t:'Valores: efectivo, transferencia, tarjeta y de tercero (TR3/TC3)',p:'P2',c:'C08',dur:'4:10'}]},
+   {id:'BAK-M40.S2',name:'Moneda en la cobranza',videos:[
     {seq:'030',t:'Moneda y tipo de cambio en el recibo',p:'P2',c:'C08',dur:'3:40'}]},
-   {name:'Saldos y devoluciones',videos:[
-    {seq:'040',t:'Devolución / egreso',p:'P3',c:'C14',dur:'3:00'},
-    {seq:'050',t:'Cuenta corriente del cliente y saldos por moneda',p:'P2',c:'C08',dur:'4:20'}]}]},
+   {id:'BAK-M40.S3',name:'Cuenta corriente y devoluciones',videos:[
+    {seq:'050',t:'Cuenta corriente del cliente y saldos por moneda',p:'P2',c:'C08',dur:'4:20'},
+    {seq:'040',t:'Devolución y egreso',p:'P3',c:'C14',dur:'3:00'}]}]},
 
  {id:'BAK-M50',name:'Facturación',tag:'P+B',perfiles:[...PERFILES],orden:60,
   resumen:'Facturar al pasajero: IVA, CAE y casos.',descripcion:'Facturar al pasajero: IVA, CAE y casos.',
-  subtemas:['Factura al pasajero','IVA y CAE','Verificación','Notas de crédito','Tipo de cambio'],
   secciones:[
-   {name:'Factura al pasajero',videos:[
-    {seq:'010',t:'Factura al pasajero: por servicio vs por producto',p:'P2',c:'C09',dur:'4:00'},
-    {seq:'020',t:'Categoría de IVA → factura A/B; ARCA y CAE',p:'P2',c:'C09',dur:'4:40'},
-    {seq:'030',t:'Verificar el voucher antes de facturar',p:'P2',c:'C09',dur:'3:20'}]},
-   {name:'Ajustes y casos',videos:[
+   {id:'BAK-M50.S1',name:'Emitir la factura',videos:[
+    {seq:'010',t:'Factura al pasajero: por servicio vs. por producto',p:'P2',c:'C09',dur:'4:00'},
+    {seq:'020',t:'Categoría de IVA y factura A/B: ARCA y CAE',p:'P2',c:'C09',dur:'4:40'}]},
+   {id:'BAK-M50.S2',name:'Controlar antes de facturar',videos:[
+    {seq:'030',t:'Verificar el voucher antes de facturar: prestador vs. proveedor',p:'P2',c:'C09',dur:'3:20'}]},
+   {id:'BAK-M50.S3',name:'Ajustes y casos especiales',videos:[
     {seq:'040',t:'Notas de crédito',p:'P3',c:'C15',dur:'3:10'},
     {seq:'050',t:'Factura parcial: dividir entre pasajeros',p:'P3',c:'C15',dur:'3:50'},
     {seq:'060',t:'Tipo de cambio promedio ponderado',p:'P3',c:'C15',dur:'4:10'}]}]},
 
  {id:'BAK-M60',name:'Pagos a proveedores',tag:'P+B',perfiles:[...PERFILES],orden:70,
   resumen:'Pagar a proveedores: órdenes y saldos.',descripcion:'Pagar a proveedores: órdenes y saldos.',
-  subtemas:['Orden de pago','Factura de compra','Saldos','Cuenta corriente'],
-  secciones:[{name:'Órdenes de pago',videos:[
-    {seq:'010',t:'Orden de pago: automático, dividido y manual',p:'P2',c:'C10',dur:'4:20'},
-    {seq:'020',t:'Vincular factura de compra e importador ARCA',p:'P3',c:'C16',dur:'3:50'},
+  secciones:[
+   {id:'BAK-M60.S1',name:'Ordenar el pago',videos:[
+    {seq:'010',t:'Orden de pago: automática, dividida y manual',p:'P2',c:'C10',dur:'4:20'},
+    {seq:'020',t:'Vincular la factura de compra y el importador ARCA',p:'P3',c:'C16',dur:'3:50'}]},
+   {id:'BAK-M60.S2',name:'Ajustes y cuenta corriente',videos:[
     {seq:'030',t:'Saldo a favor, anular y reabrir',p:'P3',c:'C16',dur:'3:00'},
     {seq:'040',t:'Cuenta corriente del proveedor',p:'P2',c:'C10',dur:'3:40'}]}]},
 
  {id:'BAK-M70',name:'Caja y bancos',tag:'P+B',perfiles:[...PERFILES],orden:80,
   resumen:'Caja y bancos: aperturas, cierres y conciliación.',descripcion:'Caja y bancos: aperturas, cierres y conciliación.',
-  subtemas:['Caja','Asientos','Apertura y cierre','Bancos'],
   secciones:[
-   {name:'Caja',videos:[
-    {seq:'010',t:'Caja: única vs por vendedor/cajero',p:'P2',c:'C11',dur:'3:30'},
-    {seq:'020',t:'Asientos automáticos y manuales, egresos, centro de costo',p:'P3',c:'C17',dur:'4:40'},
+   {id:'BAK-M70.S1',name:'Configurar y operar la caja',videos:[
+    {seq:'010',t:'Caja única vs. caja por vendedor o cajero',p:'P2',c:'C11',dur:'3:30'},
     {seq:'030',t:'Apertura y cierre de caja',p:'P3',c:'C17',dur:'3:00'}]},
-   {name:'Bancos',videos:[
+   {id:'BAK-M70.S2',name:'Movimientos y asientos',videos:[
+    {seq:'020',t:'Asientos automáticos y manuales, egresos y centro de costo',p:'P3',c:'C17',dur:'4:40'}]},
+   {id:'BAK-M70.S3',name:'Bancos y comprobantes',videos:[
     {seq:'040',t:'Bancos, transferencias y scan de comprobantes con IA',p:'P3',c:'C17',dur:'4:20'}]}]},
 
  {id:'BAK-M80',name:'Informes',tag:'P+B',perfiles:[...PERFILES],orden:90,
   resumen:'Los informes que se miran todos los días.',descripcion:'Los informes que se miran todos los días.',
-  subtemas:['Operativos','Vencimientos','Dashboard','Administrativos'],
   secciones:[
-   {name:'Informes de uso diario',videos:[
-    {seq:'010',t:'Informes operativos: saldos, listados, comisiones',p:'P2',c:'C11',dur:'4:00'},
+   {id:'BAK-M80.S1',name:'Informes operativos',videos:[
+    {seq:'010',t:'Informes operativos: saldos, listados y comisiones',p:'P2',c:'C11',dur:'4:00'},
     {seq:'020',t:'Informe de vencimientos: cobranzas y pagos',p:'P2',c:'C11',dur:'3:40'}]},
-   {name:'Dashboard y administración',videos:[
-    {seq:'030',t:'Dashboard: KPIs del negocio',p:'P3',c:'C18',dur:'4:10',tag:'B'},
-    {seq:'040',t:'Informes administrativos: ingresos y egresos',p:'P3',c:'C18',dur:'3:50'}]}]},
+   {id:'BAK-M80.S2',name:'Administración y KPIs',videos:[
+    {seq:'040',t:'Informes administrativos: ingresos y egresos',p:'P3',c:'C18',dur:'3:50'},
+    {seq:'030',t:'Dashboard: KPIs del negocio',p:'P3',c:'C18',dur:'4:10',tag:'B'}]}]},
 
  {id:'BAK-M90',name:'Contable',tag:'B',perfiles:['Business'],orden:100,
   resumen:'Contabilidad para agencias Business.',descripcion:'Contabilidad para agencias Business.',
-  subtemas:['Plan de cuentas','Asientos','Libros','Balance','Cierres'],
-  secciones:[{name:'Contabilidad Business',videos:[
+  secciones:[
+   {id:'BAK-M90.S1',name:'Configuración contable',videos:[
     {seq:'010',t:'Plan de cuentas: para qué sirve',p:'P4',c:'C19',dur:'4:00'},
-    {seq:'020',t:'Asientos automáticos: cómo se configuran',p:'P4',c:'C19',dur:'4:30'},
+    {seq:'020',t:'Asientos automáticos: cómo se configuran',p:'P4',c:'C19',dur:'4:30'}]},
+   {id:'BAK-M90.S2',name:'Libros y balances',videos:[
     {seq:'030',t:'Libro diario, libro banco y mayor',p:'P4',c:'C19',dur:'4:10'},
-    {seq:'040',t:'Balance de suma y saldo',p:'P4',c:'C19',dur:'3:40'},
+    {seq:'040',t:'Balance de suma y saldo',p:'P4',c:'C19',dur:'3:40'}]},
+   {id:'BAK-M90.S3',name:'Cierres',videos:[
     {seq:'050',t:'Ejercicios contables y cierres',p:'P4',c:'C19',dur:'4:20'}]}]},
 
  {id:'BAK-M95',name:'Receptivo operador',tag:'B-nicho',perfiles:['Business'],orden:110,
   resumen:'Receptivo operador: tarifario e itinerarios.',descripcion:'Receptivo operador: tarifario e itinerarios.',
-  subtemas:['Tarifario','Itinerario','Multidestino','Prestadores'],
-  secciones:[{name:'Tarifario e itinerarios',videos:[
-    {seq:'010',t:'Tarifario por proveedor: tipo, categoría, vigencia, temporada',p:'P4',c:'C20',dur:'4:40'},
+  secciones:[
+   {id:'BAK-M95.S1',name:'El tarifario',videos:[
+    {seq:'010',t:'Tarifario por proveedor: tipo, categoría, vigencia y temporada',p:'P4',c:'C20',dur:'4:40'}]},
+   {id:'BAK-M95.S2',name:'Armar el producto',videos:[
     {seq:'020',t:'Armar el itinerario con el tarifario',p:'P4',c:'C20',dur:'4:20'},
-    {seq:'030',t:'Modelos multidestino (paquetes)',p:'P4',c:'C20',dur:'4:00'},
-    {seq:'040',t:'Prestador nacional vs internacional e impacto impositivo',p:'P4',c:'C20',dur:'3:50'}]}]}
+    {seq:'030',t:'Modelos multidestino: paquetes',p:'P4',c:'C20',dur:'4:00'}]},
+   {id:'BAK-M95.S3',name:'Impositivo del receptivo',videos:[
+    {seq:'040',t:'Prestador nacional vs. internacional e impacto impositivo',p:'P4',c:'C20',dur:'3:50'}]}]}
 ];
 
 /* embebido: ok / falla / sin verificar */
@@ -1150,15 +1164,27 @@ function genPool(m){
 }
 
 /* inicialización compartida: la usan los módulos del seed y los que se crean a mano */
+/* El ID de sección es PERMANENTE: se reserva una vez y no se reasigna nunca.
+   Por eso se toma del máximo ya usado y no de la posición en el array: insertar
+   o reordenar una sección no puede moverle el ID a las demás, porque el tema de
+   cada pregunta y de cada duda de la Meet apunta a él. */
+function nextSecId(m){
+  const usados=(m.secciones||[]).map(s=>parseInt(String(s.id||'').split('.S')[1],10)||0);
+  return m.id+'.S'+((usados.length?Math.max.apply(null,usados):0)+1);
+}
 function initMod(m){
   m.sup=m.id.split('-')[0];
-  m.params=m.params||{porIntento:10,objetivo:50,minimo:30,umbral:'80,00 %',reintentos:'Ilimitados'};
+  m.params=m.params||{porIntento:GLOBAL.preguntasIntento,objetivo:GLOBAL.bancoObjetivo,
+    minimo:GLOBAL.bancoMinimo,umbral:'80,00 %',reintentos:'Ilimitados'};
+  /* La Meet NO lleva link por módulo: el enlace es del turno (TURNOS[].enlace).
+     Un link acá sería una segunda fuente de verdad para el mismo dato. */
   m.meet=m.meet||{habilitada:true,condicion:'Aprobar con 80 % o más',duracion:30,
-    link:(m.id==='BAK-M00'||m.id==='BAK-M10')?'meet.google.com/aca-demo':'',responsable:'Soporte y Capacitación'};
+    responsable:'Soporte y Capacitación'};
+  (m.secciones||[]).forEach(sec=>{ if(!sec.id) sec.id=nextSecId(m); });
   /* Alineado al prototipo aprobado: el "tema" del banco es SIEMPRE una sección
      del propio módulo. No hay catálogo de temas aparte. La cobertura se mide
      por sección, y esa misma taxonomía es la de las dudas de la Meet. */
-  m.subtemas=(m.secciones||[]).map((sec,i)=>({id:m.id+'-S'+(i+1),name:sec.name,orden:(i+1)*10,estado:'activo',secIdx:i}));
+  m.subtemas=(m.secciones||[]).map((sec,i)=>({id:sec.id,name:sec.name,orden:(i+1)*10,estado:'activo',secIdx:i}));
   m.pool=m.pool||genPool(m);
   return m;
 }
@@ -1186,43 +1212,85 @@ const AGENCIAS=[
    {id:105,nombre:'Ana Lucero',aprobados:0,ultimoAcceso:'—',cert:false}]}
 ];
 const recorridoDe=ag=>DATA.filter(m=>m.sup==='BAK'&&m.perfiles.includes(ag.plan)&&!m.enPrep);
+/* Los módulos del mapa que ya existen de verdad: los reservados no cuentan. */
+const mapaBAK=()=>DATA.filter(m=>m.sup==='BAK'&&!m.enPrep);
 
 /* Cola de dudas por agencia × módulo. autor = fila del plantel; tema = sección. */
+/* Dudas de la cola, por agencia × módulo. El tema apunta al ID PERMANENTE de la
+   sección (temaId), no a su nombre: renombrar una sección no puede huerfanar una
+   duda, y es la misma taxonomía que usa el tema del banco.
+   No llevan `estado`: el del cupo se deriva. Si el producto necesita marcar una
+   duda como retirada o ya tratada, es otro dato y va con otro nombre. */
 const COLAS={
  'viajes-del-sur':[
-  {modId:'BAK-M00',autor:1,video:'BAK-M00.040',tema:'Concepto y navegación',texto:'La rueda de progreso del file, ¿se configura qué pasos cuenta o son fijos?',fecha:'01/06/2026 14:22',estado:'consumido'},
-  {modId:'BAK-M10',autor:1,video:'BAK-M10.030',tema:'Alta y búsqueda',texto:'Si el file se abrió en USD y el cliente paga en ARS, ¿la moneda de registro se puede cambiar después?',fecha:'09/06/2026 09:14',estado:'abierto'},
-  {modId:'BAK-M10',autor:2,video:'BAK-M10.050',tema:'Datos y estados',texto:'El cierre automático del file, ¿espera a que estén cobrados todos los vouchers o alcanza con procesados?',fecha:'10/06/2026 11:38',estado:'abierto'},
-  {modId:'BAK-M20',autor:3,video:'BAK-M20.030',tema:'Clientes y pasajeros',texto:'Empresa que paga por tres empleados: ¿la cargo como cliente y los tres como pax, o cada uno como cliente?',fecha:'12/06/2026 16:05',estado:'agendado'},
-  {modId:'BAK-M30',autor:4,video:'BAK-M30.030',tema:'Margen e impuestos',texto:'Comisión y utilidad me dan distinto en el mismo voucher. ¿Cuál mira el informe de rentabilidad?',fecha:'17/06/2026 10:52',estado:'consumido'}],
+  {modId:'BAK-M00',autor:1,video:'BAK-M00.040',temaId:'BAK-M00.S2',texto:'La rueda de progreso del file, ¿se configura qué pasos cuenta o son fijos?',fecha:'01/06/2026 14:22'},
+  {modId:'BAK-M10',autor:1,video:'BAK-M10.030',temaId:'BAK-M10.S2',texto:'Si el file se abrió en USD y el cliente paga en ARS, ¿la moneda de registro se puede cambiar después?',fecha:'09/06/2026 09:14'},
+  {modId:'BAK-M10',autor:2,video:'BAK-M10.050',temaId:'BAK-M10.S2',texto:'El cierre automático del file, ¿espera a que estén cobrados todos los vouchers o alcanza con procesados?',fecha:'10/06/2026 11:38'},
+  {modId:'BAK-M20',autor:3,video:'BAK-M20.030',temaId:'BAK-M20.S2',texto:'Empresa que paga por tres empleados: ¿la cargo como cliente y los tres como pax, o cada uno como cliente?',fecha:'12/06/2026 16:05'},
+  {modId:'BAK-M30',autor:4,video:'BAK-M30.030',temaId:'BAK-M30.S2',texto:'Comisión y utilidad me dan distinto en el mismo voucher. ¿Cuál mira el informe de rentabilidad?',fecha:'17/06/2026 10:52'}],
  'andes-receptivo':[
-  {modId:'BAK-M00',autor:101,video:'BAK-M00.020',tema:'Concepto y navegación',texto:'El ciclo 360°, ¿cambia cuando la agencia es receptiva y el prestador es propio?',fecha:'06/07/2026 15:12',estado:'consumido'},
-  {modId:'BAK-M40',autor:102,video:'BAK-M40.030',tema:'Recibos',texto:'Pax del exterior que paga en EUR contra file en USD: ¿qué fuente de tipo de cambio toma el recibo?',fecha:'27/07/2026 10:41',estado:'abierto'},
-  {modId:'BAK-M40',autor:103,video:'BAK-M40.050',tema:'Saldos y devoluciones',texto:'La cuenta corriente por moneda, ¿se puede ver consolidada a moneda de reporte o siempre separada?',fecha:'04/08/2026 17:08',estado:'abierto'}]
+  {modId:'BAK-M00',autor:101,video:'BAK-M00.020',temaId:'BAK-M00.S1',texto:'El ciclo 360°, ¿cambia cuando la agencia es receptiva y el prestador es propio?',fecha:'06/07/2026 15:12'},
+  {modId:'BAK-M40',autor:102,video:'BAK-M40.030',temaId:'BAK-M40.S2',texto:'Pax del exterior que paga en EUR contra file en USD: ¿qué fuente de tipo de cambio toma el recibo?',fecha:'27/07/2026 10:41'},
+  {modId:'BAK-M40',autor:103,video:'BAK-M40.050',temaId:'BAK-M40.S3',texto:'La cuenta corriente por moneda, ¿se puede ver consolidada a moneda de reporte o siempre separada?',fecha:'04/08/2026 17:08'}]
 };
+/* El nombre del tema se resuelve al pintar, desde el ID. */
+function nombreTema(temaId){
+  const m=findMod(String(temaId||'').split('.S')[0]);
+  const st=m&&(m.subtemas||[]).find(x=>x.id===temaId);
+  return st?st.name:'—';
+}
 /* Franja de atención de Soporte (parámetro del backoffice, no del módulo). */
 const FRANJA={duracionMin:30,dias:'Martes y jueves',horas:'15:00 · 15:30 · 16:00 · 16:30',semanas:3,zona:'ART (UTC-3)'};
-/* Turnos ya agendados/realizados por agencia × módulo. El enlace es POR TURNO. */
+/* 'DD/MM/YYYY HH:MM' ↔ Date. El turno a futuro se genera relativo a hoy: con
+   fecha fija la demo se vence sola y el estado "agendado" deja de ser alcanzable. */
+function parseCuando(txt){
+  const p=/^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})$/.exec(txt||'');
+  return p?new Date(+p[3],+p[2]-1,+p[1],+p[4],+p[5]):null;
+}
+function enDias(n,hora){
+  const d=new Date();d.setDate(d.getDate()+n);
+  return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()+' '+hora;
+}
+/* Turnos ya agendados/realizados por agencia × módulo. El enlace es POR TURNO.
+   No llevan `estado`: el estado del cupo se deriva (ver cupoEstado). */
 const TURNOS={
  'viajes-del-sur':[
-  {modId:'BAK-M00',cuando:'02/06/2026 15:00',enlace:'meet.google.com/sgm-vds-m00',estado:'consumido'},
-  {modId:'BAK-M20',cuando:'07/09/2026 15:30',enlace:'meet.google.com/sgm-vds-m20',estado:'agendado'}],
+  {modId:'BAK-M00',cuando:'02/06/2026 15:00',enlace:'meet.google.com/sgm-vds-m00'},
+  {modId:'BAK-M20',cuando:enDias(5,'15:30'),enlace:'meet.google.com/sgm-vds-m20'}],
  'andes-receptivo':[
-  {modId:'BAK-M00',cuando:'08/07/2026 15:00',enlace:'meet.google.com/sgm-and-m00',estado:'consumido'}]
+  {modId:'BAK-M00',cuando:'08/07/2026 15:00',enlace:'meet.google.com/sgm-and-m00'}]
+};
+/* Uso de muestra por módulo: [% completado, % de reprobación]. Va indexado POR ID
+   y no por posición, porque la lista de módulos se filtra (los reservados no
+   entran) y un array posicional se corre entero en cuanto cambia el filtro. */
+const USO_MUESTRA={
+ 'BAK-M00':[95,6],'BAK-M10':[88,9],'BAK-M20':[74,22],'BAK-M30':[61,31],
+ 'BAK-M40':[52,17],'BAK-M50':[44,14],'BAK-M60':[38,11],'BAK-M70':[30,9],
+ 'BAK-M80':[26,8],'BAK-M90':[18,7],'BAK-M95':[12,5]
 };
 const CERTIFICADOS=[
- {agencia:'viajes-del-sur',persona:'Martín Ruiz',doc:'DNI 30.111.222',emitido:'28/07/2026',plan:'Professional'},
- {agencia:'andes-receptivo',persona:'Ramiro Cabrera',doc:'DNI 28.999.111',emitido:'25/07/2026',plan:'Business'}
+ {agencia:'viajes-del-sur',persona:'Martín Ruiz',doc:'DNI 30111222',emitido:'28/07/2026',plan:'Professional'},
+ {agencia:'andes-receptivo',persona:'Ramiro Cabrera',doc:'DNI 28999111',emitido:'25/07/2026',plan:'Business'}
 ];
+/* Catálogo de tipos de documento: es un PARÁMETRO GLOBAL del backoffice, no una
+   constante de cada superficie. Las claves y los patrones son los del prototipo
+   aprobado; si acá dijeran 'PAS' y allá 'PASAPORTE', un certificado emitido con
+   una clave no se podría validar con la otra. Las longitudes son conservadoras y
+   quedan a confirmar con negocio (CE-3). */
 const TIPOS_DOC=[
- {clave:'DNI',etiqueta:'DNI',regla:'7 u 8 dígitos, sin puntos'},
- {clave:'PAS',etiqueta:'Pasaporte',regla:'6 a 12 letras o números'},
- {clave:'CI',etiqueta:'Cédula (CI)',regla:'5 a 10 dígitos, verificador opcional'},
- {clave:'LCLE',etiqueta:'LC / LE',regla:'6 a 8 dígitos'}
+ {clave:'DNI',etiqueta:'DNI',etiquetaCorta:'DNI',regla:'7 u 8 dígitos, sin puntos',
+  patron:'^\\d{7,8}$',soloDigitos:true,maximo:12,ejemplo:'30123456',
+  ayuda:'Sin puntos ni espacios. Ej.: 30123456.',error:'El DNI va sin puntos, con 7 u 8 números.'},
+ {clave:'PASAPORTE',etiqueta:'Pasaporte',etiquetaCorta:'Pasaporte',regla:'6 a 12 letras o números',
+  patron:'^[A-Z0-9]{6,12}$',soloDigitos:false,maximo:16,ejemplo:'AAB123456',
+  ayuda:'Sin espacios ni guiones, entre 6 y 12 letras o números.',error:'El pasaporte va sin espacios, entre 6 y 12 letras o números.'},
+ {clave:'CI',etiqueta:'Cédula de identidad (CI)',etiquetaCorta:'CI',regla:'5 a 10 dígitos, verificador opcional',
+  patron:'^\\d{5,10}K?$',soloDigitos:false,maximo:14,ejemplo:'1234567',
+  ayuda:'Sin puntos ni guiones, entre 5 y 10 números.',error:'La cédula va sin puntos, entre 5 y 10 números.'},
+ {clave:'LC-LE',etiqueta:'Libreta cívica o de enrolamiento (LC/LE)',etiquetaCorta:'LC/LE',regla:'6 a 8 dígitos',
+  patron:'^\\d{6,8}$',soloDigitos:true,maximo:12,ejemplo:'5123456',
+  ayuda:'Sin puntos ni espacios, entre 6 y 8 números.',error:'La libreta va sin puntos, entre 6 y 8 números.'}
 ];
-/* Parámetros globales que el prototipo lee y el backoffice tiene que exponer. */
-const GLOBAL={umbralVisto:80,metodoVisto:'posición',preguntasIntento:10,umbralAprob:8,
-  soporte:'WhatsApp · +54 9 381 555-0100',zona:'ART (UTC-3)'};
 
 
 /* ============================================================
@@ -1253,6 +1321,16 @@ function modVisible(m){
   if(S.escena==='E5') return !m.enPrep;
   if(S.escena==='E4') return (VISIBLES.E4||[]).includes(m.id);
   return false;
+}
+/* El plan del video, cuando difiere del de su módulo. `vidVisible` responde otra
+   pregunta —si el video está publicado—, así que el plan va aparte: son dos
+   filtros distintos, igual que en el prototipo aprobado. */
+function planesDeTag(tag){
+  const t=String(tag||'P+B');
+  return t==='P+B'?[...PERFILES]:(t.charAt(0)==='P'?['Professional']:['Business']);
+}
+function videoAplicable(m,v,plan){
+  return planesDeTag(v.tag||m.tag).indexOf(plan)!==-1;
 }
 function vidVisible(m,v){
   if(!modVisible(m)) return false;
@@ -1346,7 +1424,28 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;',
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.remove('hide');clearTimeout(toast._i);toast._i=setTimeout(()=>t.classList.add('hide'),4600);}
 const stCls=s=>'st-'+String(s).replace(/\s+/g,'').replace('aregrabar','regrabar');
 const findMod=id=>DATA.find(m=>m.id===id);
-const vidsDe=m=>m.secciones.flatMap((s,si)=>s.videos.map(v=>({v,si,sec:s})));
+/* El orden de un video dentro de su sección es un campo APARTE del ID: un video
+   grabado después puede tener que verse antes, y el ID es permanente —sobrevive
+   al regrabado—. El campo es OPCIONAL: solo existe cuando alguien movió el video,
+   y sin él manda la posición en la estructura. No son dos fuentes de verdad: es
+   un parche con la estructura como fallback. */
+function ordenEfectivo(sec,v){
+  return v.orden!==undefined?v.orden:(sec.videos.indexOf(v)+1)*10;
+}
+function videosOrdenados(sec){
+  return (sec.videos||[]).slice().sort((a,b)=>ordenEfectivo(sec,a)-ordenEfectivo(sec,b));
+}
+/* Intercambia el orden con el vecino. El cambio queda acotado a dos videos: el
+   resto de la sección no se toca, y ningún ID se renumera. */
+function permutarVideo(sec,seq,dir){
+  const ord=videosOrdenados(sec);
+  const i=ord.findIndex(v=>v.seq===seq), j=dir==='up'?i-1:i+1;
+  if(i<0||j<0||j>=ord.length) return -1;
+  const oi=ordenEfectivo(sec,ord[i]), oj=ordenEfectivo(sec,ord[j]);
+  ord[i].orden=oj; ord[j].orden=oi;
+  return j;
+}
+const vidsDe=m=>m.secciones.flatMap((s,si)=>videosOrdenados(s).map(v=>({v,si,sec:s})));
 function nextSeq(sec){const n=sec.videos.map(v=>parseInt(v.seq,10));return String((n.length?Math.max(...n):0)+10).padStart(3,'0');}
 function modsVis(){
   const delSup=DATA.filter(m=>m.sup===S.superficie);
@@ -1367,8 +1466,8 @@ function crearModulo({sup,id,name,tag,perfiles,orden,seccion,videos}){
   const m=initMod({id:id||nextModId(sup),name:name||'Módulo sin nombre',tag:tag||'P+B',
     perfiles:perfiles&&perfiles.length?perfiles:[...PERFILES],orden:orden||nextOrden(sup),
     enPrep:true,nuevo:true,subtemas:[],secciones:[]});
-  (seccion?[].concat(seccion):[]).forEach(n=>m.secciones.push({name:n,videos:[]}));
-  if(videos) videos.forEach(v=>{ if(!m.secciones.length) m.secciones.push({name:'General',videos:[]});
+  (seccion?[].concat(seccion):[]).forEach(n=>m.secciones.push({id:nextSecId(m),name:n,videos:[]}));
+  if(videos) videos.forEach(v=>{ if(!m.secciones.length) m.secciones.push({id:nextSecId(m),name:'General',videos:[]});
     m.secciones[0].videos.push(v);});
   DATA.push(m);
   return m;
@@ -1493,9 +1592,13 @@ function viewCambios(){
    ['Tema del banco','Catálogo de sub-temas con su propio ABM.','El tema <b>es la sección</b> del módulo. Se eliminó el ABM de sub-temas.','Alinea con el prototipo y con las dudas de la Meet, y borra una fuente de desincronización.'],
    ['Módulos fuera de plan','"Ver como agencia" los ocultaba.','Se <b>muestran con candado de plan</b>, sin ordinal, sin contar para el avance.','Además de pedagógico, es una superficie comercial. Decisión del prototipo.'],
    ['Publicación y ordinales','La cadena salteaba los no publicados.','<b>Publicación en orden</b> obligatoria (requisito duro nuevo). El ordinal del recorrido va 1..N sin huecos.','Sostiene la invariante que el prototipo ya verifica.'],
-   ['Plan por video','El plan del video se heredaba del módulo, sin override.','Campo <b>plan propio del video</b>, como el Dashboard de KPIs (Business en un módulo P+B).','Sin él, ese contenido aprobado no se puede cargar.'],
+   ['Plan por video','El plan del video se heredaba del módulo, sin override.','Campo <b>plan propio del video</b>, como el Dashboard de KPIs (Business en un módulo P+B). <b>Filtra de verdad</b>: a una agencia Professional se le lista con candado y no cuenta para su avance.','Sin él, ese contenido aprobado no se puede cargar. Y declarado pero sin filtrar, el candado no existía.'],
    ['Campos de contenido','El ABM no pedía resumen ni descripción.','Se agregaron <b>resumen</b> (card) y <b>descripción</b> (syllabus) al módulo.','El prototipo los muestra; sin ellos la card y el syllabus quedan sin texto.'],
-   ['Meet','Un link fijo en la ficha del módulo.','<b>Cupo por agencia</b>, cola de dudas, coordinador, franja de atención y <b>enlace por turno</b>.','Es el modelo de negocio: una Meet por módulo por agencia, no por usuario.'],
+   ['Meet','Un link fijo en la ficha del módulo.','<b>Cupo por agencia</b>, cola de dudas, coordinador, franja de atención y <b>enlace por turno</b>. La ficha del módulo ya <b>no tiene campo de link</b>.','Es el modelo de negocio: una Meet por módulo por agencia, no por usuario. Dos lugares para el mismo enlace eran dos fuentes de verdad.'],
+   ['Estado del cupo','Se guardaba en el turno y se llamaba <span class="cellmono">sin-cola</span>.','<b>Se deriva</b> de la cola y de la fecha del turno, con el vocabulario del prototipo: <span class="cellmono">sin-lugares · abierto · agendado · consumido</span>.','Un estado guardado se desincroniza en cuanto alguien retira una duda. Y un mismo estado no puede llamarse distinto en cada superficie.'],
+   ['Secciones','20 secciones con nombres propios del backoffice.','Las <b>31 del prototipo aprobado</b>, con <b>ID permanente</b> (<span class="cellmono">BAK-M40.S3</span>) que no se reasigna al reordenar.','La sección es el tema del banco y el de las dudas: con dos taxonomías, ninguna pregunta resolvía contra el syllabus que ve la agencia.'],
+   ['Orden del video','Era la posición en la estructura, sin campo propio.','Campo <b>orden</b> dentro de la sección, independiente del ID y opcional: sin él manda la estructura.','El orden de dictado y el de reserva de IDs no son lo mismo. El ID es permanente y no se renumera para mover un video.'],
+   ['Tipos de documento','Claves propias del backoffice (<span class="cellmono">PAS</span>, <span class="cellmono">LCLE</span>), sin patrón.','Las claves del prototipo (<span class="cellmono">PASAPORTE</span>, <span class="cellmono">LC-LE</span>) más <b>patrón, ejemplo y mensajes</b>.','Un certificado emitido con una clave no se validaba con la otra. El catálogo es un parámetro global, no una constante de cada superficie.'],
    ['Certificado','No estaba en el MVP.','Plantilla, tipos de documento, fuente del documento y registro de emisiones.','El prototipo lo emite; el backoffice tiene que administrarlo.'],
    ['Panel + tracking','Estaba como "fase 2".','Avance por agencia y panel general, con la regla de agregación del prototipo.','El logueo de eventos entra en el MVP aunque las pantallas se pulan después: es lo irrecuperable.'],
    ['Banco','Mínimo 20.','Mínimo <b>30</b> (3× el intento), objetivo 50.','Con reintentos ilimitados, un banco chico se memoriza.']
@@ -1536,7 +1639,7 @@ function viewCambios(){
   w.appendChild(el('h2','','Sigue abierto — necesita decisión formal'));
   w.appendChild(t3);
 
-  w.appendChild(el('div','note v3','<b>Alineación completa ·</b> El prototipo del lado agencia está aprobado, así que manda: donde el backoffice difería, se ajustó el backoffice. El único bloque que queda por diseñar en profundidad es qué pasa con las superficies FRT y CRM dentro del recorrido de una agencia.'));
+  w.appendChild(el('div','note v3','<b>Alineación completa ·</b> El prototipo del lado agencia está aprobado, así que manda: donde el backoffice difería, se ajustó el backoffice. En esta pasada se alinearon además las <b>31 secciones</b> del syllabus con ID permanente, el <b>catálogo de tipos de documento</b>, el <b>estado derivado</b> del cupo de Meet y el <b>plan a nivel video</b>, que estaba declarado pero no filtraba. El único bloque que queda por diseñar en profundidad es qué pasa con las superficies FRT y CRM dentro del recorrido de una agencia.'));
   return w;
 }
 
@@ -1652,7 +1755,7 @@ function treeCol(){
         <span class="tag">${sec.videos.filter(v=>!v.archivado).length} videos</span>`;
       tree.appendChild(ns);
 
-      sec.videos.forEach(v=>{
+      videosOrdenados(sec).forEach(v=>{
         if(v.archivado&&!S.verArch) return;
         const p=prodDe(mod,v), id=mod.id+'.'+v.seq, emb=embebido(mod,v);
         if(S.soloPend&&p==='publicado'&&emb==='ok') return;
@@ -1735,8 +1838,8 @@ function quickForm(mod,sec,si){
   const after=S.quick.after;
   let seq=nextSeq(sec), nota='último de la sección';
   if(after){
-    const idx=sec.videos.findIndex(v=>v.seq===after);
-    const a=parseInt(after,10), b=sec.videos[idx+1]?parseInt(sec.videos[idx+1].seq,10):a+10;
+    const ord=videosOrdenados(sec), idx=ord.findIndex(v=>v.seq===after);
+    const a=parseInt(after,10), b=ord[idx+1]?parseInt(ord[idx+1].seq,10):a+10;
     seq=String(Math.floor((a+b)/2)).padStart(3,'0');
     nota='intercalado después de .'+after;
   }
@@ -1967,8 +2070,8 @@ function detMod(d,m){
          <div class="radioset"><label class="radiopill ${m.meet.habilitada?'on':''}"><input type="radio" name="meetHab" ${m.meet.habilitada?'checked':''}${dis('editar')}> Sí</label><label class="radiopill ${m.meet.habilitada?'':'on'}"><input type="radio" name="meetHab" ${m.meet.habilitada?'':'checked'}${dis('editar')}> No</label></div></div>
        <div><label>Condición de habilitación</label><div class="ro">${esc(m.meet.condicion)}<span class="lock">regla del MVP</span></div></div>
        <div><label>Duración</label><div class="row"><input type="number" value="${m.meet.duracion}" style="max-width:90px"${dis('editar')}><span class="hint" style="margin:0">minutos</span></div></div>
-       <div><label for="mlink">Link de agenda</label><input type="text" id="mlink" value="${esc(m.meet.link)}" placeholder="Falta cargar el link"${dis('editar')}>
-         ${m.meet.habilitada&&!m.meet.link?'<p class="hint miss">La Meet está habilitada sin link: avisa en el checklist de publicación, no bloquea.</p>':''}</div>
+       <div><label>Enlace de la Meet</label><div class="ro">Se genera por turno al agendar<span class="lock">no se carga acá</span></div>
+         <p class="hint">El enlace es propio del turno, no del módulo: vive en la agenda de cada agencia. Cargarlo acá sería una segunda fuente de verdad para el mismo dato.</p></div>
        <div><label>Responsable visible</label><div class="ro">${esc(m.meet.responsable)}</div></div>
      </div>
      <div class="sep"></div>
@@ -2029,7 +2132,7 @@ function detVid(d,m,sec){
   const v=sec.videos.find(x=>x.seq===S.sel.vidSeq);
   if(!v){S.sel={kind:'sec',modId:m.id,secIdx:S.sel.secIdx};return detSec(d,m,sec);}
   const id=m.id+'.'+v.seq, prod=prodDe(m,v), emb=embebido(m,v), link=tieneLink(m,v), vis=vidVisible(m,v);
-  const pos=sec.videos.indexOf(v);
+  const pos=videosOrdenados(sec).indexOf(v);
   const h=el('div','dhead');
   h.innerHTML=`<div class="idline"><span class="idbadge">${id}</span>
       <button class="info" data-info="id" aria-label="Cómo se arma el ID">i</button>
@@ -2056,7 +2159,7 @@ function detVid(d,m,sec){
      <div class="fieldgrid">
        <div><label>ID permanente</label><div class="ro"><span class="mono">${id}</span><span class="lock">no cambia nunca, ni si lo regrabás</span></div></div>
        <div><label for="vt">¿Qué enseña?</label><input type="text" id="vt" value="${esc(v.t)}"${dis('editar')}></div>
-       <div><label>Dónde está en la Academia</label><div class="ro">${esc(m.name)} › ${esc(sec.name)}<span class="lock">se cambia arrastrando en el árbol</span></div></div>
+       <div><label>Dónde está en la Academia</label><div class="ro">${esc(m.name)} › ${esc(sec.name)}<span class="lock">se cambia con ↑ ↓, abajo</span></div></div>
        <div><label>Orden dentro de la sección</label>
          <div class="row"><button class="btn btn-sm" data-vord="up"${dis('editar')}>↑ Subir</button><button class="btn btn-sm" data-vord="down"${dis('editar')}>↓ Bajar</button>
            <span class="hint" style="margin:0">posición ${pos+1} de ${sec.videos.length}</span></div>
@@ -2088,7 +2191,7 @@ function detVid(d,m,sec){
      </div>
      ${falta.length?`<div class="sep"></div><h3>Falta completar</h3><ul class="checklist">${falta.map(f=>`<li><span class="mk ${f[1]}">${f[1]==='bad'?'✕':'○'}</span>${esc(f[0])}</li>`).join('')}</ul>`
        :'<div class="sep"></div><ul class="checklist"><li><span class="mk ok">●</span>Ficha completa y embebido verificado</li></ul>'}
-     <div class="note v3"><b>Ajuste v3 ·</b> Apareció el campo <b>orden dentro de la sección</b>, independiente del ID, que era el faltante del MVP §3.3: antes un video no se podía reordenar nunca sin archivarlo y recrearlo.</div>`;
+     <div class="note v3"><b>Ajuste v3 ·</b> Apareció el campo <b>orden dentro de la sección</b>, independiente del ID, que era el faltante del MVP §3.3: antes un video no se podía reordenar nunca sin archivarlo y recrearlo. El campo es <b>opcional</b>: solo existe cuando alguien movió el video, y sin él manda la estructura. Mover un video no le toca el ID a nadie.</div>`;
   }
 
   if(S.tab==='prod'){
@@ -2458,7 +2561,7 @@ function viewResultado(){
   w.appendChild(sc);
 
   if(aprobado){
-    w.appendChild(el('div','banner ok',`<span>✓</span><div><b>Módulo aprobado.</b> Se habilita ${sig?'el módulo siguiente que te corresponda ('+sig+')':'el final de la secuencia'} y queda disponible la Meet de ${m.meet.duracion} minutos para dudas puntuales de este módulo.${m.meet.habilitada&&!m.meet.link?' <b>Falta cargar el link de agenda:</b> hoy la agencia vería el botón sin destino.':''}</div>`));
+    w.appendChild(el('div','banner ok',`<span>✓</span><div><b>Módulo aprobado.</b> Se habilita ${sig?'el módulo siguiente que te corresponda ('+sig+')':'el final de la secuencia'} y queda disponible la Meet de ${m.meet.duracion} minutos para dudas puntuales de este módulo.</div>`));
   } else {
     w.appendChild(el('div','banner warn',`<span>!</span><div><b>No alcanzó el 80 %.</b> Se puede volver a intentar sin límite: el próximo intento sortea 10 preguntas nuevas sobre las mismas ${activas(m).filter(q=>q.estado==='activa').length} del banco. El módulo siguiente sigue trabado hasta aprobar.</div>`));
   }
@@ -2567,11 +2670,16 @@ function viewAgencia(){
       n++;
       const card=el('div','modcard'+(desbloqueado?'':' lock'));
       const vids=vidsDe(m).filter(x=>!x.v.archivado&&vidVisible(m,x.v));
+      const delPlanV=vids.filter(x=>videoAplicable(m,x.v,p));
       card.innerHTML=`<div class="num">${n}</div><div class="body">
         <b>${esc(m.name)}</b>
         ${desbloqueado?'':'<span class="tag" style="margin-left:8px">se desbloquea al aprobar el anterior</span>'}
         ${desbloqueado?`<div class="hint" style="margin-top:4px">${esc(m.resumen||'')}</div>
-          <div style="margin-top:8px">${vids.map(x=>`<div class="vidline">▸ ${esc(x.v.t)} <span class="hint" style="display:inline">${x.v.dur}${(x.v.tag&&x.v.tag!==m.tag)?' · <span class="tag plan">'+esc(x.v.tag)+' (plan propio)</span>':''}</span></div>`).join('')||'<div class="hint">Sin videos visibles.</div>'}
+          <div style="margin-top:8px">${vids.map(x=>{
+            const aplica=videoAplicable(m,x.v,p), propio=x.v.tag&&x.v.tag!==m.tag;
+            return `<div class="vidline${aplica?'':' off'}">${aplica?'▸':'🔒'} ${esc(x.v.t)} <span class="hint" style="display:inline">${aplica?esc(x.v.dur):'no entra en tu plan '+esc(p)}${propio?' · <span class="tag plan">'+esc(x.v.tag)+' (plan propio)</span>':''}</span></div>`;
+          }).join('')||'<div class="hint">Sin videos visibles.</div>'}
+          ${vids.length!==delPlanV.length?`<div class="hint">${delPlanV.length} de ${vids.length} videos entran en tu plan. Los otros no cuentan para tu avance ni para la duración del módulo.</div>`:''}
           <div class="row" style="margin-top:8px"><button class="btn btn-sm btn-p" data-go2="preview|${m.id}">Hacer la evaluación</button>
             <span class="hint" style="margin:0">${m.params.porIntento} preguntas · aprobás con ${m.params.umbral}</span></div>`:''}
       </div>`;
@@ -2743,11 +2851,21 @@ function viewImportar(){
    ============================================================ */
 function agBy(id){return AGENCIAS.find(a=>a.id===id);}
 function nombrePlantel(ag,uid){const e=ag.plantel.find(x=>x.id===uid);return e?e.nombre:'—';}
+/* El estado del cupo NO se guarda: se deriva de la cola y del turno. Un estado
+   almacenado se desincroniza en cuanto alguien retira una duda.
+
+     sin dudas          → sin-lugares
+     dudas, sin turno   → abierto
+     turno a futuro     → agendado
+     turno ya pasado    → consumido
+
+   No hay `vencido`: la cola no caduca. Es el mismo vocabulario que el prototipo
+   aprobado, para que el estado no se llame distinto en cada superficie. */
 function cupoEstado(agId,modId){
   const t=(TURNOS[agId]||[]).find(x=>x.modId===modId);
-  if(t) return t.estado; // agendado / consumido
+  if(t){const d=parseCuando(t.cuando);return d&&d.getTime()>Date.now()?'agendado':'consumido';}
   const dudas=(COLAS[agId]||[]).filter(d=>d.modId===modId);
-  return dudas.length?'abierto':'sin-cola';
+  return dudas.length?'abierto':'sin-lugares';
 }
 function viewMeet(){
   const w=el('div','wrap');
@@ -2793,10 +2911,10 @@ function viewMeet(){
     const turno=(TURNOS[agId]||[]).find(x=>x.modId===modId);
     const dd=dudas.filter(d=>d.modId===modId);
     const box=el('div','card');box.style.marginBottom='16px';
-    const chip={'abierto':'st-guionado','agendado':'st-publicado','consumido':'st-backlog','sin-cola':'st-backlog'}[est];
+    const chip={'abierto':'st-guionado','agendado':'st-publicado','consumido':'st-backlog','sin-lugares':'st-backlog'}[est];
     box.innerHTML=`<div style="padding:16px 24px;border-bottom:1px solid var(--line-soft);display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <span class="idbadge">${m.id}</span><b style="font-weight:600">${esc(m.name)}</b>
-        <span class="chip ${chip}">${est==='sin-cola'?'sin dudas':est}</span>
+        <span class="chip ${chip}">${est==='sin-lugares'?'sin dudas':est}</span>
         <span class="tag">${dd.length} duda${dd.length!==1?'s':''}</span>
         ${turno?`<span class="tag ok">turno ${esc(turno.cuando)} · ${esc(turno.enlace)}</span>`:''}
         <span style="margin-left:auto"></span>
@@ -2805,13 +2923,13 @@ function viewMeet(){
       </div>
       <div style="padding:8px 24px 16px">${dd.map(d=>`
         <div style="padding:16px 0;border-bottom:1px solid var(--line-soft)">
-          <div class="row" style="gap:8px"><span class="tag">${esc(nombrePlantel(ag,d.autor))}</span><span class="tag">${esc(d.tema)}</span><span class="cellmono" style="font-size:14px;color:var(--muted)">${esc(d.video)} · ${esc(d.fecha)}</span></div>
+          <div class="row" style="gap:8px"><span class="tag">${esc(nombrePlantel(ag,d.autor))}</span><span class="tag">${esc(nombreTema(d.temaId))}</span><span class="cellmono" style="font-size:14px;color:var(--muted)">${esc(d.video)} · ${esc(d.fecha)}</span></div>
           <div style="margin-top:4px">${esc(d.texto)}</div></div>`).join('')}</div>`;
     w.appendChild(box);
   });
 
   w.appendChild(el('div','banner warn','<span>!</span><div><b>Definiciones pendientes de la Meet.</b> Quién designa al coordinador y qué pasa si se va de la agencia (hoy llega de solo lectura desde el backend). Quién ve el texto de las dudas ajenas (el prototipo: el coordinador todas, el resto solo las propias). Y si la cola vence (decidido que no).</div>'));
-  w.appendChild(el('div','note v3','<b>Pantalla nueva de alineación ·</b> El backoffice modelaba la Meet como un link fijo en la ficha del módulo. El modelo aprobado es cupo por agencia con cola de dudas, coordinador y agenda de turnos, y <b>el enlace es por turno</b>. Este es el faltante más grande del cotejo.'));
+  w.appendChild(el('div','note v3','<b>Pantalla nueva de alineación ·</b> El backoffice modelaba la Meet como un link fijo en la ficha del módulo. El modelo aprobado es cupo por agencia con cola de dudas, coordinador y agenda de turnos, y <b>el enlace es por turno</b>. Ya no hay campo de link en la ficha del módulo, y el <b>estado del cupo se deriva</b> de la cola y de la fecha del turno: guardado se desincronizaba en cuanto alguien retiraba una duda.'));
   return w;
 }
 
@@ -2834,10 +2952,10 @@ function viewCertificado(){
   w.appendChild(cfg);
 
   w.appendChild(el('h2','','Tipos de documento admitidos'));
-  w.appendChild(el('p','hint','Tabla paramétrica del backoffice (CE-3). Las longitudes son conservadoras y quedan a confirmar con negocio.'));
+  w.appendChild(el('p','hint','Tabla paramétrica del backoffice (CE-3): la <b>clave</b> y el <b>patrón</b> son los que consume el front para validar, así que salen de acá y no se escriben en cada superficie. Las longitudes son conservadoras y quedan a confirmar con negocio.'));
   const tw=el('div','tablewrap');const tb=el('table');
-  tb.innerHTML=`<thead><tr><th style="width:120px">Clave</th><th style="width:200px">Etiqueta</th><th>Regla de formato</th><th style="width:80px">Activo</th></tr></thead><tbody>`+
-    TIPOS_DOC.map(d=>`<tr><td class="cellmono">${esc(d.clave)}</td><td>${esc(d.etiqueta)}</td><td>${esc(d.regla)}</td><td><span class="chip st-publicado">sí</span></td></tr>`).join('')+'</tbody>';
+  tb.innerHTML=`<thead><tr><th style="width:110px">Clave</th><th style="width:230px">Etiqueta</th><th>Regla de formato</th><th style="width:150px">Patrón</th><th style="width:110px">Ejemplo</th><th style="width:70px">Activo</th></tr></thead><tbody>`+
+    TIPOS_DOC.map(d=>`<tr><td class="cellmono">${esc(d.clave)}</td><td>${esc(d.etiqueta)}</td><td>${esc(d.regla)}</td><td class="cellmono">${esc(d.patron)}</td><td class="cellmono">${esc(d.ejemplo)}</td><td><span class="chip st-publicado">sí</span></td></tr>`).join('')+'</tbody>';
   tw.appendChild(tb);w.appendChild(tw);
 
   const r=el('div','row');r.style.margin='8px 0 24px';
@@ -2867,7 +2985,7 @@ function viewPanelAgencia(){
   const rec=recorridoDe(ag);
   const total=rec.length;
   w.innerHTML=`<h1>Avance por agencia</h1>
-    <p class="lede">El agregado por agencia, con la regla de agregación nombrada: promedio de módulos aprobados por persona <b>sobre los del recorrido del plan</b> (${total} con ${esc(ag.plan)}), nunca sobre los 11 del mapa.</p>`;
+    <p class="lede">El agregado por agencia, con la regla de agregación nombrada: promedio de módulos aprobados por persona <b>sobre los del recorrido del plan</b> (${total} con ${esc(ag.plan)}), nunca sobre los ${mapaBAK().length} del mapa.</p>`;
 
   const sel=el('div','row');sel.style.marginBottom='16px';
   sel.innerHTML=`<span class="hint" style="margin:0">Agencia:</span>
@@ -2922,17 +3040,17 @@ function viewPanelMacro(){
    <div class="stat"><b>${totPers}</b><span>personas</span></div>
    <div class="stat"><b>${totMeets}</b><span>Meets generadas</span></div>
    <div class="stat"><b>${totColas}</b><span>dudas en cola</span></div>
-   <div class="stat"><b>2</b><span>certificados emitidos</span></div>`;
+   <div class="stat"><b>${CERTIFICADOS.length}</b><span>certificados emitidos</span></div>`;
   w.appendChild(mini);
 
   /* % de agencias que completaron cada módulo (muestra derivada del plantel) */
-  const bak=DATA.filter(m=>m.sup==='BAK'&&!m.enPrep);
+  const bak=mapaBAK();
   w.appendChild(el('h2','','Completitud y reprobación por módulo'));
   const tw=el('div','tablewrap');const tb=el('table');
   tb.innerHTML=`<thead><tr><th>Módulo</th><th style="width:120px">Plan</th><th style="width:150px">% completado</th><th style="width:150px">Tasa de reprobación</th><th style="width:130px">Señal</th></tr></thead><tbody>`+
-    bak.map((m,i)=>{
-      const compl=[95,88,74,61,0,52,44,38,30,26,18,12][i]||20;
-      const repro=[6,9,22,31,0,17,14,11,9,8,7,5][i]||10;
+    bak.map(m=>{
+      const compl=USO_MUESTRA[m.id]?USO_MUESTRA[m.id][0]:20;
+      const repro=USO_MUESTRA[m.id]?USO_MUESTRA[m.id][1]:10;
       const alerta=repro>=20;
       return `<tr data-warn="${alerta}"><td><span class="idbadge">${m.id}</span> ${esc(m.name)}</td>
         <td>${esc(m.tag)}</td>
@@ -2942,7 +3060,7 @@ function viewPanelMacro(){
     }).join('')+'</tbody>';
   tw.appendChild(tb);w.appendChild(tw);
 
-  w.appendChild(el('div','banner warn','<span>!</span><div><b>BAK-M20 (Entidades) reprueba 22 %.</b> Es la señal que el panel existe para dar: no es que las agencias sean flojas, es que "Cliente vs. Pasajero" confunde. Se cruza con el % de acierto por pregunta del banco para encontrar el video a mejorar.</div>'));
+  w.appendChild(el('div','banner warn','<span>!</span><div><b>BAK-M20 (Entidades) reprueba '+USO_MUESTRA['BAK-M20'][1]+' %.</b> Es la señal que el panel existe para dar: no es que las agencias sean flojas, es que "Cliente vs. Pasajero" confunde. Se cruza con el % de acierto por pregunta del banco para encontrar el video a mejorar.</div>'));
   w.appendChild(el('div','note v3','<b>Pantalla nueva ·</b> MVP §6. El ranking de videos más/menos vistos y el volumen de Meets por agencia salen del mismo logueo de eventos que alimenta el avance por agencia.'));
   return w;
 }
@@ -2967,7 +3085,7 @@ function viewParams(){
        <p class="hint miss">Decisión abierta P04.3. El prototipo usa posición y avisa que <b>no es el criterio de producción</b>: arrastrar la barra al final marca el video como visto. La API de YouTube alcanza para el criterio estricto — es decisión de producto, no límite técnico.</p></div>
      <div><label>Preguntas por intento</label><div class="ro"><span class="mono">${GLOBAL.preguntasIntento}</span><span class="lock">regla del MVP</span></div></div>
      <div><label>Umbral de aprobación</label><div class="ro"><span class="mono">${GLOBAL.umbralAprob} / 10</span> (80 %)<span class="lock">regla del MVP</span></div></div>
-     <div><label>Tamaño mínimo del banco para publicar</label><div class="row"><input type="number" value="30" style="max-width:100px"${dis('params')}><span class="hint" style="margin:0">alineado a 3× el intento; objetivo 50</span></div></div>
+     <div><label>Tamaño mínimo del banco para publicar</label><div class="row"><input type="number" value="${GLOBAL.bancoMinimo}" style="max-width:100px"${dis('params')}><span class="hint" style="margin:0">alineado a ${GLOBAL.bancoMinimo/GLOBAL.preguntasIntento}× el intento; objetivo ${GLOBAL.bancoObjetivo}</span></div></div>
      <div><label>Canal único de soporte</label><div class="row"><input type="text" value="${esc(GLOBAL.soporte)}" style="max-width:320px"${dis('params')}></div>
        <p class="hint">Un solo canal en toda la Academia, como en el prototipo.</p></div>
      <div><label>Zona horaria de atención</label><div class="ro">${esc(GLOBAL.zona)}<span class="lock">rotulada en pantalla, sin conversión de husos</span></div></div>
@@ -3070,7 +3188,7 @@ document.addEventListener('click',ev=>{
     if(a==='cancel'){S.qsec=null;render();return;}
     const mod=findMod(S.qsec.modId);
     const nom=($('#snn')&&$('#snn').value.trim())||'Sección sin nombre';
-    mod.secciones.push({name:nom,videos:[]});
+    mod.secciones.push({id:nextSecId(mod),name:nom,videos:[]});
     const idx=mod.secciones.length-1;
     toast('Sección "'+nom+'" creada en '+mod.id+'. Ya acepta videos.');
     if(a==='more'){S.qsec={modId:mod.id};}
@@ -3099,10 +3217,13 @@ document.addEventListener('click',ev=>{
     const ti=($('#qt')&&$('#qt').value.trim())||'Video sin título';
     const after=S.quick.after;let seq=nextSeq(sec);
     const grabado=S.quick.modo!=='reservar';
-    if(after){const i=sec.videos.findIndex(v=>v.seq===after);
-      const x=parseInt(after,10),y=sec.videos[i+1]?parseInt(sec.videos[i+1].seq,10):x+10;
+    if(after){const ord=videosOrdenados(sec), i=ord.findIndex(v=>v.seq===after);
+      const x=parseInt(after,10),y=ord[i+1]?parseInt(ord[i+1].seq,10):x+10;
       seq=String(Math.floor((x+y)/2)).padStart(3,'0');
-      sec.videos.splice(i+1,0,{seq,t:ti,p:'P3',c:'—',dur:grabado?'3:30':'',durEst:grabado?'':'4:00'});
+      /* Entra con un orden intermedio: el ID intercalado y el orden de dictado
+         se deciden por separado, aunque acá coincidan. */
+      const oa=ordenEfectivo(sec,ord[i]), ob=ord[i+1]?ordenEfectivo(sec,ord[i+1]):oa+10;
+      sec.videos.splice(sec.videos.indexOf(ord[i])+1,0,{seq,t:ti,p:'P3',c:'—',dur:grabado?'3:30':'',durEst:grabado?'':'4:00',orden:(oa+ob)/2});
     } else sec.videos.push({seq,t:ti,p:'P3',c:'—',dur:grabado?'3:30':'',durEst:grabado?'':'4:00'});
     toast('Guardado como '+mod.id+'.'+seq+' · no elegiste superficie, módulo, sección ni orden.');
     if(a==='save'){const si=S.quick.secIdx;S.quick=null;S.sel={kind:'vid',modId:mod.id,secIdx:si,vidSeq:seq};S.tab='ficha';}
@@ -3115,11 +3236,9 @@ document.addEventListener('click',ev=>{
   /* reordenamientos reales */
   if(t.dataset.vord){
     const m=findMod(S.sel.modId),sec=m.secciones[S.sel.secIdx];
-    const i=sec.videos.findIndex(v=>v.seq===S.sel.vidSeq);
-    const j=t.dataset.vord==='up'?i-1:i+1;
-    if(j<0||j>=sec.videos.length){toast('Ya está en el extremo de la sección.');return;}
-    const tmp=sec.videos[i];sec.videos[i]=sec.videos[j];sec.videos[j]=tmp;
-    render();toast('Video movido a la posición '+(j+1)+'. El ID no cambió: el orden es un campo aparte.');return;
+    const j=permutarVideo(sec,S.sel.vidSeq,t.dataset.vord);
+    if(j<0){toast('Ya está en el extremo de la sección.');return;}
+    render();toast('Video movido a la posición '+(j+1)+'. El ID no cambió: el orden es un campo aparte del ID.');return;
   }
   if(t.dataset.sord){
     const m=findMod(S.sel.modId),i=S.sel.secIdx;

@@ -218,6 +218,35 @@ modal 1002 · tooltip 1003. Cualquier superposición nueva debe entrar en esta e
 **Topbar 36 px** + **navbar 72 px** = 108 px de encabezado fijo. Es una constante del layout:
 todo lo que se ancle arriba (banners, breadcrumbs sticky, progreso de curso) parte de ahí.
 
+### 4.8 Iconografía
+
+El sitio actual **no tiene un set definido**: los iconos están sueltos por componente. Academia cierra
+ese hueco adoptando una librería, que es la decisión que evita las tres escuelas de trazo conviviendo.
+
+| Qué | Valor |
+|---|---|
+| Librería | **Tabler Icons**, variante `outline` (MIT) |
+| Grilla | 24 × 24, con la figura dentro de `1 → 23` para que el trazo no se recorte |
+| Trazo | nominal **2**, extremos y uniones redondeados |
+| Relleno | `none` siempre — son iconos de línea, nunca sólidos |
+| Color | `currentColor`: el icono toma el color del texto que lo rodea |
+| Tamaños | 14 (`.icon-sm`) · 18 (`.icon`, el por defecto) · 24 (`.icon-lg`) · 28 (`.icon-xl`) |
+
+Tres reglas que van con el set:
+
+- **El trazo se declara por CSS, no en el SVG.** El ancho *efectivo* es `nominal × px ÷ 24`: a 18 px
+  un nominal de 2 rinde 1,5 px, pero a 14 px cae a 1,17 y se ve gris. Por eso el tamaño chico usa
+  nominal 2,5 (rinde 1,46). Al agregar un tamaño, hacé la cuenta antes.
+- **El icono casi nunca lleva color propio.** La excepción es el *pairing* icono ↔ token de las
+  métricas del dashboard, y ahí manda la regla de **un solo acento de color por pantalla**.
+- **Nunca ámbar ni rojo sobre una persona** por no haber capacitado. El color de estado califica al
+  módulo, no a la gente.
+
+En el repo de la vista agencia el set vive en `assets/js/icons.js`, **generado** por
+`npm run build:icons`, con el mapeo a Tabler en `scripts/build-icons.mjs`. El backoffice es un solo
+archivo y lleva sus iconos en línea, pero con la misma grilla, el mismo trazo y los mismos tamaños:
+lo que no puede pasar es que un icono se dibuje distinto según la superficie.
+
 ---
 
 ## 5. Catálogo de componentes — anatomía y medidas
@@ -407,6 +436,12 @@ ESPACIO Y FORMA
 - Jerarquía por borde 1px + fondo gris claro, NO por sombra. Sombras solo en modales y glows.
 - Movimiento: 150 / 250 / 350 ms, ease-in-out; hovers a 300ms animando color, borde y transform.
 
+ICONOGRAFÍA
+- Tabler Icons outline. Grilla 24, trazo nominal 2, sin relleno, currentColor.
+- Tamaños 14 / 18 (por defecto) / 24 / 28. El trazo efectivo es nominal × px ÷ 24: a 14px se sube el
+  nominal a 2,5 para no caer en sub-píxel.
+- El icono no lleva color propio salvo el pairing icono↔token del dashboard, con un solo acento de
+  color por pantalla. Nunca ámbar ni rojo sobre una persona.
 COMPONENTES A RESPETAR
 - Botón: alto 48px, radio 12px, min-ancho 223px, texto 16px, gap 8px. Variante sólida azul y
   variante de borde-gradiente. Necesita además: deshabilitado, cargando, ghost, tamaños S/M/L.
