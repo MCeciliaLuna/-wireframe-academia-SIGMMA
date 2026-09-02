@@ -1,0 +1,2663 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Academia SIGMMA · Backoffice de contenido y evaluaciones (wireframe v3)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EAEEEF; --surface:#FFFFFF; --surface-sunk:#F4F7F7;
+  --ink:#16262C; --ink-2:#3D5560; --muted:#5B7078;
+  --line:#D2DCDE; --line-soft:#E4EBEC; --line-ctl:#7E9095;
+  --accent:#0E6A60; --accent-soft:#DCEBE8;
+  --warn:#9A4F0F; --warn-soft:#F6E9D9;
+  --stop:#8E3B3B; --stop-soft:#F3E2E2;
+  --plan:#3C5A9A; --plan-soft:#E1E8F4;
+  --r:3px;
+  --sans:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.app{display:grid;grid-template-columns:216px 1fr;min-height:100vh}
+.rail{background:var(--ink);color:#CFDCDE;padding:18px 0 24px;display:flex;flex-direction:column}
+.brand{padding:0 18px 20px;border-bottom:1px solid rgba(255,255,255,.09)}
+.brand strong{display:block;color:#fff;font-weight:600;letter-spacing:-.01em}
+.brand span{font-size:11.5px;color:#7E979C}
+.railgroup{padding:14px 0 4px}
+.railgroup h4{margin:0 18px 6px;font-size:10.5px;font-weight:600;color:#6F878C;letter-spacing:.04em}
+.railitem{display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:none;border:0;padding:7px 18px;color:#C3D3D6;font-size:13px;border-left:2px solid transparent}
+.railitem:hover{background:rgba(255,255,255,.05);color:#fff}
+.railitem[aria-current="true"]{background:rgba(255,255,255,.09);color:#fff;border-left-color:var(--accent);font-weight:500}
+.railitem.off{color:#5D7378;cursor:not-allowed}
+.railitem.off:hover{background:none;color:#5D7378}
+.railitem .pend{margin-left:auto;font-size:10px;color:#5D7378;border:1px solid #33474D;border-radius:2px;padding:0 4px}
+.railfoot{margin-top:auto;padding:14px 18px 0;border-top:1px solid rgba(255,255,255,.09);font-size:11.5px;color:#7E979C}
+.main{display:flex;flex-direction:column;min-width:0}
+
+.top{background:var(--surface);border-bottom:1px solid var(--line);padding:10px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.crumb{font-size:13px;color:var(--muted);min-width:0}
+.crumb b{color:var(--ink);font-weight:500}
+.topctl{margin-left:auto;display:flex;align-items:center;gap:8px}
+.topctl>span{font-size:11.5px;color:var(--muted)}
+.segbar{display:flex;border:1px solid var(--line-ctl);border-radius:var(--r);overflow:hidden}
+.seg{background:var(--surface);border:0;border-right:1px solid var(--line-soft);padding:4px 9px;font-size:12px;color:var(--ink-2);font-family:var(--mono)}
+.seg:last-child{border-right:0}
+.seg[aria-pressed="true"]{background:var(--ink);color:#fff}
+.seg.rol{font-family:var(--sans);font-size:12px}
+.escena-note{width:100%;font-size:12px;color:var(--muted);padding-top:2px}
+
+.wrap{padding:22px;max-width:1200px}
+h1{font-size:21px;font-weight:600;letter-spacing:-.015em;margin:0 0 4px}
+h2{font-size:15px;font-weight:600;margin:0 0 10px}
+h3{font-size:13px;font-weight:600;margin:0 0 6px}
+.lede{color:var(--ink-2);margin:0 0 22px;max-width:66ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.btn{background:var(--surface);border:1px solid var(--line-ctl);border-radius:var(--r);padding:6px 12px;font-size:13px;color:var(--ink)}
+.btn:hover{border-color:var(--ink-2)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-p{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500}
+.btn-p:hover{background:#0B554D;border-color:#0B554D}
+.btn-d{background:var(--surface);border-color:var(--stop);color:var(--stop)}
+.btn-q{background:none;border-color:transparent;color:var(--accent);padding:6px 6px}
+.btn-sm{padding:3px 8px;font-size:12px}
+.btn-on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sep{height:1px;background:var(--line-soft);margin:14px 0}
+label{display:block;font-size:12px;font-weight:500;color:var(--ink-2);margin-bottom:4px}
+input[type=text],input[type=url],input[type=number],select,textarea{width:100%;font-family:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--line-ctl);border-radius:var(--r);padding:6px 8px}
+textarea{line-height:1.55;resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 2px var(--accent-soft)}
+input:disabled,select:disabled,textarea:disabled{background:var(--surface-sunk);color:var(--muted);cursor:not-allowed}
+.hint{font-size:11.5px;color:var(--muted);margin-top:4px}
+.mono{font-family:var(--mono)}
+
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;padding:1px 7px;border-radius:2px;white-space:nowrap;border:1px solid transparent}
+.chip::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
+.chip.nodot::before{display:none}
+.st-backlog{background:var(--surface-sunk);color:var(--muted);border-color:var(--line)}
+.st-guionado,.st-grabado,.st-editado{background:var(--plan-soft);color:var(--plan)}
+.st-publicado{background:var(--accent-soft);color:var(--accent)}
+.st-regrabar{background:var(--warn-soft);color:var(--warn)}
+.st-obsoleto,.st-archivado{background:var(--stop-soft);color:var(--stop)}
+.vis-si{background:var(--accent-soft);color:var(--accent)}
+.vis-no{background:var(--surface-sunk);color:var(--muted);border-color:var(--line)}
+.tag{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:2px;padding:0 5px;background:var(--surface)}
+.tag.warn{color:var(--warn);border-color:#E4C9A6;background:var(--warn-soft)}
+.tag.stop{color:var(--stop);border-color:#E0BEBE;background:var(--stop-soft)}
+.tag.ok{color:var(--accent);border-color:#B6D6D0;background:var(--accent-soft)}
+.tag.plan{color:var(--plan);border-color:#C3D0E6;background:var(--plan-soft)}
+.idbadge{font-family:var(--mono);font-size:12px;background:var(--surface-sunk);border:1px solid var(--line);border-radius:2px;padding:1px 6px;color:var(--ink-2)}
+
+.doors{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+.door{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:block;width:100%}
+.door:hover{border-color:var(--accent);background:#FDFEFE}
+.door .kicker{font-size:12px;color:var(--muted);margin-bottom:8px;display:block}
+.door strong{display:block;font-size:17px;font-weight:600;letter-spacing:-.01em;margin-bottom:6px}
+.door p{margin:0 0 14px;color:var(--ink-2);font-size:13px;max-width:44ch}
+.door .who{font-size:11.5px;color:var(--muted);border-top:1px solid var(--line-soft);padding-top:10px;display:block}
+.door.locked{opacity:.5}
+.mini{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.stat b{display:block;font-size:22px;font-weight:600;letter-spacing:-.02em;font-family:var(--mono)}
+.stat span{font-size:11.5px;color:var(--muted)}
+.tasklist{list-style:none;margin:0;padding:0}
+.tasklist li{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--line-soft);font-size:13px}
+.tasklist li:last-child{border-bottom:0}
+.tasklist .grow{flex:1;min-width:0}
+.tasklist .sub{color:var(--muted);font-size:12px}
+
+.split{display:grid;grid-template-columns:minmax(430px,1fr) minmax(380px,500px);flex:1;min-height:0}
+.treecol{border-right:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;min-width:0}
+.treebar{padding:10px 14px;border-bottom:1px solid var(--line-soft);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.treebar input[type=text]{width:180px}
+.tree{overflow:auto;padding:6px 0 60px;flex:1}
+.node{display:flex;align-items:center;gap:8px;padding:5px 14px;border-left:2px solid transparent}
+.node:hover{background:var(--surface-sunk)}
+.node.sel{background:var(--accent-soft);border-left-color:var(--accent)}
+.twist{background:none;border:0;padding:0;width:14px;color:var(--muted);font-size:10px;line-height:1}
+.node .label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;background:none;border:0;padding:0}
+.n-mod{padding-left:12px;font-weight:600;border-top:1px solid var(--line-soft)}
+.n-sec{padding-left:36px;color:var(--ink-2);font-weight:500}
+.n-vid{padding-left:58px}
+.n-vid .label{color:var(--ink-2)}
+.node.arch{opacity:.55}
+.node.arch .label{text-decoration:line-through}
+.legend{padding:2px 14px 8px 36px;font-size:11.5px;color:var(--warn)}
+.addrow{padding:3px 14px 8px 58px}
+.addrow.sec{padding-left:36px}
+.addrow.mod{padding-left:12px;padding-bottom:16px}
+.addbtn{background:none;border:1px dashed var(--line-ctl);border-radius:var(--r);color:var(--muted);font-size:12px;padding:3px 9px}
+.addbtn:hover{border-color:var(--accent);color:var(--accent);border-style:solid}
+.addbtn:disabled{opacity:.5;cursor:not-allowed}
+.rowact{background:none;border:0;color:var(--muted);font-size:11px;padding:0 3px}
+.rowact:hover{color:var(--accent);text-decoration:underline}
+
+.quick{margin:4px 14px 12px 58px;border:1px solid var(--accent);border-radius:var(--r);background:#FBFDFD;padding:12px}
+.quick.sec{margin-left:36px}
+.quick .qhead{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}
+.qgrid{display:grid;gap:10px;margin-bottom:10px}
+.derived{background:var(--surface-sunk);border:1px solid var(--line-soft);border-radius:var(--r);padding:9px 11px;font-size:12px;color:var(--ink-2)}
+.derived dl{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:0}
+.derived dt{color:var(--muted)}
+.derived dd{margin:0}
+.radioset{display:flex;gap:8px;flex-wrap:wrap}
+.radiopill{display:flex;align-items:center;gap:6px;border:1px solid var(--line-ctl);border-radius:var(--r);padding:6px 10px;font-size:12.5px;background:var(--surface);cursor:pointer}
+.radiopill input{accent-color:var(--accent);margin:0}
+.radiopill.on{border-color:var(--accent);background:var(--accent-soft)}
+
+.bulk{position:sticky;bottom:0;background:var(--ink);color:#fff;padding:9px 14px;display:flex;gap:10px;align-items:center;font-size:13px;flex-wrap:wrap}
+.bulk .btn{background:transparent;border-color:#3B5158;color:#DCE7E9}
+.bulk .btn:hover{border-color:#7E979C}
+.bulk .count{font-weight:600}
+.bulk .x{margin-left:auto}
+
+.detail{background:var(--surface-sunk);overflow:auto;min-width:0}
+.dhead{padding:16px 18px 0}
+.dhead .idline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.dhead h2{font-size:16px;margin:0 0 8px;letter-spacing:-.01em}
+.dmeta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tabs{display:flex;border-bottom:1px solid var(--line);padding:0 18px;overflow-x:auto}
+.tab{background:none;border:0;border-bottom:2px solid transparent;padding:8px 11px;font-size:13px;color:var(--muted);white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:500}
+.dbody{padding:16px 18px 40px}
+.fieldgrid{display:grid;gap:12px}
+.ro{display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--r);padding:6px 9px;font-size:13px;color:var(--ink-2);flex-wrap:wrap}
+.ro .lock{font-size:11px;color:var(--muted);margin-left:auto}
+.info{border:0;background:var(--line-soft);color:var(--ink-2);border-radius:50%;width:15px;height:15px;font-size:10px;line-height:15px;text-align:center;padding:0;flex:none}
+.checklist{list-style:none;margin:0;padding:0;font-size:13px}
+.checklist li{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--line-soft);align-items:flex-start}
+.checklist li:last-child{border-bottom:0}
+.checklist .mk{width:14px;flex:none;text-align:center;font-size:12px;line-height:1.5}
+.ok{color:var(--accent)} .miss{color:var(--warn)} .bad{color:var(--stop)}
+.emptynote{color:var(--muted);font-size:13px;background:var(--surface);border:1px dashed var(--line);border-radius:var(--r);padding:14px}
+
+.bar{height:6px;background:var(--line-soft);border-radius:99px;overflow:hidden;margin-top:5px}
+.bar i{display:block;height:100%;background:var(--accent)}
+.bar.low i{background:var(--warn)}
+.bar.zero i{background:var(--stop)}
+.sublist{list-style:none;margin:10px 0 0;padding:0}
+.sublist li{padding:8px 0;border-bottom:1px solid var(--line-soft)}
+.sublist li:last-child{border-bottom:0}
+.sublist .lineup{display:flex;justify-content:space-between;gap:10px;font-size:13px;align-items:center}
+.sublist .n{font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+.steps{display:flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:18px;background:var(--surface)}
+.step{flex:1;padding:10px 14px;border-right:1px solid var(--line-soft);font-size:12.5px;color:var(--muted)}
+.step:last-child{border-right:0}
+.step[data-on="true"]{background:var(--ink);color:#fff}
+.step b{display:block;font-weight:500}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;font-weight:500;color:var(--muted);font-size:11.5px;padding:7px 10px;border-bottom:1px solid var(--line);background:var(--surface-sunk);position:sticky;top:0;letter-spacing:.03em}
+td{padding:7px 10px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+tr[data-bad="true"] td{background:#FDF6F6}
+tr[data-warn="true"] td{background:#FDFAF4}
+tr:hover td{background:var(--surface-sunk)}
+tr[data-bad="true"]:hover td{background:#FBEFEF}
+.cellmono{font-family:var(--mono);font-size:12px}
+.rowerr{color:var(--stop);font-size:11.5px;display:block;margin-top:3px}
+.rowwarn{color:var(--warn);font-size:11.5px;display:block;margin-top:3px}
+.rowfix{display:inline-flex;gap:6px;margin-top:5px;flex-wrap:wrap}
+.tablewrap{max-height:440px;overflow:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.summary{display:flex;gap:16px;align-items:center;padding:12px 0;font-size:13px;flex-wrap:wrap}
+.summary b{font-family:var(--mono)}
+
+.banner{border:1px solid;border-radius:var(--r);padding:10px 12px;font-size:12.5px;margin-bottom:14px;display:flex;gap:9px;align-items:flex-start}
+.banner b{font-weight:600}
+.banner.stop{border-color:#E0BEBE;background:var(--stop-soft);color:#6E2E2E}
+.banner.warn{border-color:#E4C9A6;background:var(--warn-soft);color:#6E3A0D}
+.banner.ok{border-color:#B6D6D0;background:var(--accent-soft);color:#0B4A44}
+.banner.plan{border-color:#C3D0E6;background:var(--plan-soft);color:#2A4272}
+
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.qcard .qn{font-size:11.5px;color:var(--muted);font-family:var(--mono);margin-bottom:5px}
+.qcard .qe{font-size:14px;margin-bottom:10px}
+.optrow{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:var(--r);padding:7px 10px;margin-bottom:6px;font-size:13px;background:var(--surface)}
+.optrow input{accent-color:var(--accent);margin:0;flex:none}
+.optrow.correct{border-color:var(--accent);background:var(--accent-soft)}
+.optrow.wrong{border-color:var(--stop);background:var(--stop-soft)}
+.optrow .mkop{margin-left:auto;font-size:11px}
+.opteditor{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.opteditor input[type=text]{flex:1}
+.opteditor .mk{flex:none;width:auto}
+
+.score{display:flex;gap:22px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;margin-bottom:14px;flex-wrap:wrap}
+.score .big{font-family:var(--mono);font-size:38px;font-weight:600;letter-spacing:-.03em;line-height:1}
+.score .pct{font-family:var(--mono);font-size:18px}
+.score .col{min-width:120px}
+.score .col span{display:block;font-size:11.5px;color:var(--muted)}
+
+.agencyframe{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:0;overflow:hidden}
+.agencyhead{background:var(--surface-sunk);border-bottom:1px solid var(--line);padding:10px 14px;font-size:12px;color:var(--muted);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.modcard{border-bottom:1px solid var(--line-soft);padding:12px 14px;display:flex;gap:12px;align-items:flex-start}
+.modcard:last-child{border-bottom:0}
+.modcard .num{font-family:var(--mono);font-size:12px;color:var(--muted);width:22px;flex:none;padding-top:2px}
+.modcard .body{flex:1;min-width:0}
+.modcard .body b{font-weight:600;font-size:14px}
+.modcard.lock{opacity:.55}
+.vidline{font-size:12.5px;color:var(--ink-2);padding:2px 0}
+
+.chain{display:flex;flex-wrap:wrap;gap:5px;align-items:center;font-size:12px;margin-top:6px}
+.chain .lnk{color:var(--muted)}
+.chain .mod{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);border-radius:2px;padding:1px 5px}
+.chain .mod.skip{opacity:.5;text-decoration:line-through}
+.chain .mod.nopub{border-style:dashed;color:var(--muted)}
+.chain .mod.here{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:500}
+
+.toast{position:fixed;right:18px;bottom:18px;background:var(--ink);color:#fff;padding:10px 14px;border-radius:var(--r);font-size:13px;max-width:380px;box-shadow:0 6px 18px rgba(22,38,44,.18);z-index:50}
+.toast.hide{display:none}
+
+.note{background:#FFFBEF;border:1px solid #E8DCB8;border-left:3px solid #C9A227;border-radius:var(--r);padding:10px 12px;font-size:12.5px;color:#5C4A15;margin:14px 0}
+.note b{color:#3F3210}
+.note.new{background:#F1F7FF;border-color:#C3D0E6;border-left-color:#3C5A9A;color:#2A4272}
+.note.new b{color:#1E3358}
+.note.v3{background:#EFF7F5;border-color:#B6D6D0;border-left-color:#0E6A60;color:#0B4A44}
+.note.v3 b{color:#083832}
+body.notes-off .note{display:none}
+
+@media (max-width:1040px){
+  .app{grid-template-columns:1fr} .rail{display:none}
+  .split{grid-template-columns:1fr}
+  .treecol{border-right:0;border-bottom:1px solid var(--line)}
+  .doors,.mini{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="Navegación principal">
+    <div class="brand"><strong>Academia SIGMMA</strong><span>Backoffice de contenido</span></div>
+    <div class="railgroup"><h4>Empezar</h4>
+      <button class="railitem" data-go="hub">Qué querés hacer</button>
+      <button class="railitem" data-go="cambios">Reglas y decisiones</button></div>
+    <div class="railgroup"><h4>Contenido</h4>
+      <button class="railitem" data-go="constructor">Estructura de la Academia</button>
+      <button class="railitem" data-go="importar">Cargar desde planilla</button></div>
+    <div class="railgroup"><h4>Soporte y certificación</h4>
+      <button class="railitem" data-go="meet">Meet y colas de dudas</button>
+      <button class="railitem" data-go="certificado">Certificados</button></div>
+    <div class="railgroup"><h4>Seguimiento</h4>
+      <button class="railitem" data-go="panelAgencia">Avance por agencia</button>
+      <button class="railitem" data-go="panelMacro">Panel general</button></div>
+    <div class="railgroup"><h4>Control</h4>
+      <button class="railitem" data-go="agencia">Ver como agencia</button>
+      <button class="railitem" data-go="roles">Roles y permisos</button>
+      <button class="railitem" data-go="params">Parámetros globales</button></div>
+    <div class="railfoot">
+      Wireframe v4 · alineado al prototipo agencia<br>
+      <label style="display:flex;gap:6px;align-items:center;margin-top:8px;color:#7E979C;font-weight:400">
+        <input type="checkbox" id="notesChk" checked style="accent-color:#0E6A60"> Ver notas de diseño
+      </label>
+    </div>
+  </nav>
+
+  <div class="main">
+    <header class="top">
+      <div class="crumb" id="crumb"></div>
+      <div class="topctl">
+        <span>Rol</span>
+        <div class="segbar" role="group" aria-label="Rol con el que estás actuando">
+          <button class="seg rol" data-rol="contenido">Contenido</button>
+          <button class="seg rol" data-rol="publicacion">Publicación</button>
+          <button class="seg rol" data-rol="consulta">Consulta</button>
+        </div>
+        <span style="margin-left:10px">Momento</span>
+        <div class="segbar" role="group" aria-label="Escena de construcción">
+          <button class="seg" data-esc="E1">E1</button><button class="seg" data-esc="E2">E2</button>
+          <button class="seg" data-esc="E3">E3</button><button class="seg" data-esc="E4">E4</button>
+          <button class="seg" data-esc="E5">E5</button>
+        </div>
+      </div>
+      <div class="escena-note" id="escenaNote"></div>
+    </header>
+    <div id="screens"></div>
+  </div>
+</div>
+<div class="toast hide" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ============================================================
+   ROLES Y PERMISOS  (bloque nuevo de la Opción 2)
+   ============================================================ */
+const PERFILES=['Professional','Business']; // planes de la AGENCIA (alineado al prototipo aprobado)
+const USERS=['M. Luna','Majo','Irene'];
+const ROLES={
+ contenido:{n:'Contenido',d:'Crea y edita módulos, secciones, videos, preguntas y temas. No publica ni archiva.',quien:'Majo · Soporte y Capacitación'},
+ publicacion:{n:'Publicación',d:'Todo lo de Contenido, más publicar, despublicar, archivar y tocar los parámetros del banco.',quien:'M. Luna · dueña de la Academia'},
+ consulta:{n:'Consulta',d:'Solo lectura: paneles, previsualización de la evaluación y "ver como agencia".',quien:'Irene · Producto, y cualquier revisor'}
+};
+const PERMS={
+ editar:['contenido','publicacion'],
+ archivar:['publicacion'],
+ publicar:['publicacion'],
+ params:['publicacion'],
+ ver:['contenido','publicacion','consulta']
+};
+const can=k=>PERMS[k].includes(S.rol);
+const dis=k=>can(k)?'':' disabled';
+const porque=k=>can(k)?'':'Tu rol ('+ROLES[S.rol].n+') no puede hacerlo. Requiere rol '+PERMS[k].map(r=>ROLES[r].n).join(' o ')+'.';
+
+/* ============================================================
+   DATOS
+   ============================================================ */
+const DATA=[
+ {id:'BAK-M00',name:'Fundamentos',tag:'P+B',perfiles:[...PERFILES],orden:10,
+  resumen:'Qué es SIGMMA y cómo moverse por el sistema.',descripcion:'Qué es SIGMMA y cómo moverse por el sistema.',
+  subtemas:['Concepto','Ciclo 360','Principios','Navegación'],
+  secciones:[{name:'Concepto y navegación',videos:[
+    {seq:'010',t:'Qué es SIGMMA: el sistema operativo de la agencia',p:'P1',c:'C01',dur:'3:40'},
+    {seq:'020',t:'El ciclo 360° de la operación turística',p:'P2',c:'C04',dur:'4:10'},
+    {seq:'030',t:'Los 7 principios y los procesos atomizados',p:'P2',c:'C04',dur:'4:30'},
+    {seq:'040',t:'Navegación: ingreso, menú, último file, rueda de progreso',p:'P1',c:'C01',dur:'3:20'}]}]},
+
+ {id:'BAK-M10',name:'File',tag:'P+B',perfiles:[...PERFILES],orden:20,
+  resumen:'El file: el contenedor de toda la operación.',descripcion:'El file: el contenedor de toda la operación.',
+  subtemas:['Búsqueda','Alta de file','Monedas','Estados','Salida grupal'],
+  secciones:[
+   {name:'Alta y búsqueda',videos:[
+    {seq:'010',t:'Buscar file (número, filtros, por nombre)',p:'P1',c:'C02',dur:'2:40'},
+    {seq:'020',t:'Crear y editar file: tipo de servicio, individual vs grupal',p:'P1',c:'C02',dur:'4:50'},
+    {seq:'030',t:'Moneda de registro vs moneda de documento',p:'P1',c:'C02',dur:'3:00'}]},
+   {name:'Datos y estados',videos:[
+    {seq:'040',t:'Datos del file: nombre, destino IATA, fechas, segmentación',p:'P2',c:'C05',dur:'3:50'},
+    {seq:'050',t:'Estados del file (automáticos y manuales, cerrar file)',p:'P2',c:'C05',dur:'4:00'},
+    {seq:'060',t:'Salida grupal: vincular files e informe de salida',p:'P3',c:'C13',dur:'4:40'},
+    {seq:'070',t:'Duplicar file (funcionalidad discontinuada)',p:'P3',c:'—',dur:'',archivado:true}]}]},
+
+ {id:'BAK-M20',name:'Entidades: clientes, pasajeros, proveedores',tag:'P+B',perfiles:[...PERFILES],orden:30,
+  resumen:'Clientes, pasajeros y proveedores: quién es quién.',descripcion:'Clientes, pasajeros y proveedores: quién es quién.',
+  subtemas:['Cliente','Cliente vs Pasajero','Pasajero','Proveedor','Importación'],
+  secciones:[
+   {name:'Clientes y pasajeros',videos:[
+    {seq:'010',t:'Cargar cliente: físico vs jurídico, autocompletar por ARCA/CUIT',p:'P1',c:'C02',dur:'4:40'},
+    {seq:'020',t:'Cliente: solapas (documentación, tarjetas, clasificación)',p:'P2',c:'C06',dur:'4:20'},
+    {seq:'030',t:'Cliente vs Pasajero (el concepto que más se confunde)',p:'P1',c:'C02',dur:'3:00'},
+    {seq:'040',t:'Cargar pasajero: pax principal, agregar a base de clientes',p:'P1',c:'C02',dur:'3:30'}]},
+   {name:'Proveedores e importación',videos:[
+    {seq:'050',t:'Proveedor: turístico y no turístico',p:'P2',c:'C06',dur:'3:10'},
+    {seq:'060',t:'Importar base de clientes y proveedores desde Excel',p:'P2',c:'C06',dur:'4:30'}]}]},
+
+ {id:'BAK-M30',name:'Voucher / Servicios',tag:'P+B',perfiles:[...PERFILES],orden:40,
+  resumen:'El voucher: cargar y procesar un servicio.',descripcion:'El voucher: cargar y procesar un servicio.',
+  subtemas:['Concepto de voucher','Carga','Margen','Impuestos','Procesar','Estados','Modelos'],
+  secciones:[
+   {name:'Voucher y cobro',videos:[
+    {seq:'010',t:'Qué es el voucher: perfil operativo y administrativo',p:'P1',c:'C03',dur:'3:00'},
+    {seq:'020',t:'Cargar voucher: tipo, subtipo, proveedor',p:'P1',c:'C03',dur:'4:50'},
+    {seq:'050',t:'Procesar el voucher: impacto en la cuenta del proveedor',p:'P1',c:'C03',dur:'2:40'}]},
+   {name:'Margen e impuestos',videos:[
+    {seq:'030',t:'Margen: comisión vs utilidad',p:'P2',c:'C07',dur:'4:00'},
+    {seq:'040',t:'Conceptos impositivos e IVA; separar aéreo de terrestre',p:'P2',c:'C07',dur:'4:40'}]},
+   {name:'Estados y plantillas',videos:[
+    {seq:'060',t:'Estados del voucher y cotización',p:'P3',c:'C12',dur:'3:30'},
+    {seq:'070',t:'Modelos: armar plantillas de venta reutilizables',p:'P3',c:'C12',dur:'4:20'}]}]},
+
+ {id:'BAK-M35',name:'Tráfico / asignación de butaca',tag:'P+B',perfiles:[...PERFILES],orden:45,
+  resumen:'Asignación de butaca y tráfico.',descripcion:'Asignación de butaca y tráfico.',enPrep:true,
+  subtemas:[],
+  secciones:[{name:'Asignación de butaca',videos:[
+    {seq:'010',t:'Tráfico: asignación de butaca',p:'P3',c:'—',dur:'',durEst:'4:00'}]}]},
+
+ {id:'BAK-M40',name:'Cobranzas / Recibos',tag:'P+B',perfiles:[...PERFILES],orden:50,
+  resumen:'Cobrar: recibos, valores y cuenta corriente.',descripcion:'Cobrar: recibos, valores y cuenta corriente.',
+  subtemas:['Modos de recibo','Valores','Moneda','Devolución','Cuenta corriente'],
+  secciones:[
+   {name:'Recibos',videos:[
+    {seq:'010',t:'Recibo: modos indicado, automático y detallado',p:'P1',c:'C03',dur:'4:50'},
+    {seq:'020',t:'Valores: efectivo, transferencia, tarjeta y de tercero',p:'P2',c:'C08',dur:'4:10'},
+    {seq:'030',t:'Moneda y tipo de cambio en el recibo',p:'P2',c:'C08',dur:'3:40'}]},
+   {name:'Saldos y devoluciones',videos:[
+    {seq:'040',t:'Devolución / egreso',p:'P3',c:'C14',dur:'3:00'},
+    {seq:'050',t:'Cuenta corriente del cliente y saldos por moneda',p:'P2',c:'C08',dur:'4:20'}]}]},
+
+ {id:'BAK-M50',name:'Facturación',tag:'P+B',perfiles:[...PERFILES],orden:60,
+  resumen:'Facturar al pasajero: IVA, CAE y casos.',descripcion:'Facturar al pasajero: IVA, CAE y casos.',
+  subtemas:['Factura al pasajero','IVA y CAE','Verificación','Notas de crédito','Tipo de cambio'],
+  secciones:[
+   {name:'Factura al pasajero',videos:[
+    {seq:'010',t:'Factura al pasajero: por servicio vs por producto',p:'P2',c:'C09',dur:'4:00'},
+    {seq:'020',t:'Categoría de IVA → factura A/B; ARCA y CAE',p:'P2',c:'C09',dur:'4:40'},
+    {seq:'030',t:'Verificar el voucher antes de facturar',p:'P2',c:'C09',dur:'3:20'}]},
+   {name:'Ajustes y casos',videos:[
+    {seq:'040',t:'Notas de crédito',p:'P3',c:'C15',dur:'3:10'},
+    {seq:'050',t:'Factura parcial: dividir entre pasajeros',p:'P3',c:'C15',dur:'3:50'},
+    {seq:'060',t:'Tipo de cambio promedio ponderado',p:'P3',c:'C15',dur:'4:10'}]}]},
+
+ {id:'BAK-M60',name:'Pagos a proveedores',tag:'P+B',perfiles:[...PERFILES],orden:70,
+  resumen:'Pagar a proveedores: órdenes y saldos.',descripcion:'Pagar a proveedores: órdenes y saldos.',
+  subtemas:['Orden de pago','Factura de compra','Saldos','Cuenta corriente'],
+  secciones:[{name:'Órdenes de pago',videos:[
+    {seq:'010',t:'Orden de pago: automático, dividido y manual',p:'P2',c:'C10',dur:'4:20'},
+    {seq:'020',t:'Vincular factura de compra e importador ARCA',p:'P3',c:'C16',dur:'3:50'},
+    {seq:'030',t:'Saldo a favor, anular y reabrir',p:'P3',c:'C16',dur:'3:00'},
+    {seq:'040',t:'Cuenta corriente del proveedor',p:'P2',c:'C10',dur:'3:40'}]}]},
+
+ {id:'BAK-M70',name:'Caja y bancos',tag:'P+B',perfiles:[...PERFILES],orden:80,
+  resumen:'Caja y bancos: aperturas, cierres y conciliación.',descripcion:'Caja y bancos: aperturas, cierres y conciliación.',
+  subtemas:['Caja','Asientos','Apertura y cierre','Bancos'],
+  secciones:[
+   {name:'Caja',videos:[
+    {seq:'010',t:'Caja: única vs por vendedor/cajero',p:'P2',c:'C11',dur:'3:30'},
+    {seq:'020',t:'Asientos automáticos y manuales, egresos, centro de costo',p:'P3',c:'C17',dur:'4:40'},
+    {seq:'030',t:'Apertura y cierre de caja',p:'P3',c:'C17',dur:'3:00'}]},
+   {name:'Bancos',videos:[
+    {seq:'040',t:'Bancos, transferencias y scan de comprobantes con IA',p:'P3',c:'C17',dur:'4:20'}]}]},
+
+ {id:'BAK-M80',name:'Informes',tag:'P+B',perfiles:[...PERFILES],orden:90,
+  resumen:'Los informes que se miran todos los días.',descripcion:'Los informes que se miran todos los días.',
+  subtemas:['Operativos','Vencimientos','Dashboard','Administrativos'],
+  secciones:[
+   {name:'Informes de uso diario',videos:[
+    {seq:'010',t:'Informes operativos: saldos, listados, comisiones',p:'P2',c:'C11',dur:'4:00'},
+    {seq:'020',t:'Informe de vencimientos: cobranzas y pagos',p:'P2',c:'C11',dur:'3:40'}]},
+   {name:'Dashboard y administración',videos:[
+    {seq:'030',t:'Dashboard: KPIs del negocio',p:'P3',c:'C18',dur:'4:10',tag:'B'},
+    {seq:'040',t:'Informes administrativos: ingresos y egresos',p:'P3',c:'C18',dur:'3:50'}]}]},
+
+ {id:'BAK-M90',name:'Contable',tag:'B',perfiles:['Business'],orden:100,
+  resumen:'Contabilidad para agencias Business.',descripcion:'Contabilidad para agencias Business.',
+  subtemas:['Plan de cuentas','Asientos','Libros','Balance','Cierres'],
+  secciones:[{name:'Contabilidad Business',videos:[
+    {seq:'010',t:'Plan de cuentas: para qué sirve',p:'P4',c:'C19',dur:'4:00'},
+    {seq:'020',t:'Asientos automáticos: cómo se configuran',p:'P4',c:'C19',dur:'4:30'},
+    {seq:'030',t:'Libro diario, libro banco y mayor',p:'P4',c:'C19',dur:'4:10'},
+    {seq:'040',t:'Balance de suma y saldo',p:'P4',c:'C19',dur:'3:40'},
+    {seq:'050',t:'Ejercicios contables y cierres',p:'P4',c:'C19',dur:'4:20'}]}]},
+
+ {id:'BAK-M95',name:'Receptivo operador',tag:'B-nicho',perfiles:['Business'],orden:110,
+  resumen:'Receptivo operador: tarifario e itinerarios.',descripcion:'Receptivo operador: tarifario e itinerarios.',
+  subtemas:['Tarifario','Itinerario','Multidestino','Prestadores'],
+  secciones:[{name:'Tarifario e itinerarios',videos:[
+    {seq:'010',t:'Tarifario por proveedor: tipo, categoría, vigencia, temporada',p:'P4',c:'C20',dur:'4:40'},
+    {seq:'020',t:'Armar el itinerario con el tarifario',p:'P4',c:'C20',dur:'4:20'},
+    {seq:'030',t:'Modelos multidestino (paquetes)',p:'P4',c:'C20',dur:'4:00'},
+    {seq:'040',t:'Prestador nacional vs internacional e impacto impositivo',p:'P4',c:'C20',dur:'3:50'}]}]}
+];
+
+/* embebido: ok / falla / sin verificar */
+const EMB_FALLA=['BAK-M20.060','BAK-M50.030'];
+const REGRABAR=['BAK-M30.020','BAK-M40.010','BAK-M20.010'];
+
+/* ============================================================
+   BANCO DE PREGUNTAS — pool generado, coherente con los temas
+   ============================================================ */
+const HAND={
+ 'BAK-M30':[
+  ['Concepto de voucher','En SIGMMA, ¿qué representa el voucher?',['La forma de cargar un servicio, con perfil operativo y administrativo','Un comprobante fiscal que se envía a ARCA','El recibo que firma el pasajero al pagar','Una plantilla de venta reutilizable'],0],
+  ['Carga','¿Cuántos vouchers corresponden por proveedor en un mismo servicio?',['Uno por proveedor','Uno por pasajero','Uno por file, sin importar el proveedor','Tantos como formas de pago haya'],0],
+  ['Procesar','Si un voucher se carga pero no se procesa, ¿qué ocurre?',['No impacta en la cuenta del proveedor ni aparece en los informes','Se cancela automáticamente a las 24 horas','Impacta igual, solo cambia el estado visual','Se factura pero no se cobra'],0],
+  ['Margen','La diferencia entre comisión y utilidad es que la comisión…',['La reconoce el proveedor sobre la tarifa','Se calcula siempre sobre el costo neto','Es lo mismo que la utilidad, cambia el nombre','Solo aplica a servicios terrestres'],0]],
+ 'BAK-M40':[
+  ['Modos de recibo','Un recibo detallado sirve para…',['Cobrar varios files de un mismo cliente en un solo recibo','Cobrar sin tener un servicio puntual asociado','Registrar una devolución al pasajero','Emitir factura A automáticamente'],0],
+  ['Valores','Un pago con tarjeta de un tercero se registra como…',['TC3, valor de tercero','Efectivo, con nota al pie','Transferencia bancaria','No se puede registrar'],0],
+  ['Cuenta corriente','La cuenta corriente del cliente se lleva…',['Por moneda de registro','En una sola moneda, siempre ARS','Por file, sin consolidar','Solo si el cliente es persona jurídica'],0]]
+};
+function corto(t){return t.split(':')[0].trim();}
+function genPool(m){
+  const pool=[]; const vids=m.secciones.flatMap(s=>s.videos.filter(v=>!v.archivado)); let i=0;
+  if(!vids.length||!m.subtemas.length) return pool;
+  (HAND[m.id]||[]).forEach((h,hi)=>{
+    const st=m.subtemas[hi%m.subtemas.length];
+    const v=vids[i%vids.length];
+    pool.push({id:m.id+'-Q'+String(++i).padStart(3,'0'),st:st?st.id:null,e:h[1],ops:h[2].map((x,k)=>({t:x,ok:k===h[3]})),
+      estado:'activa',repaso:m.id+'.'+v.seq,fecha:'2026-08-'+String(8+i).padStart(2,'0'),por:USERS[i%3],acierto:52+(i*6)%40,ver:1});
+  });
+  const T=['¿Para qué sirve %s en SIGMMA?','¿Cuál de estas afirmaciones sobre %s es correcta?','¿Cuándo corresponde usar %s?','Sobre %s: ¿qué error es el más común?'];
+  m.subtemas.forEach((st,si)=>{
+    for(let k=0;k<9;k++){
+      if(pool.length>=52) break;
+      const v=vids[(si+k)%vids.length]||vids[0];
+      pool.push({id:m.id+'-Q'+String(++i).padStart(3,'0'),st:st.id,
+        e:T[k%4].replace('%s',corto(v.t).toLowerCase()),
+        ops:[{t:'Opción correcta de referencia',ok:true},{t:'Distractor plausible A',ok:false},{t:'Distractor plausible B',ok:false},{t:'Distractor plausible C',ok:false}],
+        estado:'activa',repaso:m.id+'.'+v.seq,fecha:'2026-08-'+String(8+(i%20)).padStart(2,'0'),por:USERS[i%3],acierto:35+(i*11)%60,ver:1});
+    }
+  });
+  /* problemas deliberados, para que los filtros y validaciones se vean funcionando */
+  if(pool.length>10){
+    pool[4].estado='borrador';
+    pool[6].st=null;
+    pool[8].ops=pool[8].ops.map(o=>({...o,ok:false}));
+    pool[9].acierto=8;
+  }
+  return pool;
+}
+
+/* inicialización compartida: la usan los módulos del seed y los que se crean a mano */
+function initMod(m){
+  m.sup=m.id.split('-')[0];
+  m.params=m.params||{porIntento:10,objetivo:50,minimo:30,umbral:'80,00 %',reintentos:'Ilimitados'};
+  m.meet=m.meet||{habilitada:true,condicion:'Aprobar con 80 % o más',duracion:30,
+    link:(m.id==='BAK-M00'||m.id==='BAK-M10')?'meet.google.com/aca-demo':'',responsable:'Soporte y Capacitación'};
+  /* Alineado al prototipo aprobado: el "tema" del banco es SIEMPRE una sección
+     del propio módulo. No hay catálogo de temas aparte. La cobertura se mide
+     por sección, y esa misma taxonomía es la de las dudas de la Meet. */
+  m.subtemas=(m.secciones||[]).map((sec,i)=>({id:m.id+'-S'+(i+1),name:sec.name,orden:(i+1)*10,estado:'activo',secIdx:i}));
+  m.pool=m.pool||genPool(m);
+  return m;
+}
+DATA.forEach(initMod);
+
+/* ============================================================
+   DATOS DEL LADO AGENCIA (alineados al prototipo aprobado)
+   El backoffice tiene que producir y administrar todo esto.
+   ============================================================ */
+const AGENCIAS=[
+ {id:'viajes-del-sur',nombre:'Viajes del Sur',plan:'Professional',coordinadorId:2,
+  plantel:[
+   {id:1,nombre:'Lucía Fernández',aprobados:2,ultimoAcceso:'Hoy 10:12',cert:false},
+   {id:2,nombre:'Martín Ruiz',aprobados:9,ultimoAcceso:'28/07/2026',cert:true,coord:true},
+   {id:3,nombre:'Carla Domínguez',aprobados:5,ultimoAcceso:'30/07/2026',cert:false},
+   {id:4,nombre:'Diego Sosa',aprobados:3,ultimoAcceso:'25/07/2026',cert:false},
+   {id:5,nombre:'Paula Iglesias',aprobados:2,ultimoAcceso:'19/07/2026',cert:false},
+   {id:6,nombre:'Nicolás Vera',aprobados:0,ultimoAcceso:'—',cert:false}]},
+ {id:'andes-receptivo',nombre:'Andes Receptivo',plan:'Business',coordinadorId:101,
+  plantel:[
+   {id:101,nombre:'Sofía Bianchi',aprobados:3,ultimoAcceso:'Hoy 09:40',cert:false,coord:true},
+   {id:102,nombre:'Ramiro Cabrera',aprobados:11,ultimoAcceso:'31/07/2026',cert:true},
+   {id:103,nombre:'Julieta Ponce',aprobados:7,ultimoAcceso:'29/07/2026',cert:false},
+   {id:104,nombre:'Tomás Ferreyra',aprobados:3,ultimoAcceso:'28/07/2026',cert:false},
+   {id:105,nombre:'Ana Lucero',aprobados:0,ultimoAcceso:'—',cert:false}]}
+];
+const recorridoDe=ag=>DATA.filter(m=>m.sup==='BAK'&&m.perfiles.includes(ag.plan)&&!m.enPrep);
+
+/* Cola de dudas por agencia × módulo. autor = fila del plantel; tema = sección. */
+const COLAS={
+ 'viajes-del-sur':[
+  {modId:'BAK-M00',autor:1,video:'BAK-M00.040',tema:'Concepto y navegación',texto:'La rueda de progreso del file, ¿se configura qué pasos cuenta o son fijos?',fecha:'01/06/2026 14:22',estado:'consumido'},
+  {modId:'BAK-M10',autor:1,video:'BAK-M10.030',tema:'Alta y búsqueda',texto:'Si el file se abrió en USD y el cliente paga en ARS, ¿la moneda de registro se puede cambiar después?',fecha:'09/06/2026 09:14',estado:'abierto'},
+  {modId:'BAK-M10',autor:2,video:'BAK-M10.050',tema:'Datos y estados',texto:'El cierre automático del file, ¿espera a que estén cobrados todos los vouchers o alcanza con procesados?',fecha:'10/06/2026 11:38',estado:'abierto'},
+  {modId:'BAK-M20',autor:3,video:'BAK-M20.030',tema:'Clientes y pasajeros',texto:'Empresa que paga por tres empleados: ¿la cargo como cliente y los tres como pax, o cada uno como cliente?',fecha:'12/06/2026 16:05',estado:'agendado'},
+  {modId:'BAK-M30',autor:4,video:'BAK-M30.030',tema:'Margen e impuestos',texto:'Comisión y utilidad me dan distinto en el mismo voucher. ¿Cuál mira el informe de rentabilidad?',fecha:'17/06/2026 10:52',estado:'consumido'}],
+ 'andes-receptivo':[
+  {modId:'BAK-M00',autor:101,video:'BAK-M00.020',tema:'Concepto y navegación',texto:'El ciclo 360°, ¿cambia cuando la agencia es receptiva y el prestador es propio?',fecha:'06/07/2026 15:12',estado:'consumido'},
+  {modId:'BAK-M40',autor:102,video:'BAK-M40.030',tema:'Recibos',texto:'Pax del exterior que paga en EUR contra file en USD: ¿qué fuente de tipo de cambio toma el recibo?',fecha:'27/07/2026 10:41',estado:'abierto'},
+  {modId:'BAK-M40',autor:103,video:'BAK-M40.050',tema:'Saldos y devoluciones',texto:'La cuenta corriente por moneda, ¿se puede ver consolidada a moneda de reporte o siempre separada?',fecha:'04/08/2026 17:08',estado:'abierto'}]
+};
+/* Franja de atención de Soporte (parámetro del backoffice, no del módulo). */
+const FRANJA={duracionMin:30,dias:'Martes y jueves',horas:'15:00 · 15:30 · 16:00 · 16:30',semanas:3,zona:'ART (UTC-3)'};
+/* Turnos ya agendados/realizados por agencia × módulo. El enlace es POR TURNO. */
+const TURNOS={
+ 'viajes-del-sur':[
+  {modId:'BAK-M00',cuando:'02/06/2026 15:00',enlace:'meet.google.com/sgm-vds-m00',estado:'consumido'},
+  {modId:'BAK-M20',cuando:'07/09/2026 15:30',enlace:'meet.google.com/sgm-vds-m20',estado:'agendado'}],
+ 'andes-receptivo':[
+  {modId:'BAK-M00',cuando:'08/07/2026 15:00',enlace:'meet.google.com/sgm-and-m00',estado:'consumido'}]
+};
+const CERTIFICADOS=[
+ {agencia:'viajes-del-sur',persona:'Martín Ruiz',doc:'DNI 30.111.222',emitido:'28/07/2026',plan:'Professional'},
+ {agencia:'andes-receptivo',persona:'Ramiro Cabrera',doc:'DNI 28.999.111',emitido:'25/07/2026',plan:'Business'}
+];
+const TIPOS_DOC=[
+ {clave:'DNI',etiqueta:'DNI',regla:'7 u 8 dígitos, sin puntos'},
+ {clave:'PAS',etiqueta:'Pasaporte',regla:'6 a 12 letras o números'},
+ {clave:'CI',etiqueta:'Cédula (CI)',regla:'5 a 10 dígitos, verificador opcional'},
+ {clave:'LCLE',etiqueta:'LC / LE',regla:'6 a 8 dígitos'}
+];
+/* Parámetros globales que el prototipo lee y el backoffice tiene que exponer. */
+const GLOBAL={umbralVisto:80,metodoVisto:'posición',preguntasIntento:10,umbralAprob:8,
+  soporte:'WhatsApp · +54 9 381 555-0100',zona:'ART (UTC-3)'};
+
+
+/* ============================================================
+   ESCENAS
+   ============================================================ */
+const ESCENAS={
+ E1:{label:'E1 · Día cero',note:'Nada cargado todavía. Desde acá se puede crear el primer módulo o pegar la estructura: ya no es una pantalla sin salida.'},
+ E2:{label:'E2 · IDs reservados',note:'Los 55 videos existen como IDs en backlog. Ningún banco de preguntas armado.'},
+ E3:{label:'E3 · Guionando y grabando',note:'Los de Prioridad 1 están entre guionados y grabados. Empieza a cargarse el primer banco.'},
+ E4:{label:'E4 · Ruta esencial publicada',note:'Los 12 videos de P1 están listos. Tres módulos ya visibles para las agencias; el resto trabado por el checklist de publicación.'},
+ E5:{label:'E5 · En régimen',note:'Todo publicado. Aparece lo que antes era invisible: la cola de "a regrabar" y las aprobaciones que podrían caducar.'}
+};
+const VISIBLES={E4:['BAK-M00','BAK-M10','BAK-M20']};
+
+function prodDe(m,v){
+  const e=S.escena;
+  if(v.archivado) return 'archivado';
+  if(m.nuevo) return v.dur?'publicado':'backlog';
+  if(e==='E2') return 'backlog';
+  if(e==='E3') return v.p==='P1'?(v.seq<'030'?'grabado':'guionado'):'backlog';
+  if(e==='E4') return v.p==='P1'?'publicado':(v.p==='P2'?'guionado':'backlog');
+  if(e==='E5') return REGRABAR.includes(m.id+'.'+v.seq)?'a regrabar':'publicado';
+  return 'backlog';
+}
+function modVisible(m){
+  if(m.pubManual!==undefined) return m.pubManual;
+  if(m.nuevo) return false;
+  if(S.escena==='E5') return !m.enPrep;
+  if(S.escena==='E4') return (VISIBLES.E4||[]).includes(m.id);
+  return false;
+}
+function vidVisible(m,v){
+  if(!modVisible(m)) return false;
+  const p=prodDe(m,v);
+  return p==='publicado'||p==='a regrabar';
+}
+function tieneLink(m,v){const p=prodDe(m,v);return p==='publicado'||p==='a regrabar'||p==='editado';}
+function embebido(m,v){
+  if(!tieneLink(m,v)) return null;
+  if(EMB_FALLA.includes(m.id+'.'+v.seq)) return 'falla';
+  if(S.escena==='E3') return 'sin verificar';
+  return 'ok';
+}
+function nPreguntas(m){
+  const e=S.escena;
+  if(m.nuevo) return 0;
+  if(e==='E1'||e==='E2') return 0;
+  if(e==='E3') return m.id==='BAK-M00'?12:0;
+  if(e==='E4'){const t={'BAK-M00':50,'BAK-M10':50,'BAK-M20':50,'BAK-M30':38,'BAK-M40':22};return t[m.id]||0;}
+  return m.enPrep?0:50;
+}
+function activas(m){return m.pool.slice(0,nPreguntas(m));}
+function cobertura(m){
+  const a=activas(m).filter(q=>q.estado==='activa');
+  return m.subtemas.map(st=>({st,n:a.filter(q=>q.st===st.id).length}));
+}
+function subtemasEnCero(m){return cobertura(m).filter(c=>c.n===0).length;}
+
+/* Módulo anterior del MISMO recorrido (mismo plan). Publicar en orden es la
+   regla que sostiene los ordinales sin huecos que el prototipo garantiza. */
+function modAnterior(m){
+  const rec=DATA.filter(x=>x.sup===m.sup&&!x.enPrep&&x.perfiles.some(p=>m.perfiles.includes(p)))
+    .sort((a,b)=>a.orden-b.orden);
+  const i=rec.findIndex(x=>x.id===m.id);
+  return i>0?rec[i-1]:null;
+}
+function anteriorPublicado(m){const a=modAnterior(m);return !a||modVisible(a);}
+
+/* checklist de publicación */
+function checklistPub(m){
+  const vids=m.secciones.flatMap(s=>s.videos.filter(v=>!v.archivado));
+  const sinLink=vids.filter(v=>!tieneLink(m,v)).length;
+  const embMal=vids.filter(v=>embebido(m,v)==='falla').length;
+  const embSin=vids.filter(v=>embebido(m,v)==='sin verificar').length;
+  const nPreg=activas(m).filter(q=>q.estado==='activa').length;
+  const cero=subtemasEnCero(m);
+  const regr=vids.filter(v=>prodDe(m,v)==='a regrabar').length;
+  const duros=[
+   {ok:vids.length>0,t:'Tiene al menos un video cargado',d:vids.length+' videos'},
+   {ok:vids.length>0&&sinLink===0&&embMal===0&&embSin===0,
+    t:'Todos los videos tienen link y embebido verificado',
+    d:!vids.length?'sin videos':(sinLink?sinLink+' sin link':(embMal?embMal+' con embebido roto':(embSin?embSin+' sin verificar':'verificados')))},
+   {ok:m.secciones.length>0&&cero===0,
+    t:'Ningún tema del banco está en cero preguntas',
+    d:m.secciones.length===0?'el módulo no tiene secciones (los temas del banco son las secciones)':(cero?cero+' temas sin cubrir':'todos cubiertos')},
+   {ok:nPreg>=m.params.minimo,t:'El banco llegó al mínimo de '+m.params.minimo+' preguntas',d:nPreg+' cargadas'},
+   {ok:m.perfiles.length>0,t:'Tiene al menos un plan de agencia asignado',d:m.perfiles.join(' + ')||'ninguno'},
+   {ok:!!m.orden,t:'Tiene definido su orden en la secuencia',d:m.orden?'orden '+m.orden:'sin definir'},
+   {ok:anteriorPublicado(m),t:'El módulo anterior del recorrido ya está publicado',d:anteriorPublicado(m)?(modAnterior(m)?'anterior: '+modAnterior(m).id:'es el primero del recorrido'):'falta publicar '+((modAnterior(m)||{}).id||'')}
+  ];
+  const blandos=[
+   {ok:nPreg>=m.params.objetivo,t:'El banco llegó al objetivo de '+m.params.objetivo+' preguntas',d:nPreg+' de '+m.params.objetivo},
+   {ok:regr===0,t:'Ningún video marcado a regrabar',d:regr?regr+' a regrabar':'ninguno'},
+   {ok:m.meet.habilitada,t:'La Meet de soporte está habilitada',d:m.meet.habilitada?'sí · el enlace se genera por turno al agendar':'deshabilitada'}
+  ];
+  return {duros,blandos,bloqueado:duros.some(d=>!d.ok)};
+}
+
+/* cadena de desbloqueo alineada al prototipo aprobado:
+   - los módulos fuera de plan SE MUESTRAN con candado de plan (no se ocultan);
+   - no entran a la base de cálculo ni tienen ordinal;
+   - la publicación es en orden, así el ordinal del recorrido va 1..N sin huecos. */
+function cadena(plan){
+  return DATA.filter(m=>m.sup==='BAK').slice().sort((a,b)=>a.orden-b.orden)
+    .map(m=>({m,aplica:m.perfiles.includes(plan)&&!m.enPrep,pub:modVisible(m)}));
+}
+
+/* ============================================================
+   ESTADO UI
+   ============================================================ */
+const S={screen:'hub',escena:'E4',rol:'publicacion',superficie:'BAK',open:{'BAK-M30':true},sel:null,tab:'ficha',
+  quick:null,qsec:null,checked:new Set(),filtro:'',soloPend:false,verArch:false,
+  impPaso:1,impModo:'videos',omit:new Set(),
+  bModId:'BAK-M30',bFiltro:'',bSub:'',bEstado:'',bCorregir:false,bChecked:new Set(),
+  qEdit:null,perfilVista:'Professional',muestra:null,respuestas:{},verCorrectas:false,
+  amPlan:'P+B',meetAg:null,panelAg:null};
+
+const $=s=>document.querySelector(s);
+const el=(t,c,h)=>{const n=document.createElement(t);if(c)n.className=c;if(h!==undefined)n.innerHTML=h;return n;};
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.remove('hide');clearTimeout(toast._i);toast._i=setTimeout(()=>t.classList.add('hide'),4600);}
+const stCls=s=>'st-'+String(s).replace(/\s+/g,'').replace('aregrabar','regrabar');
+const findMod=id=>DATA.find(m=>m.id===id);
+const vidsDe=m=>m.secciones.flatMap((s,si)=>s.videos.map(v=>({v,si,sec:s})));
+function nextSeq(sec){const n=sec.videos.map(v=>parseInt(v.seq,10));return String((n.length?Math.max(...n):0)+10).padStart(3,'0');}
+function modsVis(){
+  const delSup=DATA.filter(m=>m.sup===S.superficie);
+  if(S.escena==='E1') return delSup.filter(m=>m.nuevo);
+  return delSup;
+}
+function nextModId(sup){
+  const nums=DATA.filter(m=>m.sup===sup).map(m=>parseInt(m.id.split('-M')[1],10));
+  const max=nums.length?Math.max(...nums):-10;
+  const n=Math.ceil((max+1)/10)*10;
+  return sup+'-M'+String(n).padStart(2,'0');
+}
+function nextOrden(sup){
+  const o=DATA.filter(m=>m.sup===sup).map(m=>m.orden);
+  return (o.length?Math.max(...o):0)+10;
+}
+function crearModulo({sup,id,name,tag,perfiles,orden,seccion,videos}){
+  const m=initMod({id:id||nextModId(sup),name:name||'Módulo sin nombre',tag:tag||'P+B',
+    perfiles:perfiles&&perfiles.length?perfiles:[...PERFILES],orden:orden||nextOrden(sup),
+    enPrep:true,nuevo:true,subtemas:[],secciones:[]});
+  (seccion?[].concat(seccion):[]).forEach(n=>m.secciones.push({name:n,videos:[]}));
+  if(videos) videos.forEach(v=>{ if(!m.secciones.length) m.secciones.push({name:'General',videos:[]});
+    m.secciones[0].videos.push(v);});
+  DATA.push(m);
+  return m;
+}
+
+/* ============================================================
+   SHELL
+   ============================================================ */
+function render(){
+  $('#escenaNote').textContent=ESCENAS[S.escena].note+'  ·  Actuando como '+ROLES[S.rol].n+': '+ROLES[S.rol].d;
+  document.querySelectorAll('.seg[data-esc]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.esc===S.escena)));
+  document.querySelectorAll('.seg[data-rol]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.rol===S.rol)));
+  document.querySelectorAll('.railitem[data-go]').forEach(b=>b.setAttribute('aria-current',String(b.dataset.go===S.screen)));
+  const c={hub:'Qué querés hacer',cambios:'Reglas y decisiones',constructor:'Contenido › Estructura',
+    altamod:'Contenido › Nuevo módulo',importar:'Contenido › Cargar desde planilla',
+    banco:'Contenido › '+S.bModId+' › Banco de preguntas',pregunta:'Contenido › '+S.bModId+' › Pregunta',
+    subtemas:'Contenido › '+S.bModId+' › Temas',preview:'Control › Previsualizar evaluación',
+    resultado:'Control › Resultado de la evaluación',agencia:'Control › Ver como agencia',roles:'Control › Roles y permisos',
+    meet:'Soporte › Meet y colas de dudas',certificado:'Soporte › Certificados',
+    panelAgencia:'Seguimiento › Avance por agencia',panelMacro:'Seguimiento › Panel general',params:'Control › Parámetros globales'};
+  $('#crumb').innerHTML='<b>'+ESCENAS[S.escena].label+'</b> · '+esc(c[S.screen]||'');
+  const h=$('#screens');h.innerHTML='';
+  const map={hub:viewHub,cambios:viewCambios,constructor:viewConstructor,altamod:viewAltaMod,importar:viewImportar,
+    banco:viewBanco,pregunta:viewPregunta,subtemas:viewSubtemas,preview:viewPreview,resultado:viewResultado,
+    agencia:viewAgencia,roles:viewRoles,meet:viewMeet,certificado:viewCertificado,
+    panelAgencia:viewPanelAgencia,panelMacro:viewPanelMacro,params:viewParams};
+  h.appendChild((map[S.screen]||viewHub)());
+}
+
+/* ============================================================
+   HUB
+   ============================================================ */
+function viewHub(){
+  const w=el('div','wrap');
+  const mods=modsVis();
+  w.innerHTML=`<h1>¿Qué querés hacer?</h1><p class="lede">Elegí por la tarea, no por la tabla. El sistema se ocupa de los IDs, la superficie y el orden.</p>`;
+  const d=el('div','doors');
+  d.innerHTML=`
+   <button class="door${can('editar')?'':' locked'}" data-door="tengo"><span class="kicker">Lo más frecuente</span><strong>Subir un video que ya tengo</strong>
+     <p>Pegás el link, elegís en qué parte de la Academia va y listo. Tres datos, nada más.</p>
+     <span class="who">${can('editar')?'Rol Contenido o Publicación':'Bloqueado para el rol '+ROLES[S.rol].n}</span></button>
+   <button class="door${can('editar')?'':' locked'}" data-door="preguntas"><span class="kicker">Evaluación</span><strong>Cargar preguntas de un módulo</strong>
+     <p>Escribís las preguntas del banco o pegás la planilla. Cada una con su tema, que es lo que hace que el examen no salga sesgado.</p>
+     <span class="who">${can('editar')?'Rol Contenido o Publicación':'Bloqueado para el rol '+ROLES[S.rol].n}</span></button>
+   <button class="door${can('editar')?'':' locked'}" data-door="estructura"><span class="kicker">Arranque y expansión</span><strong>Crear un módulo o una sección</strong>
+     <p>Da de alta la estructura donde después van los videos. Es el primer paso de una Academia vacía y el de cada superficie nueva.</p>
+     <span class="who">${can('editar')?'Rol Contenido o Publicación':'Bloqueado para el rol '+ROLES[S.rol].n}</span></button>
+   <button class="door${can('publicar')?'':' locked'}" data-door="publicar"><span class="kicker">Antes de salir a producción</span><strong>Publicar un módulo</strong>
+     <p>Checklist en vez de interruptor: te dice exactamente qué falta para que una agencia pueda hacerlo.</p>
+     <span class="who">${can('publicar')?'Rol Publicación · registra quién publicó y cuándo':'Bloqueado: requiere rol Publicación'}</span></button>`;
+  w.appendChild(d);
+
+  if(!mods.length){
+    w.appendChild(el('div','emptynote','<b>La Academia está vacía.</b><br>Hay dos caminos y los dos funcionan desde acá: crear el primer módulo a mano, o pegar la estructura completa (módulos y secciones) desde la planilla maestra.<div class="row" style="margin-top:12px"><button class="btn btn-p" data-go2="altamod"'+dis('editar')+'>Crear el primer módulo</button><button class="btn" data-go2="imp-estr"'+dis('editar')+'>Pegar la estructura</button></div>'));
+    w.appendChild(el('div','note v3','<b>Ajuste v3 ·</b> El día cero era una pantalla sin salida: los dos botones eran decorativos. Ahora el alta de módulo existe como pantalla propia y el importador tiene un modo Estructura que crea módulos y secciones, no solo videos sobre módulos que ya existen.'));
+    return w;
+  }
+
+  let tot=0,pub=0,sinG=0,regr=0,bloq=0;
+  mods.forEach(m=>{
+    m.secciones.forEach(s=>s.videos.forEach(v=>{if(v.archivado)return;tot++;const p=prodDe(m,v);
+      if(p==='publicado')pub++;if(p==='a regrabar')regr++;if(p==='backlog'||p==='guionado')sinG++;}));
+    if(!modVisible(m)&&checklistPub(m).bloqueado) bloq++;
+  });
+  const mini=el('div','mini');
+  mini.innerHTML=`
+   <div class="stat"><b>${tot}</b><span>videos en el mapa</span></div>
+   <div class="stat"><b>${pub}</b><span>publicados</span></div>
+   <div class="stat"><b>${sinG}</b><span>sin grabar</span></div>
+   <div class="stat"><b>${regr}</b><span>a regrabar</span></div>
+   <div class="stat"><b>${bloq}</b><span>módulos trabados para publicar</span></div>`;
+  w.appendChild(mini);
+
+  const card=el('div','card');
+  card.innerHTML=`<div style="padding:12px 14px;border-bottom:1px solid var(--line-soft)"><h3 style="margin:0">Lo que está esperando algo</h3><p class="hint" style="margin:3px 0 0">Cada ítem lleva directo al lugar donde se resuelve, con el nodo ya seleccionado.</p></div>`;
+  const ul=el('ul','tasklist');
+  const items=[];
+  mods.forEach(m=>{
+    const c=subtemasEnCero(m), n=activas(m).filter(q=>q.estado==='activa').length;
+    if(!m.secciones.length) items.push([m.id+' no tiene secciones','Sin al menos una sección no se le pueden cargar videos','Agregar sección','sec',m.id]);
+    else if(m.subtemas.length===0&&!m.enPrep) items.push([m.id+' no tiene temas definidos','Sin temas el banco no se puede validar ni publicar','Definir temas','subtemas',m.id]);
+    else if(c>0&&n>0) items.push([m.id+' tiene '+c+' tema'+(c>1?'s':'')+' sin cubrir','Bloquea la publicación: el sorteo podría dejar afuera un concepto central','Ir al banco','banco',m.id]);
+    else if(n>0&&n<m.params.objetivo) items.push([m.id+' · banco incompleto',n+' de '+m.params.objetivo+' preguntas cargadas','Completar banco','banco',m.id]);
+  });
+  mods.forEach(m=>m.secciones.forEach((s,si)=>s.videos.forEach(v=>{
+    if(embebido(m,v)==='falla') items.push([m.id+'.'+v.seq+' tiene el embebido roto','YouTube no permite embeberlo: la agencia vería "video no disponible"','Revisar video','vid',m.id,si,v.seq]);
+  })));
+  if(regr) items.push([regr+' videos marcados a regrabar','Cambió el producto y quedaron viejos','Ver la cola','regr']);
+  items.slice(0,6).forEach(it=>{
+    const li=el('li');
+    const dg=it[3]==='vid'?`data-jump="vid|${it[4]}|${it[5]}|${it[6]}"`:(it[3]==='regr'?`data-jump="regr"`:`data-jump="${it[3]}|${it[4]}"`);
+    li.innerHTML=`<span class="grow"><b style="font-weight:500">${esc(it[0])}</b><br><span class="sub">${esc(it[1])}</span></span><button class="btn btn-sm" ${dg}>${esc(it[2])}</button>`;
+    ul.appendChild(li);
+  });
+  if(!items.length) ul.appendChild(el('li','','<span class="grow">Nada pendiente en esta escena.</span>'));
+  card.appendChild(ul);
+  w.appendChild(card);
+  w.appendChild(el('div','note v3','<b>Ajuste v3 ·</b> Las cuatro puertas se habilitan según el rol: con rol Consulta las cuatro quedan atenuadas y el hub se vuelve un tablero de lectura. Cambiá el rol arriba a la derecha para verlo.'));
+  return w;
+}
+
+/* ============================================================
+   REGLAS Y DECISIONES (MVP v2 ratificado)
+   ============================================================ */
+function viewCambios(){
+  const w=el('div','wrap');
+  w.innerHTML=`<h1>Reglas y decisiones</h1>
+    <p class="lede">El backoffice está ahora <b>alineado al prototipo aprobado del lado agencia</b>. Esta pantalla es el anexo del MVP v2: qué se alineó, qué decisiones cerró el prototipo, y qué queda abierto. Sirve para que desarrollo estime sobre un solo documento.</p>`;
+
+  const alin=[
+   ['Planes','Corporate / Business / Standard (MVP §2).','<b>Professional / Business</b>, y son de la agencia. Se separó <b>planes</b> (recorrido y bases de cálculo) del <b>tag</b> editorial (P+B/B/B-nicho).','El prototipo usa dos planes; el README lo marca como "a corregir".'],
+   ['Tema del banco','Catálogo de sub-temas con su propio ABM.','El tema <b>es la sección</b> del módulo. Se eliminó el ABM de sub-temas.','Alinea con el prototipo y con las dudas de la Meet, y borra una fuente de desincronización.'],
+   ['Módulos fuera de plan','"Ver como agencia" los ocultaba.','Se <b>muestran con candado de plan</b>, sin ordinal, sin contar para el avance.','Además de pedagógico, es una superficie comercial. Decisión del prototipo.'],
+   ['Publicación y ordinales','La cadena salteaba los no publicados.','<b>Publicación en orden</b> obligatoria (requisito duro nuevo). El ordinal del recorrido va 1..N sin huecos.','Sostiene la invariante que el prototipo ya verifica.'],
+   ['Plan por video','El plan del video se heredaba del módulo, sin override.','Campo <b>plan propio del video</b>, como el Dashboard de KPIs (Business en un módulo P+B).','Sin él, ese contenido aprobado no se puede cargar.'],
+   ['Campos de contenido','El ABM no pedía resumen ni descripción.','Se agregaron <b>resumen</b> (card) y <b>descripción</b> (syllabus) al módulo.','El prototipo los muestra; sin ellos la card y el syllabus quedan sin texto.'],
+   ['Meet','Un link fijo en la ficha del módulo.','<b>Cupo por agencia</b>, cola de dudas, coordinador, franja de atención y <b>enlace por turno</b>.','Es el modelo de negocio: una Meet por módulo por agencia, no por usuario.'],
+   ['Certificado','No estaba en el MVP.','Plantilla, tipos de documento, fuente del documento y registro de emisiones.','El prototipo lo emite; el backoffice tiene que administrarlo.'],
+   ['Panel + tracking','Estaba como "fase 2".','Avance por agencia y panel general, con la regla de agregación del prototipo.','El logueo de eventos entra en el MVP aunque las pantallas se pulan después: es lo irrecuperable.'],
+   ['Banco','Mínimo 20.','Mínimo <b>30</b> (3× el intento), objetivo 50.','Con reintentos ilimitados, un banco chico se memoriza.']
+  ];
+  const t1=el('div','tablewrap');const tb1=el('table');
+  tb1.innerHTML='<thead><tr><th style="width:130px">Tema</th><th style="width:24%">Antes (MVP v1)</th><th style="width:30%">Ahora (alineado)</th><th>Por qué</th></tr></thead><tbody>'+
+    alin.map(r=>`<tr><td><b style="font-weight:500">${esc(r[0])}</b></td><td>${esc(r[1])}</td><td>${r[2]}</td><td>${esc(r[3])}</td></tr>`).join('')+'</tbody>';
+  t1.appendChild(tb1);
+  w.appendChild(el('h2','','Alineado al prototipo — pasa al MVP v2'));
+  w.appendChild(t1);
+
+  const cerr=[
+   ['Mostrar las respuestas correctas','No se muestran (P07.6). Solo el tema fallado y el video de repaso. Es la variante A de la pantalla de resultado.'],
+   ['Orden independiente del ID','Confirmado y en uso: tres secciones muestran los videos fuera del orden de ID a propósito.'],
+   ['Estado "Próximamente"','No existe: un módulo se publica solo con su syllabus completo. Valida el requisito "al menos un video".'],
+   ['Tipo de pregunta','Opción única con 4 opciones. Verdadero/falso no necesita desarrollo aparte.'],
+   ['Qué número ve la agencia','La posición en el recorrido (1..N), nunca el ID.'],
+   ['Rehacer evaluación aprobada','Gana la última nota aprobada; desaprobar no revoca (P05.4).']
+  ];
+  const t2=el('div','tablewrap');const tb2=el('table');
+  tb2.innerHTML='<thead><tr><th style="width:34%">Lo que el prototipo ya cierra</th><th>Cómo</th></tr></thead><tbody>'+
+    cerr.map(r=>`<tr><td><b style="font-weight:500">${esc(r[0])}</b></td><td>${esc(r[1])}</td></tr>`).join('')+'</tbody>';
+  t2.appendChild(tb2);
+  w.appendChild(el('h2','','Decisiones que el prototipo cierra'));
+  w.appendChild(t2);
+
+  const ab=[
+   ['Superficies FRT y CRM en el recorrido','¿Un recorrido por superficie con su propio certificado, o una sola secuencia intercalada? No está en ningún documento y condiciona el modelo.','Producto'],
+   ['Cómo se mide el 80 % de visto','Posición del cursor vs. segundos acumulados anti-scrub (P04.3). Es decisión de producto, no límite técnico.','Producto'],
+   ['Despublicar algo en curso','Si una agencia lo estaba cursando: ¿pierde acceso? ¿pierde la aprobación? ¿se le corre el ordinal?','Producto'],
+   ['La Meet exige aprobar','El que necesita ayuda es el que desaprueba (P08.6). El propio prototipo lo marca como la objeción más fuerte.','Producto + Capacitación'],
+   ['Designación del coordinador','Quién lo nombra y qué pasa si se va de la agencia. Hoy llega de solo lectura desde el backend.','Producto']
+  ];
+  const t3=el('div','tablewrap');const tb3=el('table');
+  tb3.innerHTML='<thead><tr><th style="width:32%">Sigue abierto</th><th>Qué está en juego</th><th style="width:130px">Quién decide</th></tr></thead><tbody>'+
+    ab.map(r=>`<tr data-warn="true"><td><b style="font-weight:500">${esc(r[0])}</b></td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('')+'</tbody>';
+  t3.appendChild(tb3);
+  w.appendChild(el('h2','','Sigue abierto — necesita decisión formal'));
+  w.appendChild(t3);
+
+  w.appendChild(el('div','note v3','<b>Alineación completa ·</b> El prototipo del lado agencia está aprobado, así que manda: donde el backoffice difería, se ajustó el backoffice. El único bloque que queda por diseñar en profundidad es qué pasa con las superficies FRT y CRM dentro del recorrido de una agencia.'));
+  return w;
+}
+
+/* ============================================================
+   ROLES Y PERMISOS
+   ============================================================ */
+function viewRoles(){
+  const w=el('div','wrap');
+  w.innerHTML=`<h1>Roles y permisos</h1>
+    <p class="lede">SSO resuelve quién entra a la Academia. Esto resuelve quién puede publicarla. Son dos cosas distintas y el MVP solo tenía la primera.</p>`;
+
+  const sel=el('div','row');sel.style.marginBottom='16px';
+  sel.innerHTML=`<span class="hint" style="margin:0">Estás actuando como:</span>
+    ${Object.keys(ROLES).map(r=>`<button class="btn btn-sm ${S.rol===r?'btn-on':''}" data-rol="${r}">${esc(ROLES[r].n)}</button>`).join('')}
+    <span class="hint" style="margin:0 0 0 8px">${esc(ROLES[S.rol].quien)}</span>`;
+  w.appendChild(sel);
+
+  const acciones=[
+   ['Ver la estructura, los bancos y "ver como agencia"','ver'],
+   ['Crear y editar módulos y secciones','editar'],
+   ['Cargar videos y verificar el embebido','editar'],
+   ['Cargar y editar preguntas y temas','editar'],
+   ['Importar desde planilla','editar'],
+   ['Previsualizar la evaluación','ver'],
+   ['Editar los parámetros del banco (objetivo y mínimo)','params'],
+   ['Archivar un módulo, una sección o un video','archivar'],
+   ['Publicar y despublicar','publicar']
+  ];
+  const tw=el('div','tablewrap');const tb=el('table');
+  tb.innerHTML=`<thead><tr><th>Acción</th>${Object.keys(ROLES).map(r=>`<th style="width:110px;text-align:center">${esc(ROLES[r].n)}</th>`).join('')}</tr></thead><tbody>`+
+   acciones.map(a=>`<tr><td>${esc(a[0])}</td>${Object.keys(ROLES).map(r=>
+     `<td style="text-align:center">${PERMS[a[1]].includes(r)?'<span class="ok">●</span>':'<span style="color:var(--line-ctl)">–</span>'}</td>`).join('')}</tr>`).join('')+'</tbody>';
+  tw.appendChild(tb);w.appendChild(tw);
+
+  const cards=el('div','doors');cards.style.marginTop='16px';
+  cards.innerHTML=Object.keys(ROLES).map(r=>`<div class="door" style="cursor:default">
+     <span class="kicker">${S.rol===r?'rol actual':'rol'}</span><strong>${esc(ROLES[r].n)}</strong>
+     <p>${esc(ROLES[r].d)}</p><span class="who">Típicamente: ${esc(ROLES[r].quien)}</span></div>`).join('');
+  w.appendChild(cards);
+
+  w.appendChild(el('div','banner warn','<span>!</span><div><b>Dos definiciones pendientes.</b> Primero: dónde se asignan los roles — ¿en el ABM de usuarios de sigmma.net o en un ABM propio de la Academia? Segundo: si un mismo usuario puede tener dos roles a la vez (el caso real es M. Luna, que carga contenido y también publica). Recomendación: rol único por usuario, y que Publicación incluya todo lo de Contenido, como está acá.</div>'));
+  w.appendChild(el('div','note v3','<b>Pantalla nueva v3 ·</b> Los permisos no son decorativos: el rol elegido arriba deshabilita botones en todas las pantallas. Con rol Contenido, la solapa Publicar muestra el checklist completo pero el botón de publicar queda bloqueado con el motivo; con rol Consulta, los formularios pasan a solo lectura.'));
+  return w;
+}
+
+/* ============================================================
+   CONSTRUCTOR
+   ============================================================ */
+function viewConstructor(){const s=el('div','split');s.appendChild(treeCol());s.appendChild(detailCol());return s;}
+
+function treeCol(){
+  const col=el('div','treecol');
+  const bar=el('div','treebar');
+  bar.innerHTML=`
+    <div class="segbar" role="group" aria-label="Superficie">
+      ${['BAK','FRT','CRM'].map(s=>`<button class="seg" data-sup="${s}" aria-pressed="${S.superficie===s}">${s}</button>`).join('')}
+    </div>
+    <input type="text" id="filtro" placeholder="Buscar módulo, video o ID" value="${esc(S.filtro)}" aria-label="Buscar">
+    <label class="row" style="font-size:12px;color:var(--muted);gap:5px;margin:0"><input type="checkbox" id="soloPend" ${S.soloPend?'checked':''} style="accent-color:var(--accent)"> Solo pendiente</label>
+    <label class="row" style="font-size:12px;color:var(--muted);gap:5px;margin:0"><input type="checkbox" id="verArch" ${S.verArch?'checked':''} style="accent-color:var(--accent)"> Ver archivados</label>
+    <button class="btn btn-sm" id="collapseAll" style="margin-left:auto">Cerrar todo</button>`;
+  col.appendChild(bar);
+
+  const tree=el('div','tree');tree.setAttribute('role','tree');tree.setAttribute('aria-label','Estructura de la Academia');
+  const mods=modsVis();
+
+  if(!mods.length){
+    const n=el('div','emptynote');
+    n.style.margin='14px';
+    const txt=S.superficie==='BAK'
+      ?'<b>Todavía no hay módulos en el backend.</b><br>Creá el primero o pegá la estructura desde la planilla maestra.'
+      :(S.superficie==='FRT'
+        ?'<b>La superficie FRT todavía no está mapeada.</b><br>El frontend B2B2C tiene los módulos FRT-M00 en adelante reservados, pendientes de relevar con producto. Ya se puede crear el primero.'
+        :'<b>La superficie CRM todavía no está mapeada.</b><br>Deal Closer es de gobernanza externa hasta la adquisición prevista para 2027. Cobertura mínima recomendada mientras tanto.');
+    n.innerHTML=txt+`<div class="row" style="margin-top:12px">
+      <button class="btn btn-p" data-go2="altamod"${dis('editar')}>Crear el primer módulo ${S.superficie}</button>
+      <button class="btn" data-go2="imp-estr"${dis('editar')}>Pegar la estructura</button></div>
+      ${can('editar')?'':'<p class="hint">'+esc(porque('editar'))+'</p>'}`;
+    tree.appendChild(n);
+    col.appendChild(tree);return col;
+  }
+
+  mods.slice().sort((a,b)=>a.orden-b.orden).forEach(mod=>{
+    const open=!!S.open[mod.id];
+    const nP=activas(mod).filter(q=>q.estado==='activa').length;
+    const cero=subtemasEnCero(mod);
+    const vis=modVisible(mod);
+    const n=el('div','node n-mod'+(isSel('mod',mod.id)?' sel':''));
+    n.innerHTML=`
+      <button class="twist" data-toggle="${mod.id}" aria-expanded="${open}" aria-label="Abrir módulo">${open?'▾':'▸'}</button>
+      <button class="label" role="treeitem" aria-level="1" aria-expanded="${open}" data-sel="mod|${mod.id}">${esc(mod.name)}</button>
+      <span class="idbadge">${mod.id}</span>
+      <span class="tag">orden ${mod.orden}</span>
+      <span class="tag">${esc(mod.tag)}</span>
+      <span class="chip nodot ${vis?'vis-si':'vis-no'}">${vis?'visible':'en preparación'}</span>
+      <span class="tag ${cero&&nP?'stop':(nP>=mod.params.objetivo?'ok':'')}">${nP}/${mod.params.objetivo} preg.</span>`;
+    tree.appendChild(n);
+    if(!open) return;
+
+    if(mod.nuevo) tree.appendChild(el('div','legend','Módulo recién creado en esta sesión. Acepta secciones, videos y preguntas; se publica cuando cumpla el checklist.'));
+    else if(mod.enPrep) tree.appendChild(el('div','legend','Módulo nuevo, todavía no publicado. Acepta videos y preguntas; no se muestra a las agencias hasta completar el checklist de publicación.'));
+
+    if(!mod.secciones.length){
+      const e=el('div','addrow sec');
+      e.innerHTML=`<span class="hint" style="display:inline;margin-right:8px">Sin secciones todavía.</span>`;
+      tree.appendChild(e);
+    }
+
+    mod.secciones.forEach((sec,si)=>{
+      const ns=el('div','node n-sec'+(isSel('sec',mod.id,si)?' sel':''));
+      ns.innerHTML=`<span class="twist" aria-hidden="true">└</span>
+        <button class="label" role="treeitem" aria-level="2" data-sel="sec|${mod.id}|${si}">${esc(sec.name)}</button>
+        <span class="tag">${sec.videos.filter(v=>!v.archivado).length} videos</span>`;
+      tree.appendChild(ns);
+
+      sec.videos.forEach(v=>{
+        if(v.archivado&&!S.verArch) return;
+        const p=prodDe(mod,v), id=mod.id+'.'+v.seq, emb=embebido(mod,v);
+        if(S.soloPend&&p==='publicado'&&emb==='ok') return;
+        if(S.filtro&&!(id+' '+v.t).toLowerCase().includes(S.filtro.toLowerCase())) return;
+        const nv=el('div','node n-vid'+(v.archivado?' arch':'')+(isSel('vid',mod.id,si,v.seq)?' sel':''));
+        nv.innerHTML=`
+          <input type="checkbox" class="selbox" data-check="${id}" ${S.checked.has(id)?'checked':''} aria-label="Seleccionar ${id}" style="accent-color:var(--accent);width:13px;height:13px;flex:none">
+          <span class="idbadge">${id}</span>
+          <button class="label" role="treeitem" aria-level="3" data-sel="vid|${mod.id}|${si}|${v.seq}">${esc(v.t)}</button>
+          ${emb==='falla'?'<span class="tag stop" title="YouTube no permite embeberlo">embebido ✕</span>':''}
+          ${emb==='sin verificar'?'<span class="tag warn" title="Falta verificar el embebido">embebido ?</span>':''}
+          <span class="tag">${v.p}</span>
+          <span class="chip ${stCls(p)}">${p}</span>
+          ${vidVisible(mod,v)?'<span class="chip nodot vis-si">visible</span>':'<span class="chip nodot vis-no">no visible</span>'}
+          <button class="rowact" data-ins="${mod.id}|${si}|${v.seq}" title="Insertar un video después de este">insertar ↓</button>`;
+        tree.appendChild(nv);
+      });
+
+      if(S.quick&&S.quick.modId===mod.id&&S.quick.secIdx===si) tree.appendChild(quickForm(mod,sec,si));
+      else {const a=el('div','addrow');a.innerHTML=`<button class="addbtn" data-add="vid|${mod.id}|${si}"${dis('editar')}>+ agregar video acá</button>`;tree.appendChild(a);}
+    });
+
+    if(S.qsec&&S.qsec.modId===mod.id) tree.appendChild(secForm(mod));
+    else{
+      const as=el('div','addrow sec');
+      as.innerHTML=`<button class="addbtn" data-add="sec|${mod.id}"${dis('editar')}>+ agregar sección a ${mod.id}</button>`;
+      tree.appendChild(as);
+    }
+  });
+
+  const am=el('div','addrow mod');
+  am.innerHTML=`<button class="addbtn" data-add="mod"${dis('editar')}>+ agregar módulo ${S.superficie}</button>`;
+  tree.appendChild(am);
+
+  tree.appendChild(el('div','note v3','<b>Ajuste v3 ·</b> "+ agregar módulo" y "+ agregar sección" ya no son avisos: abren el alta real. El módulo se crea en estado <b>en preparación</b> y aparece en el árbol al instante; la sección se crea en línea, sin salir del árbol.'));
+  tree.appendChild(el('div','note new','<b>De la v2 ·</b> Cada módulo muestra <b>orden</b> y <b>visibilidad</b> por separado. Cada video muestra <b>estado de producción</b> y <b>visibilidad</b> como dos chips distintos, más el semáforo de embebido, y "insertar ↓" para usar la numeración de diez en diez.'));
+  col.appendChild(tree);
+
+  if(S.checked.size){
+    const b=el('div','bulk');
+    b.innerHTML=`<span class="count">${S.checked.size} seleccionados</span>
+      <button class="btn btn-sm" data-bulk="regrabar"${dis('editar')}>Marcar a regrabar</button>
+      <button class="btn btn-sm" data-bulk="despublicar"${dis('publicar')}>Despublicar</button>
+      <button class="btn btn-sm" data-bulk="cohorte"${dis('editar')}>Asignar cohorte…</button>
+      <button class="btn btn-sm" data-bulk="mover"${dis('editar')}>Mover a otra sección…</button>
+      <button class="btn btn-sm" data-bulk="verificar"${dis('editar')}>Verificar embebido</button>
+      <button class="btn btn-sm" data-bulk="archivar"${dis('archivar')}>Archivar</button>
+      <button class="btn btn-sm x" data-bulk="clear">Deseleccionar</button>`;
+    col.appendChild(b);
+  }
+  return col;
+}
+function isSel(k,mid,si,vs){const s=S.sel;if(!s||s.kind!==k||s.modId!==mid)return false;
+  if(k==='mod')return true;if(s.secIdx!==si)return false;if(k==='sec')return true;return s.vidSeq===vs;}
+
+/* ---------- alta rápida de sección, en línea en el árbol ---------- */
+function secForm(mod){
+  const q=el('div','quick sec');
+  q.innerHTML=`
+   <div class="qhead"><b>Nueva sección</b><small style="color:var(--muted);font-size:11.5px">en ${esc(mod.name)}</small></div>
+   <div class="qgrid">
+     <div><label for="snn">Nombre de la sección</label><input type="text" id="snn" placeholder="Ej: Saldos y devoluciones" autocomplete="off">
+       <p class="hint">Es un agrupamiento visual: sirve para que una lista de 7 videos se lea como dos ideas.</p></div>
+   </div>
+   <div class="derived"><dl>
+     <dt>Módulo</dt><dd><span class="idbadge">${mod.id}</span> ${esc(mod.name)}</dd>
+     <dt>Orden dentro del módulo</dt><dd>${(mod.secciones.length+1)*10} <span class="hint" style="display:inline">última del módulo, se puede mover después</span></dd>
+     <dt>Videos</dt><dd>ninguno todavía: se agregan desde el árbol</dd>
+   </dl></div>
+   <div class="row" style="margin-top:12px">
+     <button class="btn btn-p" data-secsave="save">Crear sección</button>
+     <button class="btn" data-secsave="more">Crear y seguir agregando</button>
+     <button class="btn-q" data-secsave="cancel">Cancelar</button>
+   </div>`;
+  return q;
+}
+
+function quickForm(mod,sec,si){
+  const modo=S.quick.modo||'tengo';
+  const after=S.quick.after;
+  let seq=nextSeq(sec), nota='último de la sección';
+  if(after){
+    const idx=sec.videos.findIndex(v=>v.seq===after);
+    const a=parseInt(after,10), b=sec.videos[idx+1]?parseInt(sec.videos[idx+1].seq,10):a+10;
+    seq=String(Math.floor((a+b)/2)).padStart(3,'0');
+    nota='intercalado después de .'+after;
+  }
+  const q=el('div','quick');
+  q.innerHTML=`
+   <div class="qhead"><b>Nuevo video</b><small style="color:var(--muted);font-size:11.5px">en ${esc(mod.name)} › ${esc(sec.name)}</small></div>
+   <div class="qgrid">
+     <div><label for="qt">¿Qué enseña este video?</label><input type="text" id="qt" placeholder="Ej: Anular un recibo ya emitido" autocomplete="off">
+       <p class="hint">Escribilo como se lo contarías a alguien: una funcionalidad, un concepto.</p></div>
+     <div><label>¿En qué estado está?</label>
+       <div class="radioset">
+         <label class="radiopill ${modo==='tengo'?'on':''}"><input type="radio" name="modo" value="tengo" ${modo==='tengo'?'checked':''}> Ya lo tengo grabado</label>
+         <label class="radiopill ${modo==='reservar'?'on':''}"><input type="radio" name="modo" value="reservar" ${modo==='reservar'?'checked':''}> Todavía no se grabó</label>
+       </div></div>
+     ${modo==='tengo'?`
+     <div><label for="qlink">Link de YouTube</label><input type="url" id="qlink" placeholder="https://youtube.com/watch?v=…">
+       <p class="hint">Al guardar se lee la duración y <b>se verifica que YouTube permita embeberlo</b>. Si falla, el video queda con semáforo rojo y no se puede publicar el módulo.</p></div>`:`
+     <div><label for="qdur">Duración estimada</label><input type="text" id="qdur" placeholder="4:00" style="max-width:120px">
+       <p class="hint">Queda marcada como estimada hasta que exista el video. Sirve para planificar el cohorte.</p></div>
+     <div class="derived">Queda reservado en <b>backlog</b>, sin link, y aparece en el plan de rodaje.</div>`}
+   </div>
+   <div class="derived"><dl>
+     <dt>ID que le toca</dt><dd><span class="idbadge">${mod.id}.${seq}</span> <button class="info" data-info="id" aria-label="De dónde sale este ID">i</button> <span class="hint" style="display:inline">${esc(nota)}</span></dd>
+     <dt>Superficie</dt><dd>${mod.sup} · ${mod.sup==='BAK'?'SIGMMA Backend':(mod.sup==='FRT'?'SIGMMA Frontend':'Deal Closer')}</dd>
+     <dt>Módulo y sección</dt><dd>${esc(mod.name)} › ${esc(sec.name)}</dd>
+     <dt>Plan al que aplica</dt><dd>${esc(mod.tag)} <span class="hint" style="display:inline">(heredado del módulo)</span></dd>
+     <dt>Visibilidad</dt><dd>no visible hasta publicar el módulo</dd>
+   </dl></div>
+   <div class="row" style="margin-top:12px">
+     <button class="btn btn-p" data-quick="save">Guardar video</button>
+     <button class="btn" data-quick="save-more">Guardar y crear otro</button>
+     <button class="btn-q" data-quick="cancel">Cancelar</button>
+     <span class="hint" style="margin-left:auto">Cohorte, prioridad y guion se completan después, en Producción.</span>
+   </div>`;
+  return q;
+}
+
+/* ============================================================
+   ALTA DE MÓDULO (pantalla nueva)
+   ============================================================ */
+function viewAltaMod(){
+  const w=el('div','wrap');
+  const sup=S.superficie;
+  const id=nextModId(sup);
+  const ord=nextOrden(sup);
+  const plan=S.amPlan;
+  const perfSug=plan==='P+B'?PERFILES:['Business'];
+  const supName={BAK:'SIGMMA Backend · operación de la agencia',FRT:'SIGMMA Frontend · herramienta B2B2C',CRM:'Deal Closer · gobernanza externa'}[sup];
+
+  w.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
+    <div><h1>Nuevo módulo</h1><p class="lede" style="margin-bottom:14px">Un módulo es la unidad que dispara la evaluación y la Meet de soporte. Nace <b>en preparación</b>: acepta secciones, videos y preguntas, y no se ve hasta cumplir el checklist.</p></div>
+    <button class="btn btn-sm" data-go="constructor">← Volver al árbol</button></div>`;
+
+  if(!can('editar')){
+    w.appendChild(el('div','banner stop','<span>✕</span><div><b>Sin permiso para crear módulos.</b> '+esc(porque('editar'))+'</div>'));
+    return w;
+  }
+  if(sup==='CRM') w.appendChild(el('div','banner warn','<span>!</span><div><b>Deal Closer es de gobernanza externa hasta la adquisición prevista para 2027.</b> Crear módulos CRM debería requerir confirmación de Producto. Cobertura mínima recomendada mientras tanto.</div>'));
+
+  const card=el('div','card');card.style.padding='16px';
+  card.innerHTML=`
+   <div class="fieldgrid">
+     <div><label>Superficie</label>
+       <div class="row">${['BAK','FRT','CRM'].map(x=>`<button class="btn btn-sm ${sup===x?'btn-on':''}" data-sup="${x}">${x}</button>`).join('')}
+         <span class="hint" style="margin:0">${esc(supName)}</span></div>
+       <p class="hint">Cada superficie tiene su propio espacio de numeración. De acá sale el prefijo del ID.</p></div>
+     <div><label for="anNombre">Nombre del módulo</label><input type="text" id="anNombre" placeholder="Ej: Tráfico y asignación de butaca" autocomplete="off">
+       <p class="hint">Como lo va a leer la agencia en el listado. Sin el prefijo del ID: eso lo agrega el sistema.</p></div>
+     <div><label>Plan al que aplica</label>
+       <div class="radioset">
+         ${['P+B','B','B-nicho'].map(x=>`<label class="radiopill ${plan===x?'on':''}"><input type="radio" name="anPlan" value="${x}" ${plan===x?'checked':''}> ${x}${x==='P+B'?' — todos los planes':(x==='B'?' — solo Business':' — Business, caso puntual')}</label>`).join('')}
+       </div></div>
+     <div><label>¿Qué plan de agencia incluye este módulo?</label>
+       <div class="radioset" style="flex-direction:column;align-items:stretch">
+         ${PERFILES.map(p=>`<label class="radiopill ${perfSug.includes(p)?'on':''}" style="justify-content:flex-start"><input type="checkbox" class="apPerf" value="${p}" ${perfSug.includes(p)?'checked':''}> ${p}</label>`).join('')}
+       </div>
+       <p class="hint">Prellenado según el plan elegido; se puede ajustar. Sin ningún plan el módulo no se puede publicar, y las agencias que no lo tengan asignado lo saltean en la cadena de desbloqueo.</p></div>
+     <div><label for="anOrden">Orden en la secuencia</label>
+       <div class="row"><input type="number" id="anOrden" value="${ord}" style="max-width:110px">
+         <span class="hint" style="margin:0">de diez en diez, para poder intercalar sin renumerar</span></div>
+       <p class="hint">Si querés intercalarlo entre dos módulos existentes, poné un valor intermedio: entre orden 40 y 45 va 42.</p></div>
+     <div><label for="anSec">Primera sección (opcional)</label><input type="text" id="anSec" placeholder="Ej: Asignación de butaca">
+       <p class="hint">Si la dejás vacía, el módulo se crea sin secciones y no acepta videos hasta que agregues una. Conviene crear al menos una acá.</p></div>
+   </div>
+   <div class="sep"></div>
+   <div class="derived"><dl>
+     <dt>ID que le toca</dt><dd><span class="idbadge">${id}</span> <button class="info" data-info="idmod" aria-label="De dónde sale este ID">i</button> <span class="hint" style="display:inline">permanente, no cambia nunca</span></dd>
+     <dt>Estado inicial</dt><dd><span class="chip nodot vis-no">en preparación</span> <span class="hint" style="display:inline">no visible para ninguna agencia</span></dd>
+     <dt>Banco de preguntas</dt><dd>vacío · objetivo 50 · mínimo para publicar 20</dd>
+     <dt>Temas</dt><dd>ninguno todavía. Al cargar el primer video se puede prellenar el catálogo desde los títulos</dd>
+     <dt>Meet de soporte</dt><dd>habilitada por defecto, sin link de agenda</dd>
+   </dl></div>
+   <div class="row" style="margin-top:14px">
+     <button class="btn btn-p" data-amsave="save">Crear módulo</button>
+     <button class="btn" data-amsave="more">Crear y cargar otro</button>
+     <button class="btn-q" data-go="constructor">Cancelar</button>
+   </div>`;
+  w.appendChild(card);
+  w.appendChild(el('div','note v3','<b>Pantalla nueva v3 ·</b> Era el hueco que dejaba la Academia sin arranque posible. Los campos son los del MVP §3.1 (ID, nombre, estado, perfiles, orden) más la primera sección, que evita el paso muerto de crear un módulo que todavía no acepta videos. El ID y el estado inicial son derivados y se muestran antes de guardar, igual que en el alta de video.'));
+  return w;
+}
+
+/* ---------- detalle ---------- */
+function detailCol(){
+  const d=el('div','detail');
+  if(!S.sel){
+    const b=el('div','dbody');b.setAttribute('role','tabpanel');b.setAttribute('tabindex','0');
+    b.appendChild(el('div','emptynote','Elegí un módulo, una sección o un video del árbol para ver y editar su ficha.'));
+    d.appendChild(b);return d;
+  }
+  const m=findMod(S.sel.modId);
+  if(!m){S.sel=null;return detailCol();}
+  if(S.sel.kind==='mod') return detMod(d,m);
+  if(S.sel.kind==='sec') return detSec(d,m,m.secciones[S.sel.secIdx]);
+  return detVid(d,m,m.secciones[S.sel.secIdx]);
+}
+function tabsBar(list){
+  const t=el('div','tabs');t.setAttribute('role','tablist');
+  list.forEach(([k,l])=>{const b=el('button','tab',esc(l));b.setAttribute('role','tab');
+    b.setAttribute('aria-selected',String(S.tab===k));b.dataset.tab=k;t.appendChild(b);});
+  return t;
+}
+
+function detMod(d,m){
+  const nP=activas(m).filter(q=>q.estado==='activa').length;
+  const chk=checklistPub(m);
+  const vis=modVisible(m);
+  const h=el('div','dhead');
+  h.innerHTML=`<div class="idline"><span class="idbadge">${m.id}</span><span class="tag">${esc(m.tag)}</span>
+      <span class="chip nodot ${vis?'vis-si':'vis-no'}">${vis?'visible para las agencias':'en preparación'}</span>
+      ${chk.bloqueado&&!vis?'<span class="tag stop">no publicable todavía</span>':''}</div>
+    <h2>${esc(m.name)}</h2>
+    <div class="dmeta"><span class="tag">orden ${m.orden}</span><span class="tag">${m.secciones.length} secciones</span>
+      <span class="tag">${m.secciones.reduce((a,s)=>a+s.videos.filter(v=>!v.archivado).length,0)} videos</span>
+      <span class="tag">${nP}/${m.params.objetivo} preguntas</span><span class="tag">${m.subtemas.length} temas</span></div>`;
+  d.appendChild(h);
+  if(!['ficha','banco','eval','publicar'].includes(S.tab)) S.tab='ficha';
+  d.appendChild(tabsBar([['ficha','Ficha'],['banco','Banco'],['eval','Evaluación y Meet'],['publicar','Publicar']]));
+  const b=el('div','dbody');b.setAttribute('role','tabpanel');b.setAttribute('tabindex','0');
+
+  if(S.tab==='ficha'){
+    b.innerHTML=`
+     ${can('editar')?'':'<div class="banner plan"><span>i</span><div>'+esc(porque('editar'))+' La ficha queda en solo lectura.</div></div>'}
+     <div class="fieldgrid">
+       <div><label>ID del módulo</label><div class="ro"><span class="mono">${m.id}</span>
+         <button class="info" data-info="idmod" aria-label="Cómo se arma el ID">i</button><span class="lock">generado por el sistema</span></div></div>
+       <div><label for="mn">Nombre</label><input type="text" id="mn" value="${esc(m.name)}"${dis('editar')}></div>
+       <div><label for="mo">Orden en la secuencia</label>
+         <div class="row"><input type="number" id="mo" value="${m.orden}" style="max-width:100px"${dis('editar')}>
+           <button class="btn btn-sm" data-mord="up"${dis('editar')}>↑ Subir</button><button class="btn btn-sm" data-mord="down"${dis('editar')}>↓ Bajar</button></div>
+         <p class="hint">De diez en diez, para poder intercalar un módulo nuevo sin renumerar. De este orden depende el desbloqueo secuencial.</p>
+       </div>
+       <div><label>Cadena de desbloqueo</label>
+         <div class="row" style="gap:6px"><span class="hint" style="margin:0">Ver como:</span>
+           ${PERFILES.map(p=>`<button class="btn btn-sm ${S.perfilVista===p?'btn-on':''}" data-perfil="${p}">${p}</button>`).join('')}</div>
+         <div class="chain">${cadena(S.perfilVista).map((c,i)=>
+           `${i?'<span class="lnk">→</span>':''}<span class="mod ${c.aplica?(c.m.id===m.id?'here':(c.pub?'':'nopub')):'skip'}" title="${esc(c.m.name)}${c.aplica?(c.pub?'':' · sin publicar, la cadena lo saltea'):' · no aplica a '+S.perfilVista}">${c.m.id.replace(c.m.sup+'-','')}</span>`).join('')}</div>
+         <p class="hint">Tachado: no aplica a ${S.perfilVista}. Punteado: todavía no publicado, y la cadena también lo saltea, así una agencia no queda trabada esperando un módulo que no existe para ella o que no salió aún.</p>
+       </div>
+       <div><label for="mt">Plan al que aplica</label>
+         <select id="mt"${dis('editar')}><option ${m.tag==='P+B'?'selected':''}>P+B — todos los planes</option><option ${m.tag==='B'?'selected':''}>B — solo Business</option><option ${m.tag==='B-nicho'?'selected':''}>B-nicho — Business, caso puntual</option></select></div>
+       <div><label>¿Qué plan de agencia incluye este módulo?</label>
+         <div class="radioset" style="flex-direction:column;align-items:stretch">
+           ${PERFILES.map(p=>`<label class="radiopill ${m.perfiles.includes(p)?'on':''}" style="justify-content:flex-start"><input type="checkbox" ${m.perfiles.includes(p)?'checked':''}${dis('editar')}> ${p}</label>`).join('')}
+         </div></div>
+       <div><label>Secciones</label>
+         <div class="row"><button class="btn btn-sm" data-add="sec|${m.id}"${dis('editar')}>+ Agregar sección</button>
+           <span class="hint" style="margin:0">${m.secciones.length?m.secciones.map(s=>esc(s.name)).join(' · '):'ninguna todavía'}</span></div></div>
+       <div><label>Baja</label>
+         <div class="row"><button class="btn btn-d btn-sm" data-arch="mod"${dis('archivar')}>Archivar módulo</button></div>
+         <p class="hint">No hay borrado físico. Archivar lo saca del árbol y de la Academia, conserva el ID y el historial, y no se puede reactivar sin revisar sus videos.${can('archivar')?'':' '+esc(porque('archivar'))}</p>
+       </div>
+     </div>
+     <div class="note v3"><b>Ajuste v3 ·</b> La cadena de desbloqueo ahora distingue tres situaciones: aplica y está publicado, aplica pero <b>todavía no salió</b> (punteado), y no aplica al perfil (tachado). Los dos últimos se saltean. Era la regla que no estaba definida en ningún documento.</div>`;
+  }
+
+  if(S.tab==='banco'){
+    const cob=cobertura(m), cero=cob.filter(c=>c.n===0).length;
+    if(m.subtemas.length===0){
+      b.innerHTML=`<div class="banner stop"><span>✕</span><div><b>Este módulo no tiene temas definidos.</b> Sin temas no se puede validar el banco ni publicar el módulo: el sorteo de 10 sobre 50 podría dejar afuera un concepto central.</div></div>
+        <div class="row"><button class="btn btn-p" data-go2="subtemas|${m.id}">Definir temas</button></div>
+        <div class="note new"><b>Atajo recomendado ·</b> Al abrir el catálogo, el sistema propone los temas derivados de los títulos de los videos del módulo. La persona ajusta en vez de escribir desde cero.</div>`;
+    } else if(nP===0){
+      b.innerHTML=`<div class="emptynote"><b>El banco está vacío.</b><br>Hay dos caminos: cargar preguntas de a una, o pegar la planilla. En los dos casos <b>el tema es obligatorio</b>, porque es lo que garantiza que el examen cubra todos los conceptos del módulo.
+        <div class="row" style="margin-top:12px"><button class="btn btn-p" data-go2="pregunta|${m.id}|new"${dis('editar')}>Agregar pregunta</button><button class="btn" data-go2="imp-preg|${m.id}"${dis('editar')}>Pegar desde planilla</button><button class="btn" data-go2="subtemas|${m.id}">Administrar temas</button></div></div>`;
+    } else {
+      b.innerHTML=`
+       ${cero?`<div class="banner stop"><span>✕</span><div><b>Publicación bloqueada:</b> ${cero} tema${cero>1?'s':''} sin ninguna pregunta.</div></div>`:''}
+       <div style="font-family:var(--mono);font-size:20px">${nP}<span style="color:var(--muted);font-size:13px"> / ${m.params.objetivo}</span>
+         <span class="tag" style="margin-left:8px">mínimo para publicar: ${m.params.minimo}</span></div>
+       <div class="bar ${nP===0?'zero':(nP<m.params.objetivo?'low':'')}"><i style="width:${Math.min(100,nP/m.params.objetivo*100)}%"></i></div>
+       <ul class="sublist">${cob.map(c=>`<li><div class="lineup"><span>${esc(c.st.name)}</span>
+         <span class="n">${c.n} preguntas ${c.n===0?'<span class="bad">· sin cubrir</span>':''}</span></div>
+         <div class="bar ${c.n===0?'zero':(c.n<6?'low':'')}"><i style="width:${Math.min(100,c.n/8*100)}%"></i></div></li>`).join('')}</ul>
+       <div class="sep"></div>
+       <div class="row"><button class="btn btn-p btn-sm" data-go2="banco|${m.id}">Abrir el banco completo</button>
+         <button class="btn btn-sm" data-go2="pregunta|${m.id}|new"${dis('editar')}>Agregar pregunta</button>
+         <button class="btn btn-sm" data-go2="imp-preg|${m.id}"${dis('editar')}>Pegar desde planilla</button>
+         <button class="btn btn-sm" data-go2="subtemas|${m.id}">Temas</button></div>`;
+    }
+  }
+
+  if(S.tab==='eval'){
+    const p=m.params;
+    b.innerHTML=`
+     <h3>Parámetros de la evaluación</h3>
+     <p class="hint" style="margin:0 0 10px">Visibles siempre, para que nadie tenga que preguntar de dónde sale el 80 %. Los marcados como regla del MVP no se editan, para que ningún módulo termine con un umbral distinto sin decisión formal.</p>
+     <div class="fieldgrid">
+       <div><label>Preguntas por intento</label><div class="ro"><span class="mono">${p.porIntento}</span><span class="lock">regla del MVP</span></div></div>
+       <div><label>Tamaño objetivo del banco</label><div class="row"><input type="number" value="${p.objetivo}" style="max-width:100px"${dis('params')}><span class="hint" style="margin:0">${can('params')?'editable':esc(porque('params'))}</span></div></div>
+       <div><label>Mínimo duro para publicar</label><div class="row"><input type="number" value="${p.minimo}" style="max-width:100px"${dis('params')}><span class="hint" style="margin:0">${can('params')?'editable':'solo rol Publicación'}</span></div></div>
+       <div><label>Umbral de aprobación</label><div class="ro"><span class="mono">${p.umbral}</span> (8 de 10)<span class="lock">regla del MVP</span></div></div>
+       <div><label>Reintentos permitidos</label><div class="ro">${p.reintentos}<span class="lock">regla del MVP</span></div></div>
+       <div><label>Forzar cobertura por tema en el sorteo</label>
+         <div class="ro"><span class="tag warn">a definir</span> Decisión 2<span class="lock">recomendación: sí</span></div>
+         <p class="hint">Si el módulo tiene 10 temas o menos, garantizar al menos una pregunta de cada uno y el resto al azar.</p></div>
+       <div><label>Mostrar respuestas correctas al finalizar</label>
+         <div class="ro"><span class="tag warn">a definir</span> Decisión 1<span class="lock">recomendación: no</span></div>
+         <p class="hint">Las dos variantes están construidas en la pantalla de resultado: se pueden comparar antes de decidir.</p></div>
+       <div><label>La aprobación caduca si se regraba un video del módulo</label>
+         <div class="ro"><span class="tag warn">a definir</span> Decisión 6<span class="lock">lo decide quien declara el impacto</span></div></div>
+       <div><label>Al aprobar, habilita</label><div class="ro">El módulo siguiente que aplique al perfil${modSiguiente(m)?': '+modSiguiente(m):''}<span class="lock">solo lectura</span></div></div>
+     </div>
+     <div class="sep"></div>
+     <h3>Meet de soporte</h3>
+     <div class="fieldgrid">
+       <div><label>Meet habilitada para este módulo</label>
+         <div class="radioset"><label class="radiopill ${m.meet.habilitada?'on':''}"><input type="radio" name="meetHab" ${m.meet.habilitada?'checked':''}${dis('editar')}> Sí</label><label class="radiopill ${m.meet.habilitada?'':'on'}"><input type="radio" name="meetHab" ${m.meet.habilitada?'':'checked'}${dis('editar')}> No</label></div></div>
+       <div><label>Condición de habilitación</label><div class="ro">${esc(m.meet.condicion)}<span class="lock">regla del MVP</span></div></div>
+       <div><label>Duración</label><div class="row"><input type="number" value="${m.meet.duracion}" style="max-width:90px"${dis('editar')}><span class="hint" style="margin:0">minutos</span></div></div>
+       <div><label for="mlink">Link de agenda</label><input type="text" id="mlink" value="${esc(m.meet.link)}" placeholder="Falta cargar el link"${dis('editar')}>
+         ${m.meet.habilitada&&!m.meet.link?'<p class="hint miss">La Meet está habilitada sin link: avisa en el checklist de publicación, no bloquea.</p>':''}</div>
+       <div><label>Responsable visible</label><div class="ro">${esc(m.meet.responsable)}</div></div>
+     </div>
+     <div class="sep"></div>
+     <div class="row"><button class="btn btn-p btn-sm" data-go2="preview|${m.id}">Previsualizar la evaluación</button>
+       <span class="hint" style="margin:0">Sortea 10 preguntas con estas reglas, te deja responder y muestra el resultado como lo vería la agencia.</span></div>`;
+  }
+
+  if(S.tab==='publicar'){
+    b.innerHTML=`
+     ${chk.bloqueado
+       ?`<div class="banner stop"><span>✕</span><div><b>Todavía no se puede publicar.</b> Hay ${chk.duros.filter(x=>!x.ok).length} requisito${chk.duros.filter(x=>!x.ok).length>1?'s':''} sin cumplir.</div></div>`
+       :(vis?`<div class="banner ok"><span>✓</span><div><b>Módulo publicado.</b> Publicado por M. Luna el 12/08/2026 a las 16:40.</div></div>`
+            :`<div class="banner ok"><span>✓</span><div><b>Listo para publicar.</b> Todos los requisitos duros están cumplidos.</div></div>`)}
+     ${can('publicar')?'':'<div class="banner plan"><span>i</span><div><b>Podés revisar el checklist, no publicar.</b> '+esc(porque('publicar'))+' El checklist se muestra completo igual: sirve para saber qué falta y a quién pedírselo.</div></div>'}
+     <h3>Requisitos que bloquean</h3>
+     <ul class="checklist">${chk.duros.map(x=>`<li><span class="mk ${x.ok?'ok':'bad'}">${x.ok?'●':'✕'}</span><span>${esc(x.t)}<br><span class="hint" style="margin:0">${esc(x.d)}</span></span></li>`).join('')}</ul>
+     <div class="sep"></div>
+     <h3>Avisos que no bloquean</h3>
+     <ul class="checklist">${chk.blandos.map(x=>`<li><span class="mk ${x.ok?'ok':'miss'}">${x.ok?'●':'○'}</span><span>${esc(x.t)}<br><span class="hint" style="margin:0">${esc(x.d)}</span></span></li>`).join('')}</ul>
+     <div class="sep"></div>
+     <div class="row">
+       ${vis?`<button class="btn btn-d" data-pub="off"${dis('publicar')}>Despublicar módulo</button>`
+            :`<button class="btn btn-p" data-pub="on" ${(chk.bloqueado||!can('publicar'))?'disabled':''}>Publicar para las agencias</button>`}
+       <span class="hint" style="margin:0">${vis?'Despublicar es una acción propia: no hay que tocar el estado de producción de los videos para lograrlo.':'Al publicar se registra quién y cuándo.'}</span>
+     </div>
+     <div class="note v3"><b>Ajuste v3 ·</b> Se sumó un requisito duro que faltaba —"tiene al menos un video cargado"— porque un módulo vacío pasaba el checklist anterior. Y el botón de publicar respeta el rol: con rol Contenido queda bloqueado con el motivo escrito, en lugar de desaparecer.</div>`;
+  }
+  d.appendChild(b);return d;
+}
+function modSiguiente(m){
+  const ord=DATA.filter(x=>x.sup===m.sup).sort((a,b)=>a.orden-b.orden);
+  const i=ord.findIndex(x=>x.id===m.id);
+  return ord[i+1]?ord[i+1].id:null;
+}
+
+function detSec(d,m,sec){
+  if(!sec){S.sel={kind:'mod',modId:m.id};return detMod(d,m);}
+  const h=el('div','dhead');
+  h.innerHTML=`<div class="idline"><span class="tag">Sección de ${m.id}</span></div><h2>${esc(sec.name)}</h2>
+    <div class="dmeta"><span class="tag">${sec.videos.filter(v=>!v.archivado).length} videos</span></div>`;
+  d.appendChild(h);S.tab='ficha';d.appendChild(tabsBar([['ficha','Ficha']]));
+  const b=el('div','dbody');b.setAttribute('role','tabpanel');b.setAttribute('tabindex','0');
+  b.innerHTML=`
+   <div class="fieldgrid">
+     <div><label for="sn">Nombre de la sección</label><input type="text" id="sn" value="${esc(sec.name)}"${dis('editar')}>
+       <p class="hint">Es un agrupamiento visual dentro del módulo. Ayuda a que una lista de 7 videos se lea como dos ideas.</p></div>
+     <div><label>Módulo al que pertenece</label><div class="ro"><span class="mono">${m.id}</span> · ${esc(m.name)}<span class="lock">definido por su lugar en el árbol</span></div></div>
+     <div><label>Orden dentro del módulo</label><div class="row"><button class="btn btn-sm" data-sord="up"${dis('editar')}>↑ Subir</button><button class="btn btn-sm" data-sord="down"${dis('editar')}>↓ Bajar</button><span class="hint" style="margin:0">posición ${S.sel.secIdx+1} de ${m.secciones.length}</span></div></div>
+     <div><label>Baja</label><div class="row"><button class="btn btn-d btn-sm" data-arch="sec"${dis('archivar')}>Archivar sección</button></div>
+       <p class="hint">Los videos de la sección <b>no quedan huérfanos</b>: se archivan con ella y conservan su ID. Al reactivarla vuelven en el mismo orden.</p></div>
+   </div>
+   <div class="note v3"><b>Ajuste v3 ·</b> El reordenamiento de secciones ahora funciona de verdad: ↑ y ↓ mueven la sección en el árbol. Los videos van con ella y su ID no cambia.</div>`;
+  d.appendChild(b);return d;
+}
+
+function detVid(d,m,sec){
+  if(!sec){S.sel={kind:'mod',modId:m.id};return detMod(d,m);}
+  const v=sec.videos.find(x=>x.seq===S.sel.vidSeq);
+  if(!v){S.sel={kind:'sec',modId:m.id,secIdx:S.sel.secIdx};return detSec(d,m,sec);}
+  const id=m.id+'.'+v.seq, prod=prodDe(m,v), emb=embebido(m,v), link=tieneLink(m,v), vis=vidVisible(m,v);
+  const pos=sec.videos.indexOf(v);
+  const h=el('div','dhead');
+  h.innerHTML=`<div class="idline"><span class="idbadge">${id}</span>
+      <button class="info" data-info="id" aria-label="Cómo se arma el ID">i</button>
+      <span class="chip ${stCls(prod)}">${prod}</span>
+      <span class="chip nodot ${vis?'vis-si':'vis-no'}">${vis?'visible':'no visible'}</span></div>
+    <h2>${esc(v.t)}</h2>
+    <div class="dmeta"><span class="tag">${esc(v.tag||m.tag)}</span><span class="tag">Prioridad ${v.p}</span>
+      <span class="tag">Cohorte ${esc(v.c)}</span>${v.dur?`<span class="tag">${v.dur}</span>`:(v.durEst?`<span class="tag warn">${v.durEst} estimada</span>`:'')}
+      ${emb==='ok'?'<span class="tag ok">embebido ✓</span>':''}${emb==='falla'?'<span class="tag stop">embebido ✕</span>':''}${emb==='sin verificar'?'<span class="tag warn">embebido sin verificar</span>':''}</div>`;
+  d.appendChild(h);
+  if(!['ficha','prod','traza'].includes(S.tab)) S.tab='ficha';
+  d.appendChild(tabsBar([['ficha','Ficha'],['prod','Producción'],['traza','Trazabilidad']]));
+  const b=el('div','dbody');b.setAttribute('role','tabpanel');b.setAttribute('tabindex','0');
+
+  if(S.tab==='ficha'){
+    const falta=[];
+    if(!link) falta.push(['Link del video','miss']);
+    if(emb==='falla') falta.push(['Embebido rechazado por YouTube: la agencia vería "video no disponible"','bad']);
+    if(emb==='sin verificar') falta.push(['Verificar el embebido','miss']);
+    if(!v.dur&&!v.durEst) falta.push(['Duración','miss']);
+    if(v.c==='—') falta.push(['Cohorte de grabación','miss']);
+    b.innerHTML=`
+     ${emb==='falla'?`<div class="banner stop"><span>✕</span><div><b>El embebido falla.</b> YouTube no permite mostrar este video dentro de la Academia. Revisá la configuración de privacidad y el dominio autorizado. Mientras siga así, el módulo no se puede publicar.</div></div>`:''}
+     <div class="fieldgrid">
+       <div><label>ID permanente</label><div class="ro"><span class="mono">${id}</span><span class="lock">no cambia nunca, ni si lo regrabás</span></div></div>
+       <div><label for="vt">¿Qué enseña?</label><input type="text" id="vt" value="${esc(v.t)}"${dis('editar')}></div>
+       <div><label>Dónde está en la Academia</label><div class="ro">${esc(m.name)} › ${esc(sec.name)}<span class="lock">se cambia arrastrando en el árbol</span></div></div>
+       <div><label>Orden dentro de la sección</label>
+         <div class="row"><button class="btn btn-sm" data-vord="up"${dis('editar')}>↑ Subir</button><button class="btn btn-sm" data-vord="down"${dis('editar')}>↓ Bajar</button>
+           <span class="hint" style="margin:0">posición ${pos+1} de ${sec.videos.length}</span></div>
+         <p class="hint">El orden es un campo aparte del ID. Mover un video no le cambia el número de secuencia: por eso ${id} puede quedar antes de ${m.id}.020 sin romper nada.</p></div>
+       <div><label for="vl">Link del video</label>
+         <div class="row"><input type="url" id="vl" value="${link?'https://youtube.com/watch?v=demo'+v.seq:''}" placeholder="Todavía no hay video grabado"${dis('editar')}>
+           <button class="btn btn-sm"${dis('editar')}>Verificar</button></div>
+         <p class="hint">${link?(emb==='ok'?'Embebido verificado. Duración leída del video: '+v.dur:(emb==='falla'?'Verificación fallida el 30/08/2026.':'Sin verificar todavía.')):'Se completa cuando el video exista.'}</p></div>
+       ${!link?`<div><label for="vde">Duración estimada</label><div class="row"><input type="text" id="vde" value="${esc(v.durEst||'')}" placeholder="4:00" style="max-width:120px"${dis('editar')}><span class="tag warn">estimada</span></div>
+         <p class="hint">Se reemplaza sola por la duración real cuando se cargue el link.</p></div>`:''}
+       <div><label>Plan de este video</label>
+         <div class="radioset">
+           <label class="radiopill ${!v.tag?'on':''}"><input type="radio" name="vplan" ${!v.tag?'checked':''}${dis('editar')}> Hereda del módulo (${esc(m.tag)})</label>
+           <label class="radiopill ${v.tag?'on':''}"><input type="radio" name="vplan" ${v.tag?'checked':''}${dis('editar')}> Plan propio</label>
+         </div>
+         ${v.tag?`<div class="row" style="margin-top:6px"><span class="tag plan">${esc(v.tag)}</span><span class="hint" style="margin:0">este video aplica a un plan distinto del módulo, como el Dashboard de KPIs</span></div>`:''}
+         <p class="hint">Alineado al prototipo: un video puede tener plan propio dentro de un módulo compartido. Si no aplica al plan de la agencia, se lista con su aviso y no cuenta para el avance.</p></div>
+       <div><label>Estado de producción</label>
+         <div class="row"><span class="chip ${stCls(prod)}">${prod}</span>
+           ${sig(prod)?`<button class="btn btn-sm btn-p"${dis('editar')}>${sig(prod)}</button>`:''}
+           <button class="btn-q btn-sm">Ver los 7 estados</button></div>
+         <p class="hint">Dónde está en el proceso de producción. No define si la agencia lo ve.</p></div>
+       <div><label>Visible para las agencias</label>
+         <div class="row"><span class="chip nodot ${vis?'vis-si':'vis-no'}">${vis?'sí':'no'}</span>
+           ${vis?'<button class="btn btn-d btn-sm" data-vid-pub="off"'+dis('publicar')+'>Despublicar este video</button>':'<button class="btn btn-sm" data-vid-pub="on" '+((link&&emb==='ok'&&modVisible(m)&&can('publicar'))?'':'disabled')+'>Publicar este video</button>'}</div>
+         <p class="hint">${modVisible(m)?'Independiente del estado de producción. Un video puede estar grabado y editado sin exponerse todavía.':'El módulo no está publicado, así que ningún video suyo se ve, sin importar su visibilidad individual.'}</p></div>
+       <div><label>Baja</label><div class="row"><button class="btn btn-d btn-sm" data-arch="vid"${dis('archivar')}>Archivar video</button></div>
+         <p class="hint">Conserva el ID y el historial. El ID no se reutiliza nunca.</p></div>
+     </div>
+     ${falta.length?`<div class="sep"></div><h3>Falta completar</h3><ul class="checklist">${falta.map(f=>`<li><span class="mk ${f[1]}">${f[1]==='bad'?'✕':'○'}</span>${esc(f[0])}</li>`).join('')}</ul>`
+       :'<div class="sep"></div><ul class="checklist"><li><span class="mk ok">●</span>Ficha completa y embebido verificado</li></ul>'}
+     <div class="note v3"><b>Ajuste v3 ·</b> Apareció el campo <b>orden dentro de la sección</b>, independiente del ID, que era el faltante del MVP §3.3: antes un video no se podía reordenar nunca sin archivarlo y recrearlo.</div>`;
+  }
+
+  if(S.tab==='prod'){
+    b.innerHTML=`
+     <div class="fieldgrid">
+       <div><label for="pc">Cohorte de grabación</label><select id="pc"${dis('editar')}><option>${esc(v.c)}</option><option>Sin asignar</option></select>
+         <p class="hint">Un cohorte agrupa videos que comparten el mismo escenario de datos: se prepara una vez y se graban varios de corrido.</p></div>
+       <div><label for="pp">Prioridad de grabado</label><select id="pp"${dis('editar')}><option>${v.p}</option></select>
+         <p class="hint">P1 es lo que más se repite en los onboardings. No cambia el orden en que la agencia lo ve.</p></div>
+       <div><label>Guion</label><div class="row"><button class="btn btn-sm">${prod==='backlog'?'Escribir guion':'Ver guion'}</button>
+         <span class="hint" style="margin:0">plantilla: intro a cámara · cuerpo en pantalla · cierre</span></div></div>
+       <div><label>Escenario que hay que dejar listo antes de grabar</label>
+         <textarea rows="3" placeholder="Ej: cliente demo ya creado, file abierto con un pasajero"${dis('editar')}>${prod==='backlog'?'':'Viene del video anterior del cohorte.'}</textarea></div>
+     </div>`;
+  }
+
+  if(S.tab==='traza'){
+    const ev=[['20/07/2026 10:12','Creado · reserva de ID','Irene']];
+    if(prod!=='backlog') ev.push(['24/07/2026 15:40','Guion aprobado','Majo']);
+    if(link) ev.push(['05/08/2026 09:25','Publicado · embebido verificado','Majo']);
+    if(emb==='falla') ev.push(['30/08/2026 11:02','Verificación de embebido fallida','sistema']);
+    if(prod==='a regrabar') ev.push(['28/08/2026 17:35','Marcado a regrabar por cambio en sgm2026.09','Irene']);
+    b.innerHTML=`
+     <div class="fieldgrid">
+       <div><label>Versión del video</label><div class="ro">v1<span class="lock">sube al regrabar</span></div></div>
+       <div><label>Versión de producto que muestra</label><div class="ro">sgm2026.07<span class="lock">de la release</span></div></div>
+       <div><label>Qué desarrollo lo dejó viejo</label>
+         ${prod==='a regrabar'
+           ?`<div class="ro" style="border-color:var(--warn);background:var(--warn-soft)">Cambió la carga de voucher en sgm2026.09 · declarado por Irene</div>
+             <div class="banner warn" style="margin-top:8px"><span>!</span><div><b>Decisión pendiente (6):</b> ¿la aprobación de ${m.id} caduca para las agencias que ya lo aprobaron? Hoy sin definir en el MVP.</div></div>`
+           :'<div class="ro">Nada pendiente</div>'}
+       </div>
+       <div><label>Historial</label>
+         <div class="tablewrap" style="max-height:200px"><table><thead><tr><th>Cuándo</th><th>Qué pasó</th><th>Quién</th></tr></thead>
+         <tbody>${ev.map(e=>`<tr><td class="cellmono">${e[0]}</td><td>${esc(e[1])}</td><td>${esc(e[2])}</td></tr>`).join('')}</tbody></table></div>
+       </div>
+     </div>`;
+  }
+  d.appendChild(b);return d;
+}
+function sig(e){return {'backlog':'Marcar como guionado','guionado':'Marcar como grabado','grabado':'Marcar como editado','editado':'Marcar producción terminada','a regrabar':'Cargar nueva versión'}[e]||null;}
+
+/* ============================================================
+   BANCO COMPLETO
+   ============================================================ */
+function viewBanco(){
+  const m=findMod(S.bModId);
+  const w=el('div','wrap');
+  const act=activas(m);
+  const nAct=act.filter(q=>q.estado==='activa').length;
+  const cob=cobertura(m), cero=cob.filter(c=>c.n===0).length;
+
+  w.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
+      <div><h1>Banco de preguntas · ${m.id}</h1><p class="lede" style="margin-bottom:10px">${esc(m.name)} · el examen toma ${m.params.porIntento} al azar de este banco.</p></div>
+      <button class="btn btn-sm" data-go2="mod|${m.id}">← Volver al módulo</button></div>`;
+
+  if(cero) w.appendChild(el('div','banner stop',`<span>✕</span><div><b>Publicación bloqueada:</b> ${cero} tema${cero>1?'s':''} sin ninguna pregunta activa (${cob.filter(c=>c.n===0).map(c=>esc(c.st.name)).join(', ')}).</div>`));
+
+  const head=el('div','card');head.style.padding='14px';head.style.marginBottom='14px';
+  head.innerHTML=`<div class="row" style="gap:20px;align-items:flex-end">
+      <div><div style="font-family:var(--mono);font-size:22px">${nAct}<span style="color:var(--muted);font-size:13px"> / ${m.params.objetivo}</span></div>
+        <div style="font-size:11.5px;color:var(--muted)">activas · mínimo para publicar ${m.params.minimo}</div></div>
+      <div style="flex:1;min-width:200px"><div class="bar ${nAct<m.params.minimo?'zero':(nAct<m.params.objetivo?'low':'')}"><i style="width:${Math.min(100,nAct/m.params.objetivo*100)}%"></i></div>
+        <div class="row" style="gap:5px;margin-top:8px">${cob.map(c=>`<span class="tag ${c.n===0?'stop':(c.n<6?'warn':'ok')}">${esc(c.st.name)} ${c.n}</span>`).join('')}</div></div>
+    </div>`;
+  w.appendChild(head);
+
+  const bar=el('div','row');bar.style.marginBottom='10px';
+  bar.innerHTML=`
+    <input type="text" id="bFiltro" placeholder="Buscar en el enunciado" value="${esc(S.bFiltro)}" style="max-width:220px" aria-label="Buscar">
+    <select id="bSub" style="max-width:190px"><option value="">Todos los temas</option>
+      ${m.subtemas.map(s=>`<option value="${s.id}" ${S.bSub===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}
+      <option value="__none" ${S.bSub==='__none'?'selected':''}>Sin tema</option></select>
+    <select id="bEstado" style="max-width:150px"><option value="">Todos los estados</option>
+      ${['activa','borrador','inactiva'].map(e=>`<option ${S.bEstado===e?'selected':''}>${e}</option>`).join('')}</select>
+    <label class="row" style="font-size:12px;color:var(--muted);gap:5px;margin:0"><input type="checkbox" id="bCorregir" ${S.bCorregir?'checked':''} style="accent-color:var(--accent)"> Solo las que tienen algo para corregir</label>
+    <span style="margin-left:auto"></span>
+    <button class="btn btn-p btn-sm" data-go2="pregunta|${m.id}|new"${dis('editar')}>Agregar pregunta</button>
+    <button class="btn btn-sm" data-go2="imp-preg|${m.id}"${dis('editar')}>Pegar desde planilla</button>
+    <button class="btn btn-sm" data-go2="subtemas|${m.id}">Administrar temas</button>`;
+  w.appendChild(bar);
+
+  const rows=act.filter(q=>{
+    if(S.bFiltro&&!q.e.toLowerCase().includes(S.bFiltro.toLowerCase())) return false;
+    if(S.bSub==='__none'&&q.st) return false;
+    if(S.bSub&&S.bSub!=='__none'&&q.st!==S.bSub) return false;
+    if(S.bEstado&&q.estado!==S.bEstado) return false;
+    if(S.bCorregir&&!problema(q)) return false;
+    return true;
+  });
+
+  if(!act.length){
+    w.appendChild(el('div','emptynote','<b>El banco está vacío.</b><br>Dos caminos: cargar de a una o pegar la planilla. El tema es obligatorio en los dos, porque es lo que garantiza que el sorteo de 10 cubra todos los conceptos del módulo.'));
+    return w;
+  }
+
+  const tw=el('div','tablewrap');
+  const tb=el('table');
+  tb.innerHTML=`<thead><tr><th style="width:26px"></th><th>Enunciado</th><th style="width:150px">Tema</th>
+    <th style="width:80px">Opciones</th><th style="width:90px">Estado</th><th style="width:120px">Video de repaso</th><th style="width:130px">Última edición</th></tr></thead>`;
+  const body=el('tbody');
+  rows.forEach(q=>{
+    const pr=problema(q);
+    const stn=q.st?m.subtemas.find(s=>s.id===q.st):null;
+    const nOk=q.ops.filter(o=>o.ok).length;
+    const tr=el('tr');tr.dataset.bad=String(!!pr);
+    tr.innerHTML=`
+      <td><input type="checkbox" data-bcheck="${q.id}" ${S.bChecked.has(q.id)?'checked':''} style="accent-color:var(--accent)" aria-label="Seleccionar"></td>
+      <td><button class="label" style="text-align:left;background:none;border:0;padding:0;color:var(--ink);cursor:pointer" data-go2="pregunta|${m.id}|${q.id}" title="${esc(q.e)}">${esc(q.e.length>82?q.e.slice(0,82)+'…':q.e)}</button>
+        ${pr?`<span class="rowerr">${esc(pr)}</span>`:''}
+        ${q.acierto<15?`<span class="rowwarn">Solo ${q.acierto} % de acierto: revisá si el problema está en la pregunta.</span>`:''}</td>
+      <td>${stn?`<span class="tag ok">${esc(stn.name)}</span>`:'<span class="tag stop">sin tema</span>'}</td>
+      <td>${q.ops.length}${nOk!==1?` <span class="tag stop">${nOk} correctas</span>`:''}</td>
+      <td><span class="chip ${q.estado==='activa'?'st-publicado':(q.estado==='borrador'?'st-guionado':'st-backlog')}">${q.estado}</span></td>
+      <td class="cellmono">${esc(q.repaso||'—')}</td>
+      <td>${esc(q.fecha)}<br><span class="hint" style="margin:0">${esc(q.por)}</span></td>`;
+    body.appendChild(tr);
+  });
+  tb.appendChild(body);tw.appendChild(tb);w.appendChild(tw);
+
+  const sum=el('div','summary');
+  sum.innerHTML=`<span>${rows.length} de ${act.length} preguntas</span>
+    <span class="miss">${act.filter(problema).length} con algo para corregir</span>
+    <span style="margin-left:auto" class="row"><button class="btn btn-sm" data-go2="preview|${m.id}">Previsualizar un intento</button></span>`;
+  w.appendChild(sum);
+
+  if(S.bChecked.size){
+    const b=el('div','bulk');b.style.position='sticky';b.style.borderRadius='var(--r)';
+    b.innerHTML=`<span class="count">${S.bChecked.size} preguntas</span>
+      <button class="btn btn-sm" data-bbulk="activar"${dis('editar')}>Activar</button>
+      <button class="btn btn-sm" data-bbulk="desactivar"${dis('editar')}>Desactivar</button>
+      <button class="btn btn-sm" data-bbulk="subtema"${dis('editar')}>Asignar tema…</button>
+      <button class="btn btn-sm" data-bbulk="exportar">Exportar a planilla</button>
+      <button class="btn btn-sm x" data-bbulk="clear">Deseleccionar</button>`;
+    w.appendChild(b);
+  }
+  return w;
+}
+function problema(q){
+  const n=q.ops.filter(o=>o.ok).length;
+  if(!q.st) return 'Sin tema: no cuenta para la cobertura y bloquea la publicación.';
+  if(n===0) return 'Ninguna opción marcada como correcta.';
+  if(n>1) return 'Más de una opción marcada como correcta.';
+  if(q.ops.length<2) return 'Menos de dos opciones.';
+  return null;
+}
+
+/* ============================================================
+   ALTA / EDICIÓN DE PREGUNTA
+   ============================================================ */
+function viewPregunta(){
+  const m=findMod(S.bModId);
+  const nueva=S.qEdit==='new'||!S.qEdit;
+  const q=nueva?null:m.pool.find(x=>x.id===S.qEdit);
+  const w=el('div','wrap');
+  const ops=q?q.ops:[{t:'',ok:true},{t:'',ok:false},{t:'',ok:false},{t:'',ok:false}];
+  const vids=vidsDe(m).filter(x=>!x.v.archivado);
+
+  w.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
+    <div><h1>${nueva?'Nueva pregunta':'Editar pregunta'}</h1>
+      <p class="lede" style="margin-bottom:14px">Banco de ${m.id} · ${esc(m.name)}</p></div>
+    <button class="btn btn-sm" data-go2="banco|${m.id}">← Volver al banco</button></div>`;
+
+  if(!can('editar')){
+    w.appendChild(el('div','banner stop','<span>✕</span><div><b>Solo lectura.</b> '+esc(porque('editar'))+'</div>'));
+  }
+  if(!nueva&&q&&q.acierto<15) w.appendChild(el('div','banner warn',`<span>!</span><div><b>Solo ${q.acierto} % de acierto</b> sobre ${12+q.acierto} respuestas. Cuando casi todos fallan, el problema suele estar en el enunciado o en los distractores, no en las agencias.</div>`));
+  if(!nueva) w.appendChild(el('div','banner plan',`<span>i</span><div>Editar una pregunta ya respondida <b>crea la versión ${q?q.ver+1:2}</b>. Los intentos anteriores siguen apuntando a la versión con la que se respondieron, así las notas históricas quedan auditables.</div>`));
+
+  const card=el('div','card');card.style.padding='16px';
+  card.innerHTML=`
+   <div class="fieldgrid">
+     <div><label for="qe">Enunciado</label><textarea id="qe" rows="3" placeholder="Ej: Un recibo detallado sirve para…"${dis('editar')}>${esc(q?q.e:'')}</textarea>
+       <p class="hint">Si coincide con otra pregunta del mismo módulo, avisamos antes de guardar. No bloquea.</p></div>
+     <div><label for="qtipo">Tipo</label><select id="qtipo"${dis('editar')}><option>Opción única</option></select>
+       <p class="hint">El MVP admite solo opción única. Verdadero/falso es un caso particular con dos opciones, así que no necesita desarrollo aparte (decisión 4).</p></div>
+     <div><label>Opciones y respuesta correcta</label>
+       ${ops.map((o,i)=>`<div class="opteditor">
+         <label class="radiopill ${o.ok?'on':''}" style="padding:6px 9px"><input type="radio" name="correcta" ${o.ok?'checked':''}${dis('editar')} aria-label="Marcar como correcta"> correcta</label>
+         <input type="text" value="${esc(o.t)}" placeholder="Opción ${String.fromCharCode(65+i)}"${dis('editar')} aria-label="Texto de la opción ${String.fromCharCode(65+i)}">
+         <button class="rowact" title="Quitar opción">✕</button></div>`).join('')}
+       <button class="addbtn" style="margin-top:4px"${dis('editar')}>+ agregar opción</button>
+       <p class="hint">De 2 a 5 opciones, recomendado 4. Exactamente una correcta.</p></div>
+     <div><label for="qst">Tema (sección del módulo)</label>
+       <div class="row"><select id="qst" style="max-width:300px"${dis('editar')}>
+         <option value="">Elegí la sección…</option>
+         ${m.subtemas.map(s=>`<option value="${s.id}" ${q&&q.st===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select></div>
+       <p class="hint">Obligatorio. El tema es una <b>sección</b> del módulo: es lo que garantiza que el sorteo cubra todos los conceptos y es la misma taxonomía de las dudas de la Meet. Se agrega una sección nueva desde el árbol de estructura.</p></div>
+     <div><label for="qrep">Video de repaso</label><select id="qrep" style="max-width:340px"${dis('editar')}>
+       <option value="">Sin video asociado</option>
+       ${vids.map(x=>`<option value="${m.id}.${x.v.seq}" ${q&&q.repaso===m.id+'.'+x.v.seq?'selected':''}>${m.id}.${x.v.seq} · ${esc(x.v.t.slice(0,44))}</option>`).join('')}</select>
+       <p class="hint">Recomendado: es lo que la pantalla de resultado le muestra a la agencia cuando falla este concepto, en lugar de darle la respuesta.</p></div>
+     <div><label for="qexp">Explicación</label><textarea id="qexp" rows="2" placeholder="Por qué la correcta es la correcta"${dis('editar')}></textarea>
+       <p class="hint">Su uso depende de la decisión 1: si no se muestran las respuestas correctas al finalizar, esta explicación queda para uso interno.</p></div>
+     <div><label>Estado</label>
+       <div class="radioset">${['borrador','activa','inactiva'].map(e=>`<label class="radiopill ${(q?q.estado:'borrador')===e?'on':''}"><input type="radio" name="qest" ${(q?q.estado:'borrador')===e?'checked':''}${dis('editar')}> ${e}</label>`).join('')}</div>
+       <p class="hint">Por defecto borrador: no entra en el sorteo ni cuenta para la cobertura hasta activarla.</p></div>
+   </div>
+   <div class="sep"></div>
+   <div class="derived"><dl>
+     <dt>ID de pregunta</dt><dd><span class="idbadge">${q?q.id:m.id+'-Q'+String(m.pool.length+1).padStart(3,'0')}</span></dd>
+     <dt>Módulo · superficie</dt><dd>${m.id} · ${m.sup}</dd>
+     <dt>Versión</dt><dd>v${q?q.ver:1}</dd>
+     <dt>Creada por</dt><dd>${q?esc(q.por)+' el '+esc(q.fecha):'M. Luna · hoy'}</dd>
+     <dt>Veces respondida</dt><dd>${q?(12+q.acierto)+' · '+q.acierto+' % de acierto':'todavía sin intentos'}</dd>
+   </dl></div>
+   <div class="row" style="margin-top:14px">
+     <button class="btn btn-p" data-qsave="1"${dis('editar')}>Guardar</button>
+     <button class="btn" data-qsave="more"${dis('editar')}>Guardar y crear otra</button>
+     <button class="btn" data-go2="preview|${m.id}">Previsualizar como agencia</button>
+     ${nueva?'':'<button class="btn"'+dis('editar')+'>Duplicar</button>'}
+     <button class="btn-q" data-go2="banco|${m.id}">Cancelar</button>
+   </div>
+   <p class="hint">"Guardar y crear otra" mantiene el tema elegido, que es como se carga un banco en la práctica: de corrido, por concepto.</p>`;
+  w.appendChild(card);
+  return w;
+}
+
+/* ============================================================
+   CATÁLOGO DE SUB-TEMAS
+   ============================================================ */
+function viewSubtemas(){
+  const m=findMod(S.bModId);
+  const w=el('div','wrap');
+  const cob=cobertura(m);
+  w.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
+    <div><h1>Temas del banco · ${m.id}</h1><p class="lede" style="margin-bottom:14px">Alineado al prototipo aprobado: <b>el tema del banco es la sección del módulo</b>. No hay un catálogo aparte que mantener. Cada pregunta pertenece a una sección, y el sorteo de ${m.params.porIntento} debe cubrirlas todas.</p></div>
+    <button class="btn btn-sm" data-go2="mod|${m.id}">← Volver al módulo</button></div>`;
+
+  w.appendChild(el('div','banner plan','<span>i</span><div>Los temas se administran como <b>secciones</b>, en el árbol de estructura. Acá se ve la cobertura del banco por sección, en solo lectura. Para renombrar, reordenar o archivar un tema, se edita la sección.</div>'));
+
+  if(!m.secciones.length){
+    w.appendChild(el('div','emptynote','<b>Este módulo no tiene secciones.</b><br>Agregá una sección desde el árbol: es, a la vez, el agrupamiento visual de los videos y el tema del banco.<div class="row" style="margin-top:12px"><button class="btn btn-p" data-add="sec|'+m.id+'"'+dis('editar')+'>Agregar una sección</button></div>'));
+    return w;
+  }
+
+  const tw=el('div','tablewrap');
+  const tb=el('table');
+  tb.innerHTML=`<thead><tr><th>Tema (= sección)</th><th style="width:110px">Videos</th><th style="width:120px">Preguntas</th><th style="width:90px">Orden</th></tr></thead>`;
+  const body=el('tbody');
+  cob.forEach((c,i)=>{
+    const sec=m.secciones[i];
+    const nv=sec?sec.videos.filter(v=>!v.archivado).length:0;
+    const tr=el('tr');tr.dataset.bad=String(c.n===0);
+    tr.innerHTML=`<td>${esc(c.st.name)}</td>
+      <td class="cellmono">${nv}</td>
+      <td class="cellmono">${c.n}${c.n===0?' <span class="tag stop">sin cubrir</span>':(c.n<6?' <span class="tag warn">baja</span>':'')}</td>
+      <td class="cellmono">${c.st.orden}</td>`;
+    body.appendChild(tr);
+  });
+  tb.appendChild(body);tw.appendChild(tb);w.appendChild(tw);
+
+  const r=el('div','row');r.style.marginTop='12px';
+  r.innerHTML=`<button class="btn btn-p btn-sm" data-go2="banco|${m.id}">Ir al banco</button>
+    <button class="btn btn-sm" data-add="sec|${m.id}"${dis('editar')}>+ Agregar sección/tema</button>
+    <span class="hint" style="margin-left:auto">Un tema con preguntas no se puede vaciar sin reasignarlas: se resuelve moviendo las preguntas de sección.</span>`;
+  w.appendChild(r);
+  w.appendChild(el('div','note v3','<b>Ajuste de alineación ·</b> El ABM de sub-temas independiente se eliminó. En el prototipo aprobado el tema es siempre una sección del módulo, y esa misma taxonomía es la de las dudas de la Meet. Menos entidades, y una fuente de desincronización menos.'));
+  return w;
+}
+
+/* ============================================================
+   PREVISUALIZAR LA EVALUACIÓN
+   ============================================================ */
+function sortear(m){
+  const pool=activas(m).filter(q=>q.estado==='activa'&&q.st&&q.ops.filter(o=>o.ok).length===1);
+  const out=[];
+  const copia=pool.slice();
+  for(let i=0;i<m.params.porIntento&&copia.length;i++){
+    const k=Math.floor(Math.random()*copia.length);
+    out.push(copia.splice(k,1)[0]);
+  }
+  return out;
+}
+function viewPreview(){
+  const m=findMod(S.bModId);
+  const w=el('div','wrap');
+  if(!S.muestra||S.muestra.mod!==m.id){S.muestra={mod:m.id,qs:sortear(m)};S.respuestas={};}
+  const qs=S.muestra.qs;
+  const usados=[...new Set(qs.map(q=>q.st))];
+  const faltan=m.subtemas.filter(s=>!usados.includes(s.id));
+
+  w.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
+    <div><h1>Previsualizar la evaluación · ${m.id}</h1>
+      <p class="lede" style="margin-bottom:12px">Un intento de muestra con las reglas configuradas: ${m.params.porIntento} preguntas al azar sobre ${activas(m).filter(q=>q.estado==='activa').length}. Podés responder; <b>no queda registrado</b>.</p></div>
+    <button class="btn btn-sm" data-go2="mod|${m.id}">← Volver al módulo</button></div>`;
+
+  if(!qs.length){
+    w.appendChild(el('div','emptynote','<b>No hay preguntas activas y válidas para sortear.</b><br>Cargá el banco y revisá que cada pregunta tenga tema y exactamente una opción correcta.'));
+    return w;
+  }
+
+  const ctl=el('div','row');ctl.style.marginBottom='14px';
+  ctl.innerHTML=`<button class="btn btn-p btn-sm" data-resort="1">Volver a sortear</button>
+    <span class="tag">umbral ${m.params.umbral}</span><span class="tag">reintentos ${m.params.reintentos.toLowerCase()}</span>
+    <span class="tag warn">forzar cobertura: a definir</span>`;
+  w.appendChild(ctl);
+
+  if(faltan.length) w.appendChild(el('div','banner warn',`<span>!</span><div><b>Este sorteo dejó afuera ${faltan.length} tema${faltan.length>1?'s':''}:</b> ${faltan.map(s=>esc(s.name)).join(', ')}. Es exactamente el riesgo que resuelve la decisión 2. Probá "Volver a sortear" varias veces para ver cuánto varía.</div>`));
+  else w.appendChild(el('div','banner ok','<span>✓</span><div>Este sorteo cubrió todos los temas del módulo. Sin forzar cobertura, no está garantizado en el próximo.</div>'));
+
+  qs.forEach((q,i)=>{
+    const st=m.subtemas.find(s=>s.id===q.st);
+    const c=el('div','qcard');
+    c.innerHTML=`<div class="qn">Pregunta ${i+1} de ${qs.length} · ${esc(st?st.name:'sin tema')} · ${q.id}</div>
+      <div class="qe">${esc(q.e)}</div>
+      ${q.ops.map((o,k)=>`<label class="optrow"><input type="radio" name="pv${i}" data-pv="${i}" value="${k}" ${S.respuestas[i]===k?'checked':''}> <span>${esc(o.t)}</span></label>`).join('')}`;
+    w.appendChild(c);
+  });
+
+  const resp=Object.keys(S.respuestas).length;
+  const f=el('div','row');f.style.marginTop='6px';
+  f.innerHTML=`<button class="btn btn-p" data-verres="1">Ver resultado</button>
+    <span class="hint" style="margin:0">${resp} de ${qs.length} respondidas. Las sin responder cuentan como error, igual que en la evaluación real.</span>`;
+  w.appendChild(f);
+  return w;
+}
+
+/* ============================================================
+   RESULTADO DE LA EVALUACIÓN (pantalla nueva)
+   ============================================================ */
+function viewResultado(){
+  const m=findMod(S.bModId);
+  const w=el('div','wrap');
+  if(!S.muestra||S.muestra.mod!==m.id){S.screen='preview';return viewPreview();}
+  const qs=S.muestra.qs;
+  const total=qs.length;
+  let ok=0, sinResp=0;
+  const detalle=qs.map((q,i)=>{
+    const r=S.respuestas[i];
+    if(r===undefined) sinResp++;
+    const bien=r!==undefined&&q.ops[r]&&q.ops[r].ok;
+    if(bien) ok++;
+    return {q,i,r,bien};
+  });
+  const pct=total?(ok/total*100):0;
+  const aprobado=pct>=80;
+  const sig=modSiguiente(m);
+
+  /* temas fallados, con su video de repaso */
+  const porSub={};
+  detalle.forEach(d=>{
+    const st=m.subtemas.find(s=>s.id===d.q.st);
+    const k=st?st.name:'Sin tema';
+    porSub[k]=porSub[k]||{ok:0,tot:0,repasos:new Set()};
+    porSub[k].tot++;
+    if(d.bien) porSub[k].ok++; else if(d.q.repaso) porSub[k].repasos.add(d.q.repaso);
+  });
+  const tituloDe=idv=>{
+    const seq=idv.split('.')[1];
+    const x=vidsDe(m).find(y=>y.v.seq===seq);
+    return x?x.v.t:'video del módulo';
+  };
+
+  w.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
+    <div><h1>Resultado de la evaluación · ${m.id}</h1>
+      <p class="lede" style="margin-bottom:12px">Así ve la agencia el resultado. Es una muestra: <b>este intento no se registra</b>.</p></div>
+    <button class="btn btn-sm" data-go2="preview|${m.id}">← Volver al intento</button></div>`;
+
+  const sc=el('div','score');
+  sc.innerHTML=`
+    <div class="col"><div class="big ${aprobado?'ok':'bad'}">${ok}<span style="font-size:20px;color:var(--muted)">/${total}</span></div>
+      <span>respuestas correctas</span></div>
+    <div class="col"><div class="pct">${pct.toFixed(2).replace('.',',')} %</div><span>umbral de aprobación: ${m.params.umbral}</span></div>
+    <div class="col"><div class="pct">${aprobado?'Aprobado':'No aprobado'}</div><span>${sinResp?sinResp+' sin responder, contadas como error':'todas respondidas'}</span></div>
+    <div class="col" style="margin-left:auto"><span>Intento de muestra</span><span>${new Date().toLocaleDateString('es-AR')} · reintentos ${m.params.reintentos.toLowerCase()}</span></div>`;
+  w.appendChild(sc);
+
+  if(aprobado){
+    w.appendChild(el('div','banner ok',`<span>✓</span><div><b>Módulo aprobado.</b> Se habilita ${sig?'el módulo siguiente que te corresponda ('+sig+')':'el final de la secuencia'} y queda disponible la Meet de ${m.meet.duracion} minutos para dudas puntuales de este módulo.${m.meet.habilitada&&!m.meet.link?' <b>Falta cargar el link de agenda:</b> hoy la agencia vería el botón sin destino.':''}</div>`));
+  } else {
+    w.appendChild(el('div','banner warn',`<span>!</span><div><b>No alcanzó el 80 %.</b> Se puede volver a intentar sin límite: el próximo intento sortea 10 preguntas nuevas sobre las mismas ${activas(m).filter(q=>q.estado==='activa').length} del banco. El módulo siguiente sigue trabado hasta aprobar.</div>`));
+  }
+
+  /* variante recomendada: por tema + video de repaso */
+  const box=el('div','card');box.style.padding='16px';box.style.marginBottom='14px';
+  const fallados=Object.keys(porSub).filter(k=>porSub[k].ok<porSub[k].tot);
+  box.innerHTML=`<h3>Qué conceptos conviene repasar</h3>
+    <p class="hint" style="margin:0 0 10px">Variante recomendada de la decisión 1: no se muestran las respuestas correctas, se muestra <b>dónde</b> falló y <b>qué video</b> lo explica.</p>
+    ${fallados.length?`<ul class="sublist">${fallados.map(k=>{
+      const s=porSub[k];
+      return `<li><div class="lineup"><span>${esc(k)}</span><span class="n">${s.ok} de ${s.tot} correctas</span></div>
+        <div class="bar ${s.ok===0?'zero':'low'}"><i style="width:${s.tot?s.ok/s.tot*100:0}%"></i></div>
+        ${[...s.repasos].map(rp=>`<div class="vidline" style="margin-top:6px">▸ Repasá <span class="mono">${esc(rp)}</span> · ${esc(tituloDe(rp))}</div>`).join('')||'<div class="hint">Ninguna de las preguntas falladas tiene video de repaso asociado: se carga desde el banco.</div>'}</li>`;
+    }).join('')}</ul>`
+    :'<div class="banner ok" style="margin:0"><span>✓</span><div>Todos los temas del intento salieron correctos.</div></div>'}`;
+  w.appendChild(box);
+
+  /* comparación de variantes */
+  const cmp=el('div','row');cmp.style.marginBottom='10px';
+  cmp.innerHTML=`<button class="btn btn-sm ${S.verCorrectas?'':'btn-on'}" data-vercorr="0">Variante A · sin mostrar correctas</button>
+    <button class="btn btn-sm ${S.verCorrectas?'btn-on':''}" data-vercorr="1">Variante B · mostrando correctas</button>
+    <span class="hint" style="margin:0">Las dos están construidas para poder comparar antes de cerrar la decisión 1.</span>`;
+  w.appendChild(cmp);
+
+  if(S.verCorrectas){
+    w.appendChild(el('div','banner plan','<span>i</span><div><b>Variante B.</b> Con reintentos ilimitados, mostrar la correcta convierte el examen en un ejercicio de memoria: la agencia puede fallar, leer las respuestas y aprobar en el intento siguiente sin haber visto un video. Sirve si el objetivo es enseñar en el examen; no sirve si el examen tiene que validar aprendizaje.</div>'));
+    detalle.forEach(d=>{
+      const c=el('div','qcard');
+      const st=m.subtemas.find(s=>s.id===d.q.st);
+      c.innerHTML=`<div class="qn">Pregunta ${d.i+1} · ${esc(st?st.name:'sin tema')} · ${d.bien?'<span class="ok">correcta</span>':'<span class="bad">incorrecta</span>'}</div>
+        <div class="qe">${esc(d.q.e)}</div>
+        ${d.q.ops.map((o,k)=>{
+          const esElegida=d.r===k, esOk=o.ok;
+          const cls=esOk?'correct':(esElegida?'wrong':'');
+          const mk=esOk?'<span class="mkop ok">correcta</span>':(esElegida?'<span class="mkop bad">tu respuesta</span>':'');
+          return `<div class="optrow ${cls}"><span>${esc(o.t)}</span>${mk}</div>`;
+        }).join('')}
+        ${d.q.repaso?`<div class="hint">Video de repaso: <span class="mono">${esc(d.q.repaso)}</span></div>`:''}`;
+      w.appendChild(c);
+    });
+  } else {
+    w.appendChild(el('div','banner plan','<span>i</span><div><b>Variante A, la recomendada.</b> La agencia se lleva el detalle de arriba: qué temas falló y qué video mirar. No ve qué opción era la correcta, así que el reintento exige volver al contenido y no a la memoria.</div>'));
+  }
+
+  const acc=el('div','row');acc.style.marginTop='14px';
+  acc.innerHTML=`<button class="btn btn-p" data-resort="1">Volver a intentar</button>
+    ${aprobado&&sig?`<button class="btn">Ir al módulo siguiente (${sig})</button>`:''}
+    ${aprobado&&m.meet.habilitada?`<button class="btn">Agendar la Meet de ${m.meet.duracion} min</button>`:''}
+    <button class="btn-q" data-go2="mod|${m.id}">Volver al backoffice</button>`;
+  w.appendChild(acc);
+
+  w.appendChild(el('div','banner plan','<span>i</span><div><b>Qué registra el intento real</b> (esta muestra no registra nada): agencia y usuario, módulo, número de intento, fecha y hora, las 10 preguntas sorteadas con su versión, la respuesta elegida en cada una, la nota y el resultado. Sin la versión de cada pregunta, una nota vieja se vuelve imposible de auditar cuando el banco se edita.</div>'));
+  w.appendChild(el('div','note v3','<b>Pantalla nueva v3 ·</b> Era el hueco que dejaba huérfano al campo "video de repaso": existía en el alta de pregunta y no había ninguna pantalla que lo consumiera. Además cierra el circuito de la evaluación —desbloqueo del módulo siguiente y habilitación de la Meet— y deja comparar las dos variantes de la decisión 1 con datos en pantalla en vez de en una discusión.'));
+  return w;
+}
+
+/* ============================================================
+   VER COMO AGENCIA
+   ============================================================ */
+function viewAgencia(){
+  const w=el('div','wrap');
+  const p=S.perfilVista;
+  w.innerHTML=`<h1>Ver como agencia</h1>
+    <p class="lede">Así ve la Academia una agencia de plan ${esc(p)} en la escena ${S.escena}. Sirve para revisar antes de publicar, no después.</p>`;
+  const sel=el('div','row');sel.style.marginBottom='14px';
+  sel.innerHTML=`<span class="hint" style="margin:0">Plan de la agencia:</span>
+    ${PERFILES.map(x=>`<button class="btn btn-sm ${p===x?'btn-on':''}" data-perfil="${x}">${x}</button>`).join('')}`;
+  w.appendChild(sel);
+
+  const cad=cadena(p); // incluye los fuera de plan, alineado al prototipo
+  const delPlan=cad.filter(c=>c.aplica);
+  const disponibles=delPlan.filter(c=>c.pub);
+  const frame=el('div','agencyframe');
+  frame.appendChild(el('div','agencyhead',`<b style="color:var(--ink)">Academia SIGMMA</b> · agencia de ejemplo · plan ${esc(p)}
+    <span style="margin-left:auto" class="tag">${disponibles.length} de ${delPlan.length} módulos del recorrido</span>`));
+
+  if(!disponibles.length){
+    const e=el('div','modcard');
+    e.innerHTML=`<div class="body"><b>Todavía no hay nada publicado para este plan.</b>
+      <div class="hint">Una agencia ${esc(p)} entrando hoy vería esta pantalla. Vale la pena mirarla antes de anunciar la Academia.</div></div>`;
+    frame.appendChild(e);
+  } else {
+    let desbloqueado=true, n=0;
+    cad.forEach(c=>{
+      const m=c.m;
+      /* Fuera de plan: se muestra con candado de plan, sin ordinal, y NO entra al recorrido. */
+      if(!c.aplica){
+        const card=el('div','modcard lock');
+        const planIncluye=m.perfiles.join(' + ')||'ningún plan';
+        card.innerHTML=`<div class="num">🔒</div><div class="body"><b>${esc(m.name)}</b>
+          <span class="tag plan" style="margin-left:6px">${esc(m.tag)}</span>
+          <div class="hint">No entra en tu plan ${esc(p)}. Incluido en: <b>${esc(planIncluye)}</b>. Para sumarlo, escribile a Soporte. No cuenta para tu avance ni te traba.</div></div>`;
+        frame.appendChild(card);
+        return;
+      }
+      /* Aplica pero no publicado todavía. Con publicación en orden esto no deja huecos. */
+      if(!c.pub){
+        const card=el('div','modcard lock');
+        card.innerHTML=`<div class="num">·</div><div class="body"><b>${esc(m.name)}</b>
+          <span class="tag" style="margin-left:6px">próximamente</span>
+          <div class="hint">Todavía no publicado. Aparece con su número cuando salga.</div></div>`;
+        frame.appendChild(card);
+        return;
+      }
+      n++;
+      const card=el('div','modcard'+(desbloqueado?'':' lock'));
+      const vids=vidsDe(m).filter(x=>!x.v.archivado&&vidVisible(m,x.v));
+      card.innerHTML=`<div class="num">${n}</div><div class="body">
+        <b>${esc(m.name)}</b>
+        ${desbloqueado?'':'<span class="tag" style="margin-left:6px">se desbloquea al aprobar el anterior</span>'}
+        ${desbloqueado?`<div class="hint" style="margin-top:2px">${esc(m.resumen||'')}</div>
+          <div style="margin-top:6px">${vids.map(x=>`<div class="vidline">▸ ${esc(x.v.t)} <span class="hint" style="display:inline">${x.v.dur}${(x.v.tag&&x.v.tag!==m.tag)?' · <span class="tag plan">'+esc(x.v.tag)+' (plan propio)</span>':''}</span></div>`).join('')||'<div class="hint">Sin videos visibles.</div>'}
+          <div class="row" style="margin-top:8px"><button class="btn btn-sm btn-p" data-go2="preview|${m.id}">Hacer la evaluación</button>
+            <span class="hint" style="margin:0">${m.params.porIntento} preguntas · aprobás con ${m.params.umbral}</span></div>`:''}
+      </div>`;
+      frame.appendChild(card);
+      if(desbloqueado) desbloqueado=false;
+    });
+  }
+  w.appendChild(frame);
+  w.appendChild(el('div','note v3','<b>Alineado al prototipo aprobado ·</b> Los módulos <b>fuera de plan se muestran con candado</b> (no se ocultan): además de pedagógico, es una superficie comercial. No tienen ordinal ni cuentan para el avance. El número que ve la agencia es la <b>posición en el recorrido</b>, nunca el ID, y va de 1 a N sin huecos porque la publicación es en orden.'));
+  return w;
+}
+
+/* ============================================================
+   IMPORTAR (estructura, videos y preguntas)
+   ============================================================ */
+const FILAS_E=[
+ ['FRT-M00','Fundamentos del frontend','Concepto y acceso','P+B','10',null],
+ ['FRT-M10','Reservas del cliente final','Buscar y reservar','P+B','20',null],
+ ['FRT-M10','Reservas del cliente final','Pagos y confirmación','P+B','20',null],
+ ['FRT-M20','Mi cuenta','','P+B','30','Sin sección: el módulo se crea con una sección "General". Aviso, no error.'],
+ ['BAK-M30','Voucher / Servicios','Voucher y cobro','P+B','40','Ya existe: no se duplica, la fila se omite.'],
+ ['FRT-M10','Reservas del cliente final','Buscar y reservar','B','20','Plan distinto al de la primera fila del mismo módulo. Hay que elegir cuál vale.'],
+ ['CRM-M00','Deal Closer (cobertura mínima)','General','P+B','10','La superficie CRM es de gobernanza externa: requiere confirmación de Producto antes de crear módulos.']
+];
+const FILAS_V=[
+ ['BAK-M30.060','Estados del voucher y cotización','P+B','P3','C12',null],
+ ['BAK-M30.070','Modelos: armar plantillas de venta reutilizables','P+B','P3','C12',null],
+ ['BAK-M40.060','Anular un recibo ya emitido','P+B','P3','C14',null],
+ ['BAK-M31.010','Tráfico: asignación de butaca','P+B','P3','—','El módulo BAK-M31 no existe.'],
+ ['BAK-M50.070','Factura E de exportación','P+B','P3','C15',null],
+ ['BAK-M70.050','Conciliación bancaria automática','P+B','P3','C17',null],
+ ['BAK-M35.010','Tráfico: asignación de butaca','P+B','P3','—','Ya existe un video con este ID en la Academia.'],
+ ['BAK-M80.050','Informe de rentabilidad por vendedor','','P3','C18','Falta el plan al que aplica (P+B, B o B-nicho).'],
+ ['BAK-M20.070','Unificar clientes duplicados','P+B','P2','C06',null]
+];
+const FILAS_P=[
+ ['BAK-M40','Modos de recibo','¿Qué recibo agrupa varios files de un mismo cliente?','Detallado','Indicado','Automático','Ninguno','A',null],
+ ['BAK-M40','Devolución','¿Cómo se registra una devolución al pasajero?','Como egreso','Como recibo negativo','Como nota de crédito','No se registra','A',null],
+ ['BAK-M40','Cheques','¿Cómo se registra un cheque de tercero?','Como TR3','Como TC3','Como efectivo','No aplica','B','El tema "Cheques" no existe en BAK-M40.'],
+ ['BAK-M40','Moneda','¿Qué moneda fija la cuenta corriente del cliente?','La de registro','La de documento','La del recibo','La del voucher','A',null],
+ ['BAK-M40','Valores','¿Qué valor corresponde a una transferencia?','Efectivo','Transferencia','Tarjeta','Tercero','E','La letra E no coincide con ninguna opción cargada.'],
+ ['BAK-M40','Cuenta corriente','¿Los saldos se llevan por moneda?','Sí, por moneda de registro','No, siempre en ARS','Solo para jurídicas','Depende del file','','Sin letra de correcta.'],
+ ['BAK-M40','Modos de recibo','¿Qué recibo agrupa varios files de un mismo cliente?','Detallado','Indicado','Automático','Ninguno','A','Enunciado repetido dentro de este mismo pegado.'],
+ ['BAK-M99','Varios','¿Pregunta de un módulo inexistente?','A','B','C','D','A','El módulo BAK-M99 no existe.'],
+ ['BAK-M40','Valores','¿Qué significa TR3 en un recibo?','Transferencia de tercero','Tarjeta de tercero','Transferencia en tres pagos','Tres recibos','A',null]
+];
+
+function viewImportar(){
+  const w=el('div','wrap');
+  const modo=S.impModo;
+  const m=findMod(S.bModId);
+  w.innerHTML=`<h1>Cargar desde planilla</h1>
+    <p class="lede">Copiá las filas del tablero maestro y pegalas acá. Antes de guardar nada, te muestro fila por fila qué entró bien y qué hay que corregir.</p>`;
+
+  if(!can('editar')){
+    w.appendChild(el('div','banner stop','<span>✕</span><div><b>Sin permiso para importar.</b> '+esc(porque('editar'))+'</div>'));
+    return w;
+  }
+
+  const sel=el('div','row');sel.style.marginBottom='14px';
+  sel.innerHTML=`<span class="hint" style="margin:0">Qué vas a cargar:</span>
+    <button class="btn btn-sm ${modo==='estructura'?'btn-on':''}" data-impmodo="estructura">Estructura (módulos y secciones)</button>
+    <button class="btn btn-sm ${modo==='videos'?'btn-on':''}" data-impmodo="videos">Videos</button>
+    <button class="btn btn-sm ${modo==='preguntas'?'btn-on':''}" data-impmodo="preguntas">Preguntas del banco</button>
+    ${modo==='preguntas'?`<span class="tag" style="margin-left:8px">destino: ${m.id}</span>`:''}`;
+  w.appendChild(sel);
+
+  const steps=el('div','steps');
+  [['Pegar las filas'],['Revisar'],['Confirmar']].forEach((l,i)=>{
+    const s=el('div','step',`<b>${l[0]}</b><span>paso ${i+1} de 3</span>`);s.dataset.on=String(S.impPaso===i+1);steps.appendChild(s);});
+  w.appendChild(steps);
+
+  const ph={
+   estructura:'FRT-M00\tFundamentos del frontend\tConcepto y acceso\tP+B\t10',
+   videos:'BAK-M30.060\tEstados del voucher y cotización\tP+B\tP3\tC12',
+   preguntas:'BAK-M40\tModos de recibo\t¿Qué recibo agrupa varios files?\tDetallado\tIndicado\tAutomático\tNinguno\tA\tactiva'}[modo];
+  const cols={
+   estructura:'ID del módulo (opcional, lo generamos si falta) · nombre del módulo · nombre de la sección · plan · orden',
+   videos:'ID (opcional) · qué enseña · plan · prioridad · cohorte',
+   preguntas:'módulo · tema · enunciado · opción A · B · C · D · letra de la correcta · estado'}[modo];
+
+  if(S.impPaso===1){
+    const c=el('div','card');c.style.padding='16px';
+    c.innerHTML=`<label for="pb">Pegá acá (una fila por ${modo==='preguntas'?'pregunta':(modo==='videos'?'video':'sección')})</label>
+      <textarea id="pb" rows="8" style="font-family:var(--mono);font-size:12.5px" placeholder="${ph}"></textarea>
+      <p class="hint">Columnas esperadas: ${cols}.</p>
+      ${modo==='estructura'?'<p class="hint">Un módulo con varias secciones se repite en varias filas: el módulo se crea una sola vez y se le van agregando las secciones en el orden en que aparecen.</p>':''}
+      <div class="row" style="margin-top:14px"><button class="btn btn-p" data-imp="rev">Revisar las filas</button>
+        <button class="btn" data-imp="csv">Subir un archivo CSV</button></div>`;
+    w.appendChild(c);
+    if(modo==='estructura') w.appendChild(el('div','note v3','<b>Modo nuevo v3 ·</b> El importador solo aceptaba videos contra módulos que ya existían, así que en una Academia vacía no servía para arrancar. Este modo crea la estructura: módulos, sus secciones y su orden, con la misma vista previa fila por fila.'));
+    return w;
+  }
+
+  const filas=modo==='preguntas'?FILAS_P:(modo==='videos'?FILAS_V:FILAS_E);
+  const errIdx=modo==='preguntas'?8:5;
+  const vivas=filas.filter((f,i)=>!S.omit.has(i));
+  const ok=vivas.filter(f=>!f[errIdx]).length, bad=vivas.filter(f=>f[errIdx]).length;
+
+  const tw=el('div','tablewrap');const tb=el('table');
+  tb.innerHTML=modo==='preguntas'
+    ?`<thead><tr><th style="width:26px"></th><th style="width:80px">Módulo</th><th style="width:130px">Tema</th><th>Enunciado</th><th style="width:60px">Correcta</th></tr></thead>`
+    :(modo==='videos'
+      ?`<thead><tr><th style="width:26px"></th><th style="width:110px">ID</th><th>Qué enseña</th><th style="width:60px">Plan</th><th style="width:50px">Pri.</th><th style="width:70px">Cohorte</th></tr></thead>`
+      :`<thead><tr><th style="width:26px"></th><th style="width:90px">Módulo</th><th style="width:26%">Nombre del módulo</th><th>Sección</th><th style="width:60px">Plan</th><th style="width:60px">Orden</th></tr></thead>`);
+  const body=el('tbody');
+  filas.forEach((f,i)=>{
+    if(S.omit.has(i)) return;
+    const e=f[errIdx];
+    const aviso=!!e&&(e.indexOf('Aviso')>=0||e.indexOf('se omite')>=0);
+    const tr=el('tr');
+    if(e&&!aviso) tr.dataset.bad='true'; else if(aviso) tr.dataset.warn='true';
+    let botones='';
+    if(e){
+      if(e.indexOf('no existe')>=0&&modo==='videos') botones+=`<button class="btn btn-sm" data-fixmod="${esc(f[0].split('.')[0])}">Crear el módulo ${esc(f[0].split('.')[0])}</button>`;
+      if(e.indexOf('tema')>=0) botones+='<button class="btn btn-sm" data-fix="'+i+'">Crear el tema</button><button class="btn btn-sm" data-fix="'+i+'">Elegir uno existente</button>';
+      if(e.indexOf('repetido')>=0) botones+='<button class="btn btn-sm" data-fix="'+i+'">Quedarme con una</button>';
+      if(e.indexOf('Plan distinto')>=0) botones+='<button class="btn btn-sm" data-fix="'+i+'">Usar P+B</button><button class="btn btn-sm" data-fix="'+i+'">Usar B</button>';
+      if(e.indexOf('confirmación')>=0) botones+='<button class="btn btn-sm" data-fix="'+i+'">Pedir confirmación a Producto</button>';
+      if(!botones) botones='<button class="btn btn-sm" data-fix="'+i+'">Corregir</button>';
+      botones+=`<button class="btn btn-sm" data-skip="${i}">Omitir fila</button>`;
+    }
+    const fix=e?`<span class="${aviso?'rowwarn':'rowerr'}">${esc(e)}</span><span class="rowfix">${botones}</span>`:'';
+    const mk=e?(aviso?'<span class="miss">○</span>':'<span class="bad">✕</span>'):'<span class="ok">✓</span>';
+    tr.innerHTML=modo==='preguntas'
+      ?`<td>${mk}</td><td class="cellmono">${esc(f[0])}</td><td>${esc(f[1])}</td><td>${esc(f[2])}${fix}</td><td class="cellmono">${esc(f[7])||'<span class="bad">—</span>'}</td>`
+      :(modo==='videos'
+        ?`<td>${mk}</td><td class="cellmono">${esc(f[0])}</td><td>${esc(f[1])}${fix}</td><td>${esc(f[2])||'<span class="bad">—</span>'}</td><td>${esc(f[3])}</td><td>${esc(f[4])}</td>`
+        :`<td>${mk}</td><td class="cellmono">${esc(f[0])}</td><td>${esc(f[1])}</td><td>${esc(f[2])||'<span class="miss">sin sección</span>'}${fix}</td><td>${esc(f[3])}</td><td class="cellmono">${esc(f[4])}</td>`);
+    body.appendChild(tr);
+  });
+  tb.appendChild(body);tw.appendChild(tb);w.appendChild(tw);
+
+  if(modo==='estructura'){
+    const mods=[...new Set(vivas.filter(f=>!f[5]||f[5].indexOf('Aviso')>=0).map(f=>f[0]))];
+    const box=el('div','card');box.style.padding='14px';box.style.margin='14px 0';
+    box.innerHTML=`<h3>Qué queda creado después de importar</h3>
+      <p class="hint" style="margin:4px 0 0">${mods.length} módulos nuevos, todos <b>en preparación</b>: ${mods.map(x=>'<span class="idbadge">'+esc(x)+'</span>').join(' ')}. Ninguno se ve para las agencias hasta cargarle videos, banco de preguntas y pasar el checklist de publicación.</p>`;
+    w.appendChild(box);
+  }
+  if(modo==='preguntas'){
+    const cob=cobertura(m);
+    const nuevas={};
+    vivas.filter(f=>!f[8]).forEach(f=>{nuevas[f[1]]=(nuevas[f[1]]||0)+1;});
+    const box=el('div','card');box.style.padding='14px';box.style.margin='14px 0';
+    box.innerHTML=`<h3>Cómo queda la cobertura después de importar</h3>
+      <div class="row" style="gap:5px;margin-top:8px">${cob.map(c=>{
+        const add=nuevas[c.st.name]||0, tot=c.n+add;
+        return `<span class="tag ${tot===0?'stop':(tot<6?'warn':'ok')}">${esc(c.st.name)} ${c.n}${add?' +'+add:''}</span>`;}).join('')}</div>
+      <p class="hint">${cob.some(c=>(c.n+(nuevas[c.st.name]||0))===0)
+        ?'Después de este pegado siguen quedando temas en cero: el módulo va a seguir bloqueado para publicar.'
+        :'Con este pegado se destraba el bloqueo de publicación por cobertura.'}</p>`;
+    w.appendChild(box);
+  }
+
+  const nombre={estructura:'módulos y secciones',videos:'videos',preguntas:'preguntas'}[modo];
+  const sum=el('div','summary');
+  sum.innerHTML=`<span class="ok"><b>${ok}</b> filas listas</span><span class="miss"><b>${bad}</b> con algo para revisar</span>
+    <span style="margin-left:auto" class="row"><button class="btn" data-imp="back">Volver a pegar</button>
+    <button class="btn btn-p" data-imp="ok" ${ok?'':'disabled'}>Importar ${ok} filas de ${nombre}</button></span>`;
+  w.appendChild(sum);
+  w.appendChild(el('div','note','<b>Nota de diseño ·</b> Vista previa obligatoria y nunca un import a ciegas. Cada error se explica en la fila que lo causó y ofrece las salidas específicas de ese error, en lugar de rechazar el lote entero por una celda.'));
+  if(modo==='videos') w.appendChild(el('div','note v3','<b>Ajuste v3 ·</b> La fila de BAK-M31 antes solo se podía omitir. Ahora ofrece <b>crear el módulo que falta</b> sin abandonar el pegado: es el caso real de una planilla que va más adelantada que la Academia.'));
+  return w;
+}
+
+/* ============================================================
+   MEET Y COLAS DE DUDAS  (alineado al modelo aprobado)
+   ============================================================ */
+function agBy(id){return AGENCIAS.find(a=>a.id===id);}
+function nombrePlantel(ag,uid){const e=ag.plantel.find(x=>x.id===uid);return e?e.nombre:'—';}
+function cupoEstado(agId,modId){
+  const t=(TURNOS[agId]||[]).find(x=>x.modId===modId);
+  if(t) return t.estado; // agendado / consumido
+  const dudas=(COLAS[agId]||[]).filter(d=>d.modId===modId);
+  return dudas.length?'abierto':'sin-cola';
+}
+function viewMeet(){
+  const w=el('div','wrap');
+  const agId=S.meetAg||AGENCIAS[0].id;
+  const ag=agBy(agId);
+  w.innerHTML=`<h1>Meet y colas de dudas</h1>
+    <p class="lede">El modelo aprobado: <b>una Meet por módulo por agencia</b>, no por usuario. Cada agencia acumula una cola de dudas por módulo; un coordinador agenda una única Meet con Soporte, cuya agenda es esa cola. Es lo que hace que la Academia no vuelva a saturar Soporte.</p>`;
+
+  if(!can('editar')&&!can('ver')){}
+  const sel=el('div','row');sel.style.marginBottom='6px';
+  sel.innerHTML=`<span class="hint" style="margin:0">Agencia:</span>
+    ${AGENCIAS.map(a=>`<button class="btn btn-sm ${agId===a.id?'btn-on':''}" data-meetag="${a.id}">${esc(a.nombre)}</button>`).join('')}
+    <span class="tag" style="margin-left:8px">plan ${esc(ag.plan)}</span>
+    <span class="tag">coordinador: ${esc(nombrePlantel(ag,ag.coordinadorId))}</span>`;
+  w.appendChild(sel);
+
+  /* Franja de atención de Soporte: parámetro del backoffice */
+  const fr=el('div','card');fr.style.padding='14px';fr.style.margin='12px 0';
+  fr.innerHTML=`<h3>Franja de atención de Soporte</h3>
+    <p class="hint" style="margin:0 0 10px">Un parámetro del backoffice, no del módulo: define qué turnos ofrece el agendador. Es un dato nuevo que el MVP no tenía.</p>
+    <div class="fieldgrid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
+      <div><label>Duración por Meet</label><div class="ro">${FRANJA.duracionMin} min<span class="lock">regla del MVP</span></div></div>
+      <div><label>Días</label><div class="row"><input type="text" value="${esc(FRANJA.dias)}" style="max-width:200px"${dis('params')}></div></div>
+      <div><label>Horas</label><div class="row"><input type="text" value="${esc(FRANJA.horas)}" style="max-width:260px"${dis('params')}></div></div>
+      <div><label>Semanas de anticipación</label><div class="row"><input type="number" value="${FRANJA.semanas}" style="max-width:90px"${dis('params')}></div></div>
+      <div><label>Zona horaria</label><div class="ro">${esc(FRANJA.zona)}<span class="lock">rotulada en pantalla</span></div></div>
+    </div>`;
+  w.appendChild(fr);
+
+  /* Colas por módulo del recorrido de la agencia */
+  const rec=recorridoDe(ag);
+  const dudas=COLAS[agId]||[];
+  w.appendChild(el('h2','','Colas de dudas por módulo'));
+  w.appendChild(el('p','hint','El texto de cada duda es la mejor señal de contenido a revisar que va a tener Capacitación: si un mismo concepto junta muchas dudas, hay un video para mejorar.'));
+
+  const modsConCola=[...new Set(dudas.map(d=>d.modId))];
+  if(!modsConCola.length){
+    w.appendChild(el('div','emptynote','<b>Esta agencia no tiene dudas en cola.</b><br>Las dudas aparecen cuando una persona aprueba un módulo con ≥80 % y deja una consulta.'));
+  }
+  modsConCola.forEach(modId=>{
+    const m=findMod(modId);
+    const est=cupoEstado(agId,modId);
+    const turno=(TURNOS[agId]||[]).find(x=>x.modId===modId);
+    const dd=dudas.filter(d=>d.modId===modId);
+    const box=el('div','card');box.style.marginBottom='12px';
+    const chip={'abierto':'st-guionado','agendado':'st-publicado','consumido':'st-backlog','sin-cola':'st-backlog'}[est];
+    box.innerHTML=`<div style="padding:11px 14px;border-bottom:1px solid var(--line-soft);display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <span class="idbadge">${m.id}</span><b style="font-weight:600">${esc(m.name)}</b>
+        <span class="chip ${chip}">${est==='sin-cola'?'sin dudas':est}</span>
+        <span class="tag">${dd.length} duda${dd.length!==1?'s':''}</span>
+        ${turno?`<span class="tag ok">turno ${esc(turno.cuando)} · ${esc(turno.enlace)}</span>`:''}
+        <span style="margin-left:auto"></span>
+        ${est==='abierto'?`<button class="btn btn-sm btn-p" data-meetagendar="${modId}"${dis('editar')}>Agendar Meet</button>`:''}
+        ${est==='agendado'?`<button class="btn btn-sm" data-meetagendar="${modId}"${dis('editar')}>Ver turno</button>`:''}
+      </div>
+      <div style="padding:6px 14px 12px">${dd.map(d=>`
+        <div style="padding:8px 0;border-bottom:1px solid var(--line-soft)">
+          <div class="row" style="gap:6px"><span class="tag">${esc(nombrePlantel(ag,d.autor))}</span><span class="tag">${esc(d.tema)}</span><span class="cellmono" style="font-size:11.5px;color:var(--muted)">${esc(d.video)} · ${esc(d.fecha)}</span></div>
+          <div style="margin-top:4px">${esc(d.texto)}</div></div>`).join('')}</div>`;
+    w.appendChild(box);
+  });
+
+  w.appendChild(el('div','banner warn','<span>!</span><div><b>Definiciones pendientes de la Meet.</b> Quién designa al coordinador y qué pasa si se va de la agencia (hoy llega de solo lectura desde el backend). Quién ve el texto de las dudas ajenas (el prototipo: el coordinador todas, el resto solo las propias). Y si la cola vence (decidido que no).</div>'));
+  w.appendChild(el('div','note v3','<b>Pantalla nueva de alineación ·</b> El backoffice modelaba la Meet como un link fijo en la ficha del módulo. El modelo aprobado es cupo por agencia con cola de dudas, coordinador y agenda de turnos, y <b>el enlace es por turno</b>. Este es el faltante más grande del cotejo.'));
+  return w;
+}
+
+/* ============================================================
+   CERTIFICADOS
+   ============================================================ */
+function viewCertificado(){
+  const w=el('div','wrap');
+  w.innerHTML=`<h1>Certificados</h1>
+    <p class="lede">La agencia emite un certificado al completar el recorrido de su plan. El backoffice administra la plantilla, los tipos de documento admitidos y el registro de emisiones. Cuatro decisiones abiertas del prototipo (CE-1 a CE-4) apuntan acá.</p>`;
+
+  const cfg=el('div','card');cfg.style.padding='16px';cfg.style.marginBottom='14px';
+  cfg.innerHTML=`<h3>Fuente del documento del titular</h3>
+    <p class="hint" style="margin:0 0 10px">El nombre sale del SSO. El documento no lo tiene el modelo: hay que decidir de dónde viene (CE-1) y si se persiste (CE-2).</p>
+    <div class="radioset">
+      <label class="radiopill on"><input type="radio" name="certfuente" checked${dis('params')}> Llega del SSO / backoffice de SIGMMA</label>
+      <label class="radiopill"><input type="radio" name="certfuente"${dis('params')}> Lo carga la agencia y se valida</label>
+    </div>
+    <p class="hint">Recomendación del prototipo: que llegue precargado. Pedirlo en cada descarga es retrabajo y una oportunidad más de tipearlo mal.</p>`;
+  w.appendChild(cfg);
+
+  w.appendChild(el('h2','','Tipos de documento admitidos'));
+  w.appendChild(el('p','hint','Tabla paramétrica del backoffice (CE-3). Las longitudes son conservadoras y quedan a confirmar con negocio.'));
+  const tw=el('div','tablewrap');const tb=el('table');
+  tb.innerHTML=`<thead><tr><th style="width:120px">Clave</th><th style="width:200px">Etiqueta</th><th>Regla de formato</th><th style="width:80px">Activo</th></tr></thead><tbody>`+
+    TIPOS_DOC.map(d=>`<tr><td class="cellmono">${esc(d.clave)}</td><td>${esc(d.etiqueta)}</td><td>${esc(d.regla)}</td><td><span class="chip st-publicado">sí</span></td></tr>`).join('')+'</tbody>';
+  tw.appendChild(tb);w.appendChild(tw);
+
+  const r=el('div','row');r.style.margin='10px 0 18px';
+  r.innerHTML=`<button class="btn btn-sm btn-p"${dis('params')}>+ Agregar tipo</button>
+    <button class="btn btn-sm"${dis('params')}>Ver plantilla del certificado</button>
+    <span class="hint" style="margin:0">Valida solo el formato, nunca coincidencia: no hay contra qué cotejar.</span>`;
+  w.appendChild(r);
+
+  w.appendChild(el('h2','','Registro de emisiones'));
+  const tw2=el('div','tablewrap');const tb2=el('table');
+  tb2.innerHTML=`<thead><tr><th>Persona</th><th>Agencia</th><th style="width:110px">Plan</th><th style="width:160px">Documento</th><th style="width:120px">Emitido</th></tr></thead><tbody>`+
+    CERTIFICADOS.map(c=>`<tr><td>${esc(c.persona)}</td><td>${esc(agBy(c.agencia).nombre)}</td><td>${esc(c.plan)}</td><td class="cellmono">${esc(c.doc)}</td><td>${esc(c.emitido)}</td></tr>`).join('')+'</tbody>';
+  tw2.appendChild(tb2);w.appendChild(tw2);
+
+  w.appendChild(el('div','banner plan','<span>i</span><div><b>Qué imprime el certificado</b> (CE-4): nombre del titular, documento, agencia, plan, módulos del recorrido aprobados y fecha. El PDF lo emite el backend; el prototipo confirma los datos y ahí termina. No hay que prometer un archivo que la maqueta no genera.</div>'));
+  w.appendChild(el('div','note v3','<b>Pantalla nueva de alineación ·</b> El certificado no estaba en el MVP del backoffice y el prototipo lo emite. Sin plantilla, tipos de documento y registro de emisiones administrados acá, el lado agencia no tiene de dónde tomar los datos.'));
+  return w;
+}
+
+/* ============================================================
+   PANEL — AVANCE POR AGENCIA
+   ============================================================ */
+function viewPanelAgencia(){
+  const w=el('div','wrap');
+  const agId=S.panelAg||AGENCIAS[0].id;
+  const ag=agBy(agId);
+  const rec=recorridoDe(ag);
+  const total=rec.length;
+  w.innerHTML=`<h1>Avance por agencia</h1>
+    <p class="lede">El agregado por agencia, con la regla de agregación nombrada: promedio de módulos aprobados por persona <b>sobre los del recorrido del plan</b> (${total} con ${esc(ag.plan)}), nunca sobre los 11 del mapa.</p>`;
+
+  const sel=el('div','row');sel.style.marginBottom='12px';
+  sel.innerHTML=`<span class="hint" style="margin:0">Agencia:</span>
+    ${AGENCIAS.map(a=>`<button class="btn btn-sm ${agId===a.id?'btn-on':''}" data-panelag="${a.id}">${esc(a.nombre)}</button>`).join('')}
+    <span class="tag" style="margin-left:8px">plan ${esc(ag.plan)}</span>`;
+  w.appendChild(sel);
+
+  const prom=(ag.plantel.reduce((a,e)=>a+Math.min(e.aprobados,total),0)/ag.plantel.length/total*100);
+  const conAct=ag.plantel.filter(e=>e.aprobados>0).length;
+  const completos=ag.plantel.filter(e=>e.aprobados>=total).length;
+  const mini=el('div','mini');mini.style.gridTemplateColumns='repeat(4,1fr)';
+  mini.innerHTML=`
+   <div class="stat"><b>${ag.plantel.length}</b><span>personas en el plantel</span></div>
+   <div class="stat"><b>${prom.toFixed(2).replace('.',',')}%</b><span>avance promedio del recorrido</span></div>
+   <div class="stat"><b>${conAct}</b><span>con actividad</span></div>
+   <div class="stat"><b>${completos}</b><span>certificables</span></div>`;
+  w.appendChild(mini);
+
+  /* Ranking del plantel, desempate por última aprobación */
+  w.appendChild(el('h2','','Plantel'));
+  const tw=el('div','tablewrap');const tb=el('table');
+  tb.innerHTML=`<thead><tr><th style="width:30px">#</th><th>Persona</th><th style="width:150px">Aprobados</th><th style="width:130px">Último acceso</th><th style="width:110px">Certificado</th></tr></thead><tbody>`+
+    ag.plantel.slice().sort((a,b)=>b.aprobados-a.aprobados).map((e,i)=>`
+     <tr><td class="cellmono">${e.aprobados>0?i+1:'—'}</td>
+       <td>${esc(e.nombre)}${e.coord?' <span class="tag">coordinador</span>':''}</td>
+       <td><div class="row" style="gap:8px"><span class="cellmono">${Math.min(e.aprobados,total)}/${total}</span>
+         <div class="bar" style="flex:1;max-width:120px"><i style="width:${Math.min(100,e.aprobados/total*100)}%"></i></div></div></td>
+       <td>${e.ultimoAcceso==='—'?'<span class="hint" style="margin:0">nunca entró</span>':esc(e.ultimoAcceso)}</td>
+       <td>${e.cert?'<span class="chip st-publicado">emitido</span>':(e.aprobados>=total?'<span class="tag ok">disponible</span>':'<span class="hint" style="margin:0">—</span>')}</td></tr>`).join('')+'</tbody>';
+  tw.appendChild(tb);w.appendChild(tw);
+
+  w.appendChild(el('div','banner plan','<span>i</span><div><b>Los eventos que alimentan esto tienen que loguearse desde el día uno:</b> por usuario y módulo — intentos con fecha-hora (con segundos, que desempatan el ranking), la versión de cada pregunta sorteada, la respuesta, la nota y el resultado; por usuario y video — aperturas, progreso y visto ≥80 %. Si el MVP sale sin el logueo, este panel se construye sobre datos que no existen.</div>'));
+  w.appendChild(el('div','note v3','<b>Pantalla nueva ·</b> Era "fase 2", pero el prototipo ya define exactamente qué datos consume y con qué regla de agregación, así que dejó de ser libre.'));
+  return w;
+}
+
+/* ============================================================
+   PANEL — GENERAL (macro)
+   ============================================================ */
+function viewPanelMacro(){
+  const w=el('div','wrap');
+  w.innerHTML=`<h1>Panel general</h1>
+    <p class="lede">El agregado global de SIGMMA. La lectura clave: qué módulos reprueban más (contenido a revisar) y qué videos se ven menos. Datos de muestra.</p>`;
+
+  const totAg=AGENCIAS.length;
+  const totPers=AGENCIAS.reduce((a,ag)=>a+ag.plantel.length,0);
+  const totMeets=Object.values(TURNOS).reduce((a,t)=>a+t.length,0);
+  const totColas=Object.values(COLAS).reduce((a,c)=>a+c.length,0);
+  const mini=el('div','mini');
+  mini.innerHTML=`
+   <div class="stat"><b>${totAg}</b><span>agencias activas</span></div>
+   <div class="stat"><b>${totPers}</b><span>personas</span></div>
+   <div class="stat"><b>${totMeets}</b><span>Meets generadas</span></div>
+   <div class="stat"><b>${totColas}</b><span>dudas en cola</span></div>
+   <div class="stat"><b>2</b><span>certificados emitidos</span></div>`;
+  w.appendChild(mini);
+
+  /* % de agencias que completaron cada módulo (muestra derivada del plantel) */
+  const bak=DATA.filter(m=>m.sup==='BAK'&&!m.enPrep);
+  w.appendChild(el('h2','','Completitud y reprobación por módulo'));
+  const tw=el('div','tablewrap');const tb=el('table');
+  tb.innerHTML=`<thead><tr><th>Módulo</th><th style="width:120px">Plan</th><th style="width:150px">% completado</th><th style="width:150px">Tasa de reprobación</th><th style="width:130px">Señal</th></tr></thead><tbody>`+
+    bak.map((m,i)=>{
+      const compl=[95,88,74,61,0,52,44,38,30,26,18,12][i]||20;
+      const repro=[6,9,22,31,0,17,14,11,9,8,7,5][i]||10;
+      const alerta=repro>=20;
+      return `<tr data-warn="${alerta}"><td><span class="idbadge">${m.id}</span> ${esc(m.name)}</td>
+        <td>${esc(m.tag)}</td>
+        <td><div class="row" style="gap:8px"><span class="cellmono">${compl}%</span><div class="bar" style="flex:1;max-width:100px"><i style="width:${compl}%"></i></div></div></td>
+        <td><div class="row" style="gap:8px"><span class="cellmono">${repro}%</span><div class="bar ${alerta?'zero':'low'}" style="flex:1;max-width:100px"><i style="width:${Math.min(100,repro*3)}%"></i></div></div></td>
+        <td>${alerta?'<span class="tag stop">revisar contenido</span>':'<span class="tag ok">ok</span>'}</td></tr>`;
+    }).join('')+'</tbody>';
+  tw.appendChild(tb);w.appendChild(tw);
+
+  w.appendChild(el('div','banner warn','<span>!</span><div><b>BAK-M20 (Entidades) reprueba 22 %.</b> Es la señal que el panel existe para dar: no es que las agencias sean flojas, es que "Cliente vs. Pasajero" confunde. Se cruza con el % de acierto por pregunta del banco para encontrar el video a mejorar.</div>'));
+  w.appendChild(el('div','note v3','<b>Pantalla nueva ·</b> MVP §6. El ranking de videos más/menos vistos y el volumen de Meets por agencia salen del mismo logueo de eventos que alimenta el avance por agencia.'));
+  return w;
+}
+
+/* ============================================================
+   PARÁMETROS GLOBALES
+   ============================================================ */
+function viewParams(){
+  const w=el('div','wrap');
+  w.innerHTML=`<h1>Parámetros globales</h1>
+    <p class="lede">Los valores que el lado agencia lee y que hasta ahora vivían dispersos o solo en el documento. Acá quedan explícitos y, donde el MVP lo permite, editables.</p>`;
+
+  const card=el('div','card');card.style.padding='16px';
+  card.innerHTML=`
+   <div class="fieldgrid">
+     <div><label>Umbral para marcar un video como "visto"</label><div class="ro"><span class="mono">${GLOBAL.umbralVisto} %</span> de la duración<span class="lock">regla del MVP</span></div></div>
+     <div><label>Cómo se mide ese ${GLOBAL.umbralVisto} %</label>
+       <div class="radioset">
+         <label class="radiopill ${GLOBAL.metodoVisto==='posición'?'on':''}"><input type="radio" name="mv" ${GLOBAL.metodoVisto==='posición'?'checked':''}${dis('params')}> Posición máxima alcanzada</label>
+         <label class="radiopill ${GLOBAL.metodoVisto!=='posición'?'on':''}"><input type="radio" name="mv" ${GLOBAL.metodoVisto!=='posición'?'checked':''}${dis('params')}> Segundos efectivamente reproducidos (anti-scrub)</label>
+       </div>
+       <p class="hint miss">Decisión abierta P04.3. El prototipo usa posición y avisa que <b>no es el criterio de producción</b>: arrastrar la barra al final marca el video como visto. La API de YouTube alcanza para el criterio estricto — es decisión de producto, no límite técnico.</p></div>
+     <div><label>Preguntas por intento</label><div class="ro"><span class="mono">${GLOBAL.preguntasIntento}</span><span class="lock">regla del MVP</span></div></div>
+     <div><label>Umbral de aprobación</label><div class="ro"><span class="mono">${GLOBAL.umbralAprob} / 10</span> (80 %)<span class="lock">regla del MVP</span></div></div>
+     <div><label>Tamaño mínimo del banco para publicar</label><div class="row"><input type="number" value="30" style="max-width:100px"${dis('params')}><span class="hint" style="margin:0">alineado a 3× el intento; objetivo 50</span></div></div>
+     <div><label>Canal único de soporte</label><div class="row"><input type="text" value="${esc(GLOBAL.soporte)}" style="max-width:320px"${dis('params')}></div>
+       <p class="hint">Un solo canal en toda la Academia, como en el prototipo.</p></div>
+     <div><label>Zona horaria de atención</label><div class="ro">${esc(GLOBAL.zona)}<span class="lock">rotulada en pantalla, sin conversión de husos</span></div></div>
+     <div><label>Rehacer una evaluación ya aprobada</label>
+       <div class="ro">Gana la última nota aprobada; desaprobar después no revoca la aprobación<span class="lock">decisión del prototipo (P05.4)</span></div>
+       <p class="hint">Se cruza con la decisión 6 (¿la aprobación caduca al regrabar un video?): las dos definen si una aprobación es permanente o revisable, y conviene escribirlas juntas.</p></div>
+   </div>`;
+  w.appendChild(card);
+  w.appendChild(el('div','note v3','<b>Pantalla nueva de alineación ·</b> Reúne los parámetros que el prototipo consume: umbral de visto y su método de medición, preguntas por intento, umbral de aprobación, canal de soporte y zona horaria. Que estén acá evita que cada uno viva como una constante suelta en el código.'));
+  return w;
+}
+
+
+/* ============================================================
+   EVENTOS
+   ============================================================ */
+document.addEventListener('click',ev=>{
+  const t=ev.target.closest('[data-go],[data-go2],[data-jump],[data-door],[data-esc],[data-rol],[data-sup],[data-toggle],[data-sel],[data-add],[data-ins],[data-quick],[data-secsave],[data-amsave],[data-tab],[data-bulk],[data-bbulk],[data-imp],[data-impmodo],[data-fix],[data-fixmod],[data-skip],[data-info],[data-perfil],[data-arch],[data-pub],[data-vid-pub],[data-qsave],[data-resort],[data-verres],[data-vercorr],[data-vord],[data-sord],[data-mord],[data-meetag],[data-panelag],[data-meetagendar],#collapseAll');
+  if(!t||t.disabled) return;
+
+  if(t.dataset.go){S.screen=t.dataset.go;S.impPaso=1;render();return;}
+
+  if(t.dataset.go2){
+    const p=t.dataset.go2.split('|');
+    if(p[0]==='altamod'){S.screen='altamod';render();return;}
+    if(p[0]==='imp-estr'){S.screen='importar';S.impModo='estructura';S.impPaso=1;S.omit.clear();render();return;}
+    if(p[0]==='mod'){S.screen='constructor';S.bModId=p[1];S.open[p[1]]=true;S.sel={kind:'mod',modId:p[1]};S.tab='ficha';render();return;}
+    if(p[0]==='banco'){S.screen='banco';S.bModId=p[1];S.bChecked.clear();render();return;}
+    if(p[0]==='pregunta'){S.screen='pregunta';S.bModId=p[1];S.qEdit=p[2];render();return;}
+    if(p[0]==='subtemas'){S.screen='subtemas';S.bModId=p[1];render();return;}
+    if(p[0]==='preview'){S.screen='preview';S.bModId=p[1];S.muestra=null;S.respuestas={};render();return;}
+    if(p[0]==='imp-preg'){S.screen='importar';S.impModo='preguntas';S.bModId=p[1];S.impPaso=1;S.omit.clear();render();return;}
+  }
+
+  if(t.dataset.jump){
+    const p=t.dataset.jump.split('|');
+    if(p[0]==='banco'){S.screen='banco';S.bModId=p[1];render();return;}
+    if(p[0]==='subtemas'){S.screen='subtemas';S.bModId=p[1];render();return;}
+    if(p[0]==='sec'){S.screen='constructor';S.open[p[1]]=true;S.qsec={modId:p[1]};S.sel={kind:'mod',modId:p[1]};render();return;}
+    if(p[0]==='vid'){S.screen='constructor';S.open[p[1]]=true;S.sel={kind:'vid',modId:p[1],secIdx:+p[2],vidSeq:p[3]};S.tab='ficha';render();return;}
+    if(p[0]==='regr'){S.screen='constructor';S.soloPend=true;DATA.forEach(m=>S.open[m.id]=true);render();toast('Filtro "solo pendiente" activado. Seleccioná los videos y usá la barra de acciones.');return;}
+  }
+
+  if(t.dataset.door){
+    const d=t.dataset.door;
+    if(d==='tengo'){
+      if(!can('editar')){toast(porque('editar'));return;}
+      S.screen='constructor';const m=findMod('BAK-M40');S.superficie='BAK';S.open[m.id]=true;
+      S.quick={modId:m.id,secIdx:0,modo:'tengo'};S.sel=null;render();
+      toast('Elegí dónde va el video y pegá el link. Al guardar se verifica el embebido.');return;
+    }
+    if(d==='preguntas'){
+      if(!can('editar')){toast(porque('editar'));return;}
+      S.screen='banco';S.bModId='BAK-M40';render();toast('Banco de BAK-M40. El tema es obligatorio en cada pregunta.');return;
+    }
+    if(d==='estructura'){
+      if(!can('editar')){toast(porque('editar'));return;}
+      S.screen='altamod';render();return;
+    }
+    if(d==='publicar'){
+      if(!can('publicar')){toast(porque('publicar'));return;}
+      S.screen='constructor';S.superficie='BAK';S.bModId='BAK-M30';S.open['BAK-M30']=true;S.sel={kind:'mod',modId:'BAK-M30'};S.tab='publicar';render();return;
+    }
+  }
+
+  if(t.dataset.esc){S.escena=t.dataset.esc;S.checked.clear();S.bChecked.clear();S.quick=null;S.qsec=null;S.muestra=null;S.respuestas={};if(S.escena==='E1')S.sel=null;render();return;}
+  if(t.dataset.rol){S.rol=t.dataset.rol;S.quick=null;S.qsec=null;render();toast('Actuando como '+ROLES[S.rol].n+'. '+ROLES[S.rol].d);return;}
+  if(t.dataset.sup){S.superficie=t.dataset.sup;S.sel=null;S.quick=null;S.qsec=null;render();return;}
+  if(t.dataset.perfil){S.perfilVista=t.dataset.perfil;render();return;}
+  if(t.dataset.meetag){S.meetAg=t.dataset.meetag;render();return;}
+  if(t.dataset.panelag){S.panelAg=t.dataset.panelag;render();return;}
+  if(t.dataset.meetagendar){const est=cupoEstado(S.meetAg||AGENCIAS[0].id,t.dataset.meetagendar);
+    toast(est==='agendado'?'Turno ya agendado. El enlace de esta Meet es propio del turno, no del módulo.':'Agendando la Meet del equipo con la cola como agenda. Se toma un turno de la franja y se genera el enlace.');return;}
+  if(t.dataset.toggle){S.open[t.dataset.toggle]=!S.open[t.dataset.toggle];render();return;}
+  if(t.id==='collapseAll'){S.open={};S.quick=null;S.qsec=null;render();return;}
+
+  if(t.dataset.sel){
+    const [k,mid,si,vs]=t.dataset.sel.split('|');
+    S.sel={kind:k,modId:mid,secIdx:si!==undefined?+si:undefined,vidSeq:vs};
+    if(k==='mod'){S.open[mid]=true;S.bModId=mid;}
+    S.tab='ficha';render();return;
+  }
+
+  if(t.dataset.ins){
+    const [mid,si,seq]=t.dataset.ins.split('|');
+    S.quick={modId:mid,secIdx:+si,modo:'tengo',after:seq};render();
+    toast('Insertando después de .'+seq+'. El sistema propone la secuencia intermedia.');return;
+  }
+
+  if(t.dataset.add){
+    const p=t.dataset.add.split('|');
+    if(p[0]==='vid'){S.quick={modId:p[1],secIdx:+p[2],modo:'tengo'};S.qsec=null;render();return;}
+    if(p[0]==='sec'){S.screen='constructor';S.open[p[1]]=true;S.qsec={modId:p[1]};S.quick=null;render();return;}
+    if(p[0]==='mod'){S.screen='altamod';render();return;}
+  }
+
+  /* alta de sección */
+  if(t.dataset.secsave){
+    const a=t.dataset.secsave;
+    if(a==='cancel'){S.qsec=null;render();return;}
+    const mod=findMod(S.qsec.modId);
+    const nom=($('#snn')&&$('#snn').value.trim())||'Sección sin nombre';
+    mod.secciones.push({name:nom,videos:[]});
+    const idx=mod.secciones.length-1;
+    toast('Sección "'+nom+'" creada en '+mod.id+'. Ya acepta videos.');
+    if(a==='more'){S.qsec={modId:mod.id};}
+    else{S.qsec=null;S.sel={kind:'sec',modId:mod.id,secIdx:idx};S.tab='ficha';}
+    render();return;
+  }
+
+  /* alta de módulo */
+  if(t.dataset.amsave){
+    const nombre=($('#anNombre')&&$('#anNombre').value.trim())||'';
+    if(!nombre){toast('Falta el nombre del módulo: es el único campo que el sistema no puede derivar.');return;}
+    const perfiles=Array.from(document.querySelectorAll('.apPerf')).filter(x=>x.checked).map(x=>x.value);
+    const orden=parseInt(($('#anOrden')&&$('#anOrden').value)||nextOrden(S.superficie),10);
+    const sec=($('#anSec')&&$('#anSec').value.trim())||'';
+    const m=crearModulo({sup:S.superficie,name:nombre,tag:S.amPlan,perfiles,orden,seccion:sec?[sec]:[]});
+    toast('Módulo '+m.id+' creado en preparación'+(sec?', con la sección "'+sec+'"':', todavía sin secciones')+'. No lo ve ninguna agencia hasta pasar el checklist.');
+    if(t.dataset.amsave==='more'){render();return;}
+    S.screen='constructor';S.open[m.id]=true;S.bModId=m.id;S.sel={kind:'mod',modId:m.id};S.tab='ficha';render();return;
+  }
+
+  /* alta de video */
+  if(t.dataset.quick){
+    const a=t.dataset.quick;
+    if(a==='cancel'){S.quick=null;render();return;}
+    const mod=findMod(S.quick.modId),sec=mod.secciones[S.quick.secIdx];
+    const ti=($('#qt')&&$('#qt').value.trim())||'Video sin título';
+    const after=S.quick.after;let seq=nextSeq(sec);
+    const grabado=S.quick.modo!=='reservar';
+    if(after){const i=sec.videos.findIndex(v=>v.seq===after);
+      const x=parseInt(after,10),y=sec.videos[i+1]?parseInt(sec.videos[i+1].seq,10):x+10;
+      seq=String(Math.floor((x+y)/2)).padStart(3,'0');
+      sec.videos.splice(i+1,0,{seq,t:ti,p:'P3',c:'—',dur:grabado?'3:30':'',durEst:grabado?'':'4:00'});
+    } else sec.videos.push({seq,t:ti,p:'P3',c:'—',dur:grabado?'3:30':'',durEst:grabado?'':'4:00'});
+    toast('Guardado como '+mod.id+'.'+seq+' · no elegiste superficie, módulo, sección ni orden.');
+    if(a==='save'){const si=S.quick.secIdx;S.quick=null;S.sel={kind:'vid',modId:mod.id,secIdx:si,vidSeq:seq};S.tab='ficha';}
+    else S.quick={modId:mod.id,secIdx:S.quick.secIdx,modo:S.quick.modo};
+    render();return;
+  }
+
+  if(t.dataset.tab){S.tab=t.dataset.tab;render();return;}
+
+  /* reordenamientos reales */
+  if(t.dataset.vord){
+    const m=findMod(S.sel.modId),sec=m.secciones[S.sel.secIdx];
+    const i=sec.videos.findIndex(v=>v.seq===S.sel.vidSeq);
+    const j=t.dataset.vord==='up'?i-1:i+1;
+    if(j<0||j>=sec.videos.length){toast('Ya está en el extremo de la sección.');return;}
+    const tmp=sec.videos[i];sec.videos[i]=sec.videos[j];sec.videos[j]=tmp;
+    render();toast('Video movido a la posición '+(j+1)+'. El ID no cambió: el orden es un campo aparte.');return;
+  }
+  if(t.dataset.sord){
+    const m=findMod(S.sel.modId),i=S.sel.secIdx;
+    const j=t.dataset.sord==='up'?i-1:i+1;
+    if(j<0||j>=m.secciones.length){toast('Ya está en el extremo del módulo.');return;}
+    const tmp=m.secciones[i];m.secciones[i]=m.secciones[j];m.secciones[j]=tmp;
+    S.sel={kind:'sec',modId:m.id,secIdx:j};
+    render();toast('Sección movida. Sus videos se movieron con ella y conservan su ID.');return;
+  }
+  if(t.dataset.mord){
+    const m=findMod(S.sel.modId);
+    const ord=DATA.filter(x=>x.sup===m.sup).sort((a,b)=>a.orden-b.orden);
+    const i=ord.findIndex(x=>x.id===m.id), j=t.dataset.mord==='up'?i-1:i+1;
+    if(j<0||j>=ord.length){toast('Ya está en el extremo de la secuencia.');return;}
+    const o=m.orden;m.orden=ord[j].orden;ord[j].orden=o;
+    render();toast('Módulo movido al orden '+m.orden+'. Cambió la cadena de desbloqueo: revisala arriba.');return;
+  }
+
+  if(t.dataset.bulk){
+    const a=t.dataset.bulk,n=S.checked.size;
+    if(a==='clear'){S.checked.clear();render();return;}
+    const msg={regrabar:n+' videos marcados a regrabar. Dos clics en vez de '+n+' recorridos completos.',
+      despublicar:n+' videos despublicados. El estado de producción no se tocó: la historia queda intacta.',
+      cohorte:'Asignar cohorte a '+n+' videos de una sola vez.',
+      mover:'Mover '+n+' videos a otra sección. El ID se mantiene si el módulo no cambia.',
+      verificar:'Verificando el embebido de '+n+' videos contra YouTube…',
+      archivar:'Archivar '+n+' videos. Conservan ID e historial; el ID no se reutiliza.'}[a];
+    toast(msg);S.checked.clear();render();return;
+  }
+
+  if(t.dataset.bbulk){
+    const a=t.dataset.bbulk,n=S.bChecked.size;
+    if(a==='clear'){S.bChecked.clear();render();return;}
+    toast({activar:n+' preguntas activadas: ya entran en el sorteo.',
+      desactivar:n+' preguntas desactivadas. No se borran: dejan de entrar en el sorteo.',
+      subtema:'Asignar tema a '+n+' preguntas de una vez. Es la salida rápida cuando el import entró sin etiqueta.',
+      exportar:'Exportando '+n+' preguntas a planilla.'}[a]);
+    S.bChecked.clear();render();return;
+  }
+
+  if(t.dataset.impmodo){S.impModo=t.dataset.impmodo;S.impPaso=1;S.omit.clear();render();return;}
+  if(t.dataset.imp){
+    const a=t.dataset.imp;
+    if(a==='rev'){S.impPaso=2;render();return;}
+    if(a==='back'){S.impPaso=1;S.omit.clear();render();return;}
+    if(a==='csv'){toast('También acepta CSV, con mapeo de columnas.');return;}
+    if(a==='ok'){
+      const p=S.impModo;S.impPaso=1;S.omit.clear();
+      if(p==='preguntas'){S.screen='banco';toast('Preguntas importadas en estado borrador. Revisá y activalas para que entren en el sorteo.');}
+      else if(p==='videos'){S.screen='constructor';toast('Videos importados. Quedaron en backlog, con su ID reservado.');}
+      else{
+        /* crea de verdad la estructura FRT del pegado */
+        const yaFRT=DATA.some(m=>m.sup==='FRT');
+        if(!yaFRT){
+          crearModulo({sup:'FRT',name:'Fundamentos del frontend',tag:'P+B',perfiles:[...PERFILES],orden:10,seccion:['Concepto y acceso']});
+          crearModulo({sup:'FRT',name:'Reservas del cliente final',tag:'P+B',perfiles:[...PERFILES],orden:20,seccion:['Buscar y reservar','Pagos y confirmación']});
+          crearModulo({sup:'FRT',name:'Mi cuenta',tag:'P+B',perfiles:[...PERFILES],orden:30,seccion:['General']});
+        }
+        S.superficie='FRT';S.screen='constructor';
+        DATA.filter(m=>m.sup==='FRT').forEach(m=>S.open[m.id]=true);
+        toast('3 módulos FRT creados en preparación, con sus secciones. La fila de CRM quedó esperando confirmación de Producto.');
+      }
+      render();return;}
+  }
+  if(t.dataset.fix){toast('Se resuelve la fila sin descartar el resto del pegado.');return;}
+  if(t.dataset.fixmod){
+    const idm=t.dataset.fixmod;
+    if(findMod(idm)){toast('El módulo '+idm+' ya existe.');return;}
+    const m=crearModulo({sup:idm.split('-')[0],id:idm,name:'Módulo '+idm+' (nombre a completar)',tag:'P+B',perfiles:[...PERFILES],seccion:['General']});
+    FILAS_V.forEach(f=>{if(f[0].indexOf(idm+'.')===0) f[5]=null;});
+    toast('Módulo creado como '+m.id+' en preparación, con una sección "General". La fila del pegado quedó lista para importar; falta ponerle nombre real.');
+    render();return;
+  }
+  if(t.dataset.skip){S.omit.add(+t.dataset.skip);render();return;}
+
+  if(t.dataset.arch){
+    const w={mod:'módulo',sec:'sección',vid:'video'}[t.dataset.arch];
+    toast('Archivar '+w+': se pediría confirmación indicando qué queda fuera de la Academia. Sin borrado físico, el ID se conserva y no se reutiliza.');return;
+  }
+  if(t.dataset.pub){
+    const m=findMod(S.sel.modId);
+    m.pubManual=t.dataset.pub==='on';
+    render();
+    toast(t.dataset.pub==='on'
+      ?'Módulo publicado. Registrado: M. Luna, '+new Date().toLocaleDateString('es-AR')+'. Las agencias de los perfiles asignados ya lo ven.'
+      :'Módulo despublicado. Los videos conservan su estado de producción; solo dejó de exponerse.');
+    return;
+  }
+  if(t.dataset.vidPub){
+    toast(t.dataset.vidPub==='on'?'Video publicado dentro del módulo.':'Video despublicado. Su estado de producción sigue siendo el que era: no se perdió la historia.');
+    return;
+  }
+  if(t.dataset.qsave){
+    toast(t.dataset.qsave==='more'
+      ?'Pregunta guardada. El formulario vuelve vacío con el mismo tema, que es como se carga un banco de corrido.'
+      :'Pregunta guardada en borrador. Activala para que entre en el sorteo y cuente para la cobertura.');
+    if(t.dataset.qsave!=='more'){S.screen='banco';render();}
+    return;
+  }
+  if(t.dataset.resort){S.muestra=null;S.respuestas={};S.screen='preview';render();toast('Nuevo sorteo con las mismas reglas. Mirá si cambió la cobertura por tema.');return;}
+  if(t.dataset.verres){S.screen='resultado';render();return;}
+  if(t.dataset.vercorr!==undefined){S.verCorrectas=t.dataset.vercorr==='1';render();return;}
+
+  if(t.dataset.info==='id'){
+    toast('El ID se arma solo: BAK (superficie) + M30 (módulo) + 050 (de diez en diez, para poder intercalar). Es permanente: no cambia ni si regrabás el video.');return;
+  }
+  if(t.dataset.info==='idmod'){
+    toast('El ID del módulo es superficie + número, de diez en diez: BAK-M40, FRT-M00. Para intercalar entre dos módulos se usa un número intermedio, como BAK-M35. Es permanente.');return;
+  }
+});
+
+document.addEventListener('change',ev=>{
+  const t=ev.target;
+  if(t.id==='notesChk'){document.body.classList.toggle('notes-off',!t.checked);return;}
+  if(t.id==='soloPend'){S.soloPend=t.checked;render();return;}
+  if(t.id==='verArch'){S.verArch=t.checked;render();return;}
+  if(t.id==='bSub'){S.bSub=t.value;render();return;}
+  if(t.id==='bEstado'){S.bEstado=t.value;render();return;}
+  if(t.id==='bCorregir'){S.bCorregir=t.checked;render();return;}
+  if(t.dataset&&t.dataset.pv!==undefined){S.respuestas[+t.dataset.pv]=+t.value;return;}
+  if(t.dataset&&t.dataset.check!==undefined){t.checked?S.checked.add(t.dataset.check):S.checked.delete(t.dataset.check);render();return;}
+  if(t.dataset&&t.dataset.bcheck!==undefined){t.checked?S.bChecked.add(t.dataset.bcheck):S.bChecked.delete(t.dataset.bcheck);render();return;}
+  if(t.name==='modo'&&S.quick){S.quick.modo=t.value;render();return;}
+  if(t.name==='anPlan'){
+    S.amPlan=t.value;
+    const n=$('#anNombre')?$('#anNombre').value:'';
+    const s=$('#anSec')?$('#anSec').value:'';
+    const o=$('#anOrden')?$('#anOrden').value:'';
+    render();
+    if($('#anNombre'))$('#anNombre').value=n;
+    if($('#anSec'))$('#anSec').value=s;
+    if($('#anOrden')&&o)$('#anOrden').value=o;
+    return;
+  }
+});
+
+/* --- teclado: árbol navegable con flechas, Escape cancela el alta --- */
+function nodos(){return Array.from(document.querySelectorAll('.tree [data-sel]'));}
+function refocus(v){const b=document.querySelector('.tree [data-sel="'+v+'"]');if(b)b.focus();}
+document.addEventListener('keydown',ev=>{
+  const a=document.activeElement;
+  const enArbol=a&&a.dataset&&a.dataset.sel!==undefined;
+  if(!enArbol){
+    if(ev.key==='Escape'&&(S.quick||S.qsec)){ev.preventDefault();const q=S.quick;S.quick=null;S.qsec=null;render();if(q)refocus('sec|'+q.modId+'|'+q.secIdx);}
+    return;
+  }
+  const list=nodos(),i=list.indexOf(a),[kind,mid]=a.dataset.sel.split('|');
+  if(ev.key==='ArrowDown'){ev.preventDefault();if(list[i+1])list[i+1].focus();}
+  else if(ev.key==='ArrowUp'){ev.preventDefault();if(list[i-1])list[i-1].focus();}
+  else if(ev.key==='Home'){ev.preventDefault();if(list[0])list[0].focus();}
+  else if(ev.key==='End'){ev.preventDefault();if(list[list.length-1])list[list.length-1].focus();}
+  else if(ev.key==='ArrowRight'&&kind==='mod'&&!S.open[mid]){ev.preventDefault();S.open[mid]=true;render();refocus(a.dataset.sel);}
+  else if(ev.key==='ArrowLeft'&&kind==='mod'&&S.open[mid]){ev.preventDefault();S.open[mid]=false;render();refocus(a.dataset.sel);}
+});
+
+document.addEventListener('input',ev=>{
+  const id=ev.target.id;
+  if(id==='filtro'||id==='bFiltro'){
+    const pos=ev.target.selectionStart;
+    if(id==='filtro') S.filtro=ev.target.value; else S.bFiltro=ev.target.value;
+    render();
+    const f=$('#'+id);if(f){f.focus();f.setSelectionRange(pos,pos);}
+  }
+});
+
+render();
+</script>
+</body>
+</html>
