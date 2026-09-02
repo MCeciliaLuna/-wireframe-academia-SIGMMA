@@ -10,8 +10,13 @@
 <style>
 /* ============================================================================
    ACADEMIA SIGMMA · Backoffice
-   Alta fidelidad sobre ESTILOS-ACADEMIA.md (lenguaje visual de sigmma.net).
-   Escala tipográfica: la de §3.2, literal.
+   Alta fidelidad sobre ESTILOS-ACADEMIA.md (lenguaje visual de sigmma.net),
+   alineado al prototipo aprobado del lado agencia (`academia-AGENCIA`).
+
+   Escala tipográfica: NO es la de §3.2 literal. Esa es la del sitio comercial
+   (H1 72) y es de landing. Acá se usa el tramo bajo, un escalón por debajo del
+   de la vista agencia: esto es una herramienta de gestión interna, y su unidad
+   de pantalla es la tabla de 50 filas, no una idea por vista.
    ========================================================================= */
 
 :root{
@@ -32,14 +37,17 @@
   --sky-light:#3dc4f4;
   --sky-tint:rgba(61,196,244,.1);
 
-  --cta:#e6531f;        /* naranja dark de §2.1: #ff6b35 con texto blanco da 2,84:1 y no llega a AA */
-  --cta-hover:#d2470f;
+  --cta:#ff6b35;        /* el naranja de marca de §2.1, SIN alterar */
+  --cta-hover:#e6531f;
+  --cta-ink:#111827;    /* con blanco da 2,84:1 y no llega a AA; el contraste se arregla con la tinta, no con el hex */
 
   /* --- escala de feedback (§2.4 la declara ausente: acá se define) ------- */
   --error:#b42318;      --error-bg:#fef3f2;   --error-border:#fecdca;
   --warning:#b54708;    --warning-bg:#fffaeb; --warning-border:#fedf89;
-  --success:#176b49;    --success-bg:#e7f8f0; --success-border:#a6e9c9;  /* familia 5, oscurecida para AA en chip */
-  --info:#004f9f;       --info-bg:#e5f1fd;    --info-border:#b6d9fb;    /* #006fe0 sobre el wash da 4,21:1 */
+  --success:#17694a;    --success-bg:#eafaf3; --success-border:#b7ecd4;  /* familia 5, oscurecida para AA en chip */
+  --success-mid:#2dbe83;                                                 /* el verde de marca, para rellenos */
+  --info:#004f9f;       --info-bg:#e5f1fd;    --info-border:#b9d9f8;    /* #006fe0 sobre el wash da 4,21:1 */
+  --error-light:#fda29b;                                                 /* borde de campo inválido */
 
   /* --- grises (§2.2, los nueve pasos exactos) --------------------------- */
   --g100:#f9fafb; --g200:#f1f3f5; --g300:#e5e7eb; --g400:#d1d5db;
@@ -81,8 +89,24 @@
   --brand-edge:linear-gradient(180deg,var(--sky-light) 20%,var(--primary-hover) 50%);
   --brand-surface:linear-gradient(90deg,var(--sky-light) 20%,var(--primary-hover) 100%);
 
+  /* --- profundidad: la jerarquía la da el borde, no la sombra. Solo tres. -- */
+  /* El aspa del campo inválido, como máscara: es el mismo trazo del set. */
+  --ico-x:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M18 6l-12 12'/%3E%3Cpath d='M6 6l12 12'/%3E%3C/svg%3E");
+
+  --shadow-dropdown:0 6px 18px rgba(0,0,0,.12);
+  --shadow-modal:0 12px 48px rgba(0,0,0,.25);
+  --shadow-glow:0 0 12px rgba(76,153,220,.25);
+
   /* --- capas (§4.6) ----------------------------------------------------- */
   --z-navbar:1000; --z-sidebar:1001; --z-toast:1003;
+
+  /* --- rail: índigo profundo con su propia escala de tinta. Eran los cinco
+     únicos colores del archivo fuera del sistema; mismos valores, nombrados. */
+  --rail-ink:#c8cde8;
+  --rail-ink-strong:#dfe3f4;
+  --rail-ink-soft:#8f96c4;
+  --rail-ink-off:#5f659c;
+  --rail-line:#3a3f79;
 
   /* --- tipografía (§3.1) ------------------------------------------------ */
   --sans:"Sofia Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
@@ -96,14 +120,25 @@ body{
   font-family:var(--sans);
   background:var(--paper);
   color:var(--ink);
-  font-size:16px;              /* base de §3.2 */
+  font-size:14px;              /* la base de una herramienta de gestión, no la de §3.2 */
   line-height:1.5;
   -webkit-font-smoothing:antialiased;
 }
 button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 
 /* Foco visible y generoso: §5.8 dice explícitamente "mantenelo". */
-:focus-visible{outline:3px solid var(--primary);outline-offset:3px}
+/* --- iconos: el trazo lo declara el CSS, no el SVG. El ancho efectivo es
+   nominal x px / 24, así que el tamaño chico sube el nominal para no caer en
+   sub-píxel. Un paso menos que la vista agencia, por densidad. --- */
+.icon{display:inline-block;flex:none;vertical-align:middle;width:16px;height:16px}
+.icon svg{stroke-width:2;display:block}
+.icon-sm{width:13px;height:13px}
+.icon-sm svg{stroke-width:2.5}
+.icon-lg{width:20px;height:20px}
+
+:focus-visible{outline:3px solid var(--primary);outline-offset:3px;border-radius:var(--r-sm)}
+/* Halo azul al 10 % en lo interactivo: el mismo refuerzo que la vista agencia. */
+a:focus-visible,button:focus-visible,[role="button"]:focus-visible{box-shadow:0 0 0 4px rgba(0,111,224,.1)}
 /* Campos: el foco propio de §5.6 (2px con 1px de separación). */
 input:focus-visible,select:focus-visible,textarea:focus-visible{
   outline:2px solid var(--primary);outline-offset:1px;
@@ -123,7 +158,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 }
 .topbar-brand{font-weight:700;font-size:15px;letter-spacing:-.01em}
 .topbar-product{
-  font-size:14px;font-weight:600;padding:2px 8px;border-radius:var(--r-sm);
+  font-size:14px;font-weight:700;padding:2px 8px;border-radius:var(--r-sm);
   background:rgba(255,255,255,.16);
 }
 .topbar-meta{
@@ -135,37 +170,37 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 .app{display:grid;grid-template-columns:224px 1fr;min-height:calc(100vh - 36px)}
 
 .rail{
-  background:var(--indigo);color:#c8cde8;
+  background:var(--indigo);color:var(--rail-ink);
   padding:24px 0 24px;display:flex;flex-direction:column;
   position:relative;z-index:var(--z-sidebar);
 }
 .brand{padding:0 24px 24px;border-bottom:1px solid rgba(255,255,255,.1)}
-.brand strong{display:block;color:#fff;font-weight:700;font-size:22px;line-height:1.2;letter-spacing:-.01em}
-.brand span{font-size:14px;color:#8f96c4;font-family:var(--serif-alt)}
+.brand strong{display:block;color:#fff;font-weight:700;font-size:16px;line-height:1.2;letter-spacing:-.01em}
+.brand span{font-size:14px;color:var(--rail-ink-soft);font-family:var(--serif-alt)}
 .railgroup{padding:24px 0 0}
 .railgroup h4{
-  margin:0 24px 8px;font-size:14px;font-weight:700;color:#8f96c4;letter-spacing:.02em;
+  margin:0 24px 8px;font-size:14px;font-weight:700;color:var(--rail-ink-soft);letter-spacing:.02em;
 }
 .railitem{
   display:flex;align-items:center;gap:8px;width:100%;text-align:left;
-  background:none;border:0;padding:8px 24px;color:#c8cde8;font-size:16px;
+  background:none;border:0;padding:8px 24px;color:var(--rail-ink);font-size:14px;
   border-left:2px solid transparent;
   transition:background var(--t-hover) var(--ease),color var(--t-hover) var(--ease);
 }
 .railitem:hover{background:rgba(255,255,255,.06);color:#fff}
 .railitem[aria-current="true"]{
   background:rgba(255,255,255,.09);color:#fff;
-  border-left-color:var(--sky-light);font-weight:600;
+  border-left-color:var(--sky-light);font-weight:700;
 }
-.railitem.off{color:#5f659c;cursor:not-allowed}
-.railitem.off:hover{background:none;color:#5f659c}
+.railitem.off{color:var(--rail-ink-off);cursor:not-allowed}
+.railitem.off:hover{background:none;color:var(--rail-ink-off)}
 .railitem .pend{
-  margin-left:auto;font-size:12px;color:#8f96c4;
-  border:1px solid #3a3f79;border-radius:var(--r-sm);padding:0 4px;
+  margin-left:auto;font-size:12px;color:var(--rail-ink-soft);
+  border:1px solid var(--rail-line);border-radius:var(--r-sm);padding:0 4px;
 }
 .railfoot{
   margin-top:auto;padding:24px 24px 0;border-top:1px solid rgba(255,255,255,.1);
-  font-size:14px;color:#8f96c4;font-family:var(--serif-alt);
+  font-size:14px;color:var(--rail-ink-soft);font-family:var(--serif-alt);
 }
 
 .main{display:flex;flex-direction:column;min-width:0}
@@ -179,7 +214,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 .topctl{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .topctl>span{font-size:14px;font-weight:700;color:var(--g700)}
 .escena-note{
-  width:100%;font-size:16px;color:var(--muted);padding-top:8px;
+  width:100%;font-size:14px;color:var(--muted);padding-top:8px;
   font-family:var(--serif-alt);max-width:100ch;
 }
 
@@ -187,42 +222,52 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 .segbar{display:flex;border:1px solid var(--line-ctl);border-radius:var(--r);overflow:hidden}
 .seg{
   background:var(--surface);border:0;border-right:1px solid var(--line-soft);
-  padding:0 16px;min-height:40px;font-size:16px;color:var(--g700);
-  font-family:var(--mono);font-weight:500;
+  padding:0 12px;min-height:32px;font-size:13px;color:var(--g700);
+  font-family:var(--mono);font-weight:400;
   transition:background var(--t-hover) var(--ease),color var(--t-hover) var(--ease);
 }
 .seg:last-child{border-right:0}
 .seg:hover{background:var(--primary-wash);color:var(--primary-hover)}
-.seg[aria-pressed="true"]{background:var(--primary);color:#fff;font-weight:600}
+.seg[aria-pressed="true"]{background:var(--primary);color:#fff;font-weight:700}
 .seg.rol{font-family:var(--sans)}
 
 /* ============================================================================
-   2 · TIPOGRAFÍA  —  escala de §3.2, literal
+   2 · TIPOGRAFÍA  —  el tramo bajo de §3.2, calibrado a panel interno
    ========================================================================= */
 
 .wrap{padding:16px;max-width:1280px}
 @media (min-width:768px){ .wrap{padding:32px} .topbar-in{padding:0 32px} }
 @media (min-width:1024px){ .wrap{padding:48px} .topbar-in{padding:0 48px} }
 
-/* Headings del flujo de contenido: los peldaños grandes, sin recortar. */
-.wrap>h1{font-size:72px;font-weight:700;line-height:1.2;letter-spacing:-.03em;margin:0 0 16px;color:var(--ink)}
-.wrap>h2{font-size:57px;font-weight:700;line-height:1.2;letter-spacing:-.025em;margin:48px 0 16px;color:var(--ink)}
-.wrap>h3{font-size:45px;font-weight:700;line-height:1.2;letter-spacing:-.02em;margin:32px 0 16px;color:var(--ink)}
-.wrap>.row h1{font-size:72px;font-weight:700;line-height:1.2;letter-spacing:-.03em;margin:0 0 16px}
+/* Headings del flujo de contenido. Fluidos entre 375 y 1440 (§6.3 pide mínimo y
+   máximo por nivel), y un escalón por debajo de la vista agencia: en el listado
+   de módulos el título es la pantalla, acá compite con una tabla de 50 filas. */
+.wrap>h1,.wrap>.row h1{
+  font-size:clamp(1.75rem,1.6rem + .65vw,2rem);   /* 28 → 32 */
+  font-weight:700;line-height:1.2;letter-spacing:-.02em;margin:0 0 12px;color:var(--ink);
+}
+.wrap>h2{
+  font-size:clamp(1.375rem,1.28rem + .4vw,1.625rem); /* 22 → 26 */
+  font-weight:700;line-height:1.2;letter-spacing:-.015em;margin:32px 0 12px;color:var(--ink);
+}
+.wrap>h3{
+  font-size:clamp(1.125rem,1.07rem + .23vw,1.25rem); /* 18 → 20 */
+  font-weight:700;line-height:1.25;margin:24px 0 12px;color:var(--ink);
+}
 
-/* Headings internos de un componente: el tamaño que §5 le asigna al componente. */
+/* Headings internos de un componente. */
 h1,h2,h3{font-family:var(--sans)}
-h2{font-size:28px;font-weight:700;line-height:1.2;letter-spacing:-.015em;margin:0 0 16px}
-h3{font-size:22px;font-weight:700;line-height:1.2;margin:0 0 8px;color:var(--indigo-mid)}
+h2{font-size:18px;font-weight:700;line-height:1.25;letter-spacing:-.01em;margin:0 0 12px}
+h3{font-size:14px;font-weight:700;line-height:1.3;margin:0 0 8px;color:var(--indigo-mid)}
 
 .lede{
-  font-family:var(--serif-alt);font-size:18px;line-height:1.75;
-  color:var(--g700);margin:0 0 32px;max-width:66ch;
+  font-family:var(--serif-alt);font-size:15px;line-height:1.6;
+  color:var(--g700);margin:0 0 24px;max-width:78ch;
 }
 p{margin:0 0 16px}
 a{color:var(--primary);text-decoration:none;transition:color var(--t-hover) var(--ease)}
 a:hover{color:var(--primary-hover)}
-.hint{font-family:var(--serif-alt);font-size:14px;line-height:1.5;color:var(--muted);margin-top:8px}
+.hint{font-family:var(--serif-alt);font-size:13px;line-height:1.5;color:var(--muted);margin-top:6px}
 .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
 
 /* ============================================================================
@@ -234,23 +279,23 @@ a:hover{color:var(--primary-hover)}
 
 .btn,.btn-q{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  min-height:48px;min-width:223px;padding:0 24px;
-  border-radius:var(--r-lg);font-size:16px;font-weight:600;line-height:1.2;
+  min-height:40px;padding:0 14px;
+  border-radius:var(--r);font-size:13px;font-weight:700;line-height:1.2;
   color:var(--g800);text-align:center;
-  /* gesto de marca: borde de 1px con gradiente sobre relleno blanco */
-  border:1px solid transparent;
-  background:linear-gradient(#fff,#fff) padding-box, var(--brand-edge) border-box;
+  /* El gesto de marca NO va acá: encoda estado y en un backoffice todos los
+     botones son iguales de importantes. Queda para `.quick`, que sí es estado. */
+  border:1px solid var(--line-ctl);
+  background:var(--surface);
   transition:color var(--t-hover) var(--ease),box-shadow var(--t-hover) var(--ease),
              background var(--t-hover) var(--ease),transform var(--t-hover) var(--ease);
 }
 .btn:hover{
-  color:var(--primary-hover);
-  background:linear-gradient(var(--primary-tint),var(--primary-tint)) padding-box, var(--brand-edge) border-box;
-  box-shadow:0 0 12px rgba(76,153,220,.25);
+  color:var(--primary-hover);border-color:var(--primary-hover);
+  background:var(--primary-tint);
 }
 .btn:active{
-  border-color:var(--primary);color:var(--primary-hover);
-  background:var(--surface) padding-box, linear-gradient(var(--primary),var(--primary)) border-box;
+  border-color:var(--primary);color:var(--primary);
+  background:var(--primary-wash);
 }
 .btn:disabled{
   background:var(--g200);border-color:var(--g300);color:var(--g500);
@@ -267,19 +312,19 @@ a:hover{color:var(--primary-hover)}
 
 /* Destructivo */
 .btn-d{
-  background:var(--surface);border-color:var(--error-border);color:var(--error);font-weight:600;
+  background:var(--surface);border-color:var(--error-border);color:var(--error);font-weight:700;
 }
 .btn-d:hover{background:var(--error-bg);border-color:var(--error);color:var(--error);box-shadow:none}
 
 /* Ghost / terciario: el faltante de §5.1 */
 .btn-q{
-  background:none;border-color:transparent;color:var(--primary);font-weight:600;min-width:0;
+  background:none;border-color:transparent;color:var(--primary);font-weight:700;min-width:0;
 }
 .btn-q:hover{background:var(--primary-wash);border-color:transparent;color:var(--primary-hover);box-shadow:none}
 
 /* Tamaño S: filas del árbol, acciones masivas y barra de filtros, donde
    los 223px de la caja canónica no entran físicamente. */
-.btn-sm{min-height:36px;min-width:0;padding:0 16px;font-size:14px;border-radius:var(--r)}
+.btn-sm{min-height:32px;padding:0 10px;font-size:12px;border-radius:var(--r-sm)}
 
 /* Selección activa (perfil, agencia, modo de import) */
 .btn-on{
@@ -301,11 +346,11 @@ a:hover{color:var(--primary-hover)}
    al cliente. §2.1: el naranja es CTA de alto contraste y repartirlo le saca
    la función. */
 .btn-p[data-pub="on"]{
-  background:var(--cta);border-color:var(--cta);
-  min-height:56px;font-size:22px;font-weight:700;
+  background:var(--cta);border-color:var(--cta);color:var(--cta-ink);
+  min-height:48px;font-size:15px;font-weight:700;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.35);
 }
-.btn-p[data-pub="on"]:hover{background:var(--cta-hover);border-color:var(--cta-hover)}
+.btn-p[data-pub="on"]:hover{background:var(--cta-hover);border-color:var(--cta-hover);color:var(--cta-ink)}
 .btn-p[data-pub="on"]:disabled{background:var(--g200);border-color:var(--g300);color:var(--g500);box-shadow:none}
 
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -320,12 +365,12 @@ a:hover{color:var(--primary-hover)}
 label{display:block;font-size:14px;font-weight:700;color:var(--g700);margin-bottom:8px}
 
 input[type=text],input[type=url],input[type=number],select,textarea{
-  width:100%;font-family:inherit;font-size:16px;line-height:1.5;color:var(--ink);
+  width:100%;font-family:inherit;font-size:14px;line-height:1.5;color:var(--ink);
   background:var(--surface);border:1px solid var(--line-ctl);border-radius:var(--r);
-  padding:11px 16px;
+  padding:7px 12px;
   transition:border-color var(--t-hover) var(--ease),box-shadow var(--t-hover) var(--ease);
 }
-input[type=text],input[type=url],input[type=number],select{min-height:48px}
+input[type=text],input[type=url],input[type=number],select{min-height:36px}
 select{
   appearance:none;padding-right:44px;cursor:pointer;
   background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none' stroke='%236b7280' stroke-width='1.8'%3E%3Cpath d='M4 6.5l4 4 4-4'/%3E%3C/svg%3E");
@@ -341,19 +386,22 @@ input:disabled,select:disabled,textarea:disabled{
 }
 /* Error de campo */
 .field-error input,.field-error select,.field-error textarea,input.is-error,select.is-error{
-  border-color:#fda29b;box-shadow:0 0 0 3px var(--error-bg);
+  border-color:var(--error-light);box-shadow:0 0 0 3px var(--error-bg);
 }
 .msg-error{
   display:flex;gap:8px;align-items:flex-start;
   font-family:var(--serif-alt);font-size:14px;color:var(--error);margin-top:8px;
 }
-.msg-error::before{content:"✕";font-family:var(--sans);font-weight:700}
+.msg-error::before{
+  content:"";flex:none;width:14px;height:14px;background:currentColor;
+  -webkit-mask:var(--ico-x) center/contain no-repeat;mask:var(--ico-x) center/contain no-repeat;
+}
 
 /* Solo lectura: un campo que existe pero no se edita, con su motivo a la derecha */
 .ro{
-  display:flex;align-items:center;gap:8px;min-height:48px;
+  display:flex;align-items:center;gap:8px;min-height:36px;
   background:var(--surface-sunk);border:1px solid var(--line);border-radius:var(--r);
-  padding:11px 16px;font-size:16px;color:var(--g700);flex-wrap:wrap;
+  padding:7px 12px;font-size:14px;color:var(--g700);flex-wrap:wrap;
 }
 .ro .lock{font-family:var(--serif-alt);font-size:14px;color:var(--muted);margin-left:auto}
 
@@ -362,13 +410,13 @@ input[type=checkbox],input[type=radio]{
 }
 .radioset{display:flex;gap:8px;flex-wrap:wrap}
 .radiopill{
-  display:flex;align-items:center;gap:8px;min-height:48px;
-  border:1px solid var(--line-ctl);border-radius:var(--r);padding:11px 16px;
-  font-size:16px;background:var(--surface);cursor:pointer;
+  display:flex;align-items:center;gap:8px;min-height:36px;
+  border:1px solid var(--line-ctl);border-radius:var(--r);padding:7px 12px;
+  font-size:14px;background:var(--surface);cursor:pointer;
   transition:border-color var(--t-hover) var(--ease),background var(--t-hover) var(--ease);
 }
 .radiopill:hover{border-color:var(--g500)}
-.radiopill.on{border-color:var(--primary-hover);background:var(--primary-wash);font-weight:600}
+.radiopill.on{border-color:var(--primary-hover);background:var(--primary-wash);font-weight:700}
 
 .info{
   border:0;background:var(--line-soft);color:var(--g700);border-radius:50%;
@@ -386,7 +434,7 @@ input[type=checkbox],input[type=radio]{
    ========================================================================= */
 
 /* Panel: el contenedor genérico. Radio 12 por §4.2. */
-.card{background:var(--surface-sunk);border:1px solid var(--line);border-radius:var(--r-lg)}
+.card{background:var(--surface-sunk);border:1px solid var(--line);border-radius:var(--r-xl)}
 
 /* Card de contenido (§5.2): radio 16, media arriba de 200px, alto mínimo 382. */
 .doors{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px}
@@ -416,13 +464,13 @@ input[type=checkbox],input[type=radio]{
   margin-bottom:8px;display:block;
 }
 .door strong{
-  display:block;font-size:28px;font-weight:700;line-height:1.2;letter-spacing:-.015em;
+  display:block;font-size:18px;font-weight:700;line-height:1.2;letter-spacing:-.015em;
   color:var(--indigo-mid);margin-bottom:8px;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
   transition:color var(--t-hover) var(--ease);
 }
 .door p{
-  font-family:var(--serif-alt);margin:0 0 24px;color:var(--g700);font-size:16px;max-width:44ch;flex:none;
+  font-family:var(--serif-alt);margin:0 0 24px;color:var(--g700);font-size:14px;max-width:44ch;flex:none;
 }
 .door .who{
   font-family:var(--serif-alt);font-size:14px;color:var(--muted);
@@ -440,7 +488,7 @@ input[type=checkbox],input[type=radio]{
 /* Chip de estado, relleno con punto (§5.3) */
 .chip{
   display:inline-flex;align-items:center;gap:8px;
-  font-size:14px;font-weight:700;line-height:1.4;padding:4px 12px;
+  font-size:12px;font-weight:700;line-height:1;height:24px;padding:0 10px;
   border-radius:var(--r-full);white-space:nowrap;border:1px solid transparent;
 }
 .chip::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
@@ -457,7 +505,7 @@ input[type=checkbox],input[type=radio]{
 /* Chip de atributo, outline y peso 800 (§5.3). Variantes cerradas, no color libre (§6.7). */
 .tag{
   display:inline-flex;align-items:center;
-  font-size:14px;font-weight:800;line-height:1.4;padding:3px 12px;
+  font-size:12px;font-weight:700;line-height:1;height:24px;padding:0 10px;
   color:var(--muted);border:1px solid var(--line);border-radius:var(--r-full);
   background:var(--surface);white-space:nowrap;
 }
@@ -467,7 +515,7 @@ input[type=checkbox],input[type=radio]{
 .tag.plan{color:var(--indigo-light);border-color:var(--indigo-border);background:var(--indigo-wash)}
 
 .idbadge{
-  font-family:var(--mono);font-size:14px;font-weight:500;font-variant-numeric:tabular-nums;
+  font-family:var(--mono);font-size:12px;font-weight:400;font-variant-numeric:tabular-nums;
   background:var(--surface-sunk);border:1px solid var(--line);border-radius:var(--r-sm);
   padding:2px 8px;color:var(--g700);white-space:nowrap;
 }
@@ -480,14 +528,14 @@ input[type=checkbox],input[type=radio]{
 .stat{background:var(--surface-sunk);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px}
 .stat b{
   display:block;font-family:var(--mono);font-variant-numeric:tabular-nums;
-  font-size:45px;font-weight:600;letter-spacing:-.03em;line-height:1.1;color:var(--indigo);
+  font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1.1;color:var(--indigo);
 }
 .stat span{font-family:var(--serif-alt);font-size:14px;color:var(--muted);display:block;margin-top:8px}
 
 .tasklist{list-style:none;margin:0;padding:0}
 .tasklist li{
   display:flex;align-items:center;gap:16px;padding:16px 24px;
-  border-bottom:1px solid var(--line-soft);font-size:16px;
+  border-bottom:1px solid var(--line-soft);font-size:14px;
 }
 .tasklist li:last-child{border-bottom:0}
 .tasklist .grow{flex:1;min-width:0}
@@ -511,7 +559,7 @@ input[type=checkbox],input[type=radio]{
 
 .node{
   display:flex;align-items:center;gap:8px;row-gap:4px;flex-wrap:wrap;
-  padding:8px 24px;border-left:2px solid transparent;
+  padding:6px 24px;border-left:2px solid transparent;
   transition:background var(--t-hover) var(--ease);
 }
 .node:hover{background:var(--surface-sunk)}
@@ -522,14 +570,14 @@ input[type=checkbox],input[type=radio]{
 }
 .node .label{
   flex:1;min-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  text-align:left;background:none;border:0;padding:0;font-size:16px;color:var(--ink);
+  text-align:left;background:none;border:0;padding:0;font-size:14px;color:var(--ink);
   transition:color var(--t-hover) var(--ease);
 }
 .node .label:hover{color:var(--primary-hover)}
 .n-mod{padding-left:16px;border-top:1px solid var(--line-soft)}
-.n-mod .label{font-weight:700;font-size:22px;line-height:1.2;color:var(--indigo-mid)}
+.n-mod .label{font-weight:700;font-size:16px;line-height:1.2;color:var(--indigo-mid)}
 .n-sec{padding-left:48px}
-.n-sec .label{color:var(--g700);font-weight:600}
+.n-sec .label{color:var(--g700);font-weight:700}
 .n-vid{padding-left:80px}
 .n-vid .label{color:var(--g700);font-weight:400}
 .node.arch{opacity:.55}
@@ -544,7 +592,7 @@ input[type=checkbox],input[type=radio]{
 .addbtn{
   display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 16px;
   background:none;border:1px dashed var(--line-ctl);border-radius:var(--r);
-  color:var(--muted);font-size:14px;font-weight:600;
+  color:var(--muted);font-size:14px;font-weight:700;
   transition:border-color var(--t-hover) var(--ease),color var(--t-hover) var(--ease);
 }
 .addbtn:hover{border-color:var(--primary);color:var(--primary);border-style:solid}
@@ -552,7 +600,7 @@ input[type=checkbox],input[type=radio]{
 .addbtn:disabled:hover{border-color:var(--line-ctl);color:var(--muted);border-style:dashed}
 
 .rowact{
-  background:none;border:0;color:var(--muted);font-size:14px;font-weight:600;padding:0 4px;
+  background:none;border:0;color:var(--muted);font-size:14px;font-weight:700;padding:0 4px;
   transition:color var(--t-hover) var(--ease);
 }
 .rowact:hover{color:var(--primary-hover);text-decoration:underline}
@@ -565,7 +613,7 @@ input[type=checkbox],input[type=radio]{
 }
 .quick.sec{margin-left:48px}
 .quick .qhead{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.quick .qhead b{font-size:22px;font-weight:700;line-height:1.2;color:var(--indigo-mid)}
+.quick .qhead b{font-size:16px;font-weight:700;line-height:1.2;color:var(--indigo-mid)}
 .qgrid{display:grid;gap:24px;margin-bottom:16px}
 
 /* Bloque de datos derivados: lo que el sistema resuelve solo. */
@@ -575,15 +623,15 @@ input[type=checkbox],input[type=radio]{
 }
 .derived dl{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;margin:0}
 .derived dt{color:var(--muted)}
-.derived dd{margin:0;font-family:var(--sans);font-size:16px}
+.derived dd{margin:0;font-family:var(--sans);font-size:14px}
 
 /* Barra de acciones masivas */
 .bulk{
   position:sticky;bottom:0;background:var(--indigo);color:#fff;
-  padding:16px 24px;display:flex;gap:8px;align-items:center;font-size:16px;flex-wrap:wrap;
+  padding:16px 24px;display:flex;gap:8px;align-items:center;font-size:14px;flex-wrap:wrap;
 }
-.bulk .btn{background:transparent;border-color:#3a3f79;color:#dfe3f4}
-.bulk .btn:hover{background:rgba(255,255,255,.08);border-color:#8f96c4;color:#fff;box-shadow:none}
+.bulk .btn{background:transparent;border-color:var(--rail-line);color:var(--rail-ink-strong)}
+.bulk .btn:hover{background:rgba(255,255,255,.08);border-color:var(--rail-ink-soft);color:#fff;box-shadow:none}
 .bulk .count{font-weight:700}
 .bulk .x{margin-left:auto}
 
@@ -591,13 +639,13 @@ input[type=checkbox],input[type=radio]{
 .detail{background:var(--surface-sunk);overflow:auto;min-width:0}
 .dhead{padding:24px 32px 0}
 .dhead .idline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.dhead h2{font-size:28px;font-weight:700;line-height:1.2;letter-spacing:-.015em;margin:0 0 16px;color:var(--indigo-mid)}
+.dhead h2{font-size:18px;font-weight:700;line-height:1.2;letter-spacing:-.015em;margin:0 0 16px;color:var(--indigo-mid)}
 .dmeta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 
 .tabs{display:flex;border-bottom:1px solid var(--line);padding:0 32px;overflow-x:auto}
 .tab{
   background:none;border:0;border-bottom:2px solid transparent;
-  padding:12px 16px;font-size:16px;font-weight:600;color:var(--muted);white-space:nowrap;
+  padding:12px 16px;font-size:14px;font-weight:700;color:var(--muted);white-space:nowrap;
   transition:color var(--t-hover) var(--ease),border-color var(--t-hover) var(--ease);
 }
 .tab:hover{color:var(--primary-hover)}
@@ -608,24 +656,24 @@ input[type=checkbox],input[type=radio]{
    8 · LISTAS DE VERIFICACIÓN, PROGRESO Y ESTADOS VACÍOS
    ========================================================================= */
 
-.checklist{list-style:none;margin:0;padding:0;font-size:16px}
+.checklist{list-style:none;margin:0;padding:0;font-size:14px}
 .checklist li{
   display:flex;gap:16px;padding:12px 0;border-bottom:1px solid var(--line-soft);
   align-items:flex-start;
 }
 .checklist li:last-child{border-bottom:0}
-.checklist .mk{width:20px;flex:none;text-align:center;font-size:16px;font-weight:700;line-height:1.5}
+.checklist .mk{width:20px;flex:none;text-align:center;font-size:14px;font-weight:700;line-height:1.5}
 .ok{color:var(--success)}
 .miss{color:var(--warning)}
 .bad{color:var(--error)}
 
 /* Un vacío es una invitación a actuar, no un aviso. */
 .emptynote{
-  font-family:var(--serif-alt);font-size:16px;line-height:1.6;color:var(--g700);
+  font-family:var(--serif-alt);font-size:14px;line-height:1.6;color:var(--g700);
   background:var(--surface);border:1px dashed var(--line-ctl);border-radius:var(--r-lg);
   padding:32px;
 }
-.emptynote>b:first-child{font-family:var(--sans);font-size:22px;font-weight:700;color:var(--indigo-mid);line-height:1.2}
+.emptynote>b:first-child{font-family:var(--sans);font-size:16px;font-weight:700;color:var(--indigo-mid);line-height:1.2}
 .emptynote b{font-family:var(--sans);font-weight:700;color:var(--g800)}
 
 /* Barra de progreso */
@@ -637,7 +685,7 @@ input[type=checkbox],input[type=radio]{
 .sublist{list-style:none;margin:16px 0 0;padding:0}
 .sublist li{padding:16px 0;border-bottom:1px solid var(--line-soft)}
 .sublist li:last-child{border-bottom:0}
-.sublist .lineup{display:flex;justify-content:space-between;gap:16px;font-size:16px;align-items:center}
+.sublist .lineup{display:flex;justify-content:space-between;gap:16px;font-size:14px;align-items:center}
 .sublist .n{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:14px;color:var(--muted)}
 
 /* Indicador de pasos (§5.7) */
@@ -651,7 +699,7 @@ input[type=checkbox],input[type=radio]{
 }
 .step:last-child{border-right:0}
 .step[data-on="true"]{background:var(--primary);color:#fff}
-.step b{display:block;font-family:var(--sans);font-size:22px;font-weight:700;line-height:1.2;margin-bottom:4px}
+.step b{display:block;font-family:var(--sans);font-size:16px;font-weight:700;line-height:1.2;margin-bottom:4px}
 
 /* ============================================================================
    9 · TABLAS
@@ -661,24 +709,26 @@ input[type=checkbox],input[type=radio]{
   max-height:440px;overflow:auto;border:1px solid var(--line);
   border-radius:var(--r-lg);background:var(--surface);
 }
-table{width:100%;border-collapse:collapse;font-size:16px}
+table{width:100%;border-collapse:collapse;font-size:13px}
 th{
-  text-align:left;font-weight:700;color:var(--muted);font-size:14px;
-  padding:16px;border-bottom:1px solid var(--line);background:var(--surface-sunk);
-  position:sticky;top:0;z-index:1;letter-spacing:.02em;
+  /* El secundario --muted sobre el gris del encabezado da 4,35:1 y no llega a
+     AA: sube un paso. Es la misma corrección que hace la vista agencia. */
+  text-align:left;font-weight:700;color:var(--g700);font-size:12px;
+  padding:8px 14px;border-bottom:1px solid var(--line);background:var(--surface-sunk);
+  position:sticky;top:0;z-index:1;letter-spacing:.06em;text-transform:uppercase;
 }
-td{padding:16px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+td{padding:10px 14px;border-bottom:1px solid var(--line-soft);vertical-align:top}
 tr:hover td{background:var(--surface-sunk)}
 tr[data-bad="true"] td{background:var(--error-bg)}
 tr[data-warn="true"] td{background:var(--warning-bg)}
-tr[data-bad="true"]:hover td{background:#fce7e6}
-tr[data-warn="true"]:hover td{background:#fdf3dc}
-.cellmono{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:14px;white-space:nowrap}
+tr[data-bad="true"]:hover td{background:color-mix(in srgb,var(--error-border) 45%,var(--error-bg))}
+tr[data-warn="true"]:hover td{background:color-mix(in srgb,var(--warning-border) 45%,var(--warning-bg))}
+.cellmono{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:13px;white-space:nowrap}
 .rowerr{font-family:var(--serif-alt);color:var(--error);font-size:14px;display:block;margin-top:8px}
 .rowwarn{font-family:var(--serif-alt);color:var(--warning);font-size:14px;display:block;margin-top:8px}
 .rowfix{display:inline-flex;gap:8px;margin-top:8px;flex-wrap:wrap}
 
-.summary{display:flex;gap:24px;align-items:center;padding:16px 0;font-size:16px;flex-wrap:wrap}
+.summary{display:flex;gap:24px;align-items:center;padding:16px 0;font-size:14px;flex-wrap:wrap}
 .summary b{font-family:var(--mono);font-variant-numeric:tabular-nums}
 
 /* ============================================================================
@@ -686,27 +736,26 @@ tr[data-warn="true"]:hover td{background:#fdf3dc}
    ========================================================================= */
 
 .banner{
-  border:1px solid;border-radius:var(--r);padding:16px;
-  font-family:var(--serif-alt);font-size:16px;line-height:1.5;
-  margin-bottom:24px;display:flex;gap:16px;align-items:flex-start;
+  border:1px solid;border-left-width:4px;border-radius:var(--r);padding:12px 14px;
+  font-family:var(--serif-alt);font-size:13px;line-height:1.5;
+  margin-bottom:16px;display:flex;gap:10px;align-items:flex-start;
 }
 .banner>span:first-child{
-  font-family:var(--sans);font-weight:700;font-size:16px;flex:none;
-  width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  background:currentColor;
+  flex:none;width:20px;height:20px;margin-top:1px;
+  display:flex;align-items:center;justify-content:center;
 }
 .banner b{font-family:var(--sans);font-weight:700}
 .banner.stop{border-color:var(--error-border);background:var(--error-bg);color:var(--error)}
 .banner.warn{border-color:var(--warning-border);background:var(--warning-bg);color:var(--warning)}
 .banner.ok{border-color:var(--success-border);background:var(--success-bg);color:var(--success)}
-.banner.plan{border-color:var(--info-border);background:var(--info-bg);color:var(--info)}
+.banner.plan{border-color:var(--indigo-border);background:var(--indigo-wash);color:var(--indigo-light)}
 .banner>div{color:var(--g800)}
 .banner.stop>span:first-child,.banner.warn>span:first-child,
 .banner.ok>span:first-child,.banner.plan>span:first-child{color:#fff}
-.banner.stop>span:first-child{background:var(--error)}
-.banner.warn>span:first-child{background:var(--warning)}
-.banner.ok>span:first-child{background:var(--success)}
-.banner.plan>span:first-child{background:var(--info)}
+.banner.stop>span:first-child{color:var(--error)}
+.banner.warn>span:first-child{color:var(--warning)}
+.banner.ok>span:first-child{color:var(--success)}
+.banner.plan>span:first-child{color:var(--indigo-light)}
 
 /* ============================================================================
    11 · EVALUACIÓN  —  pregunta, opciones, resultado
@@ -719,12 +768,12 @@ tr[data-warn="true"]:hover td{background:#fdf3dc}
 .qcard .qn{
   font-family:var(--mono);font-size:14px;color:var(--muted);margin-bottom:8px;
 }
-.qcard .qe{font-size:22px;font-weight:600;line-height:1.3;margin-bottom:16px;color:var(--ink)}
+.qcard .qe{font-size:16px;font-weight:700;line-height:1.3;margin-bottom:16px;color:var(--ink)}
 
 .optrow{
   display:flex;gap:16px;align-items:center;min-height:48px;
   border:1px solid var(--line);border-radius:var(--r);padding:12px 16px;
-  margin-bottom:8px;font-size:16px;background:var(--surface);cursor:pointer;
+  margin-bottom:8px;font-size:14px;background:var(--surface);cursor:pointer;
   transition:border-color var(--t-hover) var(--ease),background var(--t-hover) var(--ease);
 }
 .optrow:hover{border-color:var(--g500)}
@@ -742,9 +791,9 @@ tr[data-warn="true"]:hover td{background:#fdf3dc}
 }
 .score .big{
   font-family:var(--mono);font-variant-numeric:tabular-nums;
-  font-size:72px;font-weight:600;letter-spacing:-.04em;line-height:1;
+  font-size:40px;font-weight:700;letter-spacing:-.04em;line-height:1;
 }
-.score .pct{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:28px;font-weight:500}
+.score .pct{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:20px;font-weight:700}
 .score .col{min-width:160px}
 .score .col>span{
   display:block;font-family:var(--serif-alt);font-size:14px;color:var(--muted);margin-top:8px;
@@ -765,7 +814,7 @@ tr[data-warn="true"]:hover td{background:#fdf3dc}
   padding:16px 24px;font-family:var(--serif-alt);font-size:14px;color:var(--muted);
   display:flex;gap:16px;align-items:center;flex-wrap:wrap;
 }
-.agencyhead b{font-family:var(--sans);font-size:22px;font-weight:700;line-height:1.2}
+.agencyhead b{font-family:var(--sans);font-size:16px;font-weight:700;line-height:1.2}
 .modcard{
   border-bottom:1px solid var(--line-soft);padding:24px;
   display:flex;gap:16px;align-items:flex-start;
@@ -774,14 +823,14 @@ tr[data-warn="true"]:hover td{background:#fdf3dc}
 .modcard:last-child{border-bottom:0}
 .modcard:not(.lock):hover{background:var(--sky-tint)}
 .modcard .num{
-  font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:22px;font-weight:600;
+  font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:16px;font-weight:700;
   color:var(--primary);width:32px;flex:none;padding-top:2px;
 }
 .modcard .body{flex:1;min-width:0}
-.modcard .body>b{font-weight:700;font-size:22px;line-height:1.2;color:var(--indigo-mid)}
+.modcard .body>b{font-weight:700;font-size:16px;line-height:1.2;color:var(--indigo-mid)}
 .modcard.lock{opacity:.6}
 .modcard.lock .num{color:var(--muted)}
-.vidline{font-size:16px;color:var(--g700);padding:4px 0}
+.vidline{font-size:14px;color:var(--g700);padding:4px 0}
 .vidline.off{color:var(--muted)}
 
 /* Cadena de desbloqueo */
@@ -796,7 +845,7 @@ tr[data-warn="true"]:hover td{background:#fdf3dc}
 .chain .mod.nopub{border-style:dashed;color:var(--muted)}
 .chain .mod.here{
   border-color:var(--primary);background:var(--primary-wash);
-  color:var(--primary);font-weight:600;
+  color:var(--primary);font-weight:700;
 }
 
 /* ============================================================================
@@ -805,7 +854,7 @@ tr[data-warn="true"]:hover td{background:#fdf3dc}
 
 .toast{
   position:fixed;right:24px;bottom:24px;background:var(--indigo);color:#fff;
-  padding:16px 24px;border-radius:var(--r-lg);font-size:16px;line-height:1.5;
+  padding:16px 24px;border-radius:var(--r-lg);font-size:14px;line-height:1.5;
   max-width:420px;box-shadow:0 12px 48px rgba(0,0,0,.25);z-index:var(--z-toast);
   animation:toastIn var(--t-base) var(--ease);
 }
@@ -819,9 +868,9 @@ tr[data-warn="true"]:hover td{background:#fdf3dc}
    ========================================================================= */
 
 .note{
-  background:#fbfcfd;border:1px dashed var(--line-ctl);border-left:3px solid var(--g500);
-  border-radius:var(--r);padding:16px 24px;margin:24px 0;
-  font-family:var(--serif-alt);font-size:14px;line-height:1.75;color:var(--g700);
+  background:var(--g100);border:1px dashed var(--line-ctl);border-left:3px solid var(--g500);
+  border-radius:var(--r);padding:12px 16px;margin:16px 0;
+  font-family:var(--serif-alt);font-size:13px;line-height:1.6;color:var(--g700);
 }
 .note b{font-family:var(--sans);font-weight:700;color:var(--g800)}
 .note.new{border-left-color:var(--indigo-light)}
@@ -849,20 +898,16 @@ body.notes-off .note{display:none}
   .doors,.mini{grid-template-columns:1fr}
   .detail{overflow:visible}
   .dhead,.dbody,.tabs{padding-left:24px;padding-right:24px}
-  .wrap>h1,.wrap>.row h1{font-size:45px}
-  .wrap>h2{font-size:36px;margin-top:32px}
-  .wrap>h3{font-size:28px}
-  .score .big{font-size:57px}
-  .stat b{font-size:36px}
+  /* Los headings ya bajan solos: la escala es fluida entre 375 y 1440. */
+  .wrap>h2{margin-top:24px}
+  .score .big{font-size:32px}
+  .stat b{font-size:24px}
   .topbar-meta{gap:16px}
 }
 @media (max-width:767px){
-  .wrap>h1,.wrap>.row h1{font-size:36px}
-  .wrap>h2{font-size:28px}
-  .wrap>h3{font-size:22px}
-  .door strong,.emptynote b,.qcard .qe,.n-mod .label,.modcard .body b,.agencyhead b{font-size:22px}
-  .score .big{font-size:45px}
-  .btn{min-width:0;width:100%}
+  .door strong,.emptynote b,.qcard .qe,.n-mod .label,.modcard .body b,.agencyhead b{font-size:15px}
+  .score .big{font-size:28px}
+  .btn{width:100%}
   .row>.btn{width:auto;flex:1 1 auto}
   .mini{grid-template-columns:1fr 1fr}
   .steps{flex-direction:column}
@@ -913,8 +958,8 @@ body.notes-off .note{display:none}
       <button class="railitem" data-go="params">Parámetros globales</button></div>
     <div class="railfoot">
       Wireframe v4 · alineado al prototipo agencia<br>
-      <label style="display:flex;gap:8px;align-items:center;margin-top:16px;color:#8f96c4;font-weight:400">
-        <input type="checkbox" id="notesChk" checked style="accent-color:#3dc4f4"> Ver notas de diseño
+      <label style="display:flex;gap:8px;align-items:center;margin-top:16px;color:var(--rail-ink-soft);font-weight:400">
+        <input type="checkbox" id="notesChk" checked style="accent-color:var(--sky-light)"> Ver notas de diseño
       </label>
     </div>
   </nav>
@@ -943,6 +988,51 @@ body.notes-off .note{display:none}
 </div>
 <div class="toast hide" id="toast" role="status" aria-live="polite"></div>
 <script>
+/* ============================================================
+   ICONOS  ·  Tabler Icons (outline), el mismo set que la vista agencia
+   ------------------------------------------------------------
+   Grilla 24, trazo 2, sin relleno, `currentColor`. Va inline y no como
+   sprite porque `<use href="archivo.svg#id">` no carga bajo `file://` y
+   el backoffice tiene que abrirse con doble click.
+
+   Los ocho primeros son literales del set de `academia-AGENCIA`. Los cinco
+   últimos no existen allá y se dibujaron sobre la misma grilla, con la
+   construcción que ya usan `arrow-right` / `arrow-left`; `circle` es
+   textualmente el primer path de `check-circle`.
+   ============================================================ */
+const ICONS={
+  "check":         '<path d="M5 12l5 5l10 -10"/>',
+  "check-circle":  '<path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M9 12l2 2l4 -4"/>',
+  "x":             '<path d="M18 6l-12 12"/><path d="M6 6l12 12"/>',
+  "alert-triangle":'<path d="M12 9v4"/><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0"/><path d="M12 16h.01"/>',
+  "info":          '<path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/><path d="M12 9h.01"/><path d="M11 12h1v4h1"/>',
+  "alert-circle":  '<path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/><path d="M12 8v4"/><path d="M12 16h.01"/>',
+  "lock":          '<path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6"/><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0"/><path d="M8 11v-4a4 4 0 1 1 8 0v4"/>',
+  "arrow-right":   '<path d="M5 12l14 0"/><path d="M13 18l6 -6"/><path d="M13 6l6 6"/>',
+  "arrow-left":    '<path d="M5 12l14 0"/><path d="M5 12l6 6"/><path d="M5 12l6 -6"/>',
+  "circle":        '<path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>',
+  "arrow-up":      '<path d="M12 5l0 14"/><path d="M18 11l-6 -6"/><path d="M6 11l6 -6"/>',
+  "arrow-down":    '<path d="M12 5l0 14"/><path d="M18 13l-6 6"/><path d="M6 13l6 6"/>',
+  "chevron-right": '<path d="M9 6l6 6l-6 6"/>',
+  "chevron-down":  '<path d="M6 9l6 6l6 -6"/>'
+};
+/* Hidrata `<span class="icon" data-icon="lock">`. Es idempotente —marca el nodo
+   con `data-icon-done`— así que se puede llamar en cada render sin costo. */
+function renderIcons(root){
+  (root||document).querySelectorAll('[data-icon]').forEach(n=>{
+    if(n.dataset.iconDone==='1') return;
+    const d=ICONS[n.dataset.icon];
+    if(!d){ n.dataset.iconDone='1'; return; }
+    n.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"'+
+      ' stroke-linecap="round" stroke-linejoin="round" width="100%" height="100%" focusable="false"></svg>';
+    n.firstChild.innerHTML=d;
+    if(!n.hasAttribute('aria-label')) n.setAttribute('aria-hidden','true');
+    n.dataset.iconDone='1';
+  });
+}
+/* Atajo para los templates: ico('lock') → el span listo para hidratar. */
+const ico=(n,cls)=>'<span class="icon'+(cls?' '+cls:'')+'" data-icon="'+n+'"></span>';
+
 /* ============================================================
    ROLES Y PERMISOS  (bloque nuevo de la Opción 2)
    ============================================================ */
@@ -1495,6 +1585,7 @@ function render(){
     agencia:viewAgencia,roles:viewRoles,meet:viewMeet,certificado:viewCertificado,
     panelAgencia:viewPanelAgencia,panelMacro:viewPanelMacro,params:viewParams};
   h.appendChild((map[S.screen]||viewHub)());
+  renderIcons(document);
 }
 
 /* ============================================================
@@ -1569,7 +1660,7 @@ function viewHub(){
   items.slice(0,6).forEach(it=>{
     const li=el('li');
     const dg=it[3]==='vid'?`data-jump="vid|${it[4]}|${it[5]}|${it[6]}"`:(it[3]==='regr'?`data-jump="regr"`:`data-jump="${it[3]}|${it[4]}"`);
-    li.innerHTML=`<span class="grow"><b style="font-weight:500">${esc(it[0])}</b><br><span class="sub">${esc(it[1])}</span></span><button class="btn btn-sm" ${dg}>${esc(it[2])}</button>`;
+    li.innerHTML=`<span class="grow"><b>${esc(it[0])}</b><br><span class="sub">${esc(it[1])}</span></span><button class="btn btn-sm" ${dg}>${esc(it[2])}</button>`;
     ul.appendChild(li);
   });
   if(!items.length) ul.appendChild(el('li','','<span class="grow">Nada pendiente en esta escena.</span>'));
@@ -1605,7 +1696,7 @@ function viewCambios(){
   ];
   const t1=el('div','tablewrap');const tb1=el('table');
   tb1.innerHTML='<thead><tr><th style="width:130px">Tema</th><th style="width:24%">Antes (MVP v1)</th><th style="width:30%">Ahora (alineado)</th><th>Por qué</th></tr></thead><tbody>'+
-    alin.map(r=>`<tr><td><b style="font-weight:500">${esc(r[0])}</b></td><td>${esc(r[1])}</td><td>${r[2]}</td><td>${esc(r[3])}</td></tr>`).join('')+'</tbody>';
+    alin.map(r=>`<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td><td>${r[2]}</td><td>${esc(r[3])}</td></tr>`).join('')+'</tbody>';
   t1.appendChild(tb1);
   w.appendChild(el('h2','','Alineado al prototipo — pasa al MVP v2'));
   w.appendChild(t1);
@@ -1620,7 +1711,7 @@ function viewCambios(){
   ];
   const t2=el('div','tablewrap');const tb2=el('table');
   tb2.innerHTML='<thead><tr><th style="width:34%">Lo que el prototipo ya cierra</th><th>Cómo</th></tr></thead><tbody>'+
-    cerr.map(r=>`<tr><td><b style="font-weight:500">${esc(r[0])}</b></td><td>${esc(r[1])}</td></tr>`).join('')+'</tbody>';
+    cerr.map(r=>`<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td></tr>`).join('')+'</tbody>';
   t2.appendChild(tb2);
   w.appendChild(el('h2','','Decisiones que el prototipo cierra'));
   w.appendChild(t2);
@@ -1634,7 +1725,7 @@ function viewCambios(){
   ];
   const t3=el('div','tablewrap');const tb3=el('table');
   tb3.innerHTML='<thead><tr><th style="width:32%">Sigue abierto</th><th>Qué está en juego</th><th style="width:130px">Quién decide</th></tr></thead><tbody>'+
-    ab.map(r=>`<tr data-warn="true"><td><b style="font-weight:500">${esc(r[0])}</b></td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('')+'</tbody>';
+    ab.map(r=>`<tr data-warn="true"><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('')+'</tbody>';
   t3.appendChild(tb3);
   w.appendChild(el('h2','','Sigue abierto — necesita decisión formal'));
   w.appendChild(t3);
@@ -1671,7 +1762,7 @@ function viewRoles(){
   const tw=el('div','tablewrap');const tb=el('table');
   tb.innerHTML=`<thead><tr><th>Acción</th>${Object.keys(ROLES).map(r=>`<th style="width:110px;text-align:center">${esc(ROLES[r].n)}</th>`).join('')}</tr></thead><tbody>`+
    acciones.map(a=>`<tr><td>${esc(a[0])}</td>${Object.keys(ROLES).map(r=>
-     `<td style="text-align:center">${PERMS[a[1]].includes(r)?'<span class="ok">●</span>':'<span style="color:var(--line-ctl)">–</span>'}</td>`).join('')}</tr>`).join('')+'</tbody>';
+     `<td style="text-align:center">${PERMS[a[1]].includes(r)?'<span class="ok"><span class="icon icon-sm" data-icon="check-circle"></span></span>':'<span style="color:var(--line-ctl)">–</span>'}</td>`).join('')}</tr>`).join('')+'</tbody>';
   tw.appendChild(tb);w.appendChild(tw);
 
   const cards=el('div','doors');cards.style.marginTop='16px';
@@ -1680,7 +1771,7 @@ function viewRoles(){
      <p>${esc(ROLES[r].d)}</p><span class="who">Típicamente: ${esc(ROLES[r].quien)}</span></div>`).join('');
   w.appendChild(cards);
 
-  w.appendChild(el('div','banner warn','<span>!</span><div><b>Dos definiciones pendientes.</b> Primero: dónde se asignan los roles — ¿en el ABM de usuarios de sigmma.net o en un ABM propio de la Academia? Segundo: si un mismo usuario puede tener dos roles a la vez (el caso real es M. Luna, que carga contenido y también publica). Recomendación: rol único por usuario, y que Publicación incluya todo lo de Contenido, como está acá.</div>'));
+  w.appendChild(el('div','banner warn','<span class="icon" data-icon="alert-triangle"></span><div><b>Dos definiciones pendientes.</b> Primero: dónde se asignan los roles — ¿en el ABM de usuarios de sigmma.net o en un ABM propio de la Academia? Segundo: si un mismo usuario puede tener dos roles a la vez (el caso real es M. Luna, que carga contenido y también publica). Recomendación: rol único por usuario, y que Publicación incluya todo lo de Contenido, como está acá.</div>'));
   w.appendChild(el('div','note v3','<b>Pantalla nueva v3 ·</b> Los permisos no son decorativos: el rol elegido arriba deshabilita botones en todas las pantallas. Con rol Contenido, la solapa Publicar muestra el checklist completo pero el botón de publicar queda bloqueado con el motivo; con rol Consulta, los formularios pasan a solo lectura.'));
   return w;
 }
@@ -1729,7 +1820,7 @@ function treeCol(){
     const vis=modVisible(mod);
     const n=el('div','node n-mod'+(isSel('mod',mod.id)?' sel':''));
     n.innerHTML=`
-      <button class="twist" data-toggle="${mod.id}" aria-expanded="${open}" aria-label="Abrir módulo">${open?'▾':'▸'}</button>
+      <button class="twist" data-toggle="${mod.id}" aria-expanded="${open}" aria-label="Abrir módulo">${open?ico('chevron-down'):ico('chevron-right')}</button>
       <button class="label" role="treeitem" aria-level="1" aria-expanded="${open}" data-sel="mod|${mod.id}">${esc(mod.name)}</button>
       <span class="idbadge">${mod.id}</span>
       <span class="tag">orden ${mod.orden}</span>
@@ -1765,12 +1856,12 @@ function treeCol(){
           <input type="checkbox" class="selbox" data-check="${id}" ${S.checked.has(id)?'checked':''} aria-label="Seleccionar ${id}" style="accent-color:var(--accent);width:16px;height:16px;flex:none">
           <span class="idbadge">${id}</span>
           <button class="label" role="treeitem" aria-level="3" data-sel="vid|${mod.id}|${si}|${v.seq}">${esc(v.t)}</button>
-          ${emb==='falla'?'<span class="tag stop" title="YouTube no permite embeberlo">embebido ✕</span>':''}
+          ${emb==='falla'?'<span class="tag stop" title="YouTube no permite embeberlo">embebido <span class="icon icon-sm" data-icon="x"></span></span>':''}
           ${emb==='sin verificar'?'<span class="tag warn" title="Falta verificar el embebido">embebido ?</span>':''}
           <span class="tag">${v.p}</span>
           <span class="chip ${stCls(p)}">${p}</span>
           ${vidVisible(mod,v)?'<span class="chip nodot vis-si">visible</span>':'<span class="chip nodot vis-no">no visible</span>'}
-          <button class="rowact" data-ins="${mod.id}|${si}|${v.seq}" title="Insertar un video después de este">insertar ↓</button>`;
+          <button class="rowact" data-ins="${mod.id}|${si}|${v.seq}" title="Insertar un video después de este">insertar <span class="icon icon-sm" data-icon="arrow-down"></span></button>`;
         tree.appendChild(nv);
       });
 
@@ -1791,7 +1882,7 @@ function treeCol(){
   tree.appendChild(am);
 
   tree.appendChild(el('div','note v3','<b>Ajuste v3 ·</b> "+ agregar módulo" y "+ agregar sección" ya no son avisos: abren el alta real. El módulo se crea en estado <b>en preparación</b> y aparece en el árbol al instante; la sección se crea en línea, sin salir del árbol.'));
-  tree.appendChild(el('div','note new','<b>De la v2 ·</b> Cada módulo muestra <b>orden</b> y <b>visibilidad</b> por separado. Cada video muestra <b>estado de producción</b> y <b>visibilidad</b> como dos chips distintos, más el semáforo de embebido, y "insertar ↓" para usar la numeración de diez en diez.'));
+  tree.appendChild(el('div','note new','<b>De la v2 ·</b> Cada módulo muestra <b>orden</b> y <b>visibilidad</b> por separado. Cada video muestra <b>estado de producción</b> y <b>visibilidad</b> como dos chips distintos, más el semáforo de embebido, y "insertar <span class="icon icon-sm" data-icon="arrow-down"></span>" para usar la numeración de diez en diez.'));
   col.appendChild(tree);
 
   if(S.checked.size){
@@ -1891,13 +1982,13 @@ function viewAltaMod(){
 
   w.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
     <div><h1>Nuevo módulo</h1><p class="lede" style="margin-bottom:16px">Un módulo es la unidad que dispara la evaluación y la Meet de soporte. Nace <b>en preparación</b>: acepta secciones, videos y preguntas, y no se ve hasta cumplir el checklist.</p></div>
-    <button class="btn btn-sm" data-go="constructor">← Volver al árbol</button></div>`;
+    <button class="btn btn-sm" data-go="constructor"><span class="icon icon-sm" data-icon="arrow-left"></span> Volver al árbol</button></div>`;
 
   if(!can('editar')){
-    w.appendChild(el('div','banner stop','<span>✕</span><div><b>Sin permiso para crear módulos.</b> '+esc(porque('editar'))+'</div>'));
+    w.appendChild(el('div','banner stop','<span class="icon" data-icon="alert-circle"></span><div><b>Sin permiso para crear módulos.</b> '+esc(porque('editar'))+'</div>'));
     return w;
   }
-  if(sup==='CRM') w.appendChild(el('div','banner warn','<span>!</span><div><b>Deal Closer es de gobernanza externa hasta la adquisición prevista para 2027.</b> Crear módulos CRM debería requerir confirmación de Producto. Cobertura mínima recomendada mientras tanto.</div>'));
+  if(sup==='CRM') w.appendChild(el('div','banner warn','<span class="icon" data-icon="alert-triangle"></span><div><b>Deal Closer es de gobernanza externa hasta la adquisición prevista para 2027.</b> Crear módulos CRM debería requerir confirmación de Producto. Cobertura mínima recomendada mientras tanto.</div>'));
 
   const card=el('div','card');card.style.padding='16px';
   card.innerHTML=`
@@ -1982,21 +2073,21 @@ function detMod(d,m){
 
   if(S.tab==='ficha'){
     b.innerHTML=`
-     ${can('editar')?'':'<div class="banner plan"><span>i</span><div>'+esc(porque('editar'))+' La ficha queda en solo lectura.</div></div>'}
+     ${can('editar')?'':'<div class="banner plan"><span class="icon" data-icon="info"></span><div>'+esc(porque('editar'))+' La ficha queda en solo lectura.</div></div>'}
      <div class="fieldgrid">
        <div><label>ID del módulo</label><div class="ro"><span class="mono">${m.id}</span>
          <button class="info" data-info="idmod" aria-label="Cómo se arma el ID">i</button><span class="lock">generado por el sistema</span></div></div>
        <div><label for="mn">Nombre</label><input type="text" id="mn" value="${esc(m.name)}"${dis('editar')}></div>
        <div><label for="mo">Orden en la secuencia</label>
          <div class="row"><input type="number" id="mo" value="${m.orden}" style="max-width:100px"${dis('editar')}>
-           <button class="btn btn-sm" data-mord="up"${dis('editar')}>↑ Subir</button><button class="btn btn-sm" data-mord="down"${dis('editar')}>↓ Bajar</button></div>
+           <button class="btn btn-sm" data-mord="up"${dis('editar')}><span class="icon icon-sm" data-icon="arrow-up"></span> Subir</button><button class="btn btn-sm" data-mord="down"${dis('editar')}><span class="icon icon-sm" data-icon="arrow-down"></span> Bajar</button></div>
          <p class="hint">De diez en diez, para poder intercalar un módulo nuevo sin renumerar. De este orden depende el desbloqueo secuencial.</p>
        </div>
        <div><label>Cadena de desbloqueo</label>
          <div class="row" style="gap:8px"><span class="hint" style="margin:0">Ver como:</span>
            ${PERFILES.map(p=>`<button class="btn btn-sm ${S.perfilVista===p?'btn-on':''}" data-perfil="${p}">${p}</button>`).join('')}</div>
          <div class="chain">${cadena(S.perfilVista).map((c,i)=>
-           `${i?'<span class="lnk">→</span>':''}<span class="mod ${c.aplica?(c.m.id===m.id?'here':(c.pub?'':'nopub')):'skip'}" title="${esc(c.m.name)}${c.aplica?(c.pub?'':' · sin publicar, la cadena lo saltea'):' · no aplica a '+S.perfilVista}">${c.m.id.replace(c.m.sup+'-','')}</span>`).join('')}</div>
+           `${i?'<span class="lnk"><span class="icon icon-sm" data-icon="arrow-right"></span></span>':''}<span class="mod ${c.aplica?(c.m.id===m.id?'here':(c.pub?'':'nopub')):'skip'}" title="${esc(c.m.name)}${c.aplica?(c.pub?'':' · sin publicar, la cadena lo saltea'):' · no aplica a '+S.perfilVista}">${c.m.id.replace(c.m.sup+'-','')}</span>`).join('')}</div>
          <p class="hint">Tachado: no aplica a ${S.perfilVista}. Punteado: todavía no publicado, y la cadena también lo saltea, así una agencia no queda trabada esperando un módulo que no existe para ella o que no salió aún.</p>
        </div>
        <div><label for="mt">Plan al que aplica</label>
@@ -2019,7 +2110,7 @@ function detMod(d,m){
   if(S.tab==='banco'){
     const cob=cobertura(m), cero=cob.filter(c=>c.n===0).length;
     if(m.subtemas.length===0){
-      b.innerHTML=`<div class="banner stop"><span>✕</span><div><b>Este módulo no tiene temas definidos.</b> Sin temas no se puede validar el banco ni publicar el módulo: el sorteo de 10 sobre 50 podría dejar afuera un concepto central.</div></div>
+      b.innerHTML=`<div class="banner stop"><span class="icon" data-icon="alert-circle"></span><div><b>Este módulo no tiene temas definidos.</b> Sin temas no se puede validar el banco ni publicar el módulo: el sorteo de 10 sobre 50 podría dejar afuera un concepto central.</div></div>
         <div class="row"><button class="btn btn-p" data-go2="subtemas|${m.id}">Definir temas</button></div>
         <div class="note new"><b>Atajo recomendado ·</b> Al abrir el catálogo, el sistema propone los temas derivados de los títulos de los videos del módulo. La persona ajusta en vez de escribir desde cero.</div>`;
     } else if(nP===0){
@@ -2027,7 +2118,7 @@ function detMod(d,m){
         <div class="row" style="margin-top:16px"><button class="btn btn-p" data-go2="pregunta|${m.id}|new"${dis('editar')}>Agregar pregunta</button><button class="btn" data-go2="imp-preg|${m.id}"${dis('editar')}>Pegar desde planilla</button><button class="btn" data-go2="subtemas|${m.id}">Administrar temas</button></div></div>`;
     } else {
       b.innerHTML=`
-       ${cero?`<div class="banner stop"><span>✕</span><div><b>Publicación bloqueada:</b> ${cero} tema${cero>1?'s':''} sin ninguna pregunta.</div></div>`:''}
+       ${cero?`<div class="banner stop"><span class="icon" data-icon="alert-circle"></span><div><b>Publicación bloqueada:</b> ${cero} tema${cero>1?'s':''} sin ninguna pregunta.</div></div>`:''}
        <div style="font-family:var(--mono);font-size:22px">${nP}<span style="color:var(--muted);font-size:14px"> / ${m.params.objetivo}</span>
          <span class="tag" style="margin-left:8px">mínimo para publicar: ${m.params.minimo}</span></div>
        <div class="bar ${nP===0?'zero':(nP<m.params.objetivo?'low':'')}"><i style="width:${Math.min(100,nP/m.params.objetivo*100)}%"></i></div>
@@ -2082,15 +2173,15 @@ function detMod(d,m){
   if(S.tab==='publicar'){
     b.innerHTML=`
      ${chk.bloqueado
-       ?`<div class="banner stop"><span>✕</span><div><b>Todavía no se puede publicar.</b> Hay ${chk.duros.filter(x=>!x.ok).length} requisito${chk.duros.filter(x=>!x.ok).length>1?'s':''} sin cumplir.</div></div>`
-       :(vis?`<div class="banner ok"><span>✓</span><div><b>Módulo publicado.</b> Publicado por M. Luna el 12/08/2026 a las 16:40.</div></div>`
-            :`<div class="banner ok"><span>✓</span><div><b>Listo para publicar.</b> Todos los requisitos duros están cumplidos.</div></div>`)}
-     ${can('publicar')?'':'<div class="banner plan"><span>i</span><div><b>Podés revisar el checklist, no publicar.</b> '+esc(porque('publicar'))+' El checklist se muestra completo igual: sirve para saber qué falta y a quién pedírselo.</div></div>'}
+       ?`<div class="banner stop"><span class="icon" data-icon="alert-circle"></span><div><b>Todavía no se puede publicar.</b> Hay ${chk.duros.filter(x=>!x.ok).length} requisito${chk.duros.filter(x=>!x.ok).length>1?'s':''} sin cumplir.</div></div>`
+       :(vis?`<div class="banner ok"><span class="icon" data-icon="check-circle"></span><div><b>Módulo publicado.</b> Publicado por M. Luna el 12/08/2026 a las 16:40.</div></div>`
+            :`<div class="banner ok"><span class="icon" data-icon="check-circle"></span><div><b>Listo para publicar.</b> Todos los requisitos duros están cumplidos.</div></div>`)}
+     ${can('publicar')?'':'<div class="banner plan"><span class="icon" data-icon="info"></span><div><b>Podés revisar el checklist, no publicar.</b> '+esc(porque('publicar'))+' El checklist se muestra completo igual: sirve para saber qué falta y a quién pedírselo.</div></div>'}
      <h3>Requisitos que bloquean</h3>
-     <ul class="checklist">${chk.duros.map(x=>`<li><span class="mk ${x.ok?'ok':'bad'}">${x.ok?'●':'✕'}</span><span>${esc(x.t)}<br><span class="hint" style="margin:0">${esc(x.d)}</span></span></li>`).join('')}</ul>
+     <ul class="checklist">${chk.duros.map(x=>`<li><span class="mk ${x.ok?'ok':'bad'}">${x.ok?ico('check-circle'):ico('x')}</span><span>${esc(x.t)}<br><span class="hint" style="margin:0">${esc(x.d)}</span></span></li>`).join('')}</ul>
      <div class="sep"></div>
      <h3>Avisos que no bloquean</h3>
-     <ul class="checklist">${chk.blandos.map(x=>`<li><span class="mk ${x.ok?'ok':'miss'}">${x.ok?'●':'○'}</span><span>${esc(x.t)}<br><span class="hint" style="margin:0">${esc(x.d)}</span></span></li>`).join('')}</ul>
+     <ul class="checklist">${chk.blandos.map(x=>`<li><span class="mk ${x.ok?'ok':'miss'}">${x.ok?ico('check-circle'):ico('circle')}</span><span>${esc(x.t)}<br><span class="hint" style="margin:0">${esc(x.d)}</span></span></li>`).join('')}</ul>
      <div class="sep"></div>
      <div class="row">
        ${vis?`<button class="btn btn-d" data-pub="off"${dis('publicar')}>Despublicar módulo</button>`
@@ -2119,11 +2210,11 @@ function detSec(d,m,sec){
      <div><label for="sn">Nombre de la sección</label><input type="text" id="sn" value="${esc(sec.name)}"${dis('editar')}>
        <p class="hint">Es un agrupamiento visual dentro del módulo. Ayuda a que una lista de 7 videos se lea como dos ideas.</p></div>
      <div><label>Módulo al que pertenece</label><div class="ro"><span class="mono">${m.id}</span> · ${esc(m.name)}<span class="lock">definido por su lugar en el árbol</span></div></div>
-     <div><label>Orden dentro del módulo</label><div class="row"><button class="btn btn-sm" data-sord="up"${dis('editar')}>↑ Subir</button><button class="btn btn-sm" data-sord="down"${dis('editar')}>↓ Bajar</button><span class="hint" style="margin:0">posición ${S.sel.secIdx+1} de ${m.secciones.length}</span></div></div>
+     <div><label>Orden dentro del módulo</label><div class="row"><button class="btn btn-sm" data-sord="up"${dis('editar')}><span class="icon icon-sm" data-icon="arrow-up"></span> Subir</button><button class="btn btn-sm" data-sord="down"${dis('editar')}><span class="icon icon-sm" data-icon="arrow-down"></span> Bajar</button><span class="hint" style="margin:0">posición ${S.sel.secIdx+1} de ${m.secciones.length}</span></div></div>
      <div><label>Baja</label><div class="row"><button class="btn btn-d btn-sm" data-arch="sec"${dis('archivar')}>Archivar sección</button></div>
        <p class="hint">Los videos de la sección <b>no quedan huérfanos</b>: se archivan con ella y conservan su ID. Al reactivarla vuelven en el mismo orden.</p></div>
    </div>
-   <div class="note v3"><b>Ajuste v3 ·</b> El reordenamiento de secciones ahora funciona de verdad: ↑ y ↓ mueven la sección en el árbol. Los videos van con ella y su ID no cambia.</div>`;
+   <div class="note v3"><b>Ajuste v3 ·</b> El reordenamiento de secciones ahora funciona de verdad: los botones de subir y bajar mueven la sección en el árbol. Los videos van con ella y su ID no cambia.</div>`;
   d.appendChild(b);return d;
 }
 
@@ -2141,7 +2232,7 @@ function detVid(d,m,sec){
     <h2>${esc(v.t)}</h2>
     <div class="dmeta"><span class="tag">${esc(v.tag||m.tag)}</span><span class="tag">Prioridad ${v.p}</span>
       <span class="tag">Cohorte ${esc(v.c)}</span>${v.dur?`<span class="tag">${v.dur}</span>`:(v.durEst?`<span class="tag warn">${v.durEst} estimada</span>`:'')}
-      ${emb==='ok'?'<span class="tag ok">embebido ✓</span>':''}${emb==='falla'?'<span class="tag stop">embebido ✕</span>':''}${emb==='sin verificar'?'<span class="tag warn">embebido sin verificar</span>':''}</div>`;
+      ${emb==='ok'?'<span class="tag ok">embebido <span class="icon icon-sm" data-icon="check"></span></span>':''}${emb==='falla'?'<span class="tag stop">embebido <span class="icon icon-sm" data-icon="x"></span></span>':''}${emb==='sin verificar'?'<span class="tag warn">embebido sin verificar</span>':''}</div>`;
   d.appendChild(h);
   if(!['ficha','prod','traza'].includes(S.tab)) S.tab='ficha';
   d.appendChild(tabsBar([['ficha','Ficha'],['prod','Producción'],['traza','Trazabilidad']]));
@@ -2155,13 +2246,13 @@ function detVid(d,m,sec){
     if(!v.dur&&!v.durEst) falta.push(['Duración','miss']);
     if(v.c==='—') falta.push(['Cohorte de grabación','miss']);
     b.innerHTML=`
-     ${emb==='falla'?`<div class="banner stop"><span>✕</span><div><b>El embebido falla.</b> YouTube no permite mostrar este video dentro de la Academia. Revisá la configuración de privacidad y el dominio autorizado. Mientras siga así, el módulo no se puede publicar.</div></div>`:''}
+     ${emb==='falla'?`<div class="banner stop"><span class="icon" data-icon="alert-circle"></span><div><b>El embebido falla.</b> YouTube no permite mostrar este video dentro de la Academia. Revisá la configuración de privacidad y el dominio autorizado. Mientras siga así, el módulo no se puede publicar.</div></div>`:''}
      <div class="fieldgrid">
        <div><label>ID permanente</label><div class="ro"><span class="mono">${id}</span><span class="lock">no cambia nunca, ni si lo regrabás</span></div></div>
        <div><label for="vt">¿Qué enseña?</label><input type="text" id="vt" value="${esc(v.t)}"${dis('editar')}></div>
-       <div><label>Dónde está en la Academia</label><div class="ro">${esc(m.name)} › ${esc(sec.name)}<span class="lock">se cambia con ↑ ↓, abajo</span></div></div>
+       <div><label>Dónde está en la Academia</label><div class="ro">${esc(m.name)} › ${esc(sec.name)}<span class="lock">se cambia con subir y bajar, abajo</span></div></div>
        <div><label>Orden dentro de la sección</label>
-         <div class="row"><button class="btn btn-sm" data-vord="up"${dis('editar')}>↑ Subir</button><button class="btn btn-sm" data-vord="down"${dis('editar')}>↓ Bajar</button>
+         <div class="row"><button class="btn btn-sm" data-vord="up"${dis('editar')}><span class="icon icon-sm" data-icon="arrow-up"></span> Subir</button><button class="btn btn-sm" data-vord="down"${dis('editar')}><span class="icon icon-sm" data-icon="arrow-down"></span> Bajar</button>
            <span class="hint" style="margin:0">posición ${pos+1} de ${sec.videos.length}</span></div>
          <p class="hint">El orden es un campo aparte del ID. Mover un video no le cambia el número de secuencia: por eso ${id} puede quedar antes de ${m.id}.020 sin romper nada.</p></div>
        <div><label for="vl">Link del video</label>
@@ -2189,8 +2280,8 @@ function detVid(d,m,sec){
        <div><label>Baja</label><div class="row"><button class="btn btn-d btn-sm" data-arch="vid"${dis('archivar')}>Archivar video</button></div>
          <p class="hint">Conserva el ID y el historial. El ID no se reutiliza nunca.</p></div>
      </div>
-     ${falta.length?`<div class="sep"></div><h3>Falta completar</h3><ul class="checklist">${falta.map(f=>`<li><span class="mk ${f[1]}">${f[1]==='bad'?'✕':'○'}</span>${esc(f[0])}</li>`).join('')}</ul>`
-       :'<div class="sep"></div><ul class="checklist"><li><span class="mk ok">●</span>Ficha completa y embebido verificado</li></ul>'}
+     ${falta.length?`<div class="sep"></div><h3>Falta completar</h3><ul class="checklist">${falta.map(f=>`<li><span class="mk ${f[1]}">${f[1]==='bad'?ico('x'):ico('circle')}</span>${esc(f[0])}</li>`).join('')}</ul>`
+       :'<div class="sep"></div><ul class="checklist"><li><span class="mk ok"><span class="icon icon-sm" data-icon="check-circle"></span></span>Ficha completa y embebido verificado</li></ul>'}
      <div class="note v3"><b>Ajuste v3 ·</b> Apareció el campo <b>orden dentro de la sección</b>, independiente del ID, que era el faltante del MVP §3.3: antes un video no se podía reordenar nunca sin archivarlo y recrearlo. El campo es <b>opcional</b>: solo existe cuando alguien movió el video, y sin él manda la estructura. Mover un video no le toca el ID a nadie.</div>`;
   }
 
@@ -2221,7 +2312,7 @@ function detVid(d,m,sec){
        <div><label>Qué desarrollo lo dejó viejo</label>
          ${prod==='a regrabar'
            ?`<div class="ro" style="border-color:var(--warn);background:var(--warn-soft)">Cambió la carga de voucher en sgm2026.09 · declarado por Irene</div>
-             <div class="banner warn" style="margin-top:8px"><span>!</span><div><b>Decisión pendiente (6):</b> ¿la aprobación de ${m.id} caduca para las agencias que ya lo aprobaron? Hoy sin definir en el MVP.</div></div>`
+             <div class="banner warn" style="margin-top:8px"><span class="icon" data-icon="alert-triangle"></span><div><b>Decisión pendiente (6):</b> ¿la aprobación de ${m.id} caduca para las agencias que ya lo aprobaron? Hoy sin definir en el MVP.</div></div>`
            :'<div class="ro">Nada pendiente</div>'}
        </div>
        <div><label>Historial</label>
@@ -2246,9 +2337,9 @@ function viewBanco(){
 
   w.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
       <div><h1>Banco de preguntas · ${m.id}</h1><p class="lede" style="margin-bottom:8px">${esc(m.name)} · el examen toma ${m.params.porIntento} al azar de este banco.</p></div>
-      <button class="btn btn-sm" data-go2="mod|${m.id}">← Volver al módulo</button></div>`;
+      <button class="btn btn-sm" data-go2="mod|${m.id}"><span class="icon icon-sm" data-icon="arrow-left"></span> Volver al módulo</button></div>`;
 
-  if(cero) w.appendChild(el('div','banner stop',`<span>✕</span><div><b>Publicación bloqueada:</b> ${cero} tema${cero>1?'s':''} sin ninguna pregunta activa (${cob.filter(c=>c.n===0).map(c=>esc(c.st.name)).join(', ')}).</div>`));
+  if(cero) w.appendChild(el('div','banner stop',`<span class="icon" data-icon="alert-circle"></span><div><b>Publicación bloqueada:</b> ${cero} tema${cero>1?'s':''} sin ninguna pregunta activa (${cob.filter(c=>c.n===0).map(c=>esc(c.st.name)).join(', ')}).</div>`));
 
   const head=el('div','card');head.style.padding='16px';head.style.marginBottom='16px';
   head.innerHTML=`<div class="row" style="gap:24px;align-items:flex-end">
@@ -2353,13 +2444,13 @@ function viewPregunta(){
   w.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
     <div><h1>${nueva?'Nueva pregunta':'Editar pregunta'}</h1>
       <p class="lede" style="margin-bottom:16px">Banco de ${m.id} · ${esc(m.name)}</p></div>
-    <button class="btn btn-sm" data-go2="banco|${m.id}">← Volver al banco</button></div>`;
+    <button class="btn btn-sm" data-go2="banco|${m.id}"><span class="icon icon-sm" data-icon="arrow-left"></span> Volver al banco</button></div>`;
 
   if(!can('editar')){
-    w.appendChild(el('div','banner stop','<span>✕</span><div><b>Solo lectura.</b> '+esc(porque('editar'))+'</div>'));
+    w.appendChild(el('div','banner stop','<span class="icon" data-icon="alert-circle"></span><div><b>Solo lectura.</b> '+esc(porque('editar'))+'</div>'));
   }
-  if(!nueva&&q&&q.acierto<15) w.appendChild(el('div','banner warn',`<span>!</span><div><b>Solo ${q.acierto} % de acierto</b> sobre ${12+q.acierto} respuestas. Cuando casi todos fallan, el problema suele estar en el enunciado o en los distractores, no en las agencias.</div>`));
-  if(!nueva) w.appendChild(el('div','banner plan',`<span>i</span><div>Editar una pregunta ya respondida <b>crea la versión ${q?q.ver+1:2}</b>. Los intentos anteriores siguen apuntando a la versión con la que se respondieron, así las notas históricas quedan auditables.</div>`));
+  if(!nueva&&q&&q.acierto<15) w.appendChild(el('div','banner warn',`<span class="icon" data-icon="alert-triangle"></span><div><b>Solo ${q.acierto} % de acierto</b> sobre ${12+q.acierto} respuestas. Cuando casi todos fallan, el problema suele estar en el enunciado o en los distractores, no en las agencias.</div>`));
+  if(!nueva) w.appendChild(el('div','banner plan',`<span class="icon" data-icon="info"></span><div>Editar una pregunta ya respondida <b>crea la versión ${q?q.ver+1:2}</b>. Los intentos anteriores siguen apuntando a la versión con la que se respondieron, así las notas históricas quedan auditables.</div>`));
 
   const card=el('div','card');card.style.padding='16px';
   card.innerHTML=`
@@ -2372,7 +2463,7 @@ function viewPregunta(){
        ${ops.map((o,i)=>`<div class="opteditor">
          <label class="radiopill ${o.ok?'on':''}" style="padding:11px 16px"><input type="radio" name="correcta" ${o.ok?'checked':''}${dis('editar')} aria-label="Marcar como correcta"> correcta</label>
          <input type="text" value="${esc(o.t)}" placeholder="Opción ${String.fromCharCode(65+i)}"${dis('editar')} aria-label="Texto de la opción ${String.fromCharCode(65+i)}">
-         <button class="rowact" title="Quitar opción">✕</button></div>`).join('')}
+         <button class="rowact" title="Quitar opción"><span class="icon icon-sm" data-icon="x"></span></button></div>`).join('')}
        <button class="addbtn" style="margin-top:4px"${dis('editar')}>+ agregar opción</button>
        <p class="hint">De 2 a 5 opciones, recomendado 4. Exactamente una correcta.</p></div>
      <div><label for="qst">Tema (sección del módulo)</label>
@@ -2419,9 +2510,9 @@ function viewSubtemas(){
   const cob=cobertura(m);
   w.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
     <div><h1>Temas del banco · ${m.id}</h1><p class="lede" style="margin-bottom:16px">Alineado al prototipo aprobado: <b>el tema del banco es la sección del módulo</b>. No hay un catálogo aparte que mantener. Cada pregunta pertenece a una sección, y el sorteo de ${m.params.porIntento} debe cubrirlas todas.</p></div>
-    <button class="btn btn-sm" data-go2="mod|${m.id}">← Volver al módulo</button></div>`;
+    <button class="btn btn-sm" data-go2="mod|${m.id}"><span class="icon icon-sm" data-icon="arrow-left"></span> Volver al módulo</button></div>`;
 
-  w.appendChild(el('div','banner plan','<span>i</span><div>Los temas se administran como <b>secciones</b>, en el árbol de estructura. Acá se ve la cobertura del banco por sección, en solo lectura. Para renombrar, reordenar o archivar un tema, se edita la sección.</div>'));
+  w.appendChild(el('div','banner plan','<span class="icon" data-icon="info"></span><div>Los temas se administran como <b>secciones</b>, en el árbol de estructura. Acá se ve la cobertura del banco por sección, en solo lectura. Para renombrar, reordenar o archivar un tema, se edita la sección.</div>'));
 
   if(!m.secciones.length){
     w.appendChild(el('div','emptynote','<b>Este módulo no tiene secciones.</b><br>Agregá una sección desde el árbol: es, a la vez, el agrupamiento visual de los videos y el tema del banco.<div class="row" style="margin-top:16px"><button class="btn btn-p" data-add="sec|'+m.id+'"'+dis('editar')+'>Agregar una sección</button></div>'));
@@ -2477,7 +2568,7 @@ function viewPreview(){
   w.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
     <div><h1>Previsualizar la evaluación · ${m.id}</h1>
       <p class="lede" style="margin-bottom:16px">Un intento de muestra con las reglas configuradas: ${m.params.porIntento} preguntas al azar sobre ${activas(m).filter(q=>q.estado==='activa').length}. Podés responder; <b>no queda registrado</b>.</p></div>
-    <button class="btn btn-sm" data-go2="mod|${m.id}">← Volver al módulo</button></div>`;
+    <button class="btn btn-sm" data-go2="mod|${m.id}"><span class="icon icon-sm" data-icon="arrow-left"></span> Volver al módulo</button></div>`;
 
   if(!qs.length){
     w.appendChild(el('div','emptynote','<b>No hay preguntas activas y válidas para sortear.</b><br>Cargá el banco y revisá que cada pregunta tenga tema y exactamente una opción correcta.'));
@@ -2490,8 +2581,8 @@ function viewPreview(){
     <span class="tag warn">forzar cobertura: a definir</span>`;
   w.appendChild(ctl);
 
-  if(faltan.length) w.appendChild(el('div','banner warn',`<span>!</span><div><b>Este sorteo dejó afuera ${faltan.length} tema${faltan.length>1?'s':''}:</b> ${faltan.map(s=>esc(s.name)).join(', ')}. Es exactamente el riesgo que resuelve la decisión 2. Probá "Volver a sortear" varias veces para ver cuánto varía.</div>`));
-  else w.appendChild(el('div','banner ok','<span>✓</span><div>Este sorteo cubrió todos los temas del módulo. Sin forzar cobertura, no está garantizado en el próximo.</div>'));
+  if(faltan.length) w.appendChild(el('div','banner warn',`<span class="icon" data-icon="alert-triangle"></span><div><b>Este sorteo dejó afuera ${faltan.length} tema${faltan.length>1?'s':''}:</b> ${faltan.map(s=>esc(s.name)).join(', ')}. Es exactamente el riesgo que resuelve la decisión 2. Probá "Volver a sortear" varias veces para ver cuánto varía.</div>`));
+  else w.appendChild(el('div','banner ok','<span class="icon" data-icon="check-circle"></span><div>Este sorteo cubrió todos los temas del módulo. Sin forzar cobertura, no está garantizado en el próximo.</div>'));
 
   qs.forEach((q,i)=>{
     const st=m.subtemas.find(s=>s.id===q.st);
@@ -2549,7 +2640,7 @@ function viewResultado(){
   w.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
     <div><h1>Resultado de la evaluación · ${m.id}</h1>
       <p class="lede" style="margin-bottom:16px">Así ve la agencia el resultado. Es una muestra: <b>este intento no se registra</b>.</p></div>
-    <button class="btn btn-sm" data-go2="preview|${m.id}">← Volver al intento</button></div>`;
+    <button class="btn btn-sm" data-go2="preview|${m.id}"><span class="icon icon-sm" data-icon="arrow-left"></span> Volver al intento</button></div>`;
 
   const sc=el('div','score');
   sc.innerHTML=`
@@ -2561,9 +2652,9 @@ function viewResultado(){
   w.appendChild(sc);
 
   if(aprobado){
-    w.appendChild(el('div','banner ok',`<span>✓</span><div><b>Módulo aprobado.</b> Se habilita ${sig?'el módulo siguiente que te corresponda ('+sig+')':'el final de la secuencia'} y queda disponible la Meet de ${m.meet.duracion} minutos para dudas puntuales de este módulo.</div>`));
+    w.appendChild(el('div','banner ok',`<span class="icon" data-icon="check-circle"></span><div><b>Módulo aprobado.</b> Se habilita ${sig?'el módulo siguiente que te corresponda ('+sig+')':'el final de la secuencia'} y queda disponible la Meet de ${m.meet.duracion} minutos para dudas puntuales de este módulo.</div>`));
   } else {
-    w.appendChild(el('div','banner warn',`<span>!</span><div><b>No alcanzó el 80 %.</b> Se puede volver a intentar sin límite: el próximo intento sortea 10 preguntas nuevas sobre las mismas ${activas(m).filter(q=>q.estado==='activa').length} del banco. El módulo siguiente sigue trabado hasta aprobar.</div>`));
+    w.appendChild(el('div','banner warn',`<span class="icon" data-icon="alert-triangle"></span><div><b>No alcanzó el 80 %.</b> Se puede volver a intentar sin límite: el próximo intento sortea 10 preguntas nuevas sobre las mismas ${activas(m).filter(q=>q.estado==='activa').length} del banco. El módulo siguiente sigue trabado hasta aprobar.</div>`));
   }
 
   /* variante recomendada: por tema + video de repaso */
@@ -2575,9 +2666,9 @@ function viewResultado(){
       const s=porSub[k];
       return `<li><div class="lineup"><span>${esc(k)}</span><span class="n">${s.ok} de ${s.tot} correctas</span></div>
         <div class="bar ${s.ok===0?'zero':'low'}"><i style="width:${s.tot?s.ok/s.tot*100:0}%"></i></div>
-        ${[...s.repasos].map(rp=>`<div class="vidline" style="margin-top:8px">▸ Repasá <span class="mono">${esc(rp)}</span> · ${esc(tituloDe(rp))}</div>`).join('')||'<div class="hint">Ninguna de las preguntas falladas tiene video de repaso asociado: se carga desde el banco.</div>'}</li>`;
+        ${[...s.repasos].map(rp=>`<div class="vidline" style="margin-top:8px"><span class="icon icon-sm" data-icon="chevron-right"></span> Repasá <span class="mono">${esc(rp)}</span> · ${esc(tituloDe(rp))}</div>`).join('')||'<div class="hint">Ninguna de las preguntas falladas tiene video de repaso asociado: se carga desde el banco.</div>'}</li>`;
     }).join('')}</ul>`
-    :'<div class="banner ok" style="margin:0"><span>✓</span><div>Todos los temas del intento salieron correctos.</div></div>'}`;
+    :'<div class="banner ok" style="margin:0"><span class="icon" data-icon="check-circle"></span><div>Todos los temas del intento salieron correctos.</div></div>'}`;
   w.appendChild(box);
 
   /* comparación de variantes */
@@ -2588,7 +2679,7 @@ function viewResultado(){
   w.appendChild(cmp);
 
   if(S.verCorrectas){
-    w.appendChild(el('div','banner plan','<span>i</span><div><b>Variante B.</b> Con reintentos ilimitados, mostrar la correcta convierte el examen en un ejercicio de memoria: la agencia puede fallar, leer las respuestas y aprobar en el intento siguiente sin haber visto un video. Sirve si el objetivo es enseñar en el examen; no sirve si el examen tiene que validar aprendizaje.</div>'));
+    w.appendChild(el('div','banner plan','<span class="icon" data-icon="info"></span><div><b>Variante B.</b> Con reintentos ilimitados, mostrar la correcta convierte el examen en un ejercicio de memoria: la agencia puede fallar, leer las respuestas y aprobar en el intento siguiente sin haber visto un video. Sirve si el objetivo es enseñar en el examen; no sirve si el examen tiene que validar aprendizaje.</div>'));
     detalle.forEach(d=>{
       const c=el('div','qcard');
       const st=m.subtemas.find(s=>s.id===d.q.st);
@@ -2604,7 +2695,7 @@ function viewResultado(){
       w.appendChild(c);
     });
   } else {
-    w.appendChild(el('div','banner plan','<span>i</span><div><b>Variante A, la recomendada.</b> La agencia se lleva el detalle de arriba: qué temas falló y qué video mirar. No ve qué opción era la correcta, así que el reintento exige volver al contenido y no a la memoria.</div>'));
+    w.appendChild(el('div','banner plan','<span class="icon" data-icon="info"></span><div><b>Variante A, la recomendada.</b> La agencia se lleva el detalle de arriba: qué temas falló y qué video mirar. No ve qué opción era la correcta, así que el reintento exige volver al contenido y no a la memoria.</div>'));
   }
 
   const acc=el('div','row');acc.style.marginTop='16px';
@@ -2614,7 +2705,7 @@ function viewResultado(){
     <button class="btn-q" data-go2="mod|${m.id}">Volver al backoffice</button>`;
   w.appendChild(acc);
 
-  w.appendChild(el('div','banner plan','<span>i</span><div><b>Qué registra el intento real</b> (esta muestra no registra nada): agencia y usuario, módulo, número de intento, fecha y hora, las 10 preguntas sorteadas con su versión, la respuesta elegida en cada una, la nota y el resultado. Sin la versión de cada pregunta, una nota vieja se vuelve imposible de auditar cuando el banco se edita.</div>'));
+  w.appendChild(el('div','banner plan','<span class="icon" data-icon="info"></span><div><b>Qué registra el intento real</b> (esta muestra no registra nada): agencia y usuario, módulo, número de intento, fecha y hora, las 10 preguntas sorteadas con su versión, la respuesta elegida en cada una, la nota y el resultado. Sin la versión de cada pregunta, una nota vieja se vuelve imposible de auditar cuando el banco se edita.</div>'));
   w.appendChild(el('div','note v3','<b>Pantalla nueva v3 ·</b> Era el hueco que dejaba huérfano al campo "video de repaso": existía en el alta de pregunta y no había ninguna pantalla que lo consumiera. Además cierra el circuito de la evaluación —desbloqueo del módulo siguiente y habilitación de la Meet— y deja comparar las dos variantes de la decisión 1 con datos en pantalla en vez de en una discusión.'));
   return w;
 }
@@ -2652,7 +2743,7 @@ function viewAgencia(){
       if(!c.aplica){
         const card=el('div','modcard lock');
         const planIncluye=m.perfiles.join(' + ')||'ningún plan';
-        card.innerHTML=`<div class="num">🔒</div><div class="body"><b>${esc(m.name)}</b>
+        card.innerHTML=`<div class="num"><span class="icon" data-icon="lock"></span></div><div class="body"><b>${esc(m.name)}</b>
           <span class="tag plan" style="margin-left:8px">${esc(m.tag)}</span>
           <div class="hint">No entra en tu plan ${esc(p)}. Incluido en: <b>${esc(planIncluye)}</b>. Para sumarlo, escribile a Soporte. No cuenta para tu avance ni te traba.</div></div>`;
         frame.appendChild(card);
@@ -2677,7 +2768,7 @@ function viewAgencia(){
         ${desbloqueado?`<div class="hint" style="margin-top:4px">${esc(m.resumen||'')}</div>
           <div style="margin-top:8px">${vids.map(x=>{
             const aplica=videoAplicable(m,x.v,p), propio=x.v.tag&&x.v.tag!==m.tag;
-            return `<div class="vidline${aplica?'':' off'}">${aplica?'▸':'🔒'} ${esc(x.v.t)} <span class="hint" style="display:inline">${aplica?esc(x.v.dur):'no entra en tu plan '+esc(p)}${propio?' · <span class="tag plan">'+esc(x.v.tag)+' (plan propio)</span>':''}</span></div>`;
+            return `<div class="vidline${aplica?'':' off'}">${aplica?ico('chevron-right','icon-sm'):ico('lock','icon-sm')} ${esc(x.v.t)} <span class="hint" style="display:inline">${aplica?esc(x.v.dur):'no entra en tu plan '+esc(p)}${propio?' · <span class="tag plan">'+esc(x.v.tag)+' (plan propio)</span>':''}</span></div>`;
           }).join('')||'<div class="hint">Sin videos visibles.</div>'}
           ${vids.length!==delPlanV.length?`<div class="hint">${delPlanV.length} de ${vids.length} videos entran en tu plan. Los otros no cuentan para tu avance ni para la duración del módulo.</div>`:''}
           <div class="row" style="margin-top:8px"><button class="btn btn-sm btn-p" data-go2="preview|${m.id}">Hacer la evaluación</button>
@@ -2735,7 +2826,7 @@ function viewImportar(){
     <p class="lede">Copiá las filas del tablero maestro y pegalas acá. Antes de guardar nada, te muestro fila por fila qué entró bien y qué hay que corregir.</p>`;
 
   if(!can('editar')){
-    w.appendChild(el('div','banner stop','<span>✕</span><div><b>Sin permiso para importar.</b> '+esc(porque('editar'))+'</div>'));
+    w.appendChild(el('div','banner stop','<span class="icon" data-icon="alert-circle"></span><div><b>Sin permiso para importar.</b> '+esc(porque('editar'))+'</div>'));
     return w;
   }
 
@@ -2803,7 +2894,7 @@ function viewImportar(){
       botones+=`<button class="btn btn-sm" data-skip="${i}">Omitir fila</button>`;
     }
     const fix=e?`<span class="${aviso?'rowwarn':'rowerr'}">${esc(e)}</span><span class="rowfix">${botones}</span>`:'';
-    const mk=e?(aviso?'<span class="miss">○</span>':'<span class="bad">✕</span>'):'<span class="ok">✓</span>';
+    const mk=e?(aviso?'<span class="miss"><span class="icon icon-sm" data-icon="circle"></span></span>':'<span class="bad"><span class="icon icon-sm" data-icon="x"></span></span>'):'<span class="ok"><span class="icon icon-sm" data-icon="check"></span></span>';
     tr.innerHTML=modo==='preguntas'
       ?`<td>${mk}</td><td class="cellmono">${esc(f[0])}</td><td>${esc(f[1])}</td><td>${esc(f[2])}${fix}</td><td class="cellmono">${esc(f[7])||'<span class="bad">—</span>'}</td>`
       :(modo==='videos'
@@ -2913,7 +3004,7 @@ function viewMeet(){
     const box=el('div','card');box.style.marginBottom='16px';
     const chip={'abierto':'st-guionado','agendado':'st-publicado','consumido':'st-backlog','sin-lugares':'st-backlog'}[est];
     box.innerHTML=`<div style="padding:16px 24px;border-bottom:1px solid var(--line-soft);display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <span class="idbadge">${m.id}</span><b style="font-weight:600">${esc(m.name)}</b>
+        <span class="idbadge">${m.id}</span><b>${esc(m.name)}</b>
         <span class="chip ${chip}">${est==='sin-lugares'?'sin dudas':est}</span>
         <span class="tag">${dd.length} duda${dd.length!==1?'s':''}</span>
         ${turno?`<span class="tag ok">turno ${esc(turno.cuando)} · ${esc(turno.enlace)}</span>`:''}
@@ -2923,12 +3014,12 @@ function viewMeet(){
       </div>
       <div style="padding:8px 24px 16px">${dd.map(d=>`
         <div style="padding:16px 0;border-bottom:1px solid var(--line-soft)">
-          <div class="row" style="gap:8px"><span class="tag">${esc(nombrePlantel(ag,d.autor))}</span><span class="tag">${esc(nombreTema(d.temaId))}</span><span class="cellmono" style="font-size:14px;color:var(--muted)">${esc(d.video)} · ${esc(d.fecha)}</span></div>
+          <div class="row" style="gap:8px"><span class="tag">${esc(nombrePlantel(ag,d.autor))}</span><span class="tag">${esc(nombreTema(d.temaId))}</span><span class="cellmono" style="color:var(--muted)">${esc(d.video)} · ${esc(d.fecha)}</span></div>
           <div style="margin-top:4px">${esc(d.texto)}</div></div>`).join('')}</div>`;
     w.appendChild(box);
   });
 
-  w.appendChild(el('div','banner warn','<span>!</span><div><b>Definiciones pendientes de la Meet.</b> Quién designa al coordinador y qué pasa si se va de la agencia (hoy llega de solo lectura desde el backend). Quién ve el texto de las dudas ajenas (el prototipo: el coordinador todas, el resto solo las propias). Y si la cola vence (decidido que no).</div>'));
+  w.appendChild(el('div','banner warn','<span class="icon" data-icon="alert-triangle"></span><div><b>Definiciones pendientes de la Meet.</b> Quién designa al coordinador y qué pasa si se va de la agencia (hoy llega de solo lectura desde el backend). Quién ve el texto de las dudas ajenas (el prototipo: el coordinador todas, el resto solo las propias). Y si la cola vence (decidido que no).</div>'));
   w.appendChild(el('div','note v3','<b>Pantalla nueva de alineación ·</b> El backoffice modelaba la Meet como un link fijo en la ficha del módulo. El modelo aprobado es cupo por agencia con cola de dudas, coordinador y agenda de turnos, y <b>el enlace es por turno</b>. Ya no hay campo de link en la ficha del módulo, y el <b>estado del cupo se deriva</b> de la cola y de la fecha del turno: guardado se desincronizaba en cuanto alguien retiraba una duda.'));
   return w;
 }
@@ -2970,7 +3061,7 @@ function viewCertificado(){
     CERTIFICADOS.map(c=>`<tr><td>${esc(c.persona)}</td><td>${esc(agBy(c.agencia).nombre)}</td><td>${esc(c.plan)}</td><td class="cellmono">${esc(c.doc)}</td><td>${esc(c.emitido)}</td></tr>`).join('')+'</tbody>';
   tw2.appendChild(tb2);w.appendChild(tw2);
 
-  w.appendChild(el('div','banner plan','<span>i</span><div><b>Qué imprime el certificado</b> (CE-4): nombre del titular, documento, agencia, plan, módulos del recorrido aprobados y fecha. El PDF lo emite el backend; el prototipo confirma los datos y ahí termina. No hay que prometer un archivo que la maqueta no genera.</div>'));
+  w.appendChild(el('div','banner plan','<span class="icon" data-icon="info"></span><div><b>Qué imprime el certificado</b> (CE-4): nombre del titular, documento, agencia, plan, módulos del recorrido aprobados y fecha. El PDF lo emite el backend; el prototipo confirma los datos y ahí termina. No hay que prometer un archivo que la maqueta no genera.</div>'));
   w.appendChild(el('div','note v3','<b>Pantalla nueva de alineación ·</b> El certificado no estaba en el MVP del backoffice y el prototipo lo emite. Sin plantilla, tipos de documento y registro de emisiones administrados acá, el lado agencia no tiene de dónde tomar los datos.'));
   return w;
 }
@@ -3017,7 +3108,7 @@ function viewPanelAgencia(){
        <td>${e.cert?'<span class="chip st-publicado">emitido</span>':(e.aprobados>=total?'<span class="tag ok">disponible</span>':'<span class="hint" style="margin:0">—</span>')}</td></tr>`).join('')+'</tbody>';
   tw.appendChild(tb);w.appendChild(tw);
 
-  w.appendChild(el('div','banner plan','<span>i</span><div><b>Los eventos que alimentan esto tienen que loguearse desde el día uno:</b> por usuario y módulo — intentos con fecha-hora (con segundos, que desempatan el ranking), la versión de cada pregunta sorteada, la respuesta, la nota y el resultado; por usuario y video — aperturas, progreso y visto ≥80 %. Si el MVP sale sin el logueo, este panel se construye sobre datos que no existen.</div>'));
+  w.appendChild(el('div','banner plan','<span class="icon" data-icon="info"></span><div><b>Los eventos que alimentan esto tienen que loguearse desde el día uno:</b> por usuario y módulo — intentos con fecha-hora (con segundos, que desempatan el ranking), la versión de cada pregunta sorteada, la respuesta, la nota y el resultado; por usuario y video — aperturas, progreso y visto ≥80 %. Si el MVP sale sin el logueo, este panel se construye sobre datos que no existen.</div>'));
   w.appendChild(el('div','note v3','<b>Pantalla nueva ·</b> Era "fase 2", pero el prototipo ya define exactamente qué datos consume y con qué regla de agregación, así que dejó de ser libre.'));
   return w;
 }
@@ -3060,7 +3151,7 @@ function viewPanelMacro(){
     }).join('')+'</tbody>';
   tw.appendChild(tb);w.appendChild(tw);
 
-  w.appendChild(el('div','banner warn','<span>!</span><div><b>BAK-M20 (Entidades) reprueba '+USO_MUESTRA['BAK-M20'][1]+' %.</b> Es la señal que el panel existe para dar: no es que las agencias sean flojas, es que "Cliente vs. Pasajero" confunde. Se cruza con el % de acierto por pregunta del banco para encontrar el video a mejorar.</div>'));
+  w.appendChild(el('div','banner warn','<span class="icon" data-icon="alert-triangle"></span><div><b>BAK-M20 (Entidades) reprueba '+USO_MUESTRA['BAK-M20'][1]+' %.</b> Es la señal que el panel existe para dar: no es que las agencias sean flojas, es que "Cliente vs. Pasajero" confunde. Se cruza con el % de acierto por pregunta del banco para encontrar el video a mejorar.</div>'));
   w.appendChild(el('div','note v3','<b>Pantalla nueva ·</b> MVP §6. El ranking de videos más/menos vistos y el volumen de Meets por agencia salen del mismo logueo de eventos que alimenta el avance por agencia.'));
   return w;
 }
