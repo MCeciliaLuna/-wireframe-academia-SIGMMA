@@ -1352,6 +1352,20 @@ function genPool(m){
 }
 
 
+/* El tema del banco ES la sección del módulo: se DERIVA en cada lectura y no se
+   guarda en ningún lado. Era un campo, `m.subtemas`, que se calculaba una sola vez
+   al iniciar, así que toda sección creada desde el backoffice existía como sección y
+   no existía como tema: los tres desplegables de la consola quedaban vacíos y no se
+   podía guardar ninguna pregunta, porque el tema es obligatorio. Es la misma clase de
+   error que el estado del cupo de la Meet —un dato derivado, guardado.
+
+   Vive acá, y no al lado de planesDe y prodDe, porque genPool la necesita y el bloque
+   de datos tiene que poder evaluarse solo: es el mismo motivo por el que este bloque
+   no puede referenciar ESCENAS ni S. */
+function subtemasDe(m){
+  return (m.secciones||[]).map((sec,i)=>({id:sec.id,name:sec.name,orden:(i+1)*10}));
+}
+
 /* inicialización compartida: la usan los módulos del seed y los que se crean a mano */
 /* El ID de sección es PERMANENTE: se reserva una vez y no se reasigna nunca.
    Por eso se toma del máximo ya usado y no de la posición en el array: insertar

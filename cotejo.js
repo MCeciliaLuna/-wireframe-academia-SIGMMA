@@ -59,12 +59,23 @@ if (ini < 0 || fin < 0) {
 }
 const PLANES = ['Professional', 'Business'];
 const USERS = ['M. Luna', 'Majo', 'Irene'];
-/* Se sacan DOS cosas del bloque, no una: el dato y la tabla de orden de los
-   momentos. Antes este script declaraba su propia copia de la lista de momentos,
-   así que el control de vigencia se comparaba contra sí mismo: si el prototipo
-   renombraba un momento, acá seguía en verde. */
-const BLOQUE = eval(html.slice(ini, fin + CIERRA.length) + '\n({DATA:DATA,ESC_ORD:ESC_ORD});');
-const DATA = BLOQUE.DATA, ORD = BLOQUE.ESC_ORD;
+/* Se sacan TRES cosas del bloque, no una: el dato, la tabla de orden de los
+   momentos y la derivación de los temas. Antes este script declaraba su propia copia
+   de la lista de momentos, así que el control de vigencia se comparaba contra sí
+   mismo: si el prototipo renombraba un momento, acá seguía en verde. */
+const BLOQUE = eval(html.slice(ini, fin + CIERRA.length) + '\n({DATA:DATA,ESC_ORD:ESC_ORD,subtemasDe:subtemasDe});');
+const DATA = BLOQUE.DATA, ORD = BLOQUE.ESC_ORD, SUB = BLOQUE.subtemasDe;
+
+/* El tema del banco se deriva de las secciones, y esa derivación tiene que vivir
+   dentro del bloque que este script evalúa: genPool la usa para saber si el módulo
+   tiene temas. Si no está, los controles de banco y de temas se comparan contra
+   `undefined` y fallan por el motivo equivocado. */
+if (typeof SUB !== 'function') {
+  console.error('El bloque de datos no exporta subtemasDe.');
+  console.error('El tema del banco se deriva de las secciones y esa derivación tiene que declararse');
+  console.error('dentro del bloque que este script evalúa, porque genPool la usa. Hay que revisar index.html.');
+  process.exit(2);
+}
 
 /* Los momentos se DERIVAN de la tabla de orden: este script no nombra ninguno,
    así que renombrarlos o colapsarlos no lo obliga a cambiar. */
@@ -168,7 +179,7 @@ const lista = (a, n) => a.slice(0, n || 8).join(', ') + (a.length > (n || 8) ? '
 const activasEn = (m, e) => (m.pool || []).filter(q => ORD[q.desde] <= ORD[e] && q.estado === 'activa');
 const sinCubrir = (m, e) => {
   const a = activasEn(m, e);
-  return m.subtemas.filter(st => !a.some(q => q.st === st.id)).map(st => st.name);
+  return SUB(m).filter(st => !a.some(q => q.st === st.id)).map(st => st.name);
 };
 
 const enRegimen = DATA.filter(m => m.sup === 'BAK' && !m.enPrep);
@@ -210,7 +221,7 @@ chequeo(malDesde.length === 0,
    a repasar un video que no explica el concepto fallado. */
 const temaAjeno = [], repasoAjeno = [];
 DATA.forEach(m => {
-  const ids = m.subtemas.map(s => s.id);
+  const ids = SUB(m).map(s => s.id);
   const secDe = {};
   (m.secciones || []).forEach(s => s.videos.forEach(v => secDe[m.id + '.' + v.seq] = s.id));
   (m.pool || []).forEach(q => {
@@ -230,6 +241,30 @@ DATA.forEach(m => {
   if (p.objetivo < p.minimo) malParams.push(m.id + ': objetivo ' + p.objetivo + ' < mínimo ' + p.minimo);
 });
 chequeo(malParams.length === 0, 'los parámetros de cada módulo respetan las reglas del MVP' + (malParams.length ? '; fallan: ' + lista(malParams, 4) : ''));
+
+/* 6 · el tema ES la sección, y lo sigue siendo después de tocar el módulo -----
+   Estos dos controles existen por un bug concreto: el tema era un campo guardado
+   que se calculaba una sola vez al iniciar, así que una sección creada desde el
+   backoffice no llegaba nunca a ser un tema, el desplegable de la consola quedaba
+   vacío y no se podía guardar ninguna pregunta. Se controlan las dos mitades: que
+   la derivación sea fiel, y que siga siéndolo si el módulo cambia después. */
+const desalineados = DATA.filter(m => {
+  const st = SUB(m), sec = m.secciones || [];
+  return st.length !== sec.length || st.some((t, i) => t.id !== sec[i].id || t.name !== sec[i].name);
+});
+chequeo(desalineados.length === 0,
+  'los temas de cada módulo son sus secciones, en el mismo orden' +
+  (desalineados.length ? '; fallan: ' + lista(desalineados.map(m => m.id)) : ''));
+
+/* La regresión propiamente dicha. Sobre una COPIA del módulo, para no ensuciar el
+   dato que miran los controles de arriba. */
+const cobayo = { ...DATA[0], secciones: (DATA[0].secciones || []).slice() };
+const antesN = SUB(cobayo).length;
+cobayo.secciones.push({ id: cobayo.id + '.S99', name: 'Sección agregada por el control', videos: [] });
+const despuesST = SUB(cobayo);
+chequeo(despuesST.length === antesN + 1 && despuesST[despuesST.length - 1].id === cobayo.id + '.S99',
+  'una sección agregada después de la carga inicial es un tema en el acto (da ' +
+  antesN + ' → ' + despuesST.length + ')');
 
 console.log('\n' + (fallos.length
   ? fallos.length + ' control(es) en rojo.\n'
