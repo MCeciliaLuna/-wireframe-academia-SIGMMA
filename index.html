@@ -2428,7 +2428,7 @@ function detSec(d,m,sec){
   b.innerHTML=`
    <div class="fieldgrid">
      <div><label for="sn">Nombre de la sección</label><input type="text" id="sn" value="${esc(sec.name)}">
-       <p class="hint">Es un agrupamiento visual dentro del módulo. Ayuda a que una lista de 7 videos se lea como dos ideas.</p></div>
+       <p class="hint">Es un agrupamiento visual dentro del módulo. Ayuda a que una lista de 7 videos se lea como dos ideas. Es además el <b>tema del banco</b>: renombrarla renombra el tema, y ninguna pregunta se queda huérfana, porque apuntan al ID y no al nombre.</p></div>
      <div><label>Módulo al que pertenece</label><div class="ro"><span class="mono">${m.id}</span> · ${esc(m.name)}<span class="lock">definido por su lugar en el árbol</span></div></div>
      <div><label>Orden dentro del módulo</label><div class="row"><button class="btn btn-sm" data-sord="up"><span class="icon icon-sm" data-icon="arrow-up"></span> Subir</button><button class="btn btn-sm" data-sord="down"><span class="icon icon-sm" data-icon="arrow-down"></span> Bajar</button><span class="hint" style="margin:0">posición ${S.sel.secIdx+1} de ${m.secciones.length}</span></div></div>
      <div><label>Baja</label><div class="row"><button class="btn btn-d btn-sm" data-arch="sec">Archivar sección</button></div>
@@ -4171,6 +4171,27 @@ document.addEventListener('change',ev=>{
     if($('#anOrden')&&o)$('#anOrden').value=o;
     return;
   }
+  /* El nombre de la SECCIÓN. El campo estaba dibujado y nadie lo leía: aceptaba lo
+     que se tipeaba y el render siguiente lo revertía sin avisar, que es peor que no
+     tener el campo. Se guarda al salir del campo, como los planes del video: el panel
+     de detalle no tiene botón de guardar.
+     Es además el nombre del tema del banco —el tema se deriva de la sección—, así que
+     no hay un segundo lugar donde renombrarlo. Vacío revierte: una sección sin nombre
+     no se distingue de las demás en el desplegable de temas, que es donde más se lee. */
+  if(t.id==='sn'){
+    if(!S.sel||S.sel.kind!=='sec') return;
+    const m=findMod(S.sel.modId),sec=m&&m.secciones[S.sel.secIdx];
+    if(!sec) return;
+    const nom=t.value.trim();
+    if(!nom){render();toast('La sección se quedó sin nombre, así que sigue llamándose "'+sec.name+'".');return;}
+    if(nom===sec.name) return;
+    const antes=sec.name;
+    sec.name=nom;
+    render();
+    toast('Sección renombrada: "'+antes+'" → "'+nom+'". El tema del banco se llama igual, porque es la misma cosa.');
+    return;
+  }
+
   /* Planes del VIDEO. Este control existía dibujado pero sin rama acá, así que se
      pintaba según el dato y no lo podía cambiar: el único caso propio del dataset
      (el Dashboard de KPIs) era lo único que se podía mostrar.
