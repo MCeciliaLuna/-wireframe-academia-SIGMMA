@@ -1902,8 +1902,13 @@ function viewHub(){
   mods.forEach(m=>{
     const c=subtemasEnCero(m), n=bancoActivas(m).length;
     if(!m.secciones.length) items.push([m.id+' no tiene secciones','sin al menos una sección no se le pueden cargar videos','Agregar sección','sec',m.id]);
-    else if(subtemasDe(m).length===0&&!m.enPrep) items.push([m.id+' no tiene temas definidos','sin temas el banco no se puede validar ni publicar','Definir temas','subtemas',m.id]);
-    else if(c>0&&n>0) items.push([m.id+' tiene '+c+' tema'+(c>1?'s':'')+' sin cubrir','bloquea la publicación: el sorteo podría dejar afuera un concepto central','Ir al banco','banco',m.id]);
+    /* "Sin temas" y "sin secciones" son la misma condición desde que el tema se
+       deriva de la sección, así que la rama de arriba ya lo cubre —y sin el guard de
+       enPrep que hacía que un módulo recién creado no avisara nada. Lo que quedaba
+       mudo era el módulo que tiene secciones y ni una sola pregunta: no llegaba a la
+       rama de cobertura, porque esa pedía n>0. */
+    else if(n===0) items.push([m.id+' no tiene ninguna pregunta cargada','sin banco no se puede publicar, y el mínimo son '+m.params.minimo,'Cargar la primera','banco',m.id]);
+    else if(c>0) items.push([m.id+' tiene '+c+' tema'+(c>1?'s':'')+' sin cubrir','bloquea la publicación: el sorteo podría dejar afuera un concepto central','Ir al banco','banco',m.id]);
     else if(n>0&&n<m.params.objetivo) items.push([m.id+' · banco incompleto',n+' de '+m.params.objetivo+' preguntas cargadas','Completar banco','banco',m.id]);
   });
   mods.forEach(m=>m.secciones.forEach((s,si)=>s.videos.forEach(v=>{
