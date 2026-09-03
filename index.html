@@ -962,7 +962,7 @@ body.notes-off .note{display:none}
     <div class="railgroup"><h4>Contenido</h4>
       <button class="railitem" data-go="constructor">Estructura de la Academia</button>
       <button class="railitem" data-go="evaluacion">Evaluaciones y bancos</button>
-      <button class="railitem" data-go="importar">Cargar desde planilla</button></div>
+      <button class="railitem" data-go="importar" data-mvp="importador">Cargar desde planilla</button></div>
     <div class="railgroup"><h4>Soporte y certificación</h4>
       <button class="railitem" data-go="meet">Meet y colas de dudas</button>
       <button class="railitem" data-go="certificado">Certificados</button></div>
@@ -1040,6 +1040,39 @@ function renderIcons(root){
 }
 /* Atajo para los templates: ico('lock') → el span listo para hidratar. */
 const ico=(n,cls)=>'<span class="icon'+(cls?' '+cls:'')+'" data-icon="'+n+'"></span>';
+
+/* ============================================================
+   DIFERIDOS DEL MVP
+   ============================================================ */
+/* La carga masiva queda escrita y apagada. El contrato de columnas y las reglas
+   de aviso/error están cerrados; lo que falta es el parser —hoy el textarea no se
+   lee y las filas de la vista previa son fixtures—. Para la entrega la carga es
+   manual: módulo, sección, video y pregunta, de a uno.
+
+   Prender el flag devuelve la pantalla, la entrada del rail, los botones y los
+   textos que ofrecen el camino de la planilla.
+
+   Se declara ACÁ, arriba de GLOBAL, porque el bloque que evalúa `cotejo.js`
+   arranca en la declaración de GLOBAL: adentro, MVP sería una referencia más que
+   el script tendría que definir por su cuenta. Ojo con nombrar los marcadores de
+   corte en texto plano —el script los busca con indexOf y se queda con el primero
+   que encuentra, comentario incluido. */
+const MVP={importador:false};
+
+/* Un solo lugar apaga lo diferido, tanto en el markup estático del shell como en
+   lo que generan las vistas. Se remueve en vez de ocultar: un botón `hidden`
+   sigue siendo alcanzable por teclado y por un `data-go` viejo. Idempotente
+   —igual que renderIcons—, así que se puede llamar en cada render.
+
+   Una clave que no existe en MVP se toma como apagada, a propósito: el default
+   de algo diferido es no estar. El costo es que un `data-mvp` mal tipeado hace
+   desaparecer el nodo en silencio; el cambio inverso —dejar visible lo que no se
+   reconoce— arriesga entregar prendido justo lo que hay que apagar. */
+function aplicarMVP(root){
+  (root||document).querySelectorAll('[data-mvp]').forEach(n=>{
+    if(!MVP[n.dataset.mvp]) n.remove();
+  });
+}
 
 /* ============================================================
    PLANES Y PERSONAS
@@ -1460,7 +1493,7 @@ const TIPOS_DOC=[
 /* Dos momentos, no cinco etapas: lo que negocio necesita ver es el día cero y el
    régimen. Las claves tienen que ser las mismas que las de ESC_ORD. */
 const ESCENAS={
- VACIA:{label:'Academia vacía',note:'Nada cargado todavía. Desde acá se puede crear el primer módulo o pegar la estructura completa: no es una pantalla sin salida.'},
+ VACIA:{label:'Academia vacía',note:'Nada cargado todavía. Desde acá se puede crear el primer módulo'+(MVP.importador?' o pegar la estructura completa':'')+': no es una pantalla sin salida.'},
  COMPLETA:{label:'Academia completa',note:'Todo publicado y con el banco completo. Aparece lo que en el día cero es invisible: la cola de "a regrabar", las aprobaciones que podrían caducar, un módulo reservado que el checklist traba, y dos módulos que están afuera con un embebido roto.'}
 };
 
@@ -1718,6 +1751,10 @@ function crumbs(){
 
 function render(){
   if(ALIAS_EV.has(S.screen)){S.evTab=ALIAS_EV.get(S.screen);S.screen='evaluacion';}
+  /* Sin botones el importador ya no se dispara, pero la pantalla no puede quedar
+     alcanzable por un `data-go2` viejo ni desde la consola: el guard la devuelve
+     al hub. Es lo que hace que "fuera del área de visibilidad" sea verificable. */
+  if(S.screen==='importar'&&!MVP.importador) S.screen='hub';
   const nota=ESCENAS[S.escena].note;
   $('#escenaNote').textContent=nota; $('#escenaNote').title=nota;
   document.querySelectorAll('.seg[data-esc]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.esc===S.escena)));
@@ -1733,6 +1770,7 @@ function render(){
     panelAgencia:viewPanelAgencia,panelMacro:viewPanelMacro,params:viewParams};
   h.appendChild((map[S.screen]||viewHub)());
   renderIcons(document);
+  aplicarMVP(document);
   restaurarFoco(foco);
 }
 
@@ -1785,7 +1823,7 @@ const ACTART={
 /* Las cuatro acciones, en orden de frecuencia real de uso. */
 const ACCIONES=[
  ['tengo','Subir un video que ya tengo','Lo más frecuente. Pegás el link y elegís en qué parte de la Academia va.'],
- ['preguntas','Cargar preguntas de un módulo','Escribís o pegás el banco. Cada una con su tema, que es lo que evita el sesgo.'],
+ ['preguntas','Cargar preguntas de un módulo','Escribís'+(MVP.importador?' o pegás':'')+' el banco. Cada una con su tema, que es lo que evita el sesgo.'],
  ['estructura','Crear un módulo o una sección','Da de alta la estructura donde después van los videos.'],
  ['publicar','Publicar un módulo','Checklist en vez de interruptor: qué falta para que una agencia pueda hacerlo.']
 ];
@@ -1802,8 +1840,12 @@ function viewHub(){
   w.appendChild(d);
 
   if(!mods.length){
-    w.appendChild(el('div','emptynote','<b>La Academia está vacía.</b><br>Hay dos caminos y los dos funcionan desde acá: crear el primer módulo a mano, o pegar la estructura completa (módulos y secciones) desde la planilla maestra.<div class="row" style="margin-top:16px"><button class="btn btn-p" data-go2="altamod">Crear el primer módulo</button><button class="btn" data-go2="imp-estr">Pegar la estructura</button></div>'));
-    w.appendChild(el('div','note v3','<b>Ajuste v3 ·</b> El día cero era una pantalla sin salida: los dos botones eran decorativos. Ahora el alta de módulo existe como pantalla propia y el importador tiene un modo Estructura que crea módulos y secciones, no solo videos sobre módulos que ya existen.'));
+    w.appendChild(el('div','emptynote','<b>La Academia está vacía.</b><br>'
+      +(MVP.importador
+        ?'Hay dos caminos y los dos funcionan desde acá: crear el primer módulo a mano, o pegar la estructura completa (módulos y secciones) desde la planilla maestra.'
+        :'El arranque es a mano: se crea el primer módulo con su primera sección, y de ahí en adelante ya acepta videos y preguntas.')
+      +'<div class="row" style="margin-top:16px"><button class="btn btn-p" data-go2="altamod">Crear el primer módulo</button><button class="btn" data-go2="imp-estr" data-mvp="importador">Pegar la estructura</button></div>'));
+    w.appendChild(el('div','note v3','<b>Ajuste v3 ·</b> El día cero era una pantalla sin salida: el botón era decorativo. Ahora el alta de módulo existe como pantalla propia, crea el módulo con su primera sección y deja la Academia lista para recibir videos.'));
     return w;
   }
 
@@ -1888,7 +1930,7 @@ function viewCambios(){
    ['Vigencia del banco','El banco de cada momento era un corte del pool contra una tabla de totales.','Cada pregunta declara <b>desde qué momento existe</b>, y el pool apunta al objetivo del módulo.','La tabla declaraba 50 preguntas para módulos cuyo pool máximo eran 18: el checklist pedía un mínimo inalcanzable, y una pregunta cargada a mano no movía ningún contador.'],
    ['Publicado y publicable','El checklist se evaluaba antes que la visibilidad, así que un módulo publicado que dejaba de cumplir decía "todavía no se puede publicar".','Tres estados separados, incluido <b>"publicado, pero hoy no cumple"</b>, y el hub los cuenta por separado.','Es información de control: el módulo está afuera, en manos de las agencias, y hoy no cumple. Decirle "todavía no se publicó" era falso y tapaba el aviso.'],
    ['Video de repaso','La pregunta tomaba el tema de su sección y el video de un video cualquiera del módulo.','Cada pregunta <b>sale de un video</b> y hereda de él las dos cosas: su tema y su video de repaso.','Una pregunta de "Los números del voucher" podía mandar a repasar un video de otra sección: el resultado derivaba a un video que no explicaba el concepto fallado.'],
-   ['Destino del pegado','El encabezado del importador decía un módulo y todas las filas traían otro, con el error escrito en el dato.','<b>Un solo destino</b> —el de la consola— y el error se calcula contra él. Los temas se cruzan por <b>ID de sección</b>, con el nombre como respaldo que avisa.','Dos fuentes de verdad para el mismo dato en la misma pantalla. Y cruzar por nombre rompe el pegado en silencio en cuanto se renombra una sección.']
+   ['Carga de contenido','Carga masiva desde planilla, en tres modos: estructura, videos y preguntas.','<b>Carga manual</b> de punta a punta: módulo, sección, video y pregunta, de a uno. La carga masiva queda <b>diferida post-MVP</b>.','El importador estaba diseñado pero no implementado: el pegado no se leía y la vista previa corría contra filas de ejemplo. Entregar el MVP con la carga que sí funciona es más honesto que entregar una pantalla que promete lo que no hace.']
   ];
   const t1=el('div','tablewrap');const tb1=el('table');
   tb1.innerHTML='<thead><tr><th style="width:130px">Tema</th><th style="width:24%">Antes (MVP v1)</th><th style="width:30%">Ahora (alineado)</th><th>Por qué</th></tr></thead><tbody>'+
@@ -1917,7 +1959,8 @@ function viewCambios(){
    ['Cómo se mide el 80 % de visto','Posición del cursor vs. segundos acumulados anti-scrub (P04.3). Es decisión de producto, no límite técnico.','Producto'],
    ['Despublicar algo en curso','Si una agencia lo estaba cursando: ¿pierde acceso? ¿pierde la aprobación? ¿se le corre el ordinal?','Producto'],
    ['La Meet exige aprobar','El que necesita ayuda es el que desaprueba (P08.6). El propio prototipo lo marca como la objeción más fuerte.','Producto + Capacitación'],
-   ['Designación del coordinador','Quién lo nombra y qué pasa si se va de la agencia. Hoy llega de solo lectura desde el backend.','Producto']
+   ['Designación del coordinador','Quién lo nombra y qué pasa si se va de la agencia. Hoy llega de solo lectura desde el backend.','Producto'],
+   ['Carga masiva desde planilla','Diferida post-MVP: para la entrega la carga es manual. El contrato de columnas está definido para los tres modos y las reglas de aviso vs. error están cerradas. Falta el parser y una definición de negocio: la planilla de videos no declara a qué sección va cada video.','Producto + Capacitación']
   ];
   const t3=el('div','tablewrap');const tb3=el('table');
   tb3.innerHTML='<thead><tr><th style="width:32%">Sigue abierto</th><th>Qué está en juego</th><th style="width:130px">Quién decide</th></tr></thead><tbody>'+
@@ -1926,7 +1969,7 @@ function viewCambios(){
   w.appendChild(el('h2','','Sigue abierto — necesita decisión formal'));
   w.appendChild(t3);
 
-  w.appendChild(el('div','note v3','<b>Alineación completa ·</b> El prototipo del lado agencia está aprobado, así que manda: donde el backoffice difería, se ajustó el backoffice. En esta pasada se alinearon además las <b>31 secciones</b> del syllabus con ID permanente, el <b>catálogo de tipos de documento</b>, el <b>estado derivado</b> del cupo de Meet y el <b>plan a nivel video</b>, que estaba declarado pero no filtraba. El único bloque que queda por diseñar en profundidad es qué pasa con las superficies FRT y CRM dentro del recorrido de una agencia.'));
+  w.appendChild(el('div','note v3','<b>Alineación completa ·</b> El prototipo del lado agencia está aprobado, así que manda: donde el backoffice difería, se ajustó el backoffice. En esta pasada se alinearon además las <b>31 secciones</b> del syllabus con ID permanente, el <b>catálogo de tipos de documento</b>, el <b>estado derivado</b> del cupo de Meet y el <b>plan a nivel video</b>, que estaba declarado pero no filtraba. Quedan dos bloques afuera del MVP: qué pasa con las superficies FRT y CRM dentro del recorrido de una agencia, y la <b>carga masiva desde planilla</b>, diferida a propósito —el diseño está hecho, falta el parser— para entregar con la carga manual, que es la que funciona de punta a punta.'));
   return w;
 }
 /* ============================================================
@@ -1954,13 +1997,13 @@ function treeCol(){
     const n=el('div','emptynote');
     n.style.margin='16px';
     const txt=S.superficie==='BAK'
-      ?'<b>Todavía no hay módulos en el backend.</b><br>Creá el primero o pegá la estructura desde la planilla maestra.'
+      ?'<b>Todavía no hay módulos en el backend.</b><br>Creá el primero'+(MVP.importador?' o pegá la estructura desde la planilla maestra.':' y su primera sección; desde ahí ya acepta videos.')
       :(S.superficie==='FRT'
         ?'<b>La superficie FRT todavía no está mapeada.</b><br>El frontend B2B2C tiene los módulos FRT-M00 en adelante reservados, pendientes de relevar con producto. Ya se puede crear el primero.'
         :'<b>La superficie CRM todavía no está mapeada.</b><br>Deal Closer es de gobernanza externa hasta la adquisición prevista para 2027. Cobertura mínima recomendada mientras tanto.');
     n.innerHTML=txt+`<div class="row" style="margin-top:16px">
       <button class="btn btn-p" data-go2="altamod">Crear el primer módulo ${S.superficie}</button>
-      <button class="btn" data-go2="imp-estr">Pegar la estructura</button></div>
+      <button class="btn" data-go2="imp-estr" data-mvp="importador">Pegar la estructura</button></div>
       `;
     tree.appendChild(n);
     col.appendChild(tree);return col;
@@ -2272,7 +2315,9 @@ function detMod(d,m){
     const p=m.params;
     b.innerHTML=`
      ${cero&&nP?`<div class="banner stop"><span class="icon" data-icon="alert-circle"></span><div><b>Publicación bloqueada:</b> ${cero} tema${cero>1?'s':''} sin ninguna pregunta activa.</div></div>`:''}
-     ${nP===0?`<div class="emptynote"><b>El banco está vacío.</b><br>Hay dos caminos: cargar preguntas de a una, o pegar la planilla. En los dos casos <b>el tema es obligatorio</b>, porque es lo que garantiza que el examen cubra todos los conceptos del módulo.</div>`:`
+     ${nP===0?`<div class="emptynote"><b>El banco está vacío.</b><br>${MVP.importador
+       ?'Hay dos caminos: cargar preguntas de a una, o pegar la planilla. En los dos casos <b>el tema es obligatorio</b>'
+       :'Las preguntas se cargan de a una y <b>el tema es obligatorio</b>'}, porque es lo que garantiza que el examen cubra todos los conceptos del módulo.</div>`:`
        <div style="font-family:var(--mono);font-size:22px">${nP}<span style="color:var(--muted);font-size:14px"> / ${p.objetivo}</span>
          <span class="tag ${nP<p.minimo?'stop':'ok'}" style="margin-left:8px">mínimo para publicar: ${p.minimo}</span></div>
        <div class="bar ${nP<p.minimo?'zero':(nP<p.objetivo?'low':'')}"><i style="width:${Math.min(100,nP/p.objetivo*100)}%"></i></div>
@@ -2291,7 +2336,7 @@ function detMod(d,m){
      <div class="row" style="margin-top:16px">
        <button class="btn btn-p" data-go2="banco|${m.id}">Abrir la evaluación</button>
        <button class="btn btn-sm" data-go2="pregunta|${m.id}|new">Agregar pregunta</button>
-       <button class="btn btn-sm" data-go2="imp-preg|${m.id}">Pegar desde planilla</button>
+       <button class="btn btn-sm" data-go2="imp-preg|${m.id}" data-mvp="importador">Pegar desde planilla</button>
        <span class="hint" style="margin:0">El banco, la cobertura, los parámetros y la previsualización están en una sola pantalla.</span></div>`;
   }
 
@@ -2605,9 +2650,13 @@ function panelBanco(m){
      cobertura, la barra en 0 y los filtros de una tabla que no existía, y recién
      al final decía que el banco estaba vacío. Cuatro mensajes para decir uno. */
   if(!act.length){
-    w.appendChild(el('div','emptynote','<b>El banco está vacío.</b><br>Dos caminos: cargar de a una o pegar la planilla. El tema es obligatorio en los dos, porque es lo que garantiza que el sorteo de '+m.params.porIntento+' cubra todos los conceptos del módulo.'
+    w.appendChild(el('div','emptynote','<b>El banco está vacío.</b><br>'
+      +(MVP.importador
+        ?'Dos caminos: cargar de a una o pegar la planilla. El tema es obligatorio en los dos, '
+        :'Las preguntas se cargan de a una, con su tema obligatorio, ')
+      +'porque es lo que garantiza que el sorteo de '+m.params.porIntento+' cubra todos los conceptos del módulo.'
       +'<div class="row" style="margin-top:16px"><button class="btn btn-p" data-go2="pregunta|'+m.id+'|new">Agregar la primera pregunta</button>'
-      +'<button class="btn" data-go2="imp-preg|'+m.id+'">Pegar desde planilla</button></div>'));
+      +'<button class="btn" data-go2="imp-preg|'+m.id+'" data-mvp="importador">Pegar desde planilla</button></div>'));
     if(futuro) w.appendChild(el('div','banner plan','<span class="icon" data-icon="info"></span><div>Hay <b>'+futuro+'</b> pregunta'+(futuro>1?'s':'')+' cargada'+(futuro>1?'s':'')+' a mano en un momento posterior. El banco muestra lo que existe con la '+ESCENAS[S.escena].label+'.</div>'));
     return w;
   }
@@ -2635,7 +2684,7 @@ function panelBanco(m){
     <label class="row" style="font-size:14px;color:var(--muted);gap:8px;margin:0"><input type="checkbox" id="bCorregir" ${S.bCorregir?'checked':''} style="accent-color:var(--accent)"> Solo las que tienen algo para corregir</label>
     <span style="margin-left:auto"></span>
     <button class="btn btn-p btn-sm" data-go2="pregunta|${m.id}|new">Agregar pregunta</button>
-    <button class="btn btn-sm" data-go2="imp-preg|${m.id}">Pegar desde planilla</button>
+    <button class="btn btn-sm" data-go2="imp-preg|${m.id}" data-mvp="importador">Pegar desde planilla</button>
     <button class="btn btn-sm" data-evtab="cobertura">Ver cobertura por tema</button>`;
   w.appendChild(bar);
 
@@ -2688,7 +2737,7 @@ function panelBanco(m){
       <select id="bBulkTema" style="max-width:200px" aria-label="Asignar tema a las seleccionadas">
         <option value="">Asignar tema…</option>
         ${m.subtemas.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select>
-      <button class="btn btn-sm" data-bbulk="exportar">Exportar a planilla</button>
+      <button class="btn btn-sm" data-bbulk="exportar" data-mvp="importador">Exportar a planilla</button>
       <button class="btn btn-sm x" data-bbulk="clear">Deseleccionar</button>`;
     w.appendChild(b);
   }

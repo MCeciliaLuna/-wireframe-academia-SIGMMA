@@ -103,7 +103,7 @@ con los botones del encabezado:
 
 | Escena | Qué se ve |
 |---|---|
-| `E1` · Día cero | Nada cargado. Se puede crear el primer módulo o pegar la estructura |
+| `E1` · Día cero | Nada cargado. Se crea el primer módulo con su primera sección |
 | `E2` · IDs reservados | Los 55 videos existen como IDs en backlog, sin bancos |
 | `E3` · Guionando y grabando | Los de Prioridad 1 entre guionados y grabados |
 | `E4` · Ruta esencial publicada | BAK-M00, M10 y M20 completos y visibles; uno con el embebido roto |
@@ -119,7 +119,7 @@ objetivo. Una pregunta cargada a mano nace en la escena en la que se cargó, igu
 | Grupo | Pantalla |
 |---|---|
 | Inicio | Qué querés hacer · **Reglas y decisiones** |
-| Contenido | Estructura de la Academia (árbol y ficha) · **Evaluaciones y bancos** · Cargar desde planilla |
+| Contenido | Estructura de la Academia (árbol y ficha) · **Evaluaciones y bancos** |
 | Soporte | Meet y colas de dudas · Certificados |
 | Seguimiento | Avance por agencia · Panel general |
 | Revisión | **Ver como agencia** · Roles y permisos · Parámetros globales |
@@ -183,6 +183,34 @@ Deuda compartida con el repo de la agencia, no divergencias entre los dos:
   funcional del MVP dice Corporate / Business / Standard y la línea multipágina usa
   Professional / Business / Corporate. Son tres taxonomías en tres documentos: hay que cerrarlo con
   negocio.
+
+### Carga masiva desde planilla — diferida post-MVP
+
+**Para la entrega, la carga de contenido es manual de punta a punta**: módulo, sección, video y
+pregunta, de a uno. La pantalla «Cargar desde planilla» está apagada por el flag `MVP.importador`
+(ver `CLAUDE.md`), no por borrado: el código sigue en `index.html`, inalcanzable.
+
+Se difiere porque **estaba diseñada pero no implementada**. Lo que hay que saber cuando se retome:
+
+- **El `<textarea>` nunca se lee.** No hay parser: las filas de la vista previa son fixtures fijos
+  (`FILAS_E`, `FILAS_V`, `FILAS_P`) y «Subir un archivo CSV» es un `toast()`. Bajo `file://` un
+  `<input type="file">` con `FileReader` sí funciona —no necesita `fetch`—, así que el botón es
+  implementable sin romper la restricción del doble click.
+- **Solo el modo Preguntas escribe de verdad** (`qImportar` → `qGuardar`). El modo Videos no crea
+  nada y el modo Estructura crea tres módulos FRT hardcodeados, sin relación con lo pegado.
+- **Lo que sí está cerrado y no hay que rediscutir**: el contrato de columnas de los tres modos, el
+  cruce del tema por ID de sección con el nombre como respaldo que avisa, y la regla de que un lote
+  no se rechaza entero por una celda (aviso entra, error no: `esAviso`).
+- **Definición de negocio pendiente**: la planilla de videos no declara **a qué sección** va cada
+  video. El ID (`BAK-M30.060`) nombra el módulo y la secuencia, pero no la sección, y los videos
+  viven dentro de secciones. Falta una columna o una regla.
+- **Dos filas del fixture de videos mienten** y hay que corregirlas antes de usarlo como demo:
+  `BAK-M30.060` y `BAK-M30.070` figuran como filas limpias, pero esos dos videos **ya existen** en
+  `DATA` (`BAK-M30.S3` y `BAK-M30.S4`). En el mismo pegado hay otra fila cuyo error declarado es
+  justamente «Ya existe un video con este ID».
+- **Nada del importador entra en el bloque que evalúa `cotejo.js`**, así que ningún control
+  automático lo custodia. Si se retoma, conviene extender el script para cotejar los tres fixtures
+  contra `DATA`.
 
 ### Requisito del front que no es de este repo
 

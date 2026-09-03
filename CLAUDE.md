@@ -90,12 +90,40 @@ SPA sin framework, con un único ciclo:
   seleccionado, filtros, paso del importador, etc.
 - **Render**: `render()` (`index.html:1778`) actualiza breadcrumb/notas, vacía `#screens` y llama a
   la vista según `S.screen` desde un map `screen → view*()`. Cada `view*()` **devuelve un nodo DOM**
-  y no toca nada fuera de él. Al final, `renderIcons(document)`.
+  y no toca nada fuera de él. Al final, `renderIcons(document)` y `aplicarMVP(document)`.
 - **Eventos**: una sola delegación de `click` en `document` (`index.html:3772`) que resuelve por
   atributos `data-*` (`data-go`, `data-go2`, `data-jump`, `data-sel`, `data-pub`, …), muta `S` y
   vuelve a llamar `render()`. **Agregar una interacción = agregar el `data-*` al selector del
   `closest(...)` y su rama al handler**, no un `addEventListener` propio.
 - **Helpers**: `el(tag,clase,html)`, `esc()`, `$()`, `toast()`, `ico(nombre)`.
+
+### Lo diferido: el flag `MVP`
+
+`const MVP={importador:false}` se declara **arriba de `GLOBAL`** —a propósito: adentro caería en el
+bloque que evalúa `cotejo.js` y el script tendría que definirlo por su cuenta— y apaga
+**«Cargar desde planilla»**, que queda escrita, completa e inalcanzable. La entrega del MVP va con
+**carga manual de todo el contenido**: módulo (`viewAltaMod`), sección (`data-qsec`), video
+(puerta «Subir un video que ya tengo» → `S.quick`) y pregunta (`data-qnew` → `viewPregunta`).
+
+El mecanismo es genérico y sirve para cualquier cosa que haya que diferir:
+
+1. Se le pone `data-mvp="<clave>"` al nodo — sirve igual en el markup estático del shell y en el
+   HTML que generan las vistas, que es lo que un ternario dentro de un template no resuelve.
+2. `aplicarMVP(root)` lo **remueve** si `MVP[clave]` es falso. Remueve en vez de ocultar porque un
+   botón `hidden` sigue siendo alcanzable por teclado. Es idempotente, como `renderIcons`.
+3. Si además hay una pantalla, va un guard en `render()`, al lado de la normalización de
+   `ALIAS_EV`: `if(S.screen==='importar'&&!MVP.importador) S.screen='hub';`
+
+Hoy hay **siete** nodos marcados: la entrada del rail, dos «Pegar la estructura», tres «Pegar desde
+planilla» y «Exportar a planilla». Los textos de los cuatro vacíos que ofrecían el camino de la
+planilla (hub, árbol, banco en la ficha y banco en la consola) usan ternario contra el flag, así que
+**prenderlo devuelve la funcionalidad y la copia**, sin reescribir nada. La vista, los fixtures, los
+handlers y `qImportar` **no se tocan**: son lo que el flag revive. El `README.md` explica por qué se
+difirió y qué falta.
+
+**Al comentar código, no escribas los marcadores de corte de `cotejo.js` en texto plano**: el script
+los busca con `indexOf` y se queda con la primera aparición, comentario incluido. Nombralos en prosa
+(«la declaración de GLOBAL»), no como literal.
 
 ### La consola de evaluación
 
