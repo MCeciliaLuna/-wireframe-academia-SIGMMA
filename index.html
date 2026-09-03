@@ -1161,7 +1161,6 @@ const DATA=[
 
  {id:'BAK-M35',name:'Tráfico / asignación de butaca',planes:[...PLANES],orden:45,
   resumen:'Asignación de butaca y tráfico.',descripcion:'Asignación de butaca y tráfico.',enPrep:true,
-  subtemas:[],
   secciones:[
    {id:'BAK-M35.S1',name:'Asignación de butaca',videos:[
     {seq:'010',t:'Tráfico: asignación de butaca',dur:'',durEst:'4:00'}]}]},
@@ -1314,7 +1313,7 @@ function genPool(m){
   if(m.enPrep) return [];
   const vids=[];
   (m.secciones||[]).forEach(sec=>sec.videos.filter(v=>!v.archivado).forEach(v=>vids.push({v,secId:sec.id})));
-  if(!vids.length||!m.subtemas.length) return [];
+  if(!vids.length||!subtemasDe(m).length) return [];
   const pool=[];
   const nid=()=>m.id+'-Q'+String(pool.length+1).padStart(3,'0');
   /* `desde` va acá y no en cada `pool.push`: firma() es el único punto por el que
@@ -1396,10 +1395,9 @@ function initMod(m){
   m.meet=m.meet||{habilitada:true,condicion:'Aprobar con 80 % o más',duracion:30,
     responsable:'Soporte y Capacitación'};
   (m.secciones||[]).forEach(sec=>{ if(!sec.id) sec.id=nextSecId(m); });
-  /* Alineado al prototipo aprobado: el "tema" del banco es SIEMPRE una sección
-     del propio módulo. No hay catálogo de temas aparte. La cobertura se mide
-     por sección, y esa misma taxonomía es la de las dudas de la Meet. */
-  m.subtemas=(m.secciones||[]).map((sec,i)=>({id:sec.id,name:sec.name,orden:(i+1)*10,estado:'activo',secIdx:i}));
+  /* El tema del banco NO se inicializa acá: se deriva en cada lectura con
+     subtemasDe(m). Inicializarlo era el bug —una sección creada después no llegaba
+     nunca a ser un tema—; el porqué está en el comentario de esa función. */
   m.pool=m.pool||genPool(m);
   return m;
 }
@@ -1451,7 +1449,7 @@ const COLAS={
 /* El nombre del tema se resuelve al pintar, desde el ID. */
 function nombreTema(temaId){
   const m=findMod(String(temaId||'').split('.S')[0]);
-  const st=m&&(m.subtemas||[]).find(x=>x.id===temaId);
+  const st=m&&subtemasDe(m).find(x=>x.id===temaId);
   return st?st.name:'—';
 }
 /* Franja de atención de Soporte (parámetro del backoffice, no del módulo). */
@@ -1574,7 +1572,7 @@ function bancoVigente(m){return (m.pool||[]).filter(q=>ESC_ORD[q.desde]<=ESC_ORD
 function bancoActivas(m){return bancoVigente(m).filter(q=>q.estado==='activa');}
 function cobertura(m){
   const a=bancoActivas(m);
-  return m.subtemas.map(st=>({st,n:a.filter(q=>q.st===st.id).length}));
+  return subtemasDe(m).map(st=>({st,n:a.filter(q=>q.st===st.id).length}));
 }
 function subtemasEnCero(m){return cobertura(m).filter(c=>c.n===0).length;}
 /* Preguntas cargadas a mano que todavía no se ven porque la escena quedó atrás.
@@ -1738,7 +1736,7 @@ function nextOrden(sup){
 function crearModulo({sup,id,name,planes,nicho,orden,seccion,videos}){
   const m=initMod({id:id||nextModId(sup),name:name||'Módulo sin nombre',
     planes:planes&&planes.length?planes:[...PLANES],nicho:!!nicho,orden:orden||nextOrden(sup),
-    enPrep:true,nuevo:true,subtemas:[],secciones:[]});
+    enPrep:true,nuevo:true,secciones:[]});
   (seccion?[].concat(seccion):[]).forEach(n=>m.secciones.push({id:nextSecId(m),name:n,videos:[]}));
   if(videos) videos.forEach(v=>{ if(!m.secciones.length) m.secciones.push({id:nextSecId(m),name:'General',videos:[]});
     m.secciones[0].videos.push(v);});
@@ -1904,7 +1902,7 @@ function viewHub(){
   mods.forEach(m=>{
     const c=subtemasEnCero(m), n=bancoActivas(m).length;
     if(!m.secciones.length) items.push([m.id+' no tiene secciones','sin al menos una sección no se le pueden cargar videos','Agregar sección','sec',m.id]);
-    else if(m.subtemas.length===0&&!m.enPrep) items.push([m.id+' no tiene temas definidos','sin temas el banco no se puede validar ni publicar','Definir temas','subtemas',m.id]);
+    else if(subtemasDe(m).length===0&&!m.enPrep) items.push([m.id+' no tiene temas definidos','sin temas el banco no se puede validar ni publicar','Definir temas','subtemas',m.id]);
     else if(c>0&&n>0) items.push([m.id+' tiene '+c+' tema'+(c>1?'s':'')+' sin cubrir','bloquea la publicación: el sorteo podría dejar afuera un concepto central','Ir al banco','banco',m.id]);
     else if(n>0&&n<m.params.objetivo) items.push([m.id+' · banco incompleto',n+' de '+m.params.objetivo+' preguntas cargadas','Completar banco','banco',m.id]);
   });
@@ -2293,7 +2291,7 @@ function detMod(d,m){
     <h2>${esc(m.name)}</h2>
     <div class="dmeta"><span class="tag">orden ${m.orden}</span><span class="tag">${m.secciones.length} secciones</span>
       <span class="tag">${m.secciones.reduce((a,s)=>a+s.videos.filter(v=>!v.archivado).length,0)} videos</span>
-      <span class="tag">${nP}/${m.params.objetivo} preguntas</span><span class="tag">${m.subtemas.length} temas</span></div>`;
+      <span class="tag">${nP}/${m.params.objetivo} preguntas</span><span class="tag">${subtemasDe(m).length} temas</span></div>`;
   d.appendChild(h);
   if(!['ficha','eval','meet','publicar'].includes(S.tab)) S.tab='ficha';
   d.appendChild(tabsBar([['ficha','Ficha'],['eval','Evaluación'],['meet','Meet'],['publicar','Publicar']]));
@@ -2621,7 +2619,7 @@ function panelConfig(m){
      <div><label>Reintentos permitidos</label><div class="ro">${esc(p.reintentos)}<span class="lock">regla del MVP</span></div></div>
      <div><label>Forzar cobertura por tema en el sorteo</label>
        <div class="radioset">${tri('pForzar',p.forzarCobertura)}</div>
-       <p class="hint">Decisión 2, recomendación: sí. Con este módulo alcanza: tiene ${m.subtemas.length} tema${m.subtemas.length===1?'':'s'} y el intento son ${p.porIntento} preguntas, así que ${m.subtemas.length<=p.porIntento?'se puede garantizar una de cada tema':'NO se puede garantizar una de cada tema'}. Se ve funcionando en la pestaña Previsualizar.</p></div>
+       <p class="hint">Decisión 2, recomendación: sí. Con este módulo alcanza: tiene ${subtemasDe(m).length} tema${subtemasDe(m).length===1?'':'s'} y el intento son ${p.porIntento} preguntas, así que ${subtemasDe(m).length<=p.porIntento?'se puede garantizar una de cada tema':'NO se puede garantizar una de cada tema'}. Se ve funcionando en la pestaña Previsualizar.</p></div>
      <div><label>Mostrar respuestas correctas al finalizar</label>
        <div class="radioset">${tri('pCorr',p.mostrarCorrectas)}</div>
        <p class="hint">Decisión 1, recomendación: no. Define con qué variante abre la pantalla de resultado; las dos siguen estando para comparar.</p></div>
@@ -2695,7 +2693,7 @@ function panelBanco(m){
   bar.innerHTML=`
     <input type="text" id="bFiltro" placeholder="Buscar en el enunciado" value="${esc(S.bFiltro)}" style="max-width:220px" aria-label="Buscar">
     <select id="bSub" style="max-width:190px" aria-label="Filtrar por tema"><option value="">Todos los temas</option>
-      ${m.subtemas.map(s=>`<option value="${s.id}" ${S.bSub===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}
+      ${subtemasDe(m).map(s=>`<option value="${s.id}" ${S.bSub===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}
       <option value="__none" ${S.bSub==='__none'?'selected':''}>Sin tema</option></select>
     <select id="bEstado" style="max-width:180px" aria-label="Filtrar por estado"><option value="">Todos los estados</option>
       ${['activa','borrador','inactiva'].map(e=>`<option ${S.bEstado===e?'selected':''}>${e}</option>`).join('')}</select>
@@ -2718,7 +2716,7 @@ function panelBanco(m){
   const body=el('tbody');
   rows.forEach(q=>{
     const pr=problemas(q);
-    const stn=q.st?m.subtemas.find(s=>s.id===q.st):null;
+    const stn=q.st?subtemasDe(m).find(s=>s.id===q.st):null;
     const nOk=q.ops.filter(o=>o.ok).length;
     const tr=el('tr');tr.dataset.bad=String(!!pr.length);
     tr.innerHTML=`
@@ -2754,7 +2752,7 @@ function panelBanco(m){
       <button class="btn btn-sm" data-bbulk="desactivar">Desactivar</button>
       <select id="bBulkTema" style="max-width:200px" aria-label="Asignar tema a las seleccionadas">
         <option value="">Asignar tema…</option>
-        ${m.subtemas.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select>
+        ${subtemasDe(m).map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select>
       <button class="btn btn-sm" data-bbulk="exportar" data-mvp="importador">Exportar a planilla</button>
       <button class="btn btn-sm x" data-bbulk="clear">Deseleccionar</button>`;
     w.appendChild(b);
@@ -2861,7 +2859,7 @@ function viewPregunta(){
      <div><label for="qst">Tema (sección del módulo)</label>
        <div class="row"><select id="qst" style="max-width:300px"${off()}>
          <option value="">Elegí la sección…</option>
-         ${m.subtemas.map(s=>`<option value="${s.id}" ${d.st===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select></div>
+         ${subtemasDe(m).map(s=>`<option value="${s.id}" ${d.st===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select></div>
        <p class="hint">Obligatorio. El tema es una <b>sección</b> del módulo: es lo que garantiza que el sorteo cubra todos los conceptos y es la misma taxonomía de las dudas de la Meet. Se agrega una sección nueva desde el árbol de estructura.</p></div>
      <div><label for="qrep">Video de repaso</label><select id="qrep" style="max-width:340px"${off()}>
        <option value="">Sin video asociado</option>
@@ -2952,8 +2950,9 @@ function sortear(m){
   const n=m.params.porIntento;
   const copia=pool.slice(), out=[];
   const saca=arr=>arr.splice(Math.floor(Math.random()*arr.length),1)[0];
-  if(m.params.forzarCobertura==='si'&&m.subtemas.length<=n){
-    m.subtemas.forEach(st=>{
+  const temas=subtemasDe(m);
+  if(m.params.forzarCobertura==='si'&&temas.length<=n){
+    temas.forEach(st=>{
       if(out.length>=n) return;
       const delTema=copia.filter(q=>q.st===st.id);
       if(!delTema.length) return;
@@ -2972,7 +2971,7 @@ function panelPrevia(m){
   if(!S.muestra||S.muestra.mod!==m.id){S.muestra={mod:m.id,qs:sortear(m)};S.respuestas={};}
   const qs=S.muestra.qs;
   const usados=[...new Set(qs.map(q=>q.st))];
-  const faltan=m.subtemas.filter(s=>!usados.includes(s.id));
+  const faltan=subtemasDe(m).filter(s=>!usados.includes(s.id));
 
   w.appendChild(el('p','lede','Un intento de muestra con las reglas configuradas: '+m.params.porIntento+' preguntas al azar sobre '+bancoActivas(m).length+'. Podés responder; <b>no queda registrado</b>.'));
 
@@ -2984,7 +2983,7 @@ function panelPrevia(m){
 
   const p=m.params;
   const forzando=p.forzarCobertura==='si';
-  const garantizable=m.subtemas.length<=p.porIntento;
+  const garantizable=subtemasDe(m).length<=p.porIntento;
   const ctl=el('div','row');ctl.style.marginBottom='16px';
   ctl.innerHTML=`<button class="btn btn-p btn-sm" data-resort="1">Volver a sortear</button>
     <span class="tag">umbral ${esc(p.umbral)}</span><span class="tag">reintentos ${p.reintentos.toLowerCase()}</span>
@@ -2993,14 +2992,14 @@ function panelPrevia(m){
   w.appendChild(ctl);
 
   if(faltan.length) w.appendChild(el('div','banner warn',`<span class="icon" data-icon="alert-triangle"></span><div><b>Este sorteo dejó afuera ${faltan.length} tema${faltan.length>1?'s':''}:</b> ${faltan.map(s=>esc(s.name)).join(', ')}. ${forzando&&!garantizable
-    ?'Forzar cobertura está en sí, pero el módulo tiene '+m.subtemas.length+' temas y el intento son '+p.porIntento+' preguntas: no se puede garantizar uno de cada uno.'
+    ?'Forzar cobertura está en sí, pero el módulo tiene '+subtemasDe(m).length+' temas y el intento son '+p.porIntento+' preguntas: no se puede garantizar uno de cada uno.'
     :'Es exactamente el riesgo que resuelve la decisión 2: probá "Volver a sortear" varias veces para ver cuánto varía, y después ponela en sí.'}</div>`));
   else w.appendChild(el('div','banner ok',`<span class="icon" data-icon="check-circle"></span><div>Este sorteo cubrió todos los temas del módulo. ${forzando&&garantizable
     ?'Con forzar cobertura en sí está garantizado en todos los intentos.'
     :'Sin forzar cobertura, no está garantizado en el próximo.'}</div>`));
 
   qs.forEach((q,i)=>{
-    const st=m.subtemas.find(s=>s.id===q.st);
+    const st=subtemasDe(m).find(s=>s.id===q.st);
     const c=el('div','qcard');
     c.innerHTML=`<div class="qn">Pregunta ${i+1} de ${qs.length} · ${esc(st?st.name:'sin tema')} · ${q.id}</div>
       <div class="qe">${esc(q.e)}</div>
@@ -3041,7 +3040,7 @@ function viewResultado(){
   /* temas fallados, con su video de repaso */
   const porSub={};
   detalle.forEach(d=>{
-    const st=m.subtemas.find(s=>s.id===d.q.st);
+    const st=subtemasDe(m).find(s=>s.id===d.q.st);
     const k=st?st.name:'Sin tema';
     porSub[k]=porSub[k]||{ok:0,tot:0,repasos:new Set()};
     porSub[k].tot++;
@@ -3103,7 +3102,7 @@ function viewResultado(){
     w.appendChild(el('div','banner plan','<span class="icon" data-icon="info"></span><div><b>Variante B.</b> Con reintentos ilimitados, mostrar la correcta convierte el examen en un ejercicio de memoria: la agencia puede fallar, leer las respuestas y aprobar en el intento siguiente sin haber visto un video. Sirve si el objetivo es enseñar en el examen; no sirve si el examen tiene que validar aprendizaje.</div>'));
     detalle.forEach(d=>{
       const c=el('div','qcard');
-      const st=m.subtemas.find(s=>s.id===d.q.st);
+      const st=subtemasDe(m).find(s=>s.id===d.q.st);
       c.innerHTML=`<div class="qn">Pregunta ${d.i+1} · ${esc(st?st.name:'sin tema')} · ${d.bien?'<span class="ok">correcta</span>':'<span class="bad">incorrecta</span>'}</div>
         <div class="qe">${esc(d.q.e)}</div>
         ${d.q.ops.map((o,k)=>{
@@ -3265,9 +3264,10 @@ const FILAS_P=[
    resolver por nombre es una advertencia y no un acierto. */
 function resolverTema(m,txt){
   const t=String(txt||'').trim();
-  const porId=m.subtemas.find(s=>s.id.toLowerCase()===t.toLowerCase());
+  const temas=subtemasDe(m);
+  const porId=temas.find(s=>s.id.toLowerCase()===t.toLowerCase());
   if(porId) return {st:porId,porNombre:false};
-  const porNom=m.subtemas.find(s=>s.name.toLowerCase()===t.toLowerCase());
+  const porNom=temas.find(s=>s.name.toLowerCase()===t.toLowerCase());
   return porNom?{st:porNom,porNombre:true}:null;
 }
 
@@ -3771,7 +3771,7 @@ document.addEventListener('click',ev=>{
          preguntas de otro módulo, la única acción directa del hub no servía. Ahora
          abre el módulo con el banco más atrasado, y el selector de la consola deja
          cambiarlo sin volver. */
-      const cand=modsVis().filter(x=>!x.enPrep&&x.subtemas.length)
+      const cand=modsVis().filter(x=>!x.enPrep&&subtemasDe(x).length)
         .sort((a,b)=>(bancoActivas(a).length-a.params.minimo)-(bancoActivas(b).length-b.params.minimo));
       S.bModId=(cand[0]||findMod('BAK-M40')||modsVis()[0]).id;
       S.screen='banco';S.bChecked.clear();render();
@@ -3879,7 +3879,7 @@ document.addEventListener('click',ev=>{
     S.screen='pregunta';S.qEdit='new';
     S.qDraft={key:m.id+'|new',...draftDe(null),st:t.dataset.qnew};
     render();
-    const nom=(m.subtemas.find(s=>s.id===t.dataset.qnew)||{}).name||'';
+    const nom=(subtemasDe(m).find(s=>s.id===t.dataset.qnew)||{}).name||'';
     toast('Pregunta nueva con el tema "'+nom+'" ya elegido.');
     return;
   }
@@ -4141,7 +4141,7 @@ document.addEventListener('change',ev=>{
     const m=findMod(S.bModId);
     const ids=selVisible(m);
     const n=qTema(m,ids,t.value);
-    const nom=(m.subtemas.find(s=>s.id===t.value)||{}).name||'';
+    const nom=(subtemasDe(m).find(s=>s.id===t.value)||{}).name||'';
     S.bChecked.clear();render();
     toast(n+' pregunta'+(n===1?'':'s')+' movida'+(n===1?'':'s')+' al tema "'+nom+'". Es la salida rápida cuando un pegado entró sin tema.');
     return;
