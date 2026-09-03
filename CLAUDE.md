@@ -25,17 +25,20 @@ node cotejo.js /ruta/a/academia-AGENCIA   # si el repo hermano no está al lado
 
 `cotejo.js` es el test de este repo: compara el dataset del backoffice contra el del prototipo
 aprobado del lado agencia (`../academia-AGENCIA/assets/js/mock-data.js`) y sale con código 1 si
-algún control queda en rojo. No hay selección de controles individuales: corre los 20 y se lee la
+algún control queda en rojo. No hay selección de controles individuales: corre los 22 y se lee la
 salida. **Correrlo después de cualquier cambio en `DATA`, en las secciones o en el banco.**
 
-Los controles se dividen en tres: nueve cotejan el mapa de contenido contra el repo de la agencia,
+Los controles se dividen en cuatro: nueve cotejan el mapa de contenido contra el repo de la agencia,
 tres los **planes** —que todo módulo declare planes válidos, que los planes propios de un video sean
 un subconjunto *estricto* de los de su módulo (declarar los mismos es heredar, y escribirlo igual es
 el estado redundante que hacía que «propio» significara dos cosas), y que los planes efectivos de
 cada video sean los aprobados—, y siete el banco de preguntas —que llegue al mínimo, que los módulos que cada escena publica tengan
 todos los temas cubiertos, IDs de pregunta únicos y con formato, `desde` válido, que el tema sea una
 sección del propio módulo, que el video de repaso sea de ese mismo tema, y que los parámetros de cada
-módulo respeten las reglas del MVP.
+módulo respeten las reglas del MVP—, y **dos los temas** —que los temas de cada módulo sean sus
+secciones en el mismo orden, y que una sección agregada *después* de la carga inicial sea un tema en
+el acto. Estos dos últimos existen por un bug concreto: el tema era un campo guardado, ver la
+invariante 3.
 
 Cómo lee el dato: `cotejo.js` corta `index.html` **desde `const GLOBAL={` hasta
 `DATA.forEach(initMod);`** y hace `eval` de todo el bloque —parámetros globales, `DATA`, `HAND`,
@@ -64,8 +67,11 @@ detalle, y `cotejo.js` verifica las que son verificables:
 1. **El ID es permanente** (módulo, sección, video). No se reasigna ni se renumera; sobrevive al
    regrabado. Por eso el **orden** es un campo aparte del ID (`ordenEfectivo`/`permutarVideo`).
 2. **Toda base de cálculo son los módulos del recorrido del plan**, nunca los 11 del mapa.
-3. **El tema del banco es una sección del propio módulo.** No hay catálogo de temas aparte:
-   `initMod` deriva `m.subtemas` de `m.secciones`.
+3. **El tema del banco es una sección del propio módulo.** No hay catálogo de temas aparte y **no hay
+   campo**: `subtemasDe(m)` lo deriva de `m.secciones` en cada lectura. Fue un campo guardado
+   (`m.subtemas`, que `initMod` calculaba una sola vez) y se desincronizaba: una sección creada desde
+   el backoffice no llegaba nunca a ser un tema, así que los desplegables de la consola quedaban
+   vacíos y no se podía guardar ninguna pregunta, porque el tema es obligatorio.
 4. **El enlace de la Meet vive en el turno y solo en el turno** (`TURNOS[].enlace`). La ficha del
    módulo no tiene campo de link, a propósito.
 5. **Dos planes**: `Professional` y `Business` (`PLANES`). Recorrido 9 / 11. Son **un solo campo**,
@@ -177,9 +183,12 @@ Cualquier vista nueva tiene que respetar los tres, porque el prototipo se demues
 Orden de declaración, que importa: `PLANES` (`1082`) → `GLOBAL` (`1091`, la **semilla**: umbral de
 visto, preguntas por intento, objetivo y mínimo del banco con los que nace un módulo) → `ESC_ORD` y
 `BANCO_ESC` (`1107`, cuánto banco hay cargado en cada escena) → `DATA` (`1109`, los módulos con sus
-secciones y videos) → `initMod` (`1364`) que se corre sobre todo `DATA` y completa lo derivado
-(`sup`, `planes`, `params`, `meet`, IDs de sección faltantes, `subtemas`, `pool`) → dato del lado
-agencia (`AGENCIAS` `1398`, `TURNOS` `1457`).
+secciones y videos) → `subtemasDe` (`1364`, el tema del banco derivado de la sección) → `initMod`
+(`1377`) que se corre sobre todo `DATA` y completa lo derivado (`sup`, `planes`, `params`, `meet`,
+IDs de sección faltantes, `pool`) → dato del lado agencia (`AGENCIAS` `1410`, `TURNOS` `1469`).
+
+`subtemasDe` vive ahí adentro y no al lado de `planesDe` y `prodDe` porque `genPool` la usa, y porque
+`cotejo.js` la necesita: el bloque exporta `subtemasDe` además de `DATA` y `ESC_ORD`.
 
 `initMod` **no toca los videos**, y es a propósito: ponerle un `planes` por default a cada video lo
 volvería indistinguible de uno al que alguien le eligió esos planes a mano.

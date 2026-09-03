@@ -59,9 +59,10 @@ Lo que comparten y no se puede tocar de un solo lado:
 2. **Toda base de cálculo son los módulos del recorrido del plan**, nunca los 11 del mapa. Un módulo
    fuera del plan de la agencia se muestra con candado, pero no entra a la cadena de desbloqueo ni a
    ningún denominador.
-3. **El tema del banco es una sección del propio módulo.** No hay catálogo de temas aparte. Es lo que
-   permite medir cobertura por sección y etiquetar las dudas de la Meet con valores que la agencia ve.
-   Una pregunta sale de un video, y de ese video hereda las dos cosas: su tema y su video de repaso.
+3. **El tema del banco es una sección del propio módulo.** No hay catálogo de temas aparte, y tampoco
+   hay un campo: se deriva de la sección en cada lectura. Es lo que permite medir cobertura por
+   sección y etiquetar las dudas de la Meet con valores que la agencia ve. Una pregunta sale de un
+   video, y de ese video hereda las dos cosas: su tema y su video de repaso.
 4. **Los parámetros de la evaluación son del módulo.** Los globales son la semilla con la que nace un
    módulo nuevo, no un segundo lugar donde editarlos. Lo que sí es global y no se edita son las reglas
    del MVP: 10 preguntas por intento, umbral 80,00 %, reintentos ilimitados, mínimo = 3× el intento.
