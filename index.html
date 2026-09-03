@@ -2902,7 +2902,11 @@ function panelCobertura(m){
 
   w.appendChild(el('div','banner plan','<span class="icon" data-icon="info"></span><div>Los temas se administran como <b>secciones</b>, en el árbol de estructura. Acá se ve la cobertura del banco por sección, en solo lectura. Para renombrar, reordenar o archivar un tema, se edita la sección.</div>'));
 
-  if(!m.secciones.length){
+  /* Pregunta por `cob`, que es lo que dibuja la tabla, y no por m.secciones: cuando
+     eran dos colecciones distintas este guard miraba una y la tabla se armaba con la
+     otra, así que un módulo con secciones y sin temas renderizaba un encabezado sin
+     una sola fila, en vez del estado vacío. */
+  if(!cob.length){
     w.appendChild(el('div','emptynote','<b>Este módulo no tiene secciones.</b><br>Agregá una sección desde el árbol: es, a la vez, el agrupamiento visual de los videos y el tema del banco.<div class="row" style="margin-top:16px"><button class="btn btn-p" data-add="sec|'+m.id+'">Agregar una sección</button></div>'));
     return w;
   }
@@ -2911,8 +2915,11 @@ function panelCobertura(m){
   const tb=el('table');
   tb.innerHTML=`<thead><tr><th>Tema (= sección)</th><th style="width:110px">Videos</th><th style="width:120px">Preguntas</th><th style="width:90px">Orden</th><th style="width:150px"></th></tr></thead>`;
   const body=el('tbody');
-  cob.forEach((c,i)=>{
-    const sec=m.secciones[i];
+  cob.forEach(c=>{
+    /* Por ID y no por posición: el tema y su sección son la misma cosa, pero
+       aparearlos por índice es lo que hacía que reordenar una sección mostrara el
+       conteo de videos de otra. */
+    const sec=m.secciones.find(s=>s.id===c.st.id);
     const nv=sec?sec.videos.filter(v=>!v.archivado).length:0;
     const tr=el('tr');tr.dataset.bad=String(c.n===0);
     tr.innerHTML=`<td>${esc(c.st.name)}</td>
