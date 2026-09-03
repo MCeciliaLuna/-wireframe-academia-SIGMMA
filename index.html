@@ -490,8 +490,10 @@ input[type=checkbox],input[type=radio]{
 .chip.nodot::before{display:none}
 
 .st-backlog{background:var(--g200);color:var(--g700);border-color:var(--line)}
-/* .st-guionado la reusan el estado "borrador" del banco y "abierto" del cupo de Meet. */
-.st-guionado{background:var(--indigo-wash);color:var(--indigo-light);border-color:var(--indigo-border)}
+/* La usan el estado "borrador" del banco y "abierto" del cupo de Meet: los dos son
+   "existe pero todavía no cuenta". Se llamaba .st-guionado por un estado de
+   producción que el MVP ya no administra. */
+.st-borrador{background:var(--indigo-wash);color:var(--indigo-light);border-color:var(--indigo-border)}
 .st-publicado{background:var(--success-bg);color:var(--success);border-color:var(--success-border)}
 .st-regrabar{background:var(--warning-bg);color:var(--warning);border-color:var(--warning-border)}
 .st-obsoleto,.st-archivado{background:var(--error-bg);color:var(--error);border-color:var(--error-border)}
@@ -1077,7 +1079,7 @@ function aplicarMVP(root){
 /* ============================================================
    PLANES Y PERSONAS
    ============================================================ */
-const PERFILES=['Professional','Business']; // planes de la AGENCIA (alineado al prototipo aprobado)
+const PLANES=['Professional','Business']; // planes de la AGENCIA (alineado al prototipo aprobado)
 const USERS=['M. Luna','Majo','Irene'];
 
 /* ============================================================
@@ -1105,143 +1107,143 @@ const GLOBAL={umbralVisto:80,metodoVisto:'posición',preguntasIntento:10,umbralA
 const ESC_ORD={VACIA:1,COMPLETA:2};
 
 const DATA=[
- {id:'BAK-M00',name:'Fundamentos',tag:'P+B',perfiles:[...PERFILES],orden:10,
+ {id:'BAK-M00',name:'Fundamentos',planes:[...PLANES],orden:10,
   resumen:'Qué es SIGMMA y cómo moverse por el sistema.',descripcion:'Qué es SIGMMA y cómo moverse por el sistema.',
   secciones:[
    {id:'BAK-M00.S1',name:'La lógica del sistema',videos:[
-    {seq:'010',t:'Qué es SIGMMA: el sistema operativo de la agencia',p:'P1',c:'C01',dur:'3:40'},
-    {seq:'020',t:'El ciclo 360° de la operación turística: cliente, prestador y utilidad',p:'P2',c:'C04',dur:'4:10'},
-    {seq:'030',t:'Los 7 principios y los procesos atomizados',p:'P2',c:'C04',dur:'4:30'}]},
+    {seq:'010',t:'Qué es SIGMMA: el sistema operativo de la agencia',dur:'3:40'},
+    {seq:'020',t:'El ciclo 360° de la operación turística: cliente, prestador y utilidad',dur:'4:10'},
+    {seq:'030',t:'Los 7 principios y los procesos atomizados',dur:'4:30'}]},
    {id:'BAK-M00.S2',name:'Moverse por SIGMMA',videos:[
-    {seq:'040',t:'Navegación: ingreso, menú, botones, último file y rueda de progreso',p:'P1',c:'C01',dur:'3:20'}]}]},
+    {seq:'040',t:'Navegación: ingreso, menú, botones, último file y rueda de progreso',dur:'3:20'}]}]},
 
- {id:'BAK-M10',name:'File',tag:'P+B',perfiles:[...PERFILES],orden:20,
+ {id:'BAK-M10',name:'File',planes:[...PLANES],orden:20,
   resumen:'El file: el contenedor de toda la operación.',descripcion:'El file: el contenedor de toda la operación.',
   secciones:[
    {id:'BAK-M10.S1',name:'Encontrar y crear un file',videos:[
-    {seq:'010',t:'Buscar file: número, filtros y por nombre',p:'P1',c:'C02',dur:'2:40'},
-    {seq:'020',t:'Crear y editar un file: tipo de servicio, individual vs. grupal',p:'P1',c:'C02',dur:'4:50'},
-    {seq:'070',t:'Duplicar file (funcionalidad discontinuada)',p:'P3',c:'—',dur:'',archivado:true}]},
+    {seq:'010',t:'Buscar file: número, filtros y por nombre',dur:'2:40'},
+    {seq:'020',t:'Crear y editar un file: tipo de servicio, individual vs. grupal',dur:'4:50'},
+    {seq:'070',t:'Duplicar file (funcionalidad discontinuada)',dur:'',archivado:true}]},
    {id:'BAK-M10.S2',name:'Configurar el file',videos:[
-    {seq:'030',t:'Moneda de registro vs. moneda de documento',p:'P1',c:'C02',dur:'3:00'},
-    {seq:'040',t:'Datos del file: nombre, destino IATA, fechas y segmentación',p:'P2',c:'C05',dur:'3:50'},
-    {seq:'050',t:'Estados del file: automáticos, manuales y cierre',p:'P2',c:'C05',dur:'4:00'}]},
+    {seq:'030',t:'Moneda de registro vs. moneda de documento',dur:'3:00'},
+    {seq:'040',t:'Datos del file: nombre, destino IATA, fechas y segmentación',dur:'3:50'},
+    {seq:'050',t:'Estados del file: automáticos, manuales y cierre',dur:'4:00'}]},
    {id:'BAK-M10.S3',name:'Files grupales',videos:[
-    {seq:'060',t:'Salida grupal: vincular files e informe de salida',p:'P3',c:'C13',dur:'4:40'}]}]},
+    {seq:'060',t:'Salida grupal: vincular files e informe de salida',dur:'4:40'}]}]},
 
- {id:'BAK-M20',name:'Entidades: clientes, pasajeros, proveedores',tag:'P+B',perfiles:[...PERFILES],orden:30,
+ {id:'BAK-M20',name:'Entidades: clientes, pasajeros, proveedores',planes:[...PLANES],orden:30,
   resumen:'Clientes, pasajeros y proveedores: quién es quién.',descripcion:'Clientes, pasajeros y proveedores: quién es quién.',
   secciones:[
    {id:'BAK-M20.S1',name:'Clientes',videos:[
-    {seq:'010',t:'Cargar un cliente: físico vs. jurídico y autocompletado por ARCA/CUIT',p:'P1',c:'C02',dur:'4:40'},
-    {seq:'020',t:'Cliente: solapas de documentación, tarjetas, clasificación y adjuntos',p:'P2',c:'C06',dur:'4:20'}]},
+    {seq:'010',t:'Cargar un cliente: físico vs. jurídico y autocompletado por ARCA/CUIT',dur:'4:40'},
+    {seq:'020',t:'Cliente: solapas de documentación, tarjetas, clasificación y adjuntos',dur:'4:20'}]},
    {id:'BAK-M20.S2',name:'Cliente vs. pasajero',videos:[
-    {seq:'030',t:'Cliente vs. pasajero: el concepto que más se confunde',p:'P1',c:'C02',dur:'3:00'},
-    {seq:'040',t:'Cargar un pasajero: pax principal y alta en la base de clientes',p:'P1',c:'C02',dur:'3:30'}]},
+    {seq:'030',t:'Cliente vs. pasajero: el concepto que más se confunde',dur:'3:00'},
+    {seq:'040',t:'Cargar un pasajero: pax principal y alta en la base de clientes',dur:'3:30'}]},
    {id:'BAK-M20.S3',name:'Proveedores y carga masiva',videos:[
-    {seq:'050',t:'Proveedor turístico y no turístico',p:'P2',c:'C06',dur:'3:10'},
-    {seq:'060',t:'Importar la base de clientes y proveedores desde Excel',p:'P2',c:'C06',dur:'4:30'}]}]},
+    {seq:'050',t:'Proveedor turístico y no turístico',dur:'3:10'},
+    {seq:'060',t:'Importar la base de clientes y proveedores desde Excel',dur:'4:30'}]}]},
 
- {id:'BAK-M30',name:'Voucher / Servicios',tag:'P+B',perfiles:[...PERFILES],orden:40,
+ {id:'BAK-M30',name:'Voucher / Servicios',planes:[...PLANES],orden:40,
   resumen:'El voucher: cargar y procesar un servicio.',descripcion:'El voucher: cargar y procesar un servicio.',
   secciones:[
    {id:'BAK-M30.S1',name:'Qué es y cómo se carga',videos:[
-    {seq:'010',t:'Qué es el voucher: perfil operativo y administrativo',p:'P1',c:'C03',dur:'3:00'},
-    {seq:'020',t:'Cargar un voucher: tipo, subtipo y proveedor',p:'P1',c:'C03',dur:'4:50'}]},
+    {seq:'010',t:'Qué es el voucher: perfil operativo y administrativo',dur:'3:00'},
+    {seq:'020',t:'Cargar un voucher: tipo, subtipo y proveedor',dur:'4:50'}]},
    {id:'BAK-M30.S2',name:'Los números del voucher',videos:[
-    {seq:'030',t:'Margen: comisión vs. utilidad',p:'P2',c:'C07',dur:'4:00'},
-    {seq:'040',t:'Conceptos impositivos e IVA: separar aéreo exento de terrestre',p:'P2',c:'C07',dur:'4:40'}]},
+    {seq:'030',t:'Margen: comisión vs. utilidad',dur:'4:00'},
+    {seq:'040',t:'Conceptos impositivos e IVA: separar aéreo exento de terrestre',dur:'4:40'}]},
    {id:'BAK-M30.S3',name:'Procesar e impactar',videos:[
-    {seq:'050',t:'Procesar el voucher: impacto en la cuenta del proveedor',p:'P1',c:'C03',dur:'2:40'},
-    {seq:'060',t:'Estados del voucher y cotización',p:'P3',c:'C12',dur:'3:30'}]},
+    {seq:'050',t:'Procesar el voucher: impacto en la cuenta del proveedor',dur:'2:40'},
+    {seq:'060',t:'Estados del voucher y cotización',dur:'3:30'}]},
    {id:'BAK-M30.S4',name:'Reutilizar',videos:[
-    {seq:'070',t:'Modelos: armar plantillas de venta reutilizables',p:'P3',c:'C12',dur:'4:20'}]}]},
+    {seq:'070',t:'Modelos: armar plantillas de venta reutilizables',dur:'4:20'}]}]},
 
- {id:'BAK-M35',name:'Tráfico / asignación de butaca',tag:'P+B',perfiles:[...PERFILES],orden:45,
+ {id:'BAK-M35',name:'Tráfico / asignación de butaca',planes:[...PLANES],orden:45,
   resumen:'Asignación de butaca y tráfico.',descripcion:'Asignación de butaca y tráfico.',enPrep:true,
   subtemas:[],
   secciones:[
    {id:'BAK-M35.S1',name:'Asignación de butaca',videos:[
-    {seq:'010',t:'Tráfico: asignación de butaca',p:'P3',c:'—',dur:'',durEst:'4:00'}]}]},
+    {seq:'010',t:'Tráfico: asignación de butaca',dur:'',durEst:'4:00'}]}]},
 
- {id:'BAK-M40',name:'Cobranzas / Recibos',tag:'P+B',perfiles:[...PERFILES],orden:50,
+ {id:'BAK-M40',name:'Cobranzas / Recibos',planes:[...PLANES],orden:50,
   resumen:'Cobrar: recibos, valores y cuenta corriente.',descripcion:'Cobrar: recibos, valores y cuenta corriente.',
   secciones:[
    {id:'BAK-M40.S1',name:'Emitir el recibo',videos:[
-    {seq:'010',t:'Recibo: modos indicado, automático y detallado',p:'P1',c:'C03',dur:'4:50'},
-    {seq:'020',t:'Valores: efectivo, transferencia, tarjeta y de tercero (TR3/TC3)',p:'P2',c:'C08',dur:'4:10'}]},
+    {seq:'010',t:'Recibo: modos indicado, automático y detallado',dur:'4:50'},
+    {seq:'020',t:'Valores: efectivo, transferencia, tarjeta y de tercero (TR3/TC3)',dur:'4:10'}]},
    {id:'BAK-M40.S2',name:'Moneda en la cobranza',videos:[
-    {seq:'030',t:'Moneda y tipo de cambio en el recibo',p:'P2',c:'C08',dur:'3:40'}]},
+    {seq:'030',t:'Moneda y tipo de cambio en el recibo',dur:'3:40'}]},
    {id:'BAK-M40.S3',name:'Cuenta corriente y devoluciones',videos:[
-    {seq:'050',t:'Cuenta corriente del cliente y saldos por moneda',p:'P2',c:'C08',dur:'4:20'},
-    {seq:'040',t:'Devolución y egreso',p:'P3',c:'C14',dur:'3:00'}]}]},
+    {seq:'050',t:'Cuenta corriente del cliente y saldos por moneda',dur:'4:20'},
+    {seq:'040',t:'Devolución y egreso',dur:'3:00'}]}]},
 
- {id:'BAK-M50',name:'Facturación',tag:'P+B',perfiles:[...PERFILES],orden:60,
+ {id:'BAK-M50',name:'Facturación',planes:[...PLANES],orden:60,
   resumen:'Facturar al pasajero: IVA, CAE y casos.',descripcion:'Facturar al pasajero: IVA, CAE y casos.',
   secciones:[
    {id:'BAK-M50.S1',name:'Emitir la factura',videos:[
-    {seq:'010',t:'Factura al pasajero: por servicio vs. por producto',p:'P2',c:'C09',dur:'4:00'},
-    {seq:'020',t:'Categoría de IVA y factura A/B: ARCA y CAE',p:'P2',c:'C09',dur:'4:40'}]},
+    {seq:'010',t:'Factura al pasajero: por servicio vs. por producto',dur:'4:00'},
+    {seq:'020',t:'Categoría de IVA y factura A/B: ARCA y CAE',dur:'4:40'}]},
    {id:'BAK-M50.S2',name:'Controlar antes de facturar',videos:[
-    {seq:'030',t:'Verificar el voucher antes de facturar: prestador vs. proveedor',p:'P2',c:'C09',dur:'3:20'}]},
+    {seq:'030',t:'Verificar el voucher antes de facturar: prestador vs. proveedor',dur:'3:20'}]},
    {id:'BAK-M50.S3',name:'Ajustes y casos especiales',videos:[
-    {seq:'040',t:'Notas de crédito',p:'P3',c:'C15',dur:'3:10'},
-    {seq:'050',t:'Factura parcial: dividir entre pasajeros',p:'P3',c:'C15',dur:'3:50'},
-    {seq:'060',t:'Tipo de cambio promedio ponderado',p:'P3',c:'C15',dur:'4:10'}]}]},
+    {seq:'040',t:'Notas de crédito',dur:'3:10'},
+    {seq:'050',t:'Factura parcial: dividir entre pasajeros',dur:'3:50'},
+    {seq:'060',t:'Tipo de cambio promedio ponderado',dur:'4:10'}]}]},
 
- {id:'BAK-M60',name:'Pagos a proveedores',tag:'P+B',perfiles:[...PERFILES],orden:70,
+ {id:'BAK-M60',name:'Pagos a proveedores',planes:[...PLANES],orden:70,
   resumen:'Pagar a proveedores: órdenes y saldos.',descripcion:'Pagar a proveedores: órdenes y saldos.',
   secciones:[
    {id:'BAK-M60.S1',name:'Ordenar el pago',videos:[
-    {seq:'010',t:'Orden de pago: automática, dividida y manual',p:'P2',c:'C10',dur:'4:20'},
-    {seq:'020',t:'Vincular la factura de compra y el importador ARCA',p:'P3',c:'C16',dur:'3:50'}]},
+    {seq:'010',t:'Orden de pago: automática, dividida y manual',dur:'4:20'},
+    {seq:'020',t:'Vincular la factura de compra y el importador ARCA',dur:'3:50'}]},
    {id:'BAK-M60.S2',name:'Ajustes y cuenta corriente',videos:[
-    {seq:'030',t:'Saldo a favor, anular y reabrir',p:'P3',c:'C16',dur:'3:00'},
-    {seq:'040',t:'Cuenta corriente del proveedor',p:'P2',c:'C10',dur:'3:40'}]}]},
+    {seq:'030',t:'Saldo a favor, anular y reabrir',dur:'3:00'},
+    {seq:'040',t:'Cuenta corriente del proveedor',dur:'3:40'}]}]},
 
- {id:'BAK-M70',name:'Caja y bancos',tag:'P+B',perfiles:[...PERFILES],orden:80,
+ {id:'BAK-M70',name:'Caja y bancos',planes:[...PLANES],orden:80,
   resumen:'Caja y bancos: aperturas, cierres y conciliación.',descripcion:'Caja y bancos: aperturas, cierres y conciliación.',
   secciones:[
    {id:'BAK-M70.S1',name:'Configurar y operar la caja',videos:[
-    {seq:'010',t:'Caja única vs. caja por vendedor o cajero',p:'P2',c:'C11',dur:'3:30'},
-    {seq:'030',t:'Apertura y cierre de caja',p:'P3',c:'C17',dur:'3:00'}]},
+    {seq:'010',t:'Caja única vs. caja por vendedor o cajero',dur:'3:30'},
+    {seq:'030',t:'Apertura y cierre de caja',dur:'3:00'}]},
    {id:'BAK-M70.S2',name:'Movimientos y asientos',videos:[
-    {seq:'020',t:'Asientos automáticos y manuales, egresos y centro de costo',p:'P3',c:'C17',dur:'4:40'}]},
+    {seq:'020',t:'Asientos automáticos y manuales, egresos y centro de costo',dur:'4:40'}]},
    {id:'BAK-M70.S3',name:'Bancos y comprobantes',videos:[
-    {seq:'040',t:'Bancos, transferencias y scan de comprobantes con IA',p:'P3',c:'C17',dur:'4:20'}]}]},
+    {seq:'040',t:'Bancos, transferencias y scan de comprobantes con IA',dur:'4:20'}]}]},
 
- {id:'BAK-M80',name:'Informes',tag:'P+B',perfiles:[...PERFILES],orden:90,
+ {id:'BAK-M80',name:'Informes',planes:[...PLANES],orden:90,
   resumen:'Los informes que se miran todos los días.',descripcion:'Los informes que se miran todos los días.',
   secciones:[
    {id:'BAK-M80.S1',name:'Informes operativos',videos:[
-    {seq:'010',t:'Informes operativos: saldos, listados y comisiones',p:'P2',c:'C11',dur:'4:00'},
-    {seq:'020',t:'Informe de vencimientos: cobranzas y pagos',p:'P2',c:'C11',dur:'3:40'}]},
+    {seq:'010',t:'Informes operativos: saldos, listados y comisiones',dur:'4:00'},
+    {seq:'020',t:'Informe de vencimientos: cobranzas y pagos',dur:'3:40'}]},
    {id:'BAK-M80.S2',name:'Administración y KPIs',videos:[
-    {seq:'040',t:'Informes administrativos: ingresos y egresos',p:'P3',c:'C18',dur:'3:50'},
-    {seq:'030',t:'Dashboard: KPIs del negocio',p:'P3',c:'C18',dur:'4:10',tag:'B'}]}]},
+    {seq:'040',t:'Informes administrativos: ingresos y egresos',dur:'3:50'},
+    {seq:'030',t:'Dashboard: KPIs del negocio',dur:'4:10',planes:['Business']}]}]},
 
- {id:'BAK-M90',name:'Contable',tag:'B',perfiles:['Business'],orden:100,
+ {id:'BAK-M90',name:'Contable',planes:['Business'],orden:100,
   resumen:'Contabilidad para agencias Business.',descripcion:'Contabilidad para agencias Business.',
   secciones:[
    {id:'BAK-M90.S1',name:'Configuración contable',videos:[
-    {seq:'010',t:'Plan de cuentas: para qué sirve',p:'P4',c:'C19',dur:'4:00'},
-    {seq:'020',t:'Asientos automáticos: cómo se configuran',p:'P4',c:'C19',dur:'4:30'}]},
+    {seq:'010',t:'Plan de cuentas: para qué sirve',dur:'4:00'},
+    {seq:'020',t:'Asientos automáticos: cómo se configuran',dur:'4:30'}]},
    {id:'BAK-M90.S2',name:'Libros y balances',videos:[
-    {seq:'030',t:'Libro diario, libro banco y mayor',p:'P4',c:'C19',dur:'4:10'},
-    {seq:'040',t:'Balance de suma y saldo',p:'P4',c:'C19',dur:'3:40'}]},
+    {seq:'030',t:'Libro diario, libro banco y mayor',dur:'4:10'},
+    {seq:'040',t:'Balance de suma y saldo',dur:'3:40'}]},
    {id:'BAK-M90.S3',name:'Cierres',videos:[
-    {seq:'050',t:'Ejercicios contables y cierres',p:'P4',c:'C19',dur:'4:20'}]}]},
+    {seq:'050',t:'Ejercicios contables y cierres',dur:'4:20'}]}]},
 
- {id:'BAK-M95',name:'Receptivo operador',tag:'B-nicho',perfiles:['Business'],orden:110,
+ {id:'BAK-M95',name:'Receptivo operador',planes:['Business'],nicho:true,orden:110,
   resumen:'Receptivo operador: tarifario e itinerarios.',descripcion:'Receptivo operador: tarifario e itinerarios.',
   secciones:[
    {id:'BAK-M95.S1',name:'El tarifario',videos:[
-    {seq:'010',t:'Tarifario por proveedor: tipo, categoría, vigencia y temporada',p:'P4',c:'C20',dur:'4:40'}]},
+    {seq:'010',t:'Tarifario por proveedor: tipo, categoría, vigencia y temporada',dur:'4:40'}]},
    {id:'BAK-M95.S2',name:'Armar el producto',videos:[
-    {seq:'020',t:'Armar el itinerario con el tarifario',p:'P4',c:'C20',dur:'4:20'},
-    {seq:'030',t:'Modelos multidestino: paquetes',p:'P4',c:'C20',dur:'4:00'}]},
+    {seq:'020',t:'Armar el itinerario con el tarifario',dur:'4:20'},
+    {seq:'030',t:'Modelos multidestino: paquetes',dur:'4:00'}]},
    {id:'BAK-M95.S3',name:'Impositivo del receptivo',videos:[
-    {seq:'040',t:'Prestador nacional vs. internacional e impacto impositivo',p:'P4',c:'C20',dur:'3:50'}]}]}
+    {seq:'040',t:'Prestador nacional vs. internacional e impacto impositivo',dur:'3:50'}]}]}
 ];
 
 /* embebido: ok / falla */
@@ -1361,6 +1363,11 @@ function nextSecId(m){
 }
 function initMod(m){
   m.sup=m.id.split('-')[0];
+  /* Un módulo sin planes no lo ve nadie, así que nace incluido en todos. Los VIDEOS
+     no se normalizan a propósito: que `v.planes` no exista es el dato —significa
+     "los mismos que el módulo"— y ponerle un default lo volvería indistinguible de
+     un video al que alguien le eligió esos planes a mano. */
+  m.planes=m.planes&&m.planes.length?m.planes:[...PLANES];
   /* Los parámetros de la evaluación son DEL MÓDULO. GLOBAL es la semilla —el valor
      con el que nace un módulo nuevo—, no una segunda pantalla donde editarlos:
      antes el objetivo y el mínimo se podían tocar en los dos lugares, sin
@@ -1405,7 +1412,7 @@ const AGENCIAS=[
    {id:104,nombre:'Tomás Ferreyra',aprobados:3,ultimoAcceso:'28/07/2026',cert:false},
    {id:105,nombre:'Ana Lucero',aprobados:0,ultimoAcceso:'—',cert:false}]}
 ];
-const recorridoDe=ag=>DATA.filter(m=>m.sup==='BAK'&&m.perfiles.includes(ag.plan)&&!m.enPrep);
+const recorridoDe=ag=>DATA.filter(m=>m.sup==='BAK'&&m.planes.includes(ag.plan)&&!m.enPrep);
 /* Los módulos del mapa que ya existen de verdad: los reservados no cuentan. */
 const mapaBAK=()=>DATA.filter(m=>m.sup==='BAK'&&!m.enPrep);
 
@@ -1509,15 +1516,25 @@ function modVisible(m){
   if(S.escena==='COMPLETA') return !m.enPrep;
   return false;
 }
-/* El plan del video, cuando difiere del de su módulo. `vidVisible` responde otra
-   pregunta —si el video está publicado—, así que el plan va aparte: son dos
-   filtros distintos, igual que en el prototipo aprobado. */
-function planesDeTag(tag){
-  const t=String(tag||'P+B');
-  return t==='P+B'?[...PERFILES]:(t.charAt(0)==='P'?['Professional']:['Business']);
+/* Los planes de un video. Que `v.planes` no exista significa "los mismos que el
+   módulo": es la herencia, y es el único lugar donde se resuelve. `vidVisible`
+   responde otra pregunta —si el video está publicado—, así que los planes van
+   aparte: son dos filtros distintos, igual que en el prototipo aprobado. */
+function planesDe(m,v){ return (v&&v.planes)||m.planes; }
+/* "Propio" = difiere del módulo. Al guardar se borra `v.planes` cuando el conjunto
+   coincide con el del módulo (ver la rama `vplan` del handler de change), así que
+   acá alcanza con preguntar si el campo existe: las dos preguntas son la misma. */
+function planesPropios(m,v){ return !!(v&&v.planes); }
+/* La etiqueta corta se DERIVA: nadie la escribe. Antes era un campo `tag` editable
+   al lado de los planes, y eran dos campos contiguos para el mismo dato. */
+function etiquetaPlanes(m){
+  const p=m.planes||[];
+  if(p.length>1) return 'P+B';
+  if(p[0]==='Professional') return 'P';
+  return m.nicho?'B-nicho':'B';
 }
 function videoAplicable(m,v,plan){
-  return planesDeTag(v.tag||m.tag).indexOf(plan)!==-1;
+  return planesDe(m,v).indexOf(plan)!==-1;
 }
 function vidVisible(m,v){
   if(!modVisible(m)) return false;
@@ -1605,7 +1622,7 @@ function qImportar(m,filas){
 /* Módulo anterior del MISMO recorrido (mismo plan). Publicar en orden es la
    regla que sostiene los ordinales sin huecos que el prototipo garantiza. */
 function modAnterior(m){
-  const rec=DATA.filter(x=>x.sup===m.sup&&!x.enPrep&&x.perfiles.some(p=>m.perfiles.includes(p)))
+  const rec=DATA.filter(x=>x.sup===m.sup&&!x.enPrep&&x.planes.some(p=>m.planes.includes(p)))
     .sort((a,b)=>a.orden-b.orden);
   const i=rec.findIndex(x=>x.id===m.id);
   return i>0?rec[i-1]:null;
@@ -1629,7 +1646,7 @@ function checklistPub(m){
     t:'Ningún tema del banco está en cero preguntas',
     d:m.secciones.length===0?'el módulo no tiene secciones (los temas del banco son las secciones)':(cero?cero+' temas sin cubrir':'todos cubiertos')},
    {ok:nPreg>=m.params.minimo,t:'El banco llegó al mínimo de '+m.params.minimo+' preguntas',d:nPreg+' cargadas'},
-   {ok:m.perfiles.length>0,t:'Tiene al menos un plan de agencia asignado',d:m.perfiles.join(' + ')||'ninguno'},
+   {ok:m.planes.length>0,t:'Tiene al menos un plan de agencia asignado',d:m.planes.join(' + ')||'ninguno'},
    {ok:!!m.orden,t:'Tiene definido su orden en la secuencia',d:m.orden?'orden '+m.orden:'sin definir'},
    {ok:anteriorPublicado(m),t:'El módulo anterior del recorrido ya está publicado',d:anteriorPublicado(m)?(modAnterior(m)?'anterior: '+modAnterior(m).id:'es el primero del recorrido'):'falta publicar '+((modAnterior(m)||{}).id||'')}
   ];
@@ -1647,7 +1664,7 @@ function checklistPub(m){
    - la publicación es en orden, así el ordinal del recorrido va 1..N sin huecos. */
 function cadena(plan){
   return DATA.filter(m=>m.sup==='BAK').slice().sort((a,b)=>a.orden-b.orden)
-    .map(m=>({m,aplica:m.perfiles.includes(plan)&&!m.enPrep,pub:modVisible(m)}));
+    .map(m=>({m,aplica:m.planes.includes(plan)&&!m.enPrep,pub:modVisible(m)}));
 }
 
 /* ============================================================
@@ -1657,8 +1674,8 @@ const S={screen:'hub',escena:'COMPLETA',superficie:'BAK',open:{'BAK-M30':true},s
   quick:null,qsec:null,checked:new Set(),filtro:'',soloPend:false,verArch:false,
   impPaso:1,impModo:'videos',omit:new Set(),
   bModId:'BAK-M30',evTab:'banco',bFiltro:'',bSub:'',bEstado:'',bCorregir:false,bChecked:new Set(),
-  qEdit:null,qDraft:null,perfilVista:'Professional',muestra:null,respuestas:{},verCorrectas:null,
-  amPlan:'P+B',meetAg:null,panelAg:null};
+  qEdit:null,qDraft:null,planVista:'Professional',muestra:null,respuestas:{},verCorrectas:null,
+  amPlanes:[...PLANES],amNicho:false,vplanAbierto:null,meetAg:null,panelAg:null};
 
 const $=s=>document.querySelector(s);
 const el=(t,c,h)=>{const n=document.createElement(t);if(c)n.className=c;if(h!==undefined)n.innerHTML=h;return n;};
@@ -1704,9 +1721,9 @@ function nextOrden(sup){
   const o=DATA.filter(m=>m.sup===sup).map(m=>m.orden);
   return (o.length?Math.max(...o):0)+10;
 }
-function crearModulo({sup,id,name,tag,perfiles,orden,seccion,videos}){
-  const m=initMod({id:id||nextModId(sup),name:name||'Módulo sin nombre',tag:tag||'P+B',
-    perfiles:perfiles&&perfiles.length?perfiles:[...PERFILES],orden:orden||nextOrden(sup),
+function crearModulo({sup,id,name,planes,nicho,orden,seccion,videos}){
+  const m=initMod({id:id||nextModId(sup),name:name||'Módulo sin nombre',
+    planes:planes&&planes.length?planes:[...PLANES],nicho:!!nicho,orden:orden||nextOrden(sup),
     enPrep:true,nuevo:true,subtemas:[],secciones:[]});
   (seccion?[].concat(seccion):[]).forEach(n=>m.secciones.push({id:nextSecId(m),name:n,videos:[]}));
   if(videos) videos.forEach(v=>{ if(!m.secciones.length) m.secciones.push({id:nextSecId(m),name:'General',videos:[]});
@@ -1853,17 +1870,17 @@ function viewHub(){
      contaba solo el primero (`!modVisible && bloqueado`), así que el hub podía
      decir 0 trabados mientras cada ficha marcaba el suyo: el tablero contradecía a
      las pantallas de detalle. */
-  let tot=0,pub=0,sinG=0,regr=0,bloq=0,caidos=0;
+  let tot=0,pub=0,sinVid=0,regr=0,bloq=0,caidos=0;
   mods.forEach(m=>{
     m.secciones.forEach(s=>s.videos.forEach(v=>{if(v.archivado)return;tot++;const p=prodDe(m,v);
-      if(p==='publicado')pub++;if(p==='a regrabar')regr++;if(p==='backlog')sinG++;}));
+      if(p==='publicado')pub++;if(p==='a regrabar')regr++;if(p==='backlog')sinVid++;}));
     if(checklistPub(m).bloqueado){ modVisible(m)?caidos++:bloq++; }
   });
   const mini=el('div','mini');
   mini.innerHTML=`
    <div class="stat"><b>${tot}</b><span>videos en el mapa</span></div>
    <div class="stat"><b>${pub}</b><span>publicados</span></div>
-   <div class="stat"><b>${sinG}</b><span>sin grabar</span></div>
+   <div class="stat"><b>${sinVid}</b><span>sin video</span></div>
    <div class="stat"><b>${regr}</b><span>a regrabar</span></div>
    <div class="stat${bloq?' warn':''}"><b>${bloq}</b><span>módulos trabados para publicar</span></div>
    <div class="stat${caidos?' warn':''}"><b>${caidos}</b><span>publicados que hoy no cumplen</span></div>`;
@@ -1910,11 +1927,12 @@ function viewCambios(){
     <p class="lede">El backoffice está ahora <b>alineado al prototipo aprobado del lado agencia</b>. Esta pantalla es el anexo del MVP v2: qué se alineó, qué decisiones cerró el prototipo, y qué queda abierto. Sirve para que desarrollo estime sobre un solo documento.</p>`;
 
   const alin=[
-   ['Planes','Corporate / Business / Standard (MVP §2).','<b>Professional / Business</b>, y son de la agencia. Se separó <b>planes</b> (recorrido y bases de cálculo) del <b>tag</b> editorial (P+B/B/B-nicho).','El prototipo usa dos planes; el README lo marca como "a corregir".'],
+   ['Planes','Corporate / Business / Standard (MVP §2).','<b>Professional / Business</b>, y son de la agencia. Un solo campo <b>planes</b> por módulo y por video, con el nombre y la forma del prototipo aprobado.','El prototipo usa dos planes; el README lo marca como "a corregir".'],
    ['Tema del banco','Catálogo de sub-temas con su propio ABM.','El tema <b>es la sección</b> del módulo. Se eliminó el ABM de sub-temas.','Alinea con el prototipo y con las dudas de la Meet, y borra una fuente de desincronización.'],
    ['Módulos fuera de plan','"Ver como agencia" los ocultaba.','Se <b>muestran con candado de plan</b>, sin ordinal, sin contar para el avance.','Además de pedagógico, es una superficie comercial. Decisión del prototipo.'],
    ['Publicación y ordinales','La cadena salteaba los no publicados.','<b>Publicación en orden</b> obligatoria (requisito duro nuevo). El ordinal del recorrido va 1..N sin huecos.','Sostiene la invariante que el prototipo ya verifica.'],
-   ['Plan por video','El plan del video se heredaba del módulo, sin override.','Campo <b>plan propio del video</b>, como el Dashboard de KPIs (Business en un módulo P+B). <b>Filtra de verdad</b>: a una agencia Professional se le lista con candado y no cuenta para su avance.','Sin él, ese contenido aprobado no se puede cargar. Y declarado pero sin filtrar, el candado no existía.'],
+   ['Planes por video','El plan del video se heredaba del módulo, sin poder restringirlo.','Un video puede incluir <b>menos planes que su módulo</b>, como el Dashboard de KPIs (Business en un módulo que incluye a los dos). <b>Filtra de verdad</b>: a una agencia Professional se le lista con candado y no cuenta para su avance.','Sin él, ese contenido aprobado no se puede cargar. Y declarado pero sin filtrar, el candado no existía.'],
+   ['Un solo campo de planes','Dos campos contiguos: <b>tag</b> editorial (P+B/B/B-nicho) al lado de los planes de agencia, y el primero prellenaba al segundo.','Queda <b>un campo</b>, <span class="cellmono">planes</span>, más un check <b>caso puntual (nicho)</b>. La etiqueta corta P+B/B/B-nicho <b>se deriva</b> y ya no se edita.','Eran dos escrituras del mismo dato, una arriba de la otra, y las dos se llamaban "plan": no había forma de saber cuál se estaba editando. El modelo aprobado usa un solo campo.'],
    ['Campos de contenido','El ABM no pedía resumen ni descripción.','Se agregaron <b>resumen</b> (card) y <b>descripción</b> (syllabus) al módulo.','El prototipo los muestra; sin ellos la card y el syllabus quedan sin texto.'],
    ['Meet','Un link fijo en la ficha del módulo.','<b>Cupo por agencia</b>, cola de dudas, coordinador, franja de atención y <b>enlace por turno</b>. La ficha del módulo ya <b>no tiene campo de link</b>.','Es el modelo de negocio: una Meet por módulo por agencia, no por usuario. Dos lugares para el mismo enlace eran dos fuentes de verdad.'],
    ['Estado del cupo','Se guardaba en el turno y se llamaba <span class="cellmono">sin-cola</span>.','<b>Se deriva</b> de la cola y de la fecha del turno, con el vocabulario del prototipo: <span class="cellmono">sin-lugares · abierto · agendado · consumido</span>.','Un estado guardado se desincroniza en cuanto alguien retira una duda. Y un mismo estado no puede llamarse distinto en cada superficie.'],
@@ -2020,7 +2038,7 @@ function treeCol(){
       <button class="label" role="treeitem" aria-level="1" aria-expanded="${open}" data-sel="mod|${mod.id}">${esc(mod.name)}</button>
       <span class="idbadge">${mod.id}</span>
       <span class="tag">orden ${mod.orden}</span>
-      <span class="tag">${esc(mod.tag)}</span>
+      <span class="tag">${etiquetaPlanes(mod)}</span>
       <span class="chip nodot ${vis?'vis-si':'vis-no'}">${vis?'visible':'en preparación'}</span>
       ${/* Lo que bloquea es el MÍNIMO, no el objetivo: antes este tag se ponía
             verde solo al llegar a 50 —un estado que ningún módulo alcanzaba— y
@@ -2058,7 +2076,6 @@ function treeCol(){
           <span class="idbadge">${id}</span>
           <button class="label" role="treeitem" aria-level="3" data-sel="vid|${mod.id}|${si}|${v.seq}">${esc(v.t)}</button>
           ${emb==='falla'?'<span class="tag stop" title="YouTube no permite embeberlo">embebido <span class="icon icon-sm" data-icon="x"></span></span>':''}
-          <span class="tag">${v.p}</span>
           <span class="chip ${stCls(p)}">${p}</span>
           ${vidVisible(mod,v)?'<span class="chip nodot vis-si">visible</span>':'<span class="chip nodot vis-no">no visible</span>'}
           <button class="rowact" data-ins="${mod.id}|${si}|${v.seq}" title="Insertar un video después de este">insertar <span class="icon icon-sm" data-icon="arrow-down"></span></button>`;
@@ -2090,7 +2107,6 @@ function treeCol(){
     b.innerHTML=`<span class="count">${S.checked.size} seleccionados</span>
       <button class="btn btn-sm" data-bulk="regrabar">Marcar a regrabar</button>
       <button class="btn btn-sm" data-bulk="despublicar">Despublicar</button>
-      <button class="btn btn-sm" data-bulk="cohorte">Asignar cohorte…</button>
       <button class="btn btn-sm" data-bulk="mover">Mover a otra sección…</button>
       <button class="btn btn-sm" data-bulk="verificar">Verificar embebido</button>
       <button class="btn btn-sm" data-bulk="archivar">Archivar</button>
@@ -2149,21 +2165,20 @@ function quickForm(mod,sec,si){
      <div><label for="qlink">Link de YouTube</label><input type="url" id="qlink" placeholder="https://youtube.com/watch?v=…">
        <p class="hint">Al guardar se lee la duración y <b>se verifica que YouTube permita embeberlo</b>. Si falla, el video queda con semáforo rojo y no se puede publicar el módulo.</p></div>`:`
      <div><label for="qdur">Duración estimada</label><input type="text" id="qdur" placeholder="4:00" style="max-width:120px">
-       <p class="hint">Queda marcada como estimada hasta que exista el video. Sirve para planificar el cohorte.</p></div>
-     <div class="derived">Queda reservado en <b>backlog</b>, sin link, y aparece en el plan de rodaje.</div>`}
+       <p class="hint">Queda marcada como estimada hasta que exista el video: le da una duración provisoria al ID reservado para que el módulo pueda mostrar un total.</p></div>
+     <div class="derived">Queda reservado en <b>backlog</b>, sin link, y figura como pendiente en el árbol y en el panel general.</div>`}
    </div>
    <div class="derived"><dl>
      <dt>ID que le toca</dt><dd><span class="idbadge">${mod.id}.${seq}</span> <button class="info" data-info="id" aria-label="De dónde sale este ID">i</button> <span class="hint" style="display:inline">${esc(nota)}</span></dd>
      <dt>Superficie</dt><dd>${mod.sup} · ${mod.sup==='BAK'?'SIGMMA Backend':(mod.sup==='FRT'?'SIGMMA Frontend':'Deal Closer')}</dd>
      <dt>Módulo y sección</dt><dd>${esc(mod.name)} › ${esc(sec.name)}</dd>
-     <dt>Plan al que aplica</dt><dd>${esc(mod.tag)} <span class="hint" style="display:inline">(heredado del módulo)</span></dd>
+     <dt>Planes que lo incluyen</dt><dd>${esc(mod.planes.join(' + '))} <span class="hint" style="display:inline">(los mismos que el módulo; se puede restringir después, en la ficha del video)</span></dd>
      <dt>Visibilidad</dt><dd>no visible hasta publicar el módulo</dd>
    </dl></div>
    <div class="row" style="margin-top:16px">
      <button class="btn btn-p" data-quick="save">Guardar video</button>
      <button class="btn" data-quick="save-more">Guardar y crear otro</button>
      <button class="btn-q" data-quick="cancel">Cancelar</button>
-     <span class="hint" style="margin-left:auto">Cohorte, prioridad y guion se completan después, en Producción.</span>
    </div>`;
   return q;
 }
@@ -2176,8 +2191,9 @@ function viewAltaMod(){
   const sup=S.superficie;
   const id=nextModId(sup);
   const ord=nextOrden(sup);
-  const plan=S.amPlan;
-  const perfSug=plan==='P+B'?PERFILES:['Business'];
+  /* Nace incluido en todos los planes: es el default del módulo, y el caso
+     frecuente. Restringirlo es la excepción, y se marca destildando. */
+  const planes=S.amPlanes;
   const supName={BAK:'SIGMMA Backend · operación de la agencia',FRT:'SIGMMA Frontend · herramienta B2B2C',CRM:'Deal Closer · gobernanza externa'}[sup];
 
   w.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
@@ -2195,15 +2211,13 @@ function viewAltaMod(){
        <p class="hint">Cada superficie tiene su propio espacio de numeración. De acá sale el prefijo del ID.</p></div>
      <div><label for="anNombre">Nombre del módulo</label><input type="text" id="anNombre" placeholder="Ej: Tráfico y asignación de butaca" autocomplete="off">
        <p class="hint">Como lo va a leer la agencia en el listado. Sin el prefijo del ID: eso lo agrega el sistema.</p></div>
-     <div><label>Plan al que aplica</label>
-       <div class="radioset">
-         ${['P+B','B','B-nicho'].map(x=>`<label class="radiopill ${plan===x?'on':''}"><input type="radio" name="anPlan" value="${x}" ${plan===x?'checked':''}> ${x}${x==='P+B'?' — todos los planes':(x==='B'?' — solo Business':' — Business, caso puntual')}</label>`).join('')}
-       </div></div>
-     <div><label>¿Qué plan de agencia incluye este módulo?</label>
+     <div><label>Planes que incluyen este módulo</label>
        <div class="radioset" style="flex-direction:column;align-items:stretch">
-         ${PERFILES.map(p=>`<label class="radiopill ${perfSug.includes(p)?'on':''}" style="justify-content:flex-start"><input type="checkbox" class="apPerf" value="${p}" ${perfSug.includes(p)?'checked':''}> ${p}</label>`).join('')}
+         ${PLANES.map(p=>`<label class="radiopill ${planes.includes(p)?'on':''}" style="justify-content:flex-start"><input type="checkbox" class="apPlan" value="${p}" ${planes.includes(p)?'checked':''}> ${p}</label>`).join('')}
+         <label class="radiopill ${S.amNicho?'on':''}" style="justify-content:flex-start"><input type="checkbox" id="anNicho" ${S.amNicho?'checked':''}> Caso puntual (nicho)</label>
        </div>
-       <p class="hint">Prellenado según el plan elegido; se puede ajustar. Sin ningún plan el módulo no se puede publicar, y las agencias que no lo tengan asignado lo saltean en la cadena de desbloqueo.</p></div>
+       <span class="tag" style="margin-top:8px">${etiquetaPlanes({planes,nicho:S.amNicho})}</span>
+       <p class="hint">Viene prellenado con los dos planes, que es el caso normal. Sin ningún plan el módulo no se puede publicar, y las agencias que no lo tengan asignado lo saltean en la cadena de desbloqueo. La etiqueta corta de arriba se deriva sola: no es un campo aparte.</p></div>
      <div><label for="anOrden">Orden en la secuencia</label>
        <div class="row"><input type="number" id="anOrden" value="${ord}" style="max-width:110px">
          <span class="hint" style="margin:0">de diez en diez, para poder intercalar sin renumerar</span></div>
@@ -2225,7 +2239,7 @@ function viewAltaMod(){
      <button class="btn-q" data-go="constructor">Cancelar</button>
    </div>`;
   w.appendChild(card);
-  w.appendChild(el('div','note v3','<b>Pantalla nueva v3 ·</b> Era el hueco que dejaba la Academia sin arranque posible. Los campos son los del MVP §3.1 (ID, nombre, estado, perfiles, orden) más la primera sección, que evita el paso muerto de crear un módulo que todavía no acepta videos. El ID y el estado inicial son derivados y se muestran antes de guardar, igual que en el alta de video.'));
+  w.appendChild(el('div','note v3','<b>Pantalla nueva v3 ·</b> Era el hueco que dejaba la Academia sin arranque posible. Los campos son los del MVP §3.1 (ID, nombre, estado, planes, orden) más la primera sección, que evita el paso muerto de crear un módulo que todavía no acepta videos. El ID y el estado inicial son derivados y se muestran antes de guardar, igual que en el alta de video.'));
   return w;
 }
 
@@ -2259,7 +2273,7 @@ function detMod(d,m){
   const chk=checklistPub(m);
   const vis=modVisible(m);
   const h=el('div','dhead');
-  h.innerHTML=`<div class="idline"><span class="idbadge">${m.id}</span><span class="tag">${esc(m.tag)}</span>
+  h.innerHTML=`<div class="idline"><span class="idbadge">${m.id}</span><span class="tag">${etiquetaPlanes(m)}</span>
       <span class="chip nodot ${vis?'vis-si':'vis-no'}">${vis?'visible para las agencias':'en preparación'}</span>
       ${chk.bloqueado&&!vis?'<span class="tag stop">no publicable todavía</span>':''}</div>
     <h2>${esc(m.name)}</h2>
@@ -2284,17 +2298,18 @@ function detMod(d,m){
        </div>
        <div><label>Cadena de desbloqueo</label>
          <div class="row" style="gap:8px"><span class="hint" style="margin:0">Ver como:</span>
-           ${PERFILES.map(p=>`<button class="btn btn-sm ${S.perfilVista===p?'btn-on':''}" data-perfil="${p}">${p}</button>`).join('')}</div>
-         <div class="chain">${cadena(S.perfilVista).map((c,i)=>
-           `${i?'<span class="lnk"><span class="icon icon-sm" data-icon="arrow-right"></span></span>':''}<span class="mod ${c.aplica?(c.m.id===m.id?'here':(c.pub?'':'nopub')):'skip'}" title="${esc(c.m.name)}${c.aplica?(c.pub?'':' · sin publicar, la cadena lo saltea'):' · no aplica a '+S.perfilVista}">${c.m.id.replace(c.m.sup+'-','')}</span>`).join('')}</div>
-         <p class="hint">Tachado: no aplica a ${S.perfilVista}. Punteado: todavía no publicado, y la cadena también lo saltea, así una agencia no queda trabada esperando un módulo que no existe para ella o que no salió aún.</p>
+           ${PLANES.map(p=>`<button class="btn btn-sm ${S.planVista===p?'btn-on':''}" data-plan="${p}">${p}</button>`).join('')}</div>
+         <div class="chain">${cadena(S.planVista).map((c,i)=>
+           `${i?'<span class="lnk"><span class="icon icon-sm" data-icon="arrow-right"></span></span>':''}<span class="mod ${c.aplica?(c.m.id===m.id?'here':(c.pub?'':'nopub')):'skip'}" title="${esc(c.m.name)}${c.aplica?(c.pub?'':' · sin publicar, la cadena lo saltea'):' · no aplica a '+S.planVista}">${c.m.id.replace(c.m.sup+'-','')}</span>`).join('')}</div>
+         <p class="hint">Tachado: no aplica a ${S.planVista}. Punteado: todavía no publicado, y la cadena también lo saltea, así una agencia no queda trabada esperando un módulo que no existe para ella o que no salió aún.</p>
        </div>
-       <div><label for="mt">Plan al que aplica</label>
-         <select id="mt"><option ${m.tag==='P+B'?'selected':''}>P+B — todos los planes</option><option ${m.tag==='B'?'selected':''}>B — solo Business</option><option ${m.tag==='B-nicho'?'selected':''}>B-nicho — Business, caso puntual</option></select></div>
-       <div><label>¿Qué plan de agencia incluye este módulo?</label>
+       <div><label>Planes que incluyen este módulo</label>
          <div class="radioset" style="flex-direction:column;align-items:stretch">
-           ${PERFILES.map(p=>`<label class="radiopill ${m.perfiles.includes(p)?'on':''}" style="justify-content:flex-start"><input type="checkbox" ${m.perfiles.includes(p)?'checked':''}> ${p}</label>`).join('')}
-         </div></div>
+           ${PLANES.map(p=>`<label class="radiopill ${m.planes.includes(p)?'on':''}" style="justify-content:flex-start"><input type="checkbox" ${m.planes.includes(p)?'checked':''}> ${p}</label>`).join('')}
+           <label class="radiopill ${m.nicho?'on':''}" style="justify-content:flex-start"><input type="checkbox" ${m.nicho?'checked':''}> Caso puntual (nicho)</label>
+         </div>
+         <span class="tag" style="margin-top:8px">${etiquetaPlanes(m)}</span>
+         <p class="hint">Es el único campo de planes del módulo: la etiqueta corta se deriva de lo tildado. Antes eran dos campos, uno arriba del otro, y uno prellenaba al otro.</p></div>
        <div><label>Secciones</label>
          <div class="row"><button class="btn btn-sm" data-add="sec|${m.id}">+ Agregar sección</button>
            <span class="hint" style="margin:0">${m.secciones.length?m.secciones.map(s=>esc(s.name)).join(' · '):'ninguna todavía'}</span></div></div>
@@ -2303,7 +2318,7 @@ function detMod(d,m){
          <p class="hint">No hay borrado físico. Archivar lo saca del árbol y de la Academia, conserva el ID y el historial, y no se puede reactivar sin revisar sus videos.</p>
        </div>
      </div>
-     <div class="note v3"><b>Ajuste v3 ·</b> La cadena de desbloqueo ahora distingue tres situaciones: aplica y está publicado, aplica pero <b>todavía no salió</b> (punteado), y no aplica al perfil (tachado). Los dos últimos se saltean. Era la regla que no estaba definida en ningún documento.</div>`;
+     <div class="note v3"><b>Ajuste v3 ·</b> La cadena de desbloqueo ahora distingue tres situaciones: aplica y está publicado, aplica pero <b>todavía no salió</b> (punteado), y no aplica al plan (tachado). Los dos últimos se saltean. Era la regla que no estaba definida en ningún documento.</div>`;
   }
 
   /* Una sola pestaña "Evaluación" en la ficha del módulo, y es un resumen con una
@@ -2331,7 +2346,7 @@ function detMod(d,m){
        <dt>Reintentos</dt><dd>${esc(p.reintentos)}</dd>
        <dt>Forzar cobertura por tema</dt><dd>${valParam(p.forzarCobertura)}</dd>
        <dt>Mostrar correctas al finalizar</dt><dd>${valParam(p.mostrarCorrectas)}</dd>
-       <dt>Al aprobar, habilita</dt><dd>El módulo siguiente que aplique al perfil${modSiguiente(m)?': '+modSiguiente(m):''}</dd>
+       <dt>Al aprobar, habilita</dt><dd>El módulo siguiente que aplique al plan${modSiguiente(m)?': '+modSiguiente(m):''}</dd>
      </dl></div>
      <div class="row" style="margin-top:16px">
        <button class="btn btn-p" data-go2="banco|${m.id}">Abrir la evaluación</button>
@@ -2416,19 +2431,22 @@ function detVid(d,m,sec){
   const v=sec.videos.find(x=>x.seq===S.sel.vidSeq);
   if(!v){S.sel={kind:'sec',modId:m.id,secIdx:S.sel.secIdx};return detSec(d,m,sec);}
   const id=m.id+'.'+v.seq, prod=prodDe(m,v), emb=embebido(m,v), link=tieneLink(m,v), vis=vidVisible(m,v);
-  const pos=videosOrdenados(sec).indexOf(v);
+  /* El panel de planes queda abierto o por el dato (el video ya está restringido) o
+     porque alguien acaba de elegir "solo algunos" y todavía no destildó nada. Lo
+     segundo es estado de pantalla, no dato: mientras no restrinja de verdad, `v.planes`
+     no se escribe, así que el dato nunca pasa por "declara los mismos que el módulo". */
+  const pos=videosOrdenados(sec).indexOf(v), propio=planesPropios(m,v)||S.vplanAbierto===id;
   const h=el('div','dhead');
   h.innerHTML=`<div class="idline"><span class="idbadge">${id}</span>
       <button class="info" data-info="id" aria-label="Cómo se arma el ID">i</button>
       <span class="chip ${stCls(prod)}">${prod}</span>
       <span class="chip nodot ${vis?'vis-si':'vis-no'}">${vis?'visible':'no visible'}</span></div>
     <h2>${esc(v.t)}</h2>
-    <div class="dmeta"><span class="tag">${esc(v.tag||m.tag)}</span><span class="tag">Prioridad ${v.p}</span>
-      <span class="tag">Cohorte ${esc(v.c)}</span>${v.dur?`<span class="tag">${v.dur}</span>`:(v.durEst?`<span class="tag warn">${v.durEst} estimada</span>`:'')}
+    <div class="dmeta"><span class="tag">${esc(planesDe(m,v).join(' + '))}</span>${v.dur?`<span class="tag">${v.dur}</span>`:(v.durEst?`<span class="tag warn">${v.durEst} estimada</span>`:'')}
       ${emb==='ok'?'<span class="tag ok">embebido <span class="icon icon-sm" data-icon="check"></span></span>':''}${emb==='falla'?'<span class="tag stop">embebido <span class="icon icon-sm" data-icon="x"></span></span>':''}</div>`;
   d.appendChild(h);
-  if(!['ficha','prod','traza'].includes(S.tab)) S.tab='ficha';
-  d.appendChild(tabsBar([['ficha','Ficha'],['prod','Producción'],['traza','Trazabilidad']]));
+  if(!['ficha','traza'].includes(S.tab)) S.tab='ficha';
+  d.appendChild(tabsBar([['ficha','Ficha'],['traza','Trazabilidad']]));
   const b=el('div','dbody');b.setAttribute('role','tabpanel');b.setAttribute('tabindex','0');
 
   if(S.tab==='ficha'){
@@ -2436,7 +2454,6 @@ function detVid(d,m,sec){
     if(!link) falta.push(['Link del video','miss']);
     if(emb==='falla') falta.push(['Embebido rechazado por YouTube: la agencia vería "video no disponible"','bad']);
     if(!v.dur&&!v.durEst) falta.push(['Duración','miss']);
-    if(v.c==='—') falta.push(['Cohorte de grabación','miss']);
     b.innerHTML=`
      ${emb==='falla'?`<div class="banner stop"><span class="icon" data-icon="alert-circle"></span><div><b>El embebido falla.</b> YouTube no permite mostrar este video dentro de la Academia. Revisá la configuración de privacidad y el dominio autorizado. Mientras siga así, el módulo no se puede publicar.</div></div>`:''}
      <div class="fieldgrid">
@@ -2453,13 +2470,15 @@ function detVid(d,m,sec){
          <p class="hint">${link?(emb==='ok'?'Embebido verificado. Duración leída del video: '+v.dur:(emb==='falla'?'Verificación fallida el 30/08/2026.':'Sin verificar todavía.')):'Se completa cuando el video exista.'}</p></div>
        ${!link?`<div><label for="vde">Duración estimada</label><div class="row"><input type="text" id="vde" value="${esc(v.durEst||'')}" placeholder="4:00" style="max-width:120px"><span class="tag warn">estimada</span></div>
          <p class="hint">Se reemplaza sola por la duración real cuando se cargue el link.</p></div>`:''}
-       <div><label>Plan de este video</label>
+       <div><label>Planes que incluyen este video</label>
          <div class="radioset">
-           <label class="radiopill ${!v.tag?'on':''}"><input type="radio" name="vplan" ${!v.tag?'checked':''}> Hereda del módulo (${esc(m.tag)})</label>
-           <label class="radiopill ${v.tag?'on':''}"><input type="radio" name="vplan" ${v.tag?'checked':''}> Plan propio</label>
+           <label class="radiopill ${propio?'':'on'}"><input type="radio" name="vplan" value="mismos" ${propio?'':'checked'}> Los mismos que el módulo (${esc(m.planes.join(' + '))})</label>
+           <label class="radiopill ${propio?'on':''}"><input type="radio" name="vplan" value="algunos" ${propio?'checked':''}> Solo algunos planes</label>
          </div>
-         ${v.tag?`<div class="row" style="margin-top:8px"><span class="tag plan">${esc(v.tag)}</span><span class="hint" style="margin:0">este video aplica a un plan distinto del módulo, como el Dashboard de KPIs</span></div>`:''}
-         <p class="hint">Alineado al prototipo: un video puede tener plan propio dentro de un módulo compartido. Si no aplica al plan de la agencia, se lista con su aviso y no cuenta para el avance.</p></div>
+         ${propio?`<div class="radioset" style="flex-direction:column;align-items:stretch;margin-top:8px">
+           ${m.planes.map(p=>`<label class="radiopill ${planesDe(m,v).includes(p)?'on':''}" style="justify-content:flex-start"><input type="checkbox" name="vplanes" value="${p}" ${planesDe(m,v).includes(p)?'checked':''}> ${p}</label>`).join('')}
+         </div>`:''}
+         <p class="hint">Un video puede aplicar a <b>menos</b> planes que su módulo: el Dashboard de KPIs es Business dentro de un módulo que incluye a los dos. A una agencia que no lo tenga, el video se le lista con candado, y no cuenta ni para su avance ni para la duración del módulo. Si volvés a tildar todos los planes del módulo, el video pasa solo a «los mismos que el módulo».</p></div>
        <div><label>Estado de producción</label>
          <div class="row"><span class="chip ${stCls(prod)}">${prod}</span>
            </div>
@@ -2476,23 +2495,8 @@ function detVid(d,m,sec){
      <div class="note v3"><b>Ajuste v3 ·</b> Apareció el campo <b>orden dentro de la sección</b>, independiente del ID, que era el faltante del MVP §3.3: antes un video no se podía reordenar nunca sin archivarlo y recrearlo. El campo es <b>opcional</b>: solo existe cuando alguien movió el video, y sin él manda la estructura. Mover un video no le toca el ID a nadie.</div>`;
   }
 
-  if(S.tab==='prod'){
-    b.innerHTML=`
-     <div class="fieldgrid">
-       <div><label for="pc">Cohorte de grabación</label><select id="pc"><option>${esc(v.c)}</option><option>Sin asignar</option></select>
-         <p class="hint">Un cohorte agrupa videos que comparten el mismo escenario de datos: se prepara una vez y se graban varios de corrido.</p></div>
-       <div><label for="pp">Prioridad de grabado</label><select id="pp"><option>${v.p}</option></select>
-         <p class="hint">P1 es lo que más se repite en los onboardings. No cambia el orden en que la agencia lo ve.</p></div>
-       <div><label>Guion</label><div class="row"><button class="btn btn-sm">${prod==='backlog'?'Escribir guion':'Ver guion'}</button>
-         <span class="hint" style="margin:0">plantilla: intro a cámara · cuerpo en pantalla · cierre</span></div></div>
-       <div><label>Escenario que hay que dejar listo antes de grabar</label>
-         <textarea rows="3" placeholder="Ej: cliente demo ya creado, file abierto con un pasajero">${prod==='backlog'?'':'Viene del video anterior del cohorte.'}</textarea></div>
-     </div>`;
-  }
-
   if(S.tab==='traza'){
     const ev=[['20/07/2026 10:12','Creado · reserva de ID','Irene']];
-    if(prod!=='backlog') ev.push(['24/07/2026 15:40','Guion aprobado','Majo']);
     if(link) ev.push(['05/08/2026 09:25','Publicado · embebido verificado','Majo']);
     if(emb==='falla') ev.push(['30/08/2026 11:02','Verificación de embebido fallida','sistema']);
     if(prod==='a regrabar') ev.push(['28/08/2026 17:35','Marcado a regrabar por cambio en sgm2026.09','Irene']);
@@ -2610,7 +2614,7 @@ function panelConfig(m){
      <div><label>La aprobación caduca si se regraba un video del módulo</label>
        <div class="radioset">${tri('pCaduca',p.caducaAlRegrabar)}</div>
        <p class="hint">Decisión 6. Lo decide quien declara el impacto del regrabado.</p></div>
-     <div><label>Al aprobar, habilita</label><div class="ro">El módulo siguiente que aplique al perfil${modSiguiente(m)?': '+modSiguiente(m):''}<span class="lock">se deriva del orden</span></div></div>
+     <div><label>Al aprobar, habilita</label><div class="ro">El módulo siguiente que aplique al plan${modSiguiente(m)?': '+modSiguiente(m):''}<span class="lock">se deriva del orden</span></div></div>
    </div>
    <div class="sep"></div>
    <div class="row">
@@ -2711,7 +2715,7 @@ function panelBanco(m){
         ${q.manual?'<span class="rowwarn">Cargada a mano en esta sesión.</span>':''}</td>
       <td>${stn?`<span class="tag ok">${esc(stn.name)}</span>`:'<span class="tag stop">sin tema</span>'}</td>
       <td>${q.ops.length}${nOk!==1?` <span class="tag stop">${nOk} correctas</span>`:''}</td>
-      <td><span class="chip ${q.estado==='activa'?'st-publicado':(q.estado==='borrador'?'st-guionado':'st-backlog')}">${q.estado}</span></td>
+      <td><span class="chip ${q.estado==='activa'?'st-publicado':(q.estado==='borrador'?'st-borrador':'st-backlog')}">${q.estado}</span></td>
       <td class="cellmono">${esc(q.repaso||'—')}</td>
       <td>${fmtFecha(q.fecha)}<br><span class="hint" style="margin:0">${esc(q.por)} · v${q.ver}</span></td>`;
     body.appendChild(tr);
@@ -3118,12 +3122,12 @@ function viewResultado(){
    ============================================================ */
 function viewAgencia(){
   const w=el('div','wrap');
-  const p=S.perfilVista;
+  const p=S.planVista;
   w.innerHTML=`<h1>Ver como agencia</h1>
     <p class="lede">Así ve la Academia una agencia de plan ${esc(p)} con la ${esc(ESCENAS[S.escena].label)}. Sirve para revisar antes de publicar, no después.</p>`;
   const sel=el('div','row');sel.style.marginBottom='16px';
   sel.innerHTML=`<span class="hint" style="margin:0">Plan de la agencia:</span>
-    ${PERFILES.map(x=>`<button class="btn btn-sm ${p===x?'btn-on':''}" data-perfil="${x}">${x}</button>`).join('')}`;
+    ${PLANES.map(x=>`<button class="btn btn-sm ${p===x?'btn-on':''}" data-plan="${x}">${x}</button>`).join('')}`;
   w.appendChild(sel);
 
   const cad=cadena(p); // incluye los fuera de plan, alineado al prototipo
@@ -3142,18 +3146,25 @@ function viewAgencia(){
     let desbloqueado=true, n=0;
     cad.forEach(c=>{
       const m=c.m;
-      /* Fuera de plan: se muestra con candado de plan, sin ordinal, y NO entra al recorrido. */
-      if(!c.aplica){
+      /* Fuera de plan: se muestra con candado de plan, sin ordinal, y NO entra al recorrido.
+         Se pregunta por los planes, NO por `c.aplica`: ese además excluye los módulos en
+         preparación, así que un reservado que sí está en el plan —BAK-M35— caía acá y se
+         le decía a la agencia "no incluido en tu plan", que es falso. Va abajo, con
+         "próximamente". `cadena()` no se toca: su `aplica` es la base del recorrido 9/11. */
+      if(!m.planes.includes(p)){
         const card=el('div','modcard lock');
-        const planIncluye=m.perfiles.join(' + ')||'ningún plan';
+        /* Copy citado textual del prototipo aprobado (modulos.html:194-196). Una
+           previsualización que parafrasea no sirve para controlar antes de publicar. */
+        const planIncluye=m.planes.join(' + ')||'ningún plan';
         card.innerHTML=`<div class="num"><span class="icon" data-icon="lock"></span></div><div class="body"><b>${esc(m.name)}</b>
-          <span class="tag plan" style="margin-left:8px">${esc(m.tag)}</span>
-          <div class="hint">No entra en tu plan ${esc(p)}. Incluido en: <b>${esc(planIncluye)}</b>. Para sumarlo, escribile a Soporte. No cuenta para tu avance ni te traba.</div></div>`;
+          <span class="tag plan" style="margin-left:8px">Plan ${esc(planIncluye)}</span>
+          <div class="hint">No incluido en tu plan. Es parte del plan ${esc(planIncluye)}. Si tu agencia lo necesita, escribinos. No cuenta para tu avance ni te traba.</div></div>`;
         frame.appendChild(card);
         return;
       }
-      /* Aplica pero no publicado todavía. Con publicación en orden esto no deja huecos. */
-      if(!c.pub){
+      /* Está en el plan pero todavía no se ve: o está reservado (`!c.aplica`) o no se
+         publicó. Con publicación en orden esto no deja huecos. */
+      if(!c.aplica||!c.pub){
         const card=el('div','modcard lock');
         card.innerHTML=`<div class="num">·</div><div class="body"><b>${esc(m.name)}</b>
           <span class="tag" style="margin-left:8px">próximamente</span>
@@ -3170,8 +3181,15 @@ function viewAgencia(){
         ${desbloqueado?'':'<span class="tag" style="margin-left:8px">se desbloquea al aprobar el anterior</span>'}
         ${desbloqueado?`<div class="hint" style="margin-top:4px">${esc(m.resumen||'')}</div>
           <div style="margin-top:8px">${vids.map(x=>{
-            const aplica=videoAplicable(m,x.v,p), propio=x.v.tag&&x.v.tag!==m.tag;
-            return `<div class="vidline${aplica?'':' off'}">${aplica?ico('chevron-right','icon-sm'):ico('lock','icon-sm')} ${esc(x.v.t)} <span class="hint" style="display:inline">${aplica?esc(x.v.dur):'no entra en tu plan '+esc(p)}${propio?' · <span class="tag plan">'+esc(x.v.tag)+' (plan propio)</span>':''}</span></div>`;
+            /* Mismo predicado que la ficha del video: `planesPropios`. Antes acá se
+               comparaba contra el módulo y en la ficha se preguntaba si el campo
+               existía, y un video podía ser "propio" en una pantalla y no en la otra. */
+            const aplica=videoAplicable(m,x.v,p), propio=planesPropios(m,x.v);
+            /* Badge citado textual del prototipo aprobado (modulo.html:206): la agencia
+               lee "Plan Business", sin frase. Y solo en el video que NO puede abrir, que
+               es donde el badge explica algo: a una agencia Business decirle "Plan
+               Business" sobre un video que sí tiene es ruido. */
+            return `<div class="vidline${aplica?'':' off'}">${aplica?ico('chevron-right','icon-sm'):ico('lock','icon-sm')} ${esc(x.v.t)} <span class="hint" style="display:inline">${aplica?esc(x.v.dur):(propio?'<span class="tag plan">Plan '+esc(x.v.planes.join(' + '))+'</span>':'')}</span></div>`;
           }).join('')||'<div class="hint">Sin videos visibles.</div>'}
           ${vids.length!==delPlanV.length?`<div class="hint">${delPlanV.length} de ${vids.length} videos entran en tu plan. Los otros no cuentan para tu avance ni para la duración del módulo.</div>`:''}
           <div class="row" style="margin-top:8px"><button class="btn btn-sm btn-p" data-go2="preview|${m.id}">Hacer la evaluación</button>
@@ -3190,24 +3208,24 @@ function viewAgencia(){
    IMPORTAR (estructura, videos y preguntas)
    ============================================================ */
 const FILAS_E=[
- ['FRT-M00','Fundamentos del frontend','Concepto y acceso','P+B','10',null],
- ['FRT-M10','Reservas del cliente final','Buscar y reservar','P+B','20',null],
- ['FRT-M10','Reservas del cliente final','Pagos y confirmación','P+B','20',null],
- ['FRT-M20','Mi cuenta','','P+B','30','Sin sección: el módulo se crea con una sección "General". Aviso, no error.'],
- ['BAK-M30','Voucher / Servicios','Voucher y cobro','P+B','40','Ya existe: no se duplica, la fila se omite.'],
- ['FRT-M10','Reservas del cliente final','Buscar y reservar','B','20','Plan distinto al de la primera fila del mismo módulo. Hay que elegir cuál vale.'],
- ['CRM-M00','Deal Closer (cobertura mínima)','General','P+B','10','La superficie CRM es de gobernanza externa: requiere confirmación de Producto antes de crear módulos.']
+ ['FRT-M00','Fundamentos del frontend','Concepto y acceso','Professional + Business','10',null],
+ ['FRT-M10','Reservas del cliente final','Buscar y reservar','Professional + Business','20',null],
+ ['FRT-M10','Reservas del cliente final','Pagos y confirmación','Professional + Business','20',null],
+ ['FRT-M20','Mi cuenta','','Professional + Business','30','Sin sección: el módulo se crea con una sección "General". Aviso, no error.'],
+ ['BAK-M30','Voucher / Servicios','Voucher y cobro','Professional + Business','40','Ya existe: no se duplica, la fila se omite.'],
+ ['FRT-M10','Reservas del cliente final','Buscar y reservar','Business','20','Planes distintos a los de la primera fila del mismo módulo. Hay que elegir cuáles valen.'],
+ ['CRM-M00','Deal Closer (cobertura mínima)','General','Professional + Business','10','La superficie CRM es de gobernanza externa: requiere confirmación de Producto antes de crear módulos.']
 ];
 const FILAS_V=[
- ['BAK-M30.060','Estados del voucher y cotización','P+B','P3','C12',null],
- ['BAK-M30.070','Modelos: armar plantillas de venta reutilizables','P+B','P3','C12',null],
- ['BAK-M40.060','Anular un recibo ya emitido','P+B','P3','C14',null],
- ['BAK-M31.010','Tráfico: asignación de butaca','P+B','P3','—','El módulo BAK-M31 no existe.'],
- ['BAK-M50.070','Factura E de exportación','P+B','P3','C15',null],
- ['BAK-M70.050','Conciliación bancaria automática','P+B','P3','C17',null],
- ['BAK-M35.010','Tráfico: asignación de butaca','P+B','P3','—','Ya existe un video con este ID en la Academia.'],
- ['BAK-M80.050','Informe de rentabilidad por vendedor','','P3','C18','Falta el plan al que aplica (P+B, B o B-nicho).'],
- ['BAK-M20.070','Unificar clientes duplicados','P+B','P2','C06',null]
+ ['BAK-M30.060','Estados del voucher y cotización','Professional + Business',null],
+ ['BAK-M30.070','Modelos: armar plantillas de venta reutilizables','Professional + Business',null],
+ ['BAK-M40.060','Anular un recibo ya emitido','Professional + Business',null],
+ ['BAK-M31.010','Tráfico: asignación de butaca','Professional + Business','El módulo BAK-M31 no existe.'],
+ ['BAK-M50.070','Factura E de exportación','Professional + Business',null],
+ ['BAK-M70.050','Conciliación bancaria automática','Professional + Business',null],
+ ['BAK-M35.010','Tráfico: asignación de butaca','Professional + Business','Ya existe un video con este ID en la Academia.'],
+ ['BAK-M80.050','Informe de rentabilidad por vendedor','','Faltan los planes que lo incluyen (Professional, Business o los dos).'],
+ ['BAK-M20.070','Unificar clientes duplicados','Professional + Business',null]
 ];
 /* El pegado de preguntas. Las filas ya no traen el error escrito: se calcula contra
    el módulo DESTINO, que es el de la consola. Antes cada fila decía "BAK-M40" y su
@@ -3269,7 +3287,13 @@ function resolverFilasP(m){
 }
 /* Los avisos entran igual; los errores, no. Mismo criterio que ya usaba la vista. */
 const esAviso=e=>!!e&&(e.indexOf('Aviso')>=0||e.indexOf('se omite')>=0);
-const errDe=(modo,f)=>modo==='preguntas'?f.err:f[5];
+/* El error va último en la fila, y "último" ya no es el mismo índice en los dos
+   modos: la fila de videos perdió prioridad y cohorte al salir la producción de
+   contenido del MVP. Van dos constantes y no un objeto indexado por `modo`
+   —aunque acá el valor sea cerrado— por lo mismo que ALIAS_EV es un Map.
+   Si esto se desalinea, la tabla deja de pintar los errores EN SILENCIO. */
+const ERR_V=3, ERR_E=5;
+const errDe=(modo,f)=>modo==='preguntas'?f.err:f[modo==='videos'?ERR_V:ERR_E];
 
 function viewImportar(){
   const w=el('div','wrap');
@@ -3295,11 +3319,11 @@ function viewImportar(){
 
   const ph={
    estructura:'FRT-M00\tFundamentos del frontend\tConcepto y acceso\tP+B\t10',
-   videos:'BAK-M30.060\tEstados del voucher y cotización\tP+B\tP3\tC12',
+   videos:'BAK-M30.060\tEstados del voucher y cotización\tP+B',
    preguntas:'BAK-M40\tBAK-M40.S1\t¿Qué recibo agrupa varios files?\tDetallado\tIndicado\tAutomático\tNinguno\tA\tactiva'}[modo];
   const cols={
-   estructura:'ID del módulo (opcional, lo generamos si falta) · nombre del módulo · nombre de la sección · plan · orden',
-   videos:'ID (opcional) · qué enseña · plan · prioridad · cohorte',
+   estructura:'ID del módulo (opcional, lo generamos si falta) · nombre del módulo · nombre de la sección · planes · orden',
+   videos:'ID (opcional) · qué enseña · planes',
    preguntas:'módulo · tema (ID de la sección, o su nombre) · enunciado · opción A · B · C · D · letra de la correcta · estado (activa o borrador)'}[modo];
 
   if(S.impPaso===1){
@@ -3326,8 +3350,8 @@ function viewImportar(){
   tb.innerHTML=modo==='preguntas'
     ?`<thead><tr><th style="width:26px"></th><th style="width:90px">Módulo</th><th style="width:170px">Tema</th><th>Enunciado</th><th style="width:70px">Correcta</th><th style="width:80px">Estado</th></tr></thead>`
     :(modo==='videos'
-      ?`<thead><tr><th style="width:26px"></th><th style="width:110px">ID</th><th>Qué enseña</th><th style="width:60px">Plan</th><th style="width:50px">Pri.</th><th style="width:70px">Cohorte</th></tr></thead>`
-      :`<thead><tr><th style="width:26px"></th><th style="width:90px">Módulo</th><th style="width:26%">Nombre del módulo</th><th>Sección</th><th style="width:60px">Plan</th><th style="width:60px">Orden</th></tr></thead>`);
+      ?`<thead><tr><th style="width:26px"></th><th style="width:110px">ID</th><th>Qué enseña</th><th style="width:110px">Planes</th></tr></thead>`
+      :`<thead><tr><th style="width:26px"></th><th style="width:90px">Módulo</th><th style="width:26%">Nombre del módulo</th><th>Sección</th><th style="width:110px">Planes</th><th style="width:60px">Orden</th></tr></thead>`);
   const body=el('tbody');
   filas.forEach((f,i)=>{
     if(S.omit.has(i)) return;
@@ -3348,7 +3372,7 @@ function viewImportar(){
       else if(e.indexOf('tema')>=0) botones+='<button class="btn btn-sm" data-fix="'+i+'">Crear el tema</button><button class="btn btn-sm" data-fix="'+i+'">Elegir uno existente</button>';
       if(e.indexOf('repetido')>=0) botones+='<button class="btn btn-sm" data-fix="'+i+'">Quedarme con una</button>';
       if(e.indexOf('letra')>=0||e.indexOf('Sin letra')>=0) botones+='<button class="btn btn-sm" data-fix="'+i+'">Elegir la correcta</button>';
-      if(e.indexOf('Plan distinto')>=0) botones+='<button class="btn btn-sm" data-fix="'+i+'">Usar P+B</button><button class="btn btn-sm" data-fix="'+i+'">Usar B</button>';
+      if(e.indexOf('Planes distintos')>=0) botones+='<button class="btn btn-sm" data-fix="'+i+'">Usar Professional + Business</button><button class="btn btn-sm" data-fix="'+i+'">Usar solo Business</button>';
       if(e.indexOf('confirmación')>=0) botones+='<button class="btn btn-sm" data-fix="'+i+'">Pedir confirmación a Producto</button>';
       if(!botones) botones='<button class="btn btn-sm" data-fix="'+i+'">Corregir</button>';
       botones+=`<button class="btn btn-sm" data-skip="${i}">Omitir fila</button>`;
@@ -3360,9 +3384,9 @@ function viewImportar(){
         <td>${f.st?`<span class="tag ok">${esc(f.temaNombre)}</span>`:`<span class="tag stop">${esc(f.temaNombre)||'sin tema'}</span>`}</td>
         <td>${esc(f.e)}${fix}</td>
         <td class="cellmono">${esc(f.correcta)||'<span class="bad">—</span>'}</td>
-        <td><span class="chip ${f.estado==='activa'?'st-publicado':'st-guionado'}">${esc(f.estado)}</span></td>`
+        <td><span class="chip ${f.estado==='activa'?'st-publicado':'st-borrador'}">${esc(f.estado)}</span></td>`
       :(modo==='videos'
-        ?`<td>${mk}</td><td class="cellmono">${esc(f[0])}</td><td>${esc(f[1])}${fix}</td><td>${esc(f[2])||'<span class="bad">—</span>'}</td><td>${esc(f[3])}</td><td>${esc(f[4])}</td>`
+        ?`<td>${mk}</td><td class="cellmono">${esc(f[0])}</td><td>${esc(f[1])}${fix}</td><td>${esc(f[2])||'<span class="bad">—</span>'}</td>`
         :`<td>${mk}</td><td class="cellmono">${esc(f[0])}</td><td>${esc(f[1])}</td><td>${esc(f[2])||'<span class="miss">sin sección</span>'}${fix}</td><td>${esc(f[3])}</td><td class="cellmono">${esc(f[4])}</td>`);
     body.appendChild(tr);
   });
@@ -3472,7 +3496,7 @@ function viewMeet(){
     const turno=(TURNOS[agId]||[]).find(x=>x.modId===modId);
     const dd=dudas.filter(d=>d.modId===modId);
     const box=el('div','card');box.style.marginBottom='16px';
-    const chip={'abierto':'st-guionado','agendado':'st-publicado','consumido':'st-backlog','sin-lugares':'st-backlog'}[est];
+    const chip={'abierto':'st-borrador','agendado':'st-publicado','consumido':'st-backlog','sin-lugares':'st-backlog'}[est];
     box.innerHTML=`<div style="padding:16px 24px;border-bottom:1px solid var(--line-soft);display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <span class="idbadge">${m.id}</span><b>${esc(m.name)}</b>
         <span class="chip ${chip}">${est==='sin-lugares'?'sin dudas':est}</span>
@@ -3608,13 +3632,13 @@ function viewPanelMacro(){
   const bak=mapaBAK();
   w.appendChild(el('h2','','Completitud y reprobación por módulo'));
   const tw=el('div','tablewrap');const tb=el('table');
-  tb.innerHTML=`<thead><tr><th>Módulo</th><th style="width:120px">Plan</th><th style="width:150px">% completado</th><th style="width:150px">Tasa de reprobación</th><th style="width:130px">Señal</th></tr></thead><tbody>`+
+  tb.innerHTML=`<thead><tr><th>Módulo</th><th style="width:120px">Planes</th><th style="width:150px">% completado</th><th style="width:150px">Tasa de reprobación</th><th style="width:130px">Señal</th></tr></thead><tbody>`+
     bak.map(m=>{
       const compl=USO_MUESTRA[m.id]?USO_MUESTRA[m.id][0]:20;
       const repro=USO_MUESTRA[m.id]?USO_MUESTRA[m.id][1]:10;
       const alerta=repro>=20;
       return `<tr data-warn="${alerta}"><td><span class="idbadge">${m.id}</span> ${esc(m.name)}</td>
-        <td>${esc(m.tag)}</td>
+        <td>${esc(m.planes.join(" + "))} <span class="tag">${etiquetaPlanes(m)}</span></td>
         <td><div class="row" style="gap:8px"><span class="cellmono">${compl}%</span><div class="bar" style="flex:1;max-width:100px"><i style="width:${compl}%"></i></div></div></td>
         <td><div class="row" style="gap:8px"><span class="cellmono">${repro}%</span><div class="bar ${alerta?'zero':'low'}" style="flex:1;max-width:100px"><i style="width:${Math.min(100,repro*3)}%"></i></div></div></td>
         <td>${alerta?'<span class="tag stop">revisar contenido</span>':'<span class="tag ok">ok</span>'}</td></tr>`;
@@ -3693,7 +3717,7 @@ function viewParams(){
    EVENTOS
    ============================================================ */
 document.addEventListener('click',ev=>{
-  const t=ev.target.closest('[data-go],[data-go2],[data-jump],[data-door],[data-esc],[data-sup],[data-toggle],[data-sel],[data-add],[data-ins],[data-quick],[data-modo],[data-secsave],[data-amsave],[data-tab],[data-evtab],[data-pmsave],[data-qnew],[data-bulk],[data-bbulk],[data-imp],[data-impmodo],[data-fix],[data-fixmod],[data-skip],[data-info],[data-perfil],[data-arch],[data-pub],[data-vid-pub],[data-qsave],[data-qopt],[data-qdup],[data-ballcheck],[data-resort],[data-verres],[data-vercorr],[data-vord],[data-sord],[data-mord],[data-meetag],[data-panelag],[data-meetagendar],#collapseAll');
+  const t=ev.target.closest('[data-go],[data-go2],[data-jump],[data-door],[data-esc],[data-sup],[data-toggle],[data-sel],[data-add],[data-ins],[data-quick],[data-modo],[data-secsave],[data-amsave],[data-tab],[data-evtab],[data-pmsave],[data-qnew],[data-bulk],[data-bbulk],[data-imp],[data-impmodo],[data-fix],[data-fixmod],[data-skip],[data-info],[data-plan],[data-arch],[data-pub],[data-vid-pub],[data-qsave],[data-qopt],[data-qdup],[data-ballcheck],[data-resort],[data-verres],[data-vercorr],[data-vord],[data-sord],[data-mord],[data-meetag],[data-panelag],[data-meetagendar],#collapseAll');
   if(!t||t.disabled) return;
 
   if(t.dataset.go){S.screen=t.dataset.go;S.impPaso=1;render();return;}
@@ -3750,7 +3774,7 @@ document.addEventListener('click',ev=>{
 
   if(t.dataset.esc){S.escena=t.dataset.esc;S.checked.clear();S.bChecked.clear();S.quick=null;S.qsec=null;S.muestra=null;S.respuestas={};if(!modsVis().length)S.sel=null;render();return;}
   if(t.dataset.sup){S.superficie=t.dataset.sup;S.sel=null;S.quick=null;S.qsec=null;render();return;}
-  if(t.dataset.perfil){S.perfilVista=t.dataset.perfil;render();return;}
+  if(t.dataset.plan){S.planVista=t.dataset.plan;render();return;}
   if(t.dataset.meetag){S.meetAg=t.dataset.meetag;render();return;}
   if(t.dataset.panelag){S.panelAg=t.dataset.panelag;render();return;}
   if(t.dataset.meetagendar){const est=cupoEstado(S.meetAg||AGENCIAS[0].id,t.dataset.meetagendar);
@@ -3796,10 +3820,10 @@ document.addEventListener('click',ev=>{
   if(t.dataset.amsave){
     const nombre=($('#anNombre')&&$('#anNombre').value.trim())||'';
     if(!nombre){toast('Falta el nombre del módulo: es el único campo que el sistema no puede derivar.');return;}
-    const perfiles=Array.from(document.querySelectorAll('.apPerf')).filter(x=>x.checked).map(x=>x.value);
+    const planes=Array.from(document.querySelectorAll('.apPlan')).filter(x=>x.checked).map(x=>x.value);
     const orden=parseInt(($('#anOrden')&&$('#anOrden').value)||nextOrden(S.superficie),10);
     const sec=($('#anSec')&&$('#anSec').value.trim())||'';
-    const m=crearModulo({sup:S.superficie,name:nombre,tag:S.amPlan,perfiles,orden,seccion:sec?[sec]:[]});
+    const m=crearModulo({sup:S.superficie,name:nombre,planes,nicho:S.amNicho,orden,seccion:sec?[sec]:[]});
     toast('Módulo '+m.id+' creado en preparación'+(sec?', con la sección "'+sec+'"':', todavía sin secciones')+'. No lo ve ninguna agencia hasta pasar el checklist.');
     if(t.dataset.amsave==='more'){render();return;}
     S.screen='constructor';S.open[m.id]=true;S.bModId=m.id;S.sel={kind:'mod',modId:m.id};S.tab='ficha';render();return;
@@ -3824,8 +3848,8 @@ document.addEventListener('click',ev=>{
       /* Entra con un orden intermedio: el ID intercalado y el orden de dictado
          se deciden por separado, aunque acá coincidan. */
       const oa=ordenEfectivo(sec,ord[i]), ob=ord[i+1]?ordenEfectivo(sec,ord[i+1]):oa+10;
-      sec.videos.splice(sec.videos.indexOf(ord[i])+1,0,{seq,t:ti,p:'P3',c:'—',dur:grabado?'3:30':'',durEst:grabado?'':'4:00',orden:(oa+ob)/2});
-    } else sec.videos.push({seq,t:ti,p:'P3',c:'—',dur:grabado?'3:30':'',durEst:grabado?'':'4:00'});
+      sec.videos.splice(sec.videos.indexOf(ord[i])+1,0,{seq,t:ti,dur:grabado?'3:30':'',durEst:grabado?'':'4:00',orden:(oa+ob)/2});
+    } else sec.videos.push({seq,t:ti,dur:grabado?'3:30':'',durEst:grabado?'':'4:00'});
     toast('Guardado como '+mod.id+'.'+seq+' · no elegiste superficie, módulo, sección ni orden.');
     if(a==='save'){const si=S.quick.secIdx;S.quick=null;S.sel={kind:'vid',modId:mod.id,secIdx:si,vidSeq:seq};S.tab='ficha';}
     else S.quick={modId:mod.id,secIdx:S.quick.secIdx,modo:S.quick.modo};
@@ -3905,7 +3929,6 @@ document.addEventListener('click',ev=>{
     if(a==='clear'){S.checked.clear();render();return;}
     const msg={regrabar:n+' videos marcados a regrabar. Dos clics en vez de '+n+' recorridos completos.',
       despublicar:n+' videos despublicados. El estado de producción no se tocó: la historia queda intacta.',
-      cohorte:'Asignar cohorte a '+n+' videos de una sola vez.',
       mover:'Mover '+n+' videos a otra sección. El ID se mantiene si el módulo no cambia.',
       verificar:'Verificando el embebido de '+n+' videos contra YouTube…',
       archivar:'Archivar '+n+' videos. Conservan ID e historial; el ID no se reutiliza.'}[a];
@@ -3970,9 +3993,9 @@ document.addEventListener('click',ev=>{
         /* crea de verdad la estructura FRT del pegado */
         const yaFRT=DATA.some(m=>m.sup==='FRT');
         if(!yaFRT){
-          crearModulo({sup:'FRT',name:'Fundamentos del frontend',tag:'P+B',perfiles:[...PERFILES],orden:10,seccion:['Concepto y acceso']});
-          crearModulo({sup:'FRT',name:'Reservas del cliente final',tag:'P+B',perfiles:[...PERFILES],orden:20,seccion:['Buscar y reservar','Pagos y confirmación']});
-          crearModulo({sup:'FRT',name:'Mi cuenta',tag:'P+B',perfiles:[...PERFILES],orden:30,seccion:['General']});
+          crearModulo({sup:'FRT',name:'Fundamentos del frontend',planes:[...PLANES],orden:10,seccion:['Concepto y acceso']});
+          crearModulo({sup:'FRT',name:'Reservas del cliente final',planes:[...PLANES],orden:20,seccion:['Buscar y reservar','Pagos y confirmación']});
+          crearModulo({sup:'FRT',name:'Mi cuenta',planes:[...PLANES],orden:30,seccion:['General']});
         }
         S.superficie='FRT';S.screen='constructor';
         DATA.filter(m=>m.sup==='FRT').forEach(m=>S.open[m.id]=true);
@@ -3995,8 +4018,8 @@ document.addEventListener('click',ev=>{
   if(t.dataset.fixmod){
     const idm=t.dataset.fixmod;
     if(findMod(idm)){toast('El módulo '+idm+' ya existe.');return;}
-    const m=crearModulo({sup:idm.split('-')[0],id:idm,name:'Módulo '+idm+' (nombre a completar)',tag:'P+B',perfiles:[...PERFILES],seccion:['General']});
-    FILAS_V.forEach(f=>{if(f[0].indexOf(idm+'.')===0) f[5]=null;});
+    const m=crearModulo({sup:idm.split('-')[0],id:idm,name:'Módulo '+idm+' (nombre a completar)',planes:[...PLANES],seccion:['General']});
+    FILAS_V.forEach(f=>{if(f[0].indexOf(idm+'.')===0) f[ERR_V]=null;});
     toast('Módulo creado como '+m.id+' en preparación, con una sección "General". La fila del pegado quedó lista para importar; falta ponerle nombre real.');
     render();return;
   }
@@ -4011,7 +4034,7 @@ document.addEventListener('click',ev=>{
     m.pubManual=t.dataset.pub==='on';
     render();
     toast(t.dataset.pub==='on'
-      ?'Módulo publicado. Registrado: M. Luna, '+new Date().toLocaleDateString('es-AR')+'. Las agencias de los perfiles asignados ya lo ven.'
+      ?'Módulo publicado. Registrado: M. Luna, '+new Date().toLocaleDateString('es-AR')+'. Las agencias de los planes asignados ya lo ven.'
       :'Módulo despublicado. Los videos conservan su estado de producción; solo dejó de exponerse.');
     return;
   }
@@ -4113,8 +4136,11 @@ document.addEventListener('change',ev=>{
   if(t.dataset&&t.dataset.check!==undefined){t.checked?S.checked.add(t.dataset.check):S.checked.delete(t.dataset.check);render();return;}
   if(t.dataset&&t.dataset.bcheck!==undefined){t.checked?S.bChecked.add(t.dataset.bcheck):S.bChecked.delete(t.dataset.bcheck);render();return;}
   if(t.name==='modo'&&S.quick){S.quick.modo=t.value;render();return;}
-  if(t.name==='anPlan'){
-    S.amPlan=t.value;
+  /* Planes del módulo que se está dando de alta. Vuelve a renderizar para refrescar
+     la etiqueta corta derivada, así que hay que devolverle al formulario lo tipeado. */
+  if(t.classList.contains('apPlan')||t.id==='anNicho'){
+    S.amPlanes=Array.from(document.querySelectorAll('.apPlan')).filter(x=>x.checked).map(x=>x.value);
+    S.amNicho=!!($('#anNicho')&&$('#anNicho').checked);
     const n=$('#anNombre')?$('#anNombre').value:'';
     const s=$('#anSec')?$('#anSec').value:'';
     const o=$('#anOrden')?$('#anOrden').value:'';
@@ -4123,6 +4149,31 @@ document.addEventListener('change',ev=>{
     if($('#anSec'))$('#anSec').value=s;
     if($('#anOrden')&&o)$('#anOrden').value=o;
     return;
+  }
+  /* Planes del VIDEO. Este control existía dibujado pero sin rama acá, así que se
+     pintaba según el dato y no lo podía cambiar: el único caso propio del dataset
+     (el Dashboard de KPIs) era lo único que se podía mostrar.
+     La normalización es la que sostiene que "propio" signifique una sola cosa: si el
+     conjunto elegido termina siendo el del módulo, se BORRA `v.planes` en lugar de
+     guardarlo igual. Así `planesPropios` —que solo pregunta si el campo existe— y
+     "difiere del módulo" son la misma pregunta, por construcción. */
+  if(t.name==='vplan'||t.name==='vplanes'){
+    if(S.sel.kind!=='vid') return;
+    const m=findMod(S.sel.modId),sec=m.secciones[S.sel.secIdx];
+    const v=sec.videos.find(x=>x.seq===S.sel.vidSeq);
+    if(!v) return;
+    const id=m.id+'.'+v.seq;
+    if(t.name==='vplan'){
+      if(t.value==='mismos'){ delete v.planes; S.vplanAbierto=null; toast('Este video vuelve a incluir los mismos planes que el módulo.'); }
+      else { S.vplanAbierto=id; toast('Destildá los planes que no lo incluyen. Mientras queden todos, sigue heredando del módulo.'); }
+    } else {
+      const elegidos=Array.from(document.querySelectorAll('input[name="vplanes"]')).filter(x=>x.checked).map(x=>x.value);
+      if(!elegidos.length){toast('Sin ningún plan el video no lo vería nadie. Dejá al menos uno.');render();return;}
+      S.vplanAbierto=id;
+      if(elegidos.length===m.planes.length){ delete v.planes; toast('Quedaron todos los planes del módulo, así que el video los hereda.'); }
+      else { v.planes=elegidos; toast('Este video ahora lo incluye solo: '+elegidos.join(' + ')+'. A las demás agencias se les lista con candado.'); }
+    }
+    render();return;
   }
 });
 

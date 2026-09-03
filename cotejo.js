@@ -14,6 +14,9 @@
      3. que cada video esté en la sección aprobada, y en el orden aprobado
      4. las invariantes del contrato: recorrido 9/11, IDs de sección únicos,
         y que el tema de cada pregunta sea una sección de su propio módulo
+     4.b los planes: que todo módulo declare planes válidos, que los planes propios de
+        un video sean un subconjunto estricto de los de su módulo, y que los planes
+        efectivos de cada video sean los aprobados
      5. el banco de preguntas: que llegue al mínimo, que cubra todos los temas de los
         módulos del recorrido, que en el momento inicial no haya banco vigente, que los IDs
         de pregunta sean únicos y con formato, que la vigencia sea un momento válido, y que
@@ -44,7 +47,7 @@ const A = global.window.ACADEMIA;
    que el banco —que se genera en initMod— quedaba afuera y no había forma de
    controlarlo.
    Lo único que hay que darle de afuera es lo que el bloque usa y se declara antes:
-   PERFILES y USERS. Si estos dos marcadores se mueven o se renombran, el script
+   PLANES y USERS. Si estos dos marcadores se mueven o se renombran, el script
    falla acá con un error explícito y no con un diff vacío. */
 const html = fs.readFileSync(path.join(AQUI, 'index.html'), 'utf8');
 const ABRE = 'const GLOBAL={', CIERRA = 'DATA.forEach(initMod);';
@@ -54,7 +57,7 @@ if (ini < 0 || fin < 0) {
   console.error('Se busca desde "' + ABRE + '" hasta "' + CIERRA + '": si se renombró o se movió, hay que actualizar cotejo.js.');
   process.exit(2);
 }
-const PERFILES = ['Professional', 'Business'];
+const PLANES = ['Professional', 'Business'];
 const USERS = ['M. Luna', 'Majo', 'Irene'];
 /* Se sacan DOS cosas del bloque, no una: el dato y la tabla de orden de los
    momentos. Antes este script declaraba su propia copia de la lista de momentos,
@@ -79,10 +82,13 @@ const ULTIMO = MOMENTOS.reduce((a, b) => (ORD[b] > ORD[a] ? b : a));
 const PROPIOS = { 'BAK-M10.070': 'archivado', 'BAK-M35.010': 'módulo reservado' };
 
 const aprobado = {}, backoffice = {};
+/* Los planes EFECTIVOS: que el video no los declare significa, de los dos lados,
+   "los mismos que el módulo". Sin esto el plan por video quedaba fuera del cotejo. */
 A.modulos.forEach(m => m.secciones.forEach((s, si) => s.videos.forEach((v, vi) =>
-  aprobado[v.id] = { t: v.titulo, sec: s.titulo, si, vi })));
+  aprobado[v.id] = { t: v.titulo, sec: s.titulo, si, vi, planes: (v.planes || m.planes).slice().sort() })));
 DATA.forEach(m => (m.secciones || []).forEach((s, si) => (s.videos || []).forEach((v, vi) =>
-  backoffice[m.id + '.' + v.seq] = { t: v.t, sec: s.name, si, vi })));
+  backoffice[m.id + '.' + v.seq] = { t: v.t, sec: s.name, si, vi, mod: m,
+    propios: v.planes || null, planes: (v.planes || m.planes).slice().sort() })));
 
 const fallos = [];
 const chequeo = (ok, msg) => { console.log((ok ? '  ok   ' : '  FALLA ') + msg); if (!ok) fallos.push(msg); };
@@ -108,7 +114,7 @@ const dOrd = comunes.filter(id => aprobado[id].si !== backoffice[id].si || aprob
 chequeo(dOrd.length === 0, dOrd.length + ' videos están en otra posición' + (dOrd.length ? ': ' + dOrd.join(', ') : ''));
 
 /* 4 · invariantes del contrato -------------------------------------------- */
-const rec = p => DATA.filter(m => m.id.split('-')[0] === 'BAK' && m.perfiles.indexOf(p) !== -1 && !m.enPrep).length;
+const rec = p => DATA.filter(m => m.id.split('-')[0] === 'BAK' && m.planes.indexOf(p) !== -1 && !m.enPrep).length;
 chequeo(rec('Professional') === 9, 'recorrido Professional = 9 (da ' + rec('Professional') + ')');
 chequeo(rec('Business') === 11, 'recorrido Business = 11 (da ' + rec('Business') + ')');
 
@@ -120,6 +126,36 @@ chequeo(secIds.every(Boolean) && new Set(secIds).size === secIds.length,
 const nSecAprobadas = A.modulos.reduce((a, m) => a + m.secciones.length, 0);
 const nSecAca = secIds.length - 1; /* la de BAK-M35, reservado, no está en el mapa aprobado */
 chequeo(nSecAca === nSecAprobadas, nSecAprobadas + ' secciones aprobadas (acá ' + nSecAca + ' + 1 del módulo reservado)');
+
+/* 4.b · los planes, que hasta ahora no cotejaba nadie ---------------------- */
+/* Un módulo sin planes no lo ve ninguna agencia: no es un estado válido del dato. */
+const sinPlanes = DATA.filter(m => !m.planes || !m.planes.length);
+const planRaro = DATA.filter(m => (m.planes || []).some(p => PLANES.indexOf(p) === -1));
+chequeo(sinPlanes.length === 0 && planRaro.length === 0,
+  'los ' + DATA.length + ' módulos declaran planes, y todos son planes que existen' +
+  (sinPlanes.length ? ' · sin planes: ' + sinPlanes.map(m => m.id).join(', ') : '') +
+  (planRaro.length ? ' · plan desconocido: ' + planRaro.map(m => m.id).join(', ') : ''));
+
+/* Un video no puede alcanzar un plan que su módulo no incluye: el módulo es la puerta.
+   Y si declara exactamente los del módulo, sobra: eso es heredar, y las dos formas de
+   escribir lo mismo son las que hacían que "propio" significara dos cosas distintas. */
+const fuera = [], redundantes = [];
+Object.keys(backoffice).forEach(id => {
+  const b = backoffice[id];
+  if (!b.propios) return;
+  if (b.propios.some(p => b.mod.planes.indexOf(p) === -1)) fuera.push(id);
+  if (b.propios.length === b.mod.planes.length) redundantes.push(id);
+});
+chequeo(fuera.length === 0 && redundantes.length === 0,
+  'los planes propios de cada video son un subconjunto estricto de los de su módulo' +
+  (fuera.length ? ' · fuera del módulo: ' + fuera.join(', ') : '') +
+  (redundantes.length ? ' · iguales al módulo, hay que borrarlos: ' + redundantes.join(', ') : ''));
+
+/* Y contra el aprobado, que es el que manda. */
+const dPlan = comunes.filter(id => aprobado[id].planes.join('+') !== backoffice[id].planes.join('+'));
+chequeo(dPlan.length === 0, dPlan.length + ' videos incluyen planes distintos del aprobado' +
+  (dPlan.length ? ': ' + dPlan.map(id => id + ' (acá ' + backoffice[id].planes.join('+') +
+    ', aprobado ' + aprobado[id].planes.join('+') + ')').join(', ') : ''));
 
 /* 5 · el banco de preguntas ------------------------------------------------ */
 /* Una lista larga en una sola línea no se lee: se muestran los primeros y se dice

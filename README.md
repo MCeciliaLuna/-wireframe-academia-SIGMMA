@@ -19,7 +19,7 @@ antes de estimar o de escribir una línea de código:
 
 | Rama | Qué es | Estado |
 |---|---|---|
-| **`main`** | **El backoffice de gestión de la Academia**, en un solo archivo: `index.html`. Administra módulos, secciones, videos, bancos, planes, Meet, certificados y los paneles de avance. | **Canónica. Es la que manda.** |
+| **`main`** | **El backoffice de gestión de la Academia**, en un solo archivo: `index.html`. Administra módulos, secciones, videos, bancos, planes, Meet, certificados y los paneles de avance. **No administra la fabricación del contenido** —cohorte de grabación, guion, prioridad de rodaje—: eso es la rama de abajo. | **Canónica. Es la que manda.** |
 | `feat/simplificacion-bloque-a` | Backoffice **multipágina de producción de contenido**: cohortes, guiones, tablero de rodaje, importador. Es la herramienta de trabajo de Capacitación para *fabricar* los videos. | Otro producto, otro alcance. **Fuera de este MVP.** |
 | `inicio-panel-de-modulos` | Estado intermedio de esa misma línea multipágina. | Histórica. No usar. |
 
@@ -75,7 +75,9 @@ La regla: **si se puede derivar, se deriva.**
 
 | Se deriva | De qué sale |
 |---|---|
-| Recorrido y su total (9 / 11) | `modulo.perfiles` ∩ plan de la agencia, excluyendo los reservados |
+| Recorrido y su total (9 / 11) | `modulo.planes` ∩ plan de la agencia, excluyendo los reservados |
+| Planes de un video | `video.planes` si existe; si no, los del módulo — la ausencia **es** la herencia |
+| Etiqueta corta `P+B` / `B` / `B-nicho` | `modulo.planes` + el flag `modulo.nicho` (`etiquetaPlanes`) |
 | Posición en el recorrido (1..N, sin huecos) | orden de los módulos publicados del recorrido |
 | **Estado del cupo de Meet** | la cola de dudas + la fecha del turno |
 | Promedio de avance de la agencia | aprobaciones del plantel / (personas × total del recorrido) |
@@ -182,7 +184,11 @@ Deuda compartida con el repo de la agencia, no divergencias entre los dos:
 - **El nombre de los planes.** Acá y en la vista agencia son Professional / Business; el alcance
   funcional del MVP dice Corporate / Business / Standard y la línea multipágina usa
   Professional / Business / Corporate. Son tres taxonomías en tres documentos: hay que cerrarlo con
-  negocio.
+  negocio. **El colapso a un solo campo `planes` no cierra este pendiente**: cambia dónde se guarda
+  el dato, no cómo se llaman los planes.
+- **El «caso puntual» (`modulo.nicho`).** Hoy solo lo tiene Receptivo operador, y lo único que hace
+  es cambiar la etiqueta corta a `B-nicho`. Falta definir si además tiene que cambiar algo del
+  comportamiento —si entra al recorrido, si aparece en el certificado— o si es solo editorial.
 
 ### Carga masiva desde planilla — diferida post-MVP
 

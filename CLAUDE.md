@@ -25,18 +25,21 @@ node cotejo.js /ruta/a/academia-AGENCIA   # si el repo hermano no está al lado
 
 `cotejo.js` es el test de este repo: compara el dataset del backoffice contra el del prototipo
 aprobado del lado agencia (`../academia-AGENCIA/assets/js/mock-data.js`) y sale con código 1 si
-algún control queda en rojo. No hay selección de controles individuales: corre los 16 y se lee la
+algún control queda en rojo. No hay selección de controles individuales: corre los 20 y se lee la
 salida. **Correrlo después de cualquier cambio en `DATA`, en las secciones o en el banco.**
 
-Los controles se dividen en dos: nueve cotejan el mapa de contenido contra el repo de la agencia, y
-siete el banco de preguntas —que llegue al mínimo, que los módulos que cada escena publica tengan
+Los controles se dividen en tres: nueve cotejan el mapa de contenido contra el repo de la agencia,
+tres los **planes** —que todo módulo declare planes válidos, que los planes propios de un video sean
+un subconjunto *estricto* de los de su módulo (declarar los mismos es heredar, y escribirlo igual es
+el estado redundante que hacía que «propio» significara dos cosas), y que los planes efectivos de
+cada video sean los aprobados—, y siete el banco de preguntas —que llegue al mínimo, que los módulos que cada escena publica tengan
 todos los temas cubiertos, IDs de pregunta únicos y con formato, `desde` válido, que el tema sea una
 sección del propio módulo, que el video de repaso sea de ese mismo tema, y que los parámetros de cada
 módulo respeten las reglas del MVP.
 
 Cómo lee el dato: `cotejo.js` corta `index.html` **desde `const GLOBAL={` hasta
 `DATA.forEach(initMod);`** y hace `eval` de todo el bloque —parámetros globales, `DATA`, `HAND`,
-`genPool` e `initMod`—, definiendo por su cuenta lo único que el bloque toma de afuera: `PERFILES` y
+`genPool` e `initMod`—, definiendo por su cuenta lo único que el bloque toma de afuera: `PLANES` y
 `USERS`. Antes cortaba solo el literal de `DATA`, así que el banco de preguntas quedaba fuera del
 alcance de los controles. **Mover o renombrar cualquiera de esos dos marcadores, o meter dentro del
 bloque una referencia a un global declarado más abajo, rompe el script** (falla con un error
@@ -65,11 +68,24 @@ detalle, y `cotejo.js` verifica las que son verificables:
    `initMod` deriva `m.subtemas` de `m.secciones`.
 4. **El enlace de la Meet vive en el turno y solo en el turno** (`TURNOS[].enlace`). La ficha del
    módulo no tiene campo de link, a propósito.
-5. **Dos planes**: `Professional` y `Business` (`PERFILES`). Recorrido 9 / 11.
+5. **Dos planes**: `Professional` y `Business` (`PLANES`). Recorrido 9 / 11. Son **un solo campo**,
+   `m.planes` / `v.planes`, con el nombre y la forma del modelo aprobado; el matiz «caso puntual» es
+   un flag aparte (`m.nicho`) y la etiqueta corta `P+B` / `B` / `B-nicho` se **deriva**
+   (`etiquetaPlanes`), no se edita. Que `v.planes` **no exista** significa «los mismos que el
+   módulo»: por eso al guardar se borra cuando el conjunto coincide con el del módulo, y así
+   `planesPropios` —que solo pregunta si el campo existe— y «difiere del módulo» son la misma
+   pregunta. `cotejo.js` lo custodia.
 6. **Si se puede derivar, se deriva** (recorrido, ordinal, estado del cupo de Meet, promedios,
    cobertura del banco, vigencia de cada pregunta). El estado del cupo guardado se desincroniza; es el
    caso de manual.
-7. **Los parámetros de la evaluación son del módulo** (`m.params`). `GLOBAL` es la semilla con la que
+7. **El MVP administra contenido que ya existe, no su producción.** Los videos entran con su link
+   (o como ID reservado) y se agrupan en secciones. **Cohorte de grabación, guion, prioridad de
+   rodaje y escenario previo se sacaron a propósito** el 03/09/2026: son la herramienta con la que
+   Capacitación *fabrica* los videos y viven en `feat/simplificacion-bloque-a`. Lo que sí es de este
+   repo es el **estado de producción** (`prodDe`: backlog / publicado / a regrabar / archivado),
+   porque gobierna la visibilidad y el checklist. Si un campo describe *cómo se graba* y no *qué se
+   publica*, no va acá.
+8. **Los parámetros de la evaluación son del módulo** (`m.params`). `GLOBAL` es la semilla con la que
    nace un módulo, no un segundo lugar donde editarlos: la pantalla de parámetros globales es de
    lectura. Lo que no se edita en ningún lado son las reglas del MVP —10 por intento, umbral 80,00 %,
    reintentos ilimitados— y el mínimo nunca puede bajar de 3× el intento.
@@ -146,26 +162,30 @@ con `S.tab` (`Ficha · Evaluación · Meet · Publicar`) y la consola `data-evta
 
 Cualquier vista nueva tiene que respetar los tres, porque el prototipo se demuestra moviéndolos:
 
-- **Escena** (`ESCENAS`, `index.html:1504`, `E1`…`E5`): en qué momento de la construcción está el
+- **Escena** (`ESCENAS`, `index.html:1502`): en qué momento de la construcción está el
   sistema. Deriva el estado de producción de cada video (`prodDe`) y la visibilidad de los módulos
   (`modVisible`). El dato es siempre el mismo; lo que cambia es lo que se ve.
-- **Rol** (`ROLES` / `PERMS`, `index.html:1062`): `can('publicar')` decide, `dis('publicar')`
-  devuelve el atributo `disabled` para el template y `porque('publicar')` el texto del toast que
-  explica el bloqueo. **Todo botón que muta tiene que pasar por los tres.** El rol no es decorativo.
+- **Rol**: **ya no existe.** El ajuste v4 (`viewCambios`, `index.html:1917`) eliminó el selector de
+  rol y `can()` / `dis()` / `porque()` con él: todos los usuarios del backoffice entran con las
+  mismas atribuciones. No escribir código nuevo contra esos tres helpers —no están declarados y
+  la llamada revienta en runtime.
 - **Superficie** (`S.superficie`, `m.sup`): `initMod` deriva `m.sup` del prefijo del ID (`BAK-M30`
   → `BAK`). Hoy solo hay contenido `BAK`; `FRT` y `CRM` están abiertas en el `README.md`.
 
 ### El dato
 
-Orden de declaración, que importa: `GLOBAL` (`1084`, la **semilla**: umbral de visto, preguntas por
-intento, objetivo y mínimo del banco con los que nace un módulo) → `ESC_ORD` y `BANCO_ESC` (`1101`,
-cuánto banco hay cargado en cada escena) → `DATA` (`1106`, los módulos con sus secciones y videos) →
-`initMod` (`1373`) que se corre sobre todo `DATA` y completa lo derivado (`sup`, `params`, `meet`,
-IDs de sección faltantes, `subtemas`, `pool`) → dato del lado agencia (`AGENCIAS` `1402`,
-`TURNOS` `1461`).
+Orden de declaración, que importa: `PLANES` (`1082`) → `GLOBAL` (`1091`, la **semilla**: umbral de
+visto, preguntas por intento, objetivo y mínimo del banco con los que nace un módulo) → `ESC_ORD` y
+`BANCO_ESC` (`1107`, cuánto banco hay cargado en cada escena) → `DATA` (`1109`, los módulos con sus
+secciones y videos) → `initMod` (`1364`) que se corre sobre todo `DATA` y completa lo derivado
+(`sup`, `planes`, `params`, `meet`, IDs de sección faltantes, `subtemas`, `pool`) → dato del lado
+agencia (`AGENCIAS` `1398`, `TURNOS` `1457`).
 
-Los bancos de preguntas: `HAND` (`1257`) tiene las preguntas escritas de verdad, solo de `BAK-M30` y
-`BAK-M40`, y **cada una declara de qué video sale**; `genPool` (`1307`) completa el resto con
+`initMod` **no toca los videos**, y es a propósito: ponerle un `planes` por default a cada video lo
+volvería indistinguible de uno al que alguien le eligió esos planes a mano.
+
+Los bancos de preguntas: `HAND` (`1260`) tiene las preguntas escritas de verdad, solo de `BAK-M30` y
+`BAK-M40`, y **cada una declara de qué video sale**; `genPool` (`1310`) completa el resto con
 preguntas de estructura y la interfaz lo avisa. Escribir los bancos reales es trabajo de contenido,
 no de código.
 
