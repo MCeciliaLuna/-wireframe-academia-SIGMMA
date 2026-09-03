@@ -213,6 +213,10 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 }
 .crumb{font-size:14px;color:var(--muted);min-width:0;font-family:var(--serif-alt)}
 .crumb b{color:var(--ink);font-weight:700;font-family:var(--sans)}
+/* Los tramos que llevan a alguna parte son botones de verdad. La miga parecía una
+   ruta navegable y era texto plano. */
+.crumb button{background:none;border:0;padding:0;font:inherit;color:var(--primary);cursor:pointer;text-decoration:underline;text-decoration-color:transparent;transition:text-decoration-color var(--t-hover) var(--ease)}
+.crumb button:hover{text-decoration-color:currentColor}
 .topctl{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .topctl>span{font-size:14px;font-weight:700;color:var(--g700)}
 /* Un renglón propio y no más: es contexto del prototipo, no contenido de la
@@ -236,7 +240,6 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 .seg:last-child{border-right:0}
 .seg:hover{background:var(--primary-wash);color:var(--primary-hover)}
 .seg[aria-pressed="true"]{background:var(--primary);color:#fff;font-weight:700}
-.seg.rol{font-family:var(--sans)}
 
 /* ============================================================================
    2 · TIPOGRAFÍA  —  el tramo bajo de §3.2, calibrado a panel interno
@@ -474,12 +477,8 @@ input[type=checkbox],input[type=radio]{
   color:var(--g700);margin-top:2px;
 }
 .act .tag{margin-top:6px}
-.act:hover:not(.locked){border-color:var(--primary-hover);background:var(--sky-tint)}
-.act:hover:not(.locked) b{color:var(--primary-hover)}
-.act.locked{opacity:.55;cursor:not-allowed}
-/* Las cards de rol reusan la grilla pero no son accionables: sin glifo ni hover. */
-.act-flat{cursor:default;flex-direction:column;gap:2px}
-.act-flat:hover{border-color:var(--line);background:var(--surface-sunk)}
+.act:hover{border-color:var(--primary-hover);background:var(--sky-tint)}
+.act:hover b{color:var(--primary-hover)}
 
 /* Chip de estado, relleno con punto (§5.3) */
 .chip{
@@ -491,7 +490,8 @@ input[type=checkbox],input[type=radio]{
 .chip.nodot::before{display:none}
 
 .st-backlog{background:var(--g200);color:var(--g700);border-color:var(--line)}
-.st-guionado,.st-grabado,.st-editado{background:var(--indigo-wash);color:var(--indigo-light);border-color:var(--indigo-border)}
+/* .st-guionado la reusan el estado "borrador" del banco y "abierto" del cupo de Meet. */
+.st-guionado{background:var(--indigo-wash);color:var(--indigo-light);border-color:var(--indigo-border)}
 .st-publicado{background:var(--success-bg);color:var(--success);border-color:var(--success-border)}
 .st-regrabar{background:var(--warning-bg);color:var(--warning);border-color:var(--warning-border)}
 .st-obsoleto,.st-archivado{background:var(--error-bg);color:var(--error);border-color:var(--error-border)}
@@ -505,6 +505,10 @@ input[type=checkbox],input[type=radio]{
   color:var(--muted);border:1px solid var(--line);border-radius:var(--r-full);
   background:var(--surface);white-space:nowrap;
 }
+/* El mismo tag, cuando además es un atajo: el botón no hereda la tipografía del
+   documento, así que se la damos. No es un componente nuevo. */
+button.tag{font-family:inherit;cursor:pointer}
+button.tag:hover{border-color:var(--ink-soft);color:var(--ink)}
 .tag.warn{color:var(--warning);border-color:var(--warning-border);background:var(--warning-bg)}
 .tag.stop{color:var(--error);border-color:var(--error-border);background:var(--error-bg)}
 .tag.ok{color:var(--success);border-color:var(--success-border);background:var(--success-bg)}
@@ -651,6 +655,8 @@ input[type=checkbox],input[type=radio]{
 .dmeta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 
 .tabs{display:flex;border-bottom:1px solid var(--line);padding:0 32px;overflow-x:auto}
+/* En una pantalla completa el padding lo pone el .wrap, no las pestañas. */
+.tabs.flush{padding:0}
 .tab{
   background:none;border:0;border-bottom:2px solid transparent;
   padding:12px 16px;font-size:14px;font-weight:700;color:var(--muted);white-space:nowrap;
@@ -942,7 +948,7 @@ body.notes-off .note{display:none}
     <span class="topbar-product">Academia</span>
     <div class="topbar-meta">
       <span>Soporte · WhatsApp +54 9 381 555-0100</span>
-      <span>M. Luna</span>
+      <span>M. Luna · Publicación</span>
       <span class="mono">ART · UTC-3</span>
     </div>
   </div>
@@ -955,6 +961,7 @@ body.notes-off .note{display:none}
       <button class="railitem" data-go="cambios">Reglas y decisiones</button></div>
     <div class="railgroup"><h4>Contenido</h4>
       <button class="railitem" data-go="constructor">Estructura de la Academia</button>
+      <button class="railitem" data-go="evaluacion">Evaluaciones y bancos</button>
       <button class="railitem" data-go="importar">Cargar desde planilla</button></div>
     <div class="railgroup"><h4>Soporte y certificación</h4>
       <button class="railitem" data-go="meet">Meet y colas de dudas</button>
@@ -964,7 +971,6 @@ body.notes-off .note{display:none}
       <button class="railitem" data-go="panelMacro">Panel general</button></div>
     <div class="railgroup"><h4>Control</h4>
       <button class="railitem" data-go="agencia">Ver como agencia</button>
-      <button class="railitem" data-go="roles">Roles y permisos</button>
       <button class="railitem" data-go="params">Parámetros globales</button></div>
     <div class="railfoot">
       Wireframe v4 · alineado al prototipo agencia<br>
@@ -978,17 +984,9 @@ body.notes-off .note{display:none}
     <header class="top">
       <div class="crumb" id="crumb"></div>
       <div class="topctl">
-        <span>Rol</span>
-        <div class="segbar" role="group" aria-label="Rol con el que estás actuando">
-          <button class="seg rol" data-rol="contenido">Contenido</button>
-          <button class="seg rol" data-rol="publicacion">Publicación</button>
-          <button class="seg rol" data-rol="consulta">Consulta</button>
-        </div>
-        <span style="margin-left:16px">Momento</span>
-        <div class="segbar" role="group" aria-label="Escena de construcción">
-          <button class="seg" data-esc="E1">E1</button><button class="seg" data-esc="E2">E2</button>
-          <button class="seg" data-esc="E3">E3</button><button class="seg" data-esc="E4">E4</button>
-          <button class="seg" data-esc="E5">E5</button>
+        <span>Momento</span>
+        <div class="segbar" role="group" aria-label="Momento de la Academia">
+          <button class="seg" data-esc="VACIA">Vacía</button><button class="seg" data-esc="COMPLETA">Completa</button>
         </div>
       </div>
       <div class="escena-note" id="escenaNote"></div>
@@ -1044,25 +1042,10 @@ function renderIcons(root){
 const ico=(n,cls)=>'<span class="icon'+(cls?' '+cls:'')+'" data-icon="'+n+'"></span>';
 
 /* ============================================================
-   ROLES Y PERMISOS  (bloque nuevo de la Opción 2)
+   PLANES Y PERSONAS
    ============================================================ */
 const PERFILES=['Professional','Business']; // planes de la AGENCIA (alineado al prototipo aprobado)
 const USERS=['M. Luna','Majo','Irene'];
-const ROLES={
- contenido:{n:'Contenido',d:'Crea y edita módulos, secciones, videos, preguntas y temas. No publica ni archiva.',quien:'Majo · Soporte y Capacitación'},
- publicacion:{n:'Publicación',d:'Todo lo de Contenido, más publicar, despublicar, archivar y tocar los parámetros del banco.',quien:'M. Luna · dueña de la Academia'},
- consulta:{n:'Consulta',d:'Solo lectura: paneles, previsualización de la evaluación y "ver como agencia".',quien:'Irene · Producto, y cualquier revisor'}
-};
-const PERMS={
- editar:['contenido','publicacion'],
- archivar:['publicacion'],
- publicar:['publicacion'],
- params:['publicacion'],
- ver:['contenido','publicacion','consulta']
-};
-const can=k=>PERMS[k].includes(S.rol);
-const dis=k=>can(k)?'':' disabled';
-const porque=k=>can(k)?'':'Tu rol ('+ROLES[S.rol].n+') no puede hacerlo. Requiere rol '+PERMS[k].map(r=>ROLES[r].n).join(' o ')+'.';
 
 /* ============================================================
    DATOS
@@ -1073,6 +1056,20 @@ const porque=k=>can(k)?'':'Tu rol ('+ROLES[S.rol].n+') no puede hacerlo. Requier
 const GLOBAL={umbralVisto:80,metodoVisto:'posición',preguntasIntento:10,umbralAprob:8,
   bancoObjetivo:50,bancoMinimo:30,
   soporte:'WhatsApp · +54 9 381 555-0100',zona:'ART (UTC-3)'};
+
+/* Orden de los momentos, para poder comparar "¿esto ya existía?" con un <=.
+   Vive acá y no al lado de ESCENAS porque lo necesita el propio dato: cada
+   pregunta guarda desde qué momento existe, y el banco se genera antes de que
+   estén declarados los momentos.
+
+   No se reduce a un booleano aunque hoy sean dos: la forma `ESC_ORD[q.desde] <=
+   ESC_ORD[S.escena]` es la que sostiene que la vigencia la declare la pregunta y
+   no un corte del pool por cantidad, que es el bug que esto reemplazó.
+
+   OJO: `ESCENAS` (más abajo) tiene que declarar EXACTAMENTE estas mismas claves.
+   Son dos listas y `cotejo.js` solo custodia esta: si se separan, `render()` falla
+   al arrancar con un TypeError sobre `ESCENAS[S.escena]`. */
+const ESC_ORD={VACIA:1,COMPLETA:2};
 
 const DATA=[
  {id:'BAK-M00',name:'Fundamentos',tag:'P+B',perfiles:[...PERFILES],orden:10,
@@ -1214,54 +1211,111 @@ const DATA=[
     {seq:'040',t:'Prestador nacional vs. internacional e impacto impositivo',p:'P4',c:'C20',dur:'3:50'}]}]}
 ];
 
-/* embebido: ok / falla / sin verificar */
+/* embebido: ok / falla */
 const EMB_FALLA=['BAK-M20.060','BAK-M50.030'];
 const REGRABAR=['BAK-M30.020','BAK-M40.010','BAK-M20.010'];
 
 /* ============================================================
    BANCO DE PREGUNTAS — pool generado, coherente con los temas
    ============================================================ */
+/* Las escritas de verdad. Cada una declara EL VIDEO al que pertenece —no un
+   tema— porque de ese video salen las dos cosas que la pregunta necesita: su tema
+   (la sección del video) y su video de repaso. Formato:
+   [seq del video, enunciado, opciones, índice de la correcta]. */
 const HAND={
  'BAK-M30':[
-  ['Concepto de voucher','En SIGMMA, ¿qué representa el voucher?',['La forma de cargar un servicio, con perfil operativo y administrativo','Un comprobante fiscal que se envía a ARCA','El recibo que firma el pasajero al pagar','Una plantilla de venta reutilizable'],0],
-  ['Carga','¿Cuántos vouchers corresponden por proveedor en un mismo servicio?',['Uno por proveedor','Uno por pasajero','Uno por file, sin importar el proveedor','Tantos como formas de pago haya'],0],
-  ['Procesar','Si un voucher se carga pero no se procesa, ¿qué ocurre?',['No impacta en la cuenta del proveedor ni aparece en los informes','Se cancela automáticamente a las 24 horas','Impacta igual, solo cambia el estado visual','Se factura pero no se cobra'],0],
-  ['Margen','La diferencia entre comisión y utilidad es que la comisión…',['La reconoce el proveedor sobre la tarifa','Se calcula siempre sobre el costo neto','Es lo mismo que la utilidad, cambia el nombre','Solo aplica a servicios terrestres'],0]],
+  ['010','En SIGMMA, ¿qué representa el voucher?',['La forma de cargar un servicio, con perfil operativo y administrativo','Un comprobante fiscal que se envía a ARCA','El recibo que firma el pasajero al pagar','Una plantilla de venta reutilizable'],0],
+  ['020','¿Cuántos vouchers corresponden por proveedor en un mismo servicio?',['Uno por proveedor','Uno por pasajero','Uno por file, sin importar el proveedor','Tantos como formas de pago haya'],0],
+  ['050','Si un voucher se carga pero no se procesa, ¿qué ocurre?',['No impacta en la cuenta del proveedor ni aparece en los informes','Se cancela automáticamente a las 24 horas','Impacta igual, solo cambia el estado visual','Se factura pero no se cobra'],0],
+  ['030','La diferencia entre comisión y utilidad es que la comisión…',['La reconoce el proveedor sobre la tarifa','Se calcula siempre sobre el costo neto','Es lo mismo que la utilidad, cambia el nombre','Solo aplica a servicios terrestres'],0]],
  'BAK-M40':[
-  ['Modos de recibo','Un recibo detallado sirve para…',['Cobrar varios files de un mismo cliente en un solo recibo','Cobrar sin tener un servicio puntual asociado','Registrar una devolución al pasajero','Emitir factura A automáticamente'],0],
-  ['Valores','Un pago con tarjeta de un tercero se registra como…',['TC3, valor de tercero','Efectivo, con nota al pie','Transferencia bancaria','No se puede registrar'],0],
-  ['Cuenta corriente','La cuenta corriente del cliente se lleva…',['Por moneda de registro','En una sola moneda, siempre ARS','Por file, sin consolidar','Solo si el cliente es persona jurídica'],0]]
+  ['010','Un recibo detallado sirve para…',['Cobrar varios files de un mismo cliente en un solo recibo','Cobrar sin tener un servicio puntual asociado','Registrar una devolución al pasajero','Emitir factura A automáticamente'],0],
+  ['020','Un pago con tarjeta de un tercero se registra como…',['TC3, valor de tercero','Efectivo, con nota al pie','Transferencia bancaria','No se puede registrar'],0],
+  ['050','La cuenta corriente del cliente se lleva…',['Por moneda de registro','En una sola moneda, siempre ARS','Por file, sin consolidar','Solo si el cliente es persona jurídica'],0]]
 };
 function corto(t){return t.split(':')[0].trim();}
+
+/* Las 13 plantillas no son un número decorativo: el módulo real con menos videos
+   vigentes tiene 4 (BAK-M00, M60, M70, M80, M95) y 13 × 4 = 52 ≥ 50, el objetivo
+   del banco. Con menos plantillas esos módulos no llegarían al objetivo ni con el
+   pool completo, y el checklist les pediría un número inalcanzable. */
+const T_PREG=[
+ '¿Para qué sirve %s en SIGMMA?',
+ '¿Cuál de estas afirmaciones sobre %s es correcta?',
+ '¿Cuándo corresponde usar %s?',
+ 'Sobre %s: ¿qué error es el más común?',
+ '¿Qué impacto administrativo tiene %s?',
+ '¿Qué dato es obligatorio para %s?',
+ 'En %s, ¿qué se puede modificar después de confirmar?',
+ '¿Qué informe refleja %s?',
+ '¿Qué pasa si se omite %s?',
+ '¿Qué rol de la agencia opera %s?',
+ 'Sobre %s: ¿qué conviene revisar antes de avanzar?',
+ '¿Cómo se controla %s a fin de mes?',
+ '¿Qué documento respalda %s?'
+];
+
+/* Problemas deliberados, para que los filtros y las validaciones se vean
+   funcionando. Van solo en los dos módulos con banco escrito a mano, que además
+   ninguna escena declara publicados: en un módulo publicado, el checklist
+   mostraría un bloqueo que la propia escena contradice. Los índices caen dentro
+   del tramo vigente en E4, que es donde se demuestran.
+   Orden: [borrador, sin tema, sin correcta, acierto bajísimo]. */
+const SUCIAS={'BAK-M30':[5,7,9,11],'BAK-M40':[4,6,8,10]};
+
+/* El banco se genera DESDE LOS VIDEOS, no desde las secciones: cada pregunta
+   hereda el tema y el video de repaso del video del que sale. Antes el tema venía
+   de la sección y el repaso de `vids[(si+k)%vids.length]`, así que una pregunta de
+   "Los números del voucher" podía mandar a repasar un video de otra sección: la
+   pantalla de resultado derivaba a un video que no explicaba el concepto fallado.
+
+   El recorrido es por plantilla y después por video, no al revés, para que
+   CUALQUIER prefijo del pool cubra todas las secciones. De eso depende que los
+   módulos que una escena declara publicados tengan cobertura completa. */
 function genPool(m){
-  const pool=[]; const vids=m.secciones.flatMap(s=>s.videos.filter(v=>!v.archivado)); let i=0;
-  if(!vids.length||!m.subtemas.length) return pool;
-  (HAND[m.id]||[]).forEach((h,hi)=>{
-    const st=m.subtemas[hi%m.subtemas.length];
-    const v=vids[i%vids.length];
-    pool.push({id:m.id+'-Q'+String(++i).padStart(3,'0'),st:st?st.id:null,e:h[1],ops:h[2].map((x,k)=>({t:x,ok:k===h[3]})),
-      estado:'activa',repaso:m.id+'.'+v.seq,fecha:'2026-08-'+String(8+i).padStart(2,'0'),por:USERS[i%3],acierto:52+(i*6)%40,ver:1});
+  /* Un módulo en preparación es una cáscara reservada: no se le inventa banco.
+     Además es el único caso del seed que deja ver el estado vacío del banco, que
+     antes no se podía alcanzar con ningún módulo. */
+  if(m.enPrep) return [];
+  const vids=[];
+  (m.secciones||[]).forEach(sec=>sec.videos.filter(v=>!v.archivado).forEach(v=>vids.push({v,secId:sec.id})));
+  if(!vids.length||!m.subtemas.length) return [];
+  const pool=[];
+  const nid=()=>m.id+'-Q'+String(pool.length+1).padStart(3,'0');
+  /* `desde` va acá y no en cada `pool.push`: firma() es el único punto por el que
+     pasan las dos ramas de generación (las de HAND y las de plantilla), así que es
+     un solo lugar para el mismo dato. Es un literal a propósito: este bloque lo
+     evalúa `cotejo.js` sin el resto del archivo, así que no puede referenciar
+     `ESCENAS` ni `S`, que se declaran más abajo. */
+  const firma=()=>({fecha:'2026-08-'+String(8+pool.length%20).padStart(2,'0'),por:USERS[pool.length%USERS.length],
+    tipo:'unica',explicacion:'',estado:'activa',ver:1,desde:'COMPLETA'});
+
+  (HAND[m.id]||[]).forEach(h=>{
+    const x=vids.find(y=>y.v.seq===h[0])||vids[0];
+    pool.push({...firma(),id:nid(),st:x.secId,e:h[1],ops:h[2].map((t,k)=>({t,ok:k===h[3]})),
+      repaso:m.id+'.'+x.v.seq,acierto:52+(pool.length*6)%40});
   });
-  const T=['¿Para qué sirve %s en SIGMMA?','¿Cuál de estas afirmaciones sobre %s es correcta?','¿Cuándo corresponde usar %s?','Sobre %s: ¿qué error es el más común?'];
-  m.subtemas.forEach((st,si)=>{
-    for(let k=0;k<9;k++){
-      if(pool.length>=52) break;
-      const v=vids[(si+k)%vids.length]||vids[0];
-      pool.push({id:m.id+'-Q'+String(++i).padStart(3,'0'),st:st.id,
-        e:T[k%4].replace('%s',corto(v.t).toLowerCase()),
-        ops:[{t:'Opción correcta de referencia',ok:true},{t:'Distractor plausible A',ok:false},{t:'Distractor plausible B',ok:false},{t:'Distractor plausible C',ok:false}],
-        estado:'activa',repaso:m.id+'.'+v.seq,fecha:'2026-08-'+String(8+(i%20)).padStart(2,'0'),por:USERS[i%3],acierto:35+(i*11)%60,ver:1});
+  for(let t=0;t<T_PREG.length&&pool.length<m.params.objetivo;t++){
+    for(let j=0;j<vids.length&&pool.length<m.params.objetivo;j++){
+      const x=vids[j];
+      pool.push({...firma(),id:nid(),st:x.secId,e:T_PREG[t].replace('%s',corto(x.v.t).toLowerCase()),
+        ops:[{t:'Opción correcta de referencia',ok:true},{t:'Distractor plausible A',ok:false},
+             {t:'Distractor plausible B',ok:false},{t:'Distractor plausible C',ok:false}],
+        repaso:m.id+'.'+x.v.seq,acierto:35+(pool.length*11)%60});
     }
-  });
-  /* problemas deliberados, para que los filtros y validaciones se vean funcionando */
-  if(pool.length>10){
-    pool[4].estado='borrador';
-    pool[6].st=null;
-    pool[8].ops=pool[8].ops.map(o=>({...o,ok:false}));
-    pool[9].acierto=8;
+  }
+
+  const idx=SUCIAS[m.id];
+  if(idx){
+    const [bo,sinT,sinC,floja]=idx;
+    if(pool[bo]) pool[bo].estado='borrador';
+    if(pool[sinT]) pool[sinT].st=null;
+    if(pool[sinC]) pool[sinC].ops=pool[sinC].ops.map(o=>({...o,ok:false}));
+    if(pool[floja]) pool[floja].acierto=8;
   }
   return pool;
 }
+
 
 /* inicialización compartida: la usan los módulos del seed y los que se crean a mano */
 /* El ID de sección es PERMANENTE: se reserva una vez y no se reasigna nunca.
@@ -1274,8 +1328,15 @@ function nextSecId(m){
 }
 function initMod(m){
   m.sup=m.id.split('-')[0];
+  /* Los parámetros de la evaluación son DEL MÓDULO. GLOBAL es la semilla —el valor
+     con el que nace un módulo nuevo—, no una segunda pantalla donde editarlos:
+     antes el objetivo y el mínimo se podían tocar en los dos lugares, sin
+     precedencia definida y sin que el global propagara a lo ya creado.
+     Las tres decisiones abiertas viven acá como valor, no como cartel: así se
+     pueden probar por módulo antes de cerrarlas. */
   m.params=m.params||{porIntento:GLOBAL.preguntasIntento,objetivo:GLOBAL.bancoObjetivo,
-    minimo:GLOBAL.bancoMinimo,umbral:'80,00 %',reintentos:'Ilimitados'};
+    minimo:GLOBAL.bancoMinimo,umbral:'80,00 %',reintentos:'Ilimitados',
+    forzarCobertura:'a definir',mostrarCorrectas:'a definir',caducaAlRegrabar:'a definir'};
   /* La Meet NO lleva link por módulo: el enlace es del turno (TURNOS[].enlace).
      Un link acá sería una segunda fuente de verdad para el mismo dato. */
   m.meet=m.meet||{habilitada:true,condicion:'Aprobar con 80 % o más',duracion:30,
@@ -1396,30 +1457,23 @@ const TIPOS_DOC=[
 /* ============================================================
    ESCENAS
    ============================================================ */
+/* Dos momentos, no cinco etapas: lo que negocio necesita ver es el día cero y el
+   régimen. Las claves tienen que ser las mismas que las de ESC_ORD. */
 const ESCENAS={
- E1:{label:'E1 · Día cero',note:'Nada cargado todavía. Desde acá se puede crear el primer módulo o pegar la estructura: ya no es una pantalla sin salida.'},
- E2:{label:'E2 · IDs reservados',note:'Los 55 videos existen como IDs en backlog. Ningún banco de preguntas armado.'},
- E3:{label:'E3 · Guionando y grabando',note:'Los de Prioridad 1 están entre guionados y grabados. Empieza a cargarse el primer banco.'},
- E4:{label:'E4 · Ruta esencial publicada',note:'Los 12 videos de P1 están listos. Tres módulos ya visibles para las agencias; el resto trabado por el checklist de publicación.'},
- E5:{label:'E5 · En régimen',note:'Todo publicado. Aparece lo que antes era invisible: la cola de "a regrabar" y las aprobaciones que podrían caducar.'}
+ VACIA:{label:'Academia vacía',note:'Nada cargado todavía. Desde acá se puede crear el primer módulo o pegar la estructura completa: no es una pantalla sin salida.'},
+ COMPLETA:{label:'Academia completa',note:'Todo publicado y con el banco completo. Aparece lo que en el día cero es invisible: la cola de "a regrabar", las aprobaciones que podrían caducar, un módulo reservado que el checklist traba, y dos módulos que están afuera con un embebido roto.'}
 };
-const VISIBLES={E4:['BAK-M00','BAK-M10','BAK-M20']};
 
 function prodDe(m,v){
-  const e=S.escena;
   if(v.archivado) return 'archivado';
   if(m.nuevo) return v.dur?'publicado':'backlog';
-  if(e==='E2') return 'backlog';
-  if(e==='E3') return v.p==='P1'?(v.seq<'030'?'grabado':'guionado'):'backlog';
-  if(e==='E4') return v.p==='P1'?'publicado':(v.p==='P2'?'guionado':'backlog');
-  if(e==='E5') return REGRABAR.includes(m.id+'.'+v.seq)?'a regrabar':'publicado';
+  if(S.escena==='COMPLETA') return REGRABAR.includes(m.id+'.'+v.seq)?'a regrabar':'publicado';
   return 'backlog';
 }
 function modVisible(m){
   if(m.pubManual!==undefined) return m.pubManual;
   if(m.nuevo) return false;
-  if(S.escena==='E5') return !m.enPrep;
-  if(S.escena==='E4') return (VISIBLES.E4||[]).includes(m.id);
+  if(S.escena==='COMPLETA') return !m.enPrep;
   return false;
 }
 /* El plan del video, cuando difiere del de su módulo. `vidVisible` responde otra
@@ -1437,27 +1491,83 @@ function vidVisible(m,v){
   const p=prodDe(m,v);
   return p==='publicado'||p==='a regrabar';
 }
-function tieneLink(m,v){const p=prodDe(m,v);return p==='publicado'||p==='a regrabar'||p==='editado';}
+function tieneLink(m,v){const p=prodDe(m,v);return p==='publicado'||p==='a regrabar';}
 function embebido(m,v){
   if(!tieneLink(m,v)) return null;
   if(EMB_FALLA.includes(m.id+'.'+v.seq)) return 'falla';
-  if(S.escena==='E3') return 'sin verificar';
   return 'ok';
 }
-function nPreguntas(m){
-  const e=S.escena;
-  if(m.nuevo) return 0;
-  if(e==='E1'||e==='E2') return 0;
-  if(e==='E3') return m.id==='BAK-M00'?12:0;
-  if(e==='E4'){const t={'BAK-M00':50,'BAK-M10':50,'BAK-M20':50,'BAK-M30':38,'BAK-M40':22};return t[m.id]||0;}
-  return m.enPrep?0:50;
-}
-function activas(m){return m.pool.slice(0,nPreguntas(m));}
+/* Qué preguntas del banco existen en la escena actual. La vigencia la declara la
+   propia pregunta (`desde`), no un corte del pool: así una pregunta cargada a mano
+   aparece en el acto y el contador deja de ser un número fijo por escena que el
+   dato no podía sostener.
+
+   `bancoVigente` es todo lo cargado —incluye borradores e inactivas—; `bancoActivas`
+   es lo que entra en el sorteo y cuenta para la cobertura. Antes había una sola
+   función `activas()` que en realidad devolvía un `slice` del pool, y cada llamador
+   tenía que acordarse de filtrar por estado. */
+function bancoVigente(m){return (m.pool||[]).filter(q=>ESC_ORD[q.desde]<=ESC_ORD[S.escena]);}
+function bancoActivas(m){return bancoVigente(m).filter(q=>q.estado==='activa');}
 function cobertura(m){
-  const a=activas(m).filter(q=>q.estado==='activa');
+  const a=bancoActivas(m);
   return m.subtemas.map(st=>({st,n:a.filter(q=>q.st===st.id).length}));
 }
 function subtemasEnCero(m){return cobertura(m).filter(c=>c.n===0).length;}
+/* Preguntas cargadas a mano que todavía no se ven porque la escena quedó atrás.
+   El banco lo avisa: si no, una pregunta recién guardada "desaparece" al mover el
+   selector de escena y parece un error del prototipo. */
+function bancoFuturo(m){return (m.pool||[]).filter(q=>q.manual&&ESC_ORD[q.desde]>ESC_ORD[S.escena]).length;}
+
+/* ============================================================
+   ESCRITURA DEL BANCO
+   ============================================================ */
+/* El ID de pregunta es PERMANENTE, igual que el de módulo, sección y video: se
+   toma del máximo ya usado y NO de la cantidad de preguntas, porque desactivar una
+   no puede liberar su número para otra. Editar conserva el ID y sube la versión.
+   No hay borrado físico: se pasa a `inactiva`. */
+function nextQId(m){
+  const usados=(m.pool||[]).map(q=>parseInt(String(q.id).split('-Q')[1],10)||0);
+  return m.id+'-Q'+String((usados.length?Math.max.apply(null,usados):0)+1).padStart(3,'0');
+}
+const hoyISO=()=>new Date().toISOString().slice(0,10);
+/* El dato guarda YYYY-MM-DD y la pantalla muestra DD/MM/YYYY. */
+const fmtFecha=s=>{const p=String(s||'').split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:String(s||'—');};
+const qDe=(m,id)=>(m.pool||[]).find(q=>q.id===id);
+
+/* Guarda una pregunta nueva o una versión nueva de una existente. Devuelve la
+   pregunta guardada, para que el llamador pueda contar en el toast qué pasó. */
+function qGuardar(m,datos,id){
+  const q=id&&id!=='new'?qDe(m,id):null;
+  if(q){
+    /* Solo versiona lo que YA se respondió: los intentos viejos apuntan a la
+       versión con la que se respondieron, y por eso una pregunta respondida no se
+       sobrescribe en silencio. Subirle la versión a una que nunca entró en un
+       intento infla el historial sin auditar nada. */
+    const respondida=q.acierto!=null;
+    Object.assign(q,datos);
+    if(respondida) q.ver++;
+    q.fecha=hoyISO(); q.por=USERS[0];
+    return q;
+  }
+  const nueva={tipo:'unica',explicacion:'',ver:1,acierto:null,
+    desde:S.escena,manual:true,fecha:hoyISO(),por:USERS[0],...datos,id:nextQId(m)};
+  m.pool.push(nueva);
+  return nueva;
+}
+function qEstado(m,ids,estado){
+  let n=0;ids.forEach(id=>{const q=qDe(m,id);if(q&&q.estado!==estado){q.estado=estado;n++;}});return n;
+}
+function qTema(m,ids,temaId){
+  let n=0;ids.forEach(id=>{const q=qDe(m,id);if(q&&q.st!==temaId){q.st=temaId;n++;}});return n;
+}
+/* Entran con el estado que declara la planilla, y en borrador si no declara nada.
+   La columna "estado" del pegado existía en el contrato de columnas y no se leía
+   nunca: el parser usaba ese lugar para el mensaje de error. */
+function qImportar(m,filas){
+  return filas.map(f=>qGuardar(m,{st:f.st||null,e:f.e,ops:f.ops,
+    estado:f.estado==='activa'?'activa':'borrador',
+    repaso:f.repaso||'',explicacion:f.explicacion||''})).length;
+}
 
 /* Módulo anterior del MISMO recorrido (mismo plan). Publicar en orden es la
    regla que sostiene los ordinales sin huecos que el prototipo garantiza. */
@@ -1474,15 +1584,14 @@ function checklistPub(m){
   const vids=m.secciones.flatMap(s=>s.videos.filter(v=>!v.archivado));
   const sinLink=vids.filter(v=>!tieneLink(m,v)).length;
   const embMal=vids.filter(v=>embebido(m,v)==='falla').length;
-  const embSin=vids.filter(v=>embebido(m,v)==='sin verificar').length;
-  const nPreg=activas(m).filter(q=>q.estado==='activa').length;
+  const nPreg=bancoActivas(m).length;
   const cero=subtemasEnCero(m);
   const regr=vids.filter(v=>prodDe(m,v)==='a regrabar').length;
   const duros=[
    {ok:vids.length>0,t:'Tiene al menos un video cargado',d:vids.length+' videos'},
-   {ok:vids.length>0&&sinLink===0&&embMal===0&&embSin===0,
+   {ok:vids.length>0&&sinLink===0&&embMal===0,
     t:'Todos los videos tienen link y embebido verificado',
-    d:!vids.length?'sin videos':(sinLink?sinLink+' sin link':(embMal?embMal+' con embebido roto':(embSin?embSin+' sin verificar':'verificados')))},
+    d:!vids.length?'sin videos':(sinLink?sinLink+' sin link':(embMal?embMal+' con embebido roto':'verificados'))},
    {ok:m.secciones.length>0&&cero===0,
     t:'Ningún tema del banco está en cero preguntas',
     d:m.secciones.length===0?'el módulo no tiene secciones (los temas del banco son las secciones)':(cero?cero+' temas sin cubrir':'todos cubiertos')},
@@ -1511,11 +1620,11 @@ function cadena(plan){
 /* ============================================================
    ESTADO UI
    ============================================================ */
-const S={screen:'hub',escena:'E4',rol:'publicacion',superficie:'BAK',open:{'BAK-M30':true},sel:null,tab:'ficha',
+const S={screen:'hub',escena:'COMPLETA',superficie:'BAK',open:{'BAK-M30':true},sel:null,tab:'ficha',
   quick:null,qsec:null,checked:new Set(),filtro:'',soloPend:false,verArch:false,
   impPaso:1,impModo:'videos',omit:new Set(),
-  bModId:'BAK-M30',bFiltro:'',bSub:'',bEstado:'',bCorregir:false,bChecked:new Set(),
-  qEdit:null,perfilVista:'Professional',muestra:null,respuestas:{},verCorrectas:false,
+  bModId:'BAK-M30',evTab:'banco',bFiltro:'',bSub:'',bEstado:'',bCorregir:false,bChecked:new Set(),
+  qEdit:null,qDraft:null,perfilVista:'Professional',muestra:null,respuestas:{},verCorrectas:null,
   amPlan:'P+B',meetAg:null,panelAg:null};
 
 const $=s=>document.querySelector(s);
@@ -1549,7 +1658,7 @@ const vidsDe=m=>m.secciones.flatMap((s,si)=>videosOrdenados(s).map(v=>({v,si,sec
 function nextSeq(sec){const n=sec.videos.map(v=>parseInt(v.seq,10));return String((n.length?Math.max(...n):0)+10).padStart(3,'0');}
 function modsVis(){
   const delSup=DATA.filter(m=>m.sup===S.superficie);
-  if(S.escena==='E1') return delSup.filter(m=>m.nuevo);
+  if(S.escena==='VACIA') return delSup.filter(m=>m.nuevo);
   return delSup;
 }
 function nextModId(sup){
@@ -1576,27 +1685,83 @@ function crearModulo({sup,id,name,tag,perfiles,orden,seccion,videos}){
 /* ============================================================
    SHELL
    ============================================================ */
+/* Las tres pantallas del banco se unificaron en la consola de evaluación. Se
+   normalizan acá, en un solo lugar, para no tener que reescribir cada data-go2 y
+   cada data-jump del prototipo: el que pedía "banco" aterriza en la consola con la
+   pestaña Banco abierta. */
+/* Va en un Map y no en un objeto a propósito: con un objeto literal,
+   `ALIAS_EV['constructor']` devuelve Object.prototype.constructor —una función, o
+   sea algo verdadero— y la pantalla `constructor` (el árbol de estructura) se
+   redirigía a la consola de evaluación. Un Map no tiene cadena de prototipos. */
+const ALIAS_EV=new Map([['banco','banco'],['subtemas','cobertura'],['preview','previa']]);
+
+/* Migas de pan: el tramo con segundo elemento es navegable. */
+function crumbs(){
+  const b=S.bModId, tab=(EV_TABS.find(t=>t[0]===S.evTab)||['','Banco'])[1];
+  return {
+   hub:[['Qué querés hacer']],
+   cambios:[['Reglas y decisiones']],
+   constructor:[['Contenido'],['Estructura']],
+   altamod:[['Contenido'],['Estructura','constructor'],['Nuevo módulo']],
+   importar:[['Contenido'],['Cargar desde planilla']],
+   evaluacion:[['Contenido'],['Evaluaciones','evaluacion'],[b+' › '+tab]],
+   pregunta:[['Contenido'],['Evaluaciones','evaluacion'],[b,'banco'],['Pregunta']],
+   resultado:[['Contenido'],['Evaluaciones','evaluacion'],[b,'preview'],['Resultado del intento']],
+   agencia:[['Control'],['Ver como agencia']],
+   params:[['Control'],['Parámetros globales']],
+   meet:[['Soporte'],['Meet y colas de dudas']],
+   certificado:[['Soporte'],['Certificados']],
+   panelAgencia:[['Seguimiento'],['Avance por agencia']],
+   panelMacro:[['Seguimiento'],['Panel general']]
+  }[S.screen]||[];
+}
+
 function render(){
-  const nota=ESCENAS[S.escena].note+'  ·  Actuando como '+ROLES[S.rol].n+'.';
+  if(ALIAS_EV.has(S.screen)){S.evTab=ALIAS_EV.get(S.screen);S.screen='evaluacion';}
+  const nota=ESCENAS[S.escena].note;
   $('#escenaNote').textContent=nota; $('#escenaNote').title=nota;
   document.querySelectorAll('.seg[data-esc]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.esc===S.escena)));
-  document.querySelectorAll('.seg[data-rol]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.rol===S.rol)));
   document.querySelectorAll('.railitem[data-go]').forEach(b=>b.setAttribute('aria-current',String(b.dataset.go===S.screen)));
-  const c={hub:'Qué querés hacer',cambios:'Reglas y decisiones',constructor:'Contenido › Estructura',
-    altamod:'Contenido › Nuevo módulo',importar:'Contenido › Cargar desde planilla',
-    banco:'Contenido › '+S.bModId+' › Banco de preguntas',pregunta:'Contenido › '+S.bModId+' › Pregunta',
-    subtemas:'Contenido › '+S.bModId+' › Temas',preview:'Control › Previsualizar evaluación',
-    resultado:'Control › Resultado de la evaluación',agencia:'Control › Ver como agencia',roles:'Control › Roles y permisos',
-    meet:'Soporte › Meet y colas de dudas',certificado:'Soporte › Certificados',
-    panelAgencia:'Seguimiento › Avance por agencia',panelMacro:'Seguimiento › Panel general',params:'Control › Parámetros globales'};
-  $('#crumb').innerHTML='<b>'+ESCENAS[S.escena].label+'</b> · '+esc(c[S.screen]||'');
-  const h=$('#screens');h.innerHTML='';
+  $('#crumb').innerHTML='<b>'+ESCENAS[S.escena].label+'</b> · '+crumbs().map(([t,go])=>
+    go?'<button data-go="'+go+'">'+esc(t)+'</button>':esc(t)).join(' › ');
+  const h=$('#screens');
+  const foco=recordarFoco(h);
+  h.innerHTML='';
   const map={hub:viewHub,cambios:viewCambios,constructor:viewConstructor,altamod:viewAltaMod,importar:viewImportar,
-    banco:viewBanco,pregunta:viewPregunta,subtemas:viewSubtemas,preview:viewPreview,resultado:viewResultado,
-    agencia:viewAgencia,roles:viewRoles,meet:viewMeet,certificado:viewCertificado,
+    evaluacion:viewEvaluacion,pregunta:viewPregunta,resultado:viewResultado,
+    agencia:viewAgencia,meet:viewMeet,certificado:viewCertificado,
     panelAgencia:viewPanelAgencia,panelMacro:viewPanelMacro,params:viewParams};
   h.appendChild((map[S.screen]||viewHub)());
   renderIcons(document);
+  restaurarFoco(foco);
+}
+
+/* Cada render vacía #screens, así que el elemento que tenía el foco desaparece y
+   el foco se va al body. Con el banco escribiendo de verdad eso se volvió
+   intolerable: marcar veinte preguntas eran veinte saltos al body. Se recuerda por
+   `id` o por firma `data-*` —lo único estable entre dos renders— y se devuelve el
+   caret si era un campo de texto. Generaliza el parche que antes existía solo para
+   el buscador del banco. */
+function recordarFoco(cont){
+  const a=document.activeElement;
+  if(!a||!cont.contains(a)) return null;
+  const sel=a.id?'#'+a.id
+    :(a.dataset&&Object.keys(a.dataset).length
+      ?'['+Object.keys(a.dataset).map(k=>'data-'+k.replace(/[A-Z]/g,c=>'-'+c.toLowerCase())+'="'+a.dataset[k]+'"').join('][')+']'
+      :null);
+  if(!sel) return null;
+  const txt=/^(INPUT|TEXTAREA)$/.test(a.tagName)&&a.type!=='checkbox'&&a.type!=='radio';
+  return {sel,pos:txt?a.selectionStart:null};
+}
+function restaurarFoco(f){
+  if(!f) return;
+  /* El selector se arma con valores del dato, así que un valor raro no puede
+     tumbar el render entero: recuperar el foco es una cortesía, no un requisito. */
+  let n=null;
+  try{ n=$('#screens').querySelector(f.sel); }catch(e){ return; }
+  if(!n) return;
+  n.focus();
+  if(f.pos!=null&&n.setSelectionRange) try{n.setSelectionRange(f.pos,f.pos);}catch(e){}
 }
 
 /* ============================================================
@@ -1617,13 +1782,12 @@ const ACTART={
  publicar:`<span class="glyph"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13l4 4 8-8"/><path d="M4 31l4 4 8-8"/><path d="M23 15h21M23 33h21"/></svg></span>`
 };
 
-/* Las cuatro acciones, en orden de frecuencia real de uso. La linea de rol
-   solo aparece cuando bloquea: repetida en las cuatro no informaba nada. */
+/* Las cuatro acciones, en orden de frecuencia real de uso. */
 const ACCIONES=[
- ['tengo','editar','Subir un video que ya tengo','Lo más frecuente. Pegás el link y elegís en qué parte de la Academia va.'],
- ['preguntas','editar','Cargar preguntas de un módulo','Escribís o pegás el banco. Cada una con su tema, que es lo que evita el sesgo.'],
- ['estructura','editar','Crear un módulo o una sección','Da de alta la estructura donde después van los videos.'],
- ['publicar','publicar','Publicar un módulo','Checklist en vez de interruptor: qué falta para que una agencia pueda hacerlo.']
+ ['tengo','Subir un video que ya tengo','Lo más frecuente. Pegás el link y elegís en qué parte de la Academia va.'],
+ ['preguntas','Cargar preguntas de un módulo','Escribís o pegás el banco. Cada una con su tema, que es lo que evita el sesgo.'],
+ ['estructura','Crear un módulo o una sección','Da de alta la estructura donde después van los videos.'],
+ ['publicar','Publicar un módulo','Checklist en vez de interruptor: qué falta para que una agencia pueda hacerlo.']
 ];
 
 function viewHub(){
@@ -1632,26 +1796,26 @@ function viewHub(){
   w.innerHTML=`<h1>¿Qué querés hacer?</h1><p class="lede">Elegí por la tarea, no por la tabla. El sistema se ocupa de los IDs, la superficie y el orden.</p>`;
 
   const d=el('div','actgrid');
-  d.innerHTML=ACCIONES.map(([k,perm,titulo,desc])=>{
-    const ok=can(perm);
-    const motivo=perm==='publicar'?'Requiere rol Publicación':'Bloqueado para el rol '+ROLES[S.rol].n;
-    return `<button class="act${ok?'':' locked'}" data-door="${k}">${ACTART[k]}<span class="txt"><b>${esc(titulo)}</b>
-      <span class="d">${esc(desc)}</span>
-      ${ok?'':`<span class="tag warn">${esc(motivo)}</span>`}</span></button>`;
-  }).join('');
+  d.innerHTML=ACCIONES.map(([k,titulo,desc])=>
+    `<button class="act" data-door="${k}">${ACTART[k]}<span class="txt"><b>${esc(titulo)}</b>
+      <span class="d">${esc(desc)}</span></span></button>`).join('');
   w.appendChild(d);
 
   if(!mods.length){
-    w.appendChild(el('div','emptynote','<b>La Academia está vacía.</b><br>Hay dos caminos y los dos funcionan desde acá: crear el primer módulo a mano, o pegar la estructura completa (módulos y secciones) desde la planilla maestra.<div class="row" style="margin-top:16px"><button class="btn btn-p" data-go2="altamod"'+dis('editar')+'>Crear el primer módulo</button><button class="btn" data-go2="imp-estr"'+dis('editar')+'>Pegar la estructura</button></div>'));
+    w.appendChild(el('div','emptynote','<b>La Academia está vacía.</b><br>Hay dos caminos y los dos funcionan desde acá: crear el primer módulo a mano, o pegar la estructura completa (módulos y secciones) desde la planilla maestra.<div class="row" style="margin-top:16px"><button class="btn btn-p" data-go2="altamod">Crear el primer módulo</button><button class="btn" data-go2="imp-estr">Pegar la estructura</button></div>'));
     w.appendChild(el('div','note v3','<b>Ajuste v3 ·</b> El día cero era una pantalla sin salida: los dos botones eran decorativos. Ahora el alta de módulo existe como pantalla propia y el importador tiene un modo Estructura que crea módulos y secciones, no solo videos sobre módulos que ya existen.'));
     return w;
   }
 
-  let tot=0,pub=0,sinG=0,regr=0,bloq=0;
+  /* Trabado y "publicado que dejó de cumplir" son dos números distintos. Antes se
+     contaba solo el primero (`!modVisible && bloqueado`), así que el hub podía
+     decir 0 trabados mientras cada ficha marcaba el suyo: el tablero contradecía a
+     las pantallas de detalle. */
+  let tot=0,pub=0,sinG=0,regr=0,bloq=0,caidos=0;
   mods.forEach(m=>{
     m.secciones.forEach(s=>s.videos.forEach(v=>{if(v.archivado)return;tot++;const p=prodDe(m,v);
-      if(p==='publicado')pub++;if(p==='a regrabar')regr++;if(p==='backlog'||p==='guionado')sinG++;}));
-    if(!modVisible(m)&&checklistPub(m).bloqueado) bloq++;
+      if(p==='publicado')pub++;if(p==='a regrabar')regr++;if(p==='backlog')sinG++;}));
+    if(checklistPub(m).bloqueado){ modVisible(m)?caidos++:bloq++; }
   });
   const mini=el('div','mini');
   mini.innerHTML=`
@@ -1659,12 +1823,13 @@ function viewHub(){
    <div class="stat"><b>${pub}</b><span>publicados</span></div>
    <div class="stat"><b>${sinG}</b><span>sin grabar</span></div>
    <div class="stat"><b>${regr}</b><span>a regrabar</span></div>
-   <div class="stat${bloq?' warn':''}"><b>${bloq}</b><span>módulos trabados para publicar</span></div>`;
+   <div class="stat${bloq?' warn':''}"><b>${bloq}</b><span>módulos trabados para publicar</span></div>
+   <div class="stat${caidos?' warn':''}"><b>${caidos}</b><span>publicados que hoy no cumplen</span></div>`;
   w.appendChild(mini);
 
   const items=[];
   mods.forEach(m=>{
-    const c=subtemasEnCero(m), n=activas(m).filter(q=>q.estado==='activa').length;
+    const c=subtemasEnCero(m), n=bancoActivas(m).length;
     if(!m.secciones.length) items.push([m.id+' no tiene secciones','sin al menos una sección no se le pueden cargar videos','Agregar sección','sec',m.id]);
     else if(m.subtemas.length===0&&!m.enPrep) items.push([m.id+' no tiene temas definidos','sin temas el banco no se puede validar ni publicar','Definir temas','subtemas',m.id]);
     else if(c>0&&n>0) items.push([m.id+' tiene '+c+' tema'+(c>1?'s':'')+' sin cubrir','bloquea la publicación: el sorteo podría dejar afuera un concepto central','Ir al banco','banco',m.id]);
@@ -1687,10 +1852,10 @@ function viewHub(){
   });
   /* El corte era silencioso: un pendiente que no se lista es un pendiente que no existe. */
   if(items.length>TOPE) ul.appendChild(el('li','','<span class="grow"><span class="more">Hay '+(items.length-TOPE)+' pendiente'+(items.length-TOPE>1?'s':'')+' más en la estructura.</span></span><button class="btn btn-sm" data-go="constructor">Ver la estructura</button>'));
-  if(!items.length) ul.appendChild(el('li','','<span class="grow">Nada pendiente en esta escena.</span>'));
+  if(!items.length) ul.appendChild(el('li','','<span class="grow">Nada pendiente en este momento.</span>'));
   card.appendChild(ul);
   w.appendChild(card);
-  w.appendChild(el('div','note v3','<b>Ajuste v3 ·</b> Las cuatro acciones se habilitan según el rol: con rol Consulta las cuatro quedan atenuadas y el hub se vuelve un tablero de lectura. Cambiá el rol arriba a la derecha para verlo.'));
+  w.appendChild(el('div','note v3','<b>Ajuste v4 ·</b> Todos los usuarios del backoffice entran con las mismas atribuciones (rol Publicación): ya no hay selector de rol, ni acciones que se atenúen según quién esté mirando. Las cuatro puertas están siempre disponibles.'));
   return w;
 }
 
@@ -1716,7 +1881,14 @@ function viewCambios(){
    ['Tipos de documento','Claves propias del backoffice (<span class="cellmono">PAS</span>, <span class="cellmono">LCLE</span>), sin patrón.','Las claves del prototipo (<span class="cellmono">PASAPORTE</span>, <span class="cellmono">LC-LE</span>) más <b>patrón, ejemplo y mensajes</b>.','Un certificado emitido con una clave no se validaba con la otra. El catálogo es un parámetro global, no una constante de cada superficie.'],
    ['Certificado','No estaba en el MVP.','Plantilla, tipos de documento, fuente del documento y registro de emisiones.','El prototipo lo emite; el backoffice tiene que administrarlo.'],
    ['Panel + tracking','Estaba como "fase 2".','Avance por agencia y panel general, con la regla de agregación del prototipo.','El logueo de eventos entra en el MVP aunque las pantallas se pulan después: es lo irrecuperable.'],
-   ['Banco','Mínimo 20.','Mínimo <b>30</b> (3× el intento), objetivo 50.','Con reintentos ilimitados, un banco chico se memoriza.']
+   ['Banco','Mínimo 20.','Mínimo <b>30</b> (3× el intento), objetivo 50.','Con reintentos ilimitados, un banco chico se memoriza.'],
+   ['Dónde vive la evaluación','Repartida en cinco lugares: dos pestañas de la ficha del módulo y tres pantallas propias, ninguna en la navegación principal.','Una <b>consola única</b> por módulo —Banco, Cobertura, Configuración, Previsualizar— con selector de módulo, entrada propia en el rail y una sola pestaña "Evaluación" en la ficha.','Cargar preguntas de un módulo que no fuera el de la puerta del hub costaba cinco clicks y saber que el banco vivía dentro del árbol de estructura. Y adentro del banco no se podía cambiar de módulo.'],
+   ['Parámetros de la evaluación','El objetivo y el mínimo se editaban en dos pantallas —la ficha del módulo y Parámetros globales— sin precedencia definida.','<b>Son del módulo</b>. El global es la semilla con la que nace un módulo nuevo y pasó a solo lectura, con una tabla de qué módulos se apartaron.','El global se copiaba una sola vez al iniciar, así que editarlo no propagaba a lo ya creado: el mismo número en dos lugares, y ninguno mandaba.'],
+   ['Decisiones 1, 2 y 6','Carteles fijos que decían "a definir" en la ficha.','<b>Valores configurables por módulo</b> que se aplican de verdad: forzar cobertura cambia el sorteo, y mostrar correctas define con qué variante abre el resultado.','Una decisión abierta se cierra probándola. Como cartel no se podía comparar; como parámetro, negocio la ve funcionando antes de firmar.'],
+   ['Vigencia del banco','El banco de cada momento era un corte del pool contra una tabla de totales.','Cada pregunta declara <b>desde qué momento existe</b>, y el pool apunta al objetivo del módulo.','La tabla declaraba 50 preguntas para módulos cuyo pool máximo eran 18: el checklist pedía un mínimo inalcanzable, y una pregunta cargada a mano no movía ningún contador.'],
+   ['Publicado y publicable','El checklist se evaluaba antes que la visibilidad, así que un módulo publicado que dejaba de cumplir decía "todavía no se puede publicar".','Tres estados separados, incluido <b>"publicado, pero hoy no cumple"</b>, y el hub los cuenta por separado.','Es información de control: el módulo está afuera, en manos de las agencias, y hoy no cumple. Decirle "todavía no se publicó" era falso y tapaba el aviso.'],
+   ['Video de repaso','La pregunta tomaba el tema de su sección y el video de un video cualquiera del módulo.','Cada pregunta <b>sale de un video</b> y hereda de él las dos cosas: su tema y su video de repaso.','Una pregunta de "Los números del voucher" podía mandar a repasar un video de otra sección: el resultado derivaba a un video que no explicaba el concepto fallado.'],
+   ['Destino del pegado','El encabezado del importador decía un módulo y todas las filas traían otro, con el error escrito en el dato.','<b>Un solo destino</b> —el de la consola— y el error se calcula contra él. Los temas se cruzan por <b>ID de sección</b>, con el nombre como respaldo que avisa.','Dos fuentes de verdad para el mismo dato en la misma pantalla. Y cruzar por nombre rompe el pegado en silencio en cuanto se renombra una sección.']
   ];
   const t1=el('div','tablewrap');const tb1=el('table');
   tb1.innerHTML='<thead><tr><th style="width:130px">Tema</th><th style="width:24%">Antes (MVP v1)</th><th style="width:30%">Ahora (alineado)</th><th>Por qué</th></tr></thead><tbody>'+
@@ -1757,50 +1929,6 @@ function viewCambios(){
   w.appendChild(el('div','note v3','<b>Alineación completa ·</b> El prototipo del lado agencia está aprobado, así que manda: donde el backoffice difería, se ajustó el backoffice. En esta pasada se alinearon además las <b>31 secciones</b> del syllabus con ID permanente, el <b>catálogo de tipos de documento</b>, el <b>estado derivado</b> del cupo de Meet y el <b>plan a nivel video</b>, que estaba declarado pero no filtraba. El único bloque que queda por diseñar en profundidad es qué pasa con las superficies FRT y CRM dentro del recorrido de una agencia.'));
   return w;
 }
-
-/* ============================================================
-   ROLES Y PERMISOS
-   ============================================================ */
-function viewRoles(){
-  const w=el('div','wrap');
-  w.innerHTML=`<h1>Roles y permisos</h1>
-    <p class="lede">SSO resuelve quién entra a la Academia. Esto resuelve quién puede publicarla. Son dos cosas distintas y el MVP solo tenía la primera.</p>`;
-
-  const sel=el('div','row');sel.style.marginBottom='16px';
-  sel.innerHTML=`<span class="hint" style="margin:0">Estás actuando como:</span>
-    ${Object.keys(ROLES).map(r=>`<button class="btn btn-sm ${S.rol===r?'btn-on':''}" data-rol="${r}">${esc(ROLES[r].n)}</button>`).join('')}
-    <span class="hint" style="margin:0 0 0 8px">${esc(ROLES[S.rol].quien)}</span>`;
-  w.appendChild(sel);
-
-  const acciones=[
-   ['Ver la estructura, los bancos y "ver como agencia"','ver'],
-   ['Crear y editar módulos y secciones','editar'],
-   ['Cargar videos y verificar el embebido','editar'],
-   ['Cargar y editar preguntas y temas','editar'],
-   ['Importar desde planilla','editar'],
-   ['Previsualizar la evaluación','ver'],
-   ['Editar los parámetros del banco (objetivo y mínimo)','params'],
-   ['Archivar un módulo, una sección o un video','archivar'],
-   ['Publicar y despublicar','publicar']
-  ];
-  const tw=el('div','tablewrap');const tb=el('table');
-  tb.innerHTML=`<thead><tr><th>Acción</th>${Object.keys(ROLES).map(r=>`<th style="width:110px;text-align:center">${esc(ROLES[r].n)}</th>`).join('')}</tr></thead><tbody>`+
-   acciones.map(a=>`<tr><td>${esc(a[0])}</td>${Object.keys(ROLES).map(r=>
-     `<td style="text-align:center">${PERMS[a[1]].includes(r)?'<span class="ok"><span class="icon icon-sm" data-icon="check-circle"></span></span>':'<span style="color:var(--line-ctl)">–</span>'}</td>`).join('')}</tr>`).join('')+'</tbody>';
-  tw.appendChild(tb);w.appendChild(tw);
-
-  const cards=el('div','actgrid');cards.style.gridTemplateColumns='repeat(3,1fr)';cards.style.marginTop='16px';
-  cards.innerHTML=Object.keys(ROLES).map(r=>`<div class="act act-flat">
-     <b>${esc(ROLES[r].n)}${S.rol===r?' <span class="tag">rol actual</span>':''}</b>
-     <span class="d">${esc(ROLES[r].d)}</span>
-     <span class="d">Típicamente: ${esc(ROLES[r].quien)}</span></div>`).join('');
-  w.appendChild(cards);
-
-  w.appendChild(el('div','banner warn','<span class="icon" data-icon="alert-triangle"></span><div><b>Dos definiciones pendientes.</b> Primero: dónde se asignan los roles — ¿en el ABM de usuarios de sigmma.net o en un ABM propio de la Academia? Segundo: si un mismo usuario puede tener dos roles a la vez (el caso real es M. Luna, que carga contenido y también publica). Recomendación: rol único por usuario, y que Publicación incluya todo lo de Contenido, como está acá.</div>'));
-  w.appendChild(el('div','note v3','<b>Pantalla nueva v3 ·</b> Los permisos no son decorativos: el rol elegido arriba deshabilita botones en todas las pantallas. Con rol Contenido, la solapa Publicar muestra el checklist completo pero el botón de publicar queda bloqueado con el motivo; con rol Consulta, los formularios pasan a solo lectura.'));
-  return w;
-}
-
 /* ============================================================
    CONSTRUCTOR
    ============================================================ */
@@ -1831,16 +1959,16 @@ function treeCol(){
         ?'<b>La superficie FRT todavía no está mapeada.</b><br>El frontend B2B2C tiene los módulos FRT-M00 en adelante reservados, pendientes de relevar con producto. Ya se puede crear el primero.'
         :'<b>La superficie CRM todavía no está mapeada.</b><br>Deal Closer es de gobernanza externa hasta la adquisición prevista para 2027. Cobertura mínima recomendada mientras tanto.');
     n.innerHTML=txt+`<div class="row" style="margin-top:16px">
-      <button class="btn btn-p" data-go2="altamod"${dis('editar')}>Crear el primer módulo ${S.superficie}</button>
-      <button class="btn" data-go2="imp-estr"${dis('editar')}>Pegar la estructura</button></div>
-      ${can('editar')?'':'<p class="hint">'+esc(porque('editar'))+'</p>'}`;
+      <button class="btn btn-p" data-go2="altamod">Crear el primer módulo ${S.superficie}</button>
+      <button class="btn" data-go2="imp-estr">Pegar la estructura</button></div>
+      `;
     tree.appendChild(n);
     col.appendChild(tree);return col;
   }
 
   mods.slice().sort((a,b)=>a.orden-b.orden).forEach(mod=>{
     const open=!!S.open[mod.id];
-    const nP=activas(mod).filter(q=>q.estado==='activa').length;
+    const nP=bancoActivas(mod).length;
     const cero=subtemasEnCero(mod);
     const vis=modVisible(mod);
     const n=el('div','node n-mod'+(isSel('mod',mod.id)?' sel':''));
@@ -1851,7 +1979,12 @@ function treeCol(){
       <span class="tag">orden ${mod.orden}</span>
       <span class="tag">${esc(mod.tag)}</span>
       <span class="chip nodot ${vis?'vis-si':'vis-no'}">${vis?'visible':'en preparación'}</span>
-      <span class="tag ${cero&&nP?'stop':(nP>=mod.params.objetivo?'ok':'')}">${nP}/${mod.params.objetivo} preg.</span>`;
+      ${/* Lo que bloquea es el MÍNIMO, no el objetivo: antes este tag se ponía
+            verde solo al llegar a 50 —un estado que ningún módulo alcanzaba— y
+            rojo solo por cobertura. Y ahora es un atajo al banco, que era el otro
+            motivo por el que costaba encontrarlo. */''}
+      <button class="tag ${(cero&&nP)||nP<mod.params.minimo?'stop':(nP<mod.params.objetivo?'warn':'ok')}"
+        data-jump="banco|${mod.id}" title="Abrir el banco de ${mod.id}${nP<mod.params.minimo?' · por debajo del mínimo de '+mod.params.minimo:''}">${nP}/${mod.params.objetivo} preg.</button>`;
     tree.appendChild(n);
     if(!open) return;
 
@@ -1882,7 +2015,6 @@ function treeCol(){
           <span class="idbadge">${id}</span>
           <button class="label" role="treeitem" aria-level="3" data-sel="vid|${mod.id}|${si}|${v.seq}">${esc(v.t)}</button>
           ${emb==='falla'?'<span class="tag stop" title="YouTube no permite embeberlo">embebido <span class="icon icon-sm" data-icon="x"></span></span>':''}
-          ${emb==='sin verificar'?'<span class="tag warn" title="Falta verificar el embebido">embebido ?</span>':''}
           <span class="tag">${v.p}</span>
           <span class="chip ${stCls(p)}">${p}</span>
           ${vidVisible(mod,v)?'<span class="chip nodot vis-si">visible</span>':'<span class="chip nodot vis-no">no visible</span>'}
@@ -1891,19 +2023,19 @@ function treeCol(){
       });
 
       if(S.quick&&S.quick.modId===mod.id&&S.quick.secIdx===si) tree.appendChild(quickForm(mod,sec,si));
-      else {const a=el('div','addrow');a.innerHTML=`<button class="addbtn" data-add="vid|${mod.id}|${si}"${dis('editar')}>+ agregar video acá</button>`;tree.appendChild(a);}
+      else {const a=el('div','addrow');a.innerHTML=`<button class="addbtn" data-add="vid|${mod.id}|${si}">+ agregar video acá</button>`;tree.appendChild(a);}
     });
 
     if(S.qsec&&S.qsec.modId===mod.id) tree.appendChild(secForm(mod));
     else{
       const as=el('div','addrow sec');
-      as.innerHTML=`<button class="addbtn" data-add="sec|${mod.id}"${dis('editar')}>+ agregar sección a ${mod.id}</button>`;
+      as.innerHTML=`<button class="addbtn" data-add="sec|${mod.id}">+ agregar sección a ${mod.id}</button>`;
       tree.appendChild(as);
     }
   });
 
   const am=el('div','addrow mod');
-  am.innerHTML=`<button class="addbtn" data-add="mod"${dis('editar')}>+ agregar módulo ${S.superficie}</button>`;
+  am.innerHTML=`<button class="addbtn" data-add="mod">+ agregar módulo ${S.superficie}</button>`;
   tree.appendChild(am);
 
   tree.appendChild(el('div','note v3','<b>Ajuste v3 ·</b> "+ agregar módulo" y "+ agregar sección" ya no son avisos: abren el alta real. El módulo se crea en estado <b>en preparación</b> y aparece en el árbol al instante; la sección se crea en línea, sin salir del árbol.'));
@@ -1913,12 +2045,12 @@ function treeCol(){
   if(S.checked.size){
     const b=el('div','bulk');
     b.innerHTML=`<span class="count">${S.checked.size} seleccionados</span>
-      <button class="btn btn-sm" data-bulk="regrabar"${dis('editar')}>Marcar a regrabar</button>
-      <button class="btn btn-sm" data-bulk="despublicar"${dis('publicar')}>Despublicar</button>
-      <button class="btn btn-sm" data-bulk="cohorte"${dis('editar')}>Asignar cohorte…</button>
-      <button class="btn btn-sm" data-bulk="mover"${dis('editar')}>Mover a otra sección…</button>
-      <button class="btn btn-sm" data-bulk="verificar"${dis('editar')}>Verificar embebido</button>
-      <button class="btn btn-sm" data-bulk="archivar"${dis('archivar')}>Archivar</button>
+      <button class="btn btn-sm" data-bulk="regrabar">Marcar a regrabar</button>
+      <button class="btn btn-sm" data-bulk="despublicar">Despublicar</button>
+      <button class="btn btn-sm" data-bulk="cohorte">Asignar cohorte…</button>
+      <button class="btn btn-sm" data-bulk="mover">Mover a otra sección…</button>
+      <button class="btn btn-sm" data-bulk="verificar">Verificar embebido</button>
+      <button class="btn btn-sm" data-bulk="archivar">Archivar</button>
       <button class="btn btn-sm x" data-bulk="clear">Deseleccionar</button>`;
     col.appendChild(b);
   }
@@ -1967,8 +2099,8 @@ function quickForm(mod,sec,si){
        <p class="hint">Escribilo como se lo contarías a alguien: una funcionalidad, un concepto.</p></div>
      <div><label>¿En qué estado está?</label>
        <div class="radioset">
-         <label class="radiopill ${modo==='tengo'?'on':''}"><input type="radio" name="modo" value="tengo" ${modo==='tengo'?'checked':''}> Ya lo tengo grabado</label>
-         <label class="radiopill ${modo==='reservar'?'on':''}"><input type="radio" name="modo" value="reservar" ${modo==='reservar'?'checked':''}> Todavía no se grabó</label>
+         <label class="radiopill ${modo==='tengo'?'on':''}" data-modo="tengo"><input type="radio" name="modo" value="tengo" ${modo==='tengo'?'checked':''}> Ya lo tengo grabado</label>
+         <label class="radiopill ${modo==='reservar'?'on':''}" data-modo="reservar"><input type="radio" name="modo" value="reservar" ${modo==='reservar'?'checked':''}> Todavía no se grabó</label>
        </div></div>
      ${modo==='tengo'?`
      <div><label for="qlink">Link de YouTube</label><input type="url" id="qlink" placeholder="https://youtube.com/watch?v=…">
@@ -2009,10 +2141,6 @@ function viewAltaMod(){
     <div><h1>Nuevo módulo</h1><p class="lede" style="margin-bottom:16px">Un módulo es la unidad que dispara la evaluación y la Meet de soporte. Nace <b>en preparación</b>: acepta secciones, videos y preguntas, y no se ve hasta cumplir el checklist.</p></div>
     <button class="btn btn-sm" data-go="constructor"><span class="icon icon-sm" data-icon="arrow-left"></span> Volver al árbol</button></div>`;
 
-  if(!can('editar')){
-    w.appendChild(el('div','banner stop','<span class="icon" data-icon="alert-circle"></span><div><b>Sin permiso para crear módulos.</b> '+esc(porque('editar'))+'</div>'));
-    return w;
-  }
   if(sup==='CRM') w.appendChild(el('div','banner warn','<span class="icon" data-icon="alert-triangle"></span><div><b>Deal Closer es de gobernanza externa hasta la adquisición prevista para 2027.</b> Crear módulos CRM debería requerir confirmación de Producto. Cobertura mínima recomendada mientras tanto.</div>'));
 
   const card=el('div','card');card.style.padding='16px';
@@ -2072,15 +2200,19 @@ function detailCol(){
   if(S.sel.kind==='sec') return detSec(d,m,m.secciones[S.sel.secIdx]);
   return detVid(d,m,m.secciones[S.sel.secIdx]);
 }
-function tabsBar(list){
+/* `attr` dice en qué data-* viaja la pestaña y `actual` cuál está abierta: la ficha
+   del módulo y la consola de evaluación tienen cada una su propio juego, y duplicar
+   el cableado de roles ARIA para eso no tenía sentido. */
+function tabsBar(list,attr,actual){
+  const a=attr||'tab', act=actual===undefined?S.tab:actual;
   const t=el('div','tabs');t.setAttribute('role','tablist');
   list.forEach(([k,l])=>{const b=el('button','tab',esc(l));b.setAttribute('role','tab');
-    b.setAttribute('aria-selected',String(S.tab===k));b.dataset.tab=k;t.appendChild(b);});
+    b.setAttribute('aria-selected',String(act===k));b.setAttribute('data-'+a,k);t.appendChild(b);});
   return t;
 }
 
 function detMod(d,m){
-  const nP=activas(m).filter(q=>q.estado==='activa').length;
+  const nP=bancoActivas(m).length;
   const chk=checklistPub(m);
   const vis=modVisible(m);
   const h=el('div','dhead');
@@ -2092,20 +2224,19 @@ function detMod(d,m){
       <span class="tag">${m.secciones.reduce((a,s)=>a+s.videos.filter(v=>!v.archivado).length,0)} videos</span>
       <span class="tag">${nP}/${m.params.objetivo} preguntas</span><span class="tag">${m.subtemas.length} temas</span></div>`;
   d.appendChild(h);
-  if(!['ficha','banco','eval','publicar'].includes(S.tab)) S.tab='ficha';
-  d.appendChild(tabsBar([['ficha','Ficha'],['banco','Banco'],['eval','Evaluación y Meet'],['publicar','Publicar']]));
+  if(!['ficha','eval','meet','publicar'].includes(S.tab)) S.tab='ficha';
+  d.appendChild(tabsBar([['ficha','Ficha'],['eval','Evaluación'],['meet','Meet'],['publicar','Publicar']]));
   const b=el('div','dbody');b.setAttribute('role','tabpanel');b.setAttribute('tabindex','0');
 
   if(S.tab==='ficha'){
     b.innerHTML=`
-     ${can('editar')?'':'<div class="banner plan"><span class="icon" data-icon="info"></span><div>'+esc(porque('editar'))+' La ficha queda en solo lectura.</div></div>'}
      <div class="fieldgrid">
        <div><label>ID del módulo</label><div class="ro"><span class="mono">${m.id}</span>
          <button class="info" data-info="idmod" aria-label="Cómo se arma el ID">i</button><span class="lock">generado por el sistema</span></div></div>
-       <div><label for="mn">Nombre</label><input type="text" id="mn" value="${esc(m.name)}"${dis('editar')}></div>
+       <div><label for="mn">Nombre</label><input type="text" id="mn" value="${esc(m.name)}"></div>
        <div><label for="mo">Orden en la secuencia</label>
-         <div class="row"><input type="number" id="mo" value="${m.orden}" style="max-width:100px"${dis('editar')}>
-           <button class="btn btn-sm" data-mord="up"${dis('editar')}><span class="icon icon-sm" data-icon="arrow-up"></span> Subir</button><button class="btn btn-sm" data-mord="down"${dis('editar')}><span class="icon icon-sm" data-icon="arrow-down"></span> Bajar</button></div>
+         <div class="row"><input type="number" id="mo" value="${m.orden}" style="max-width:100px">
+           <button class="btn btn-sm" data-mord="up"><span class="icon icon-sm" data-icon="arrow-up"></span> Subir</button><button class="btn btn-sm" data-mord="down"><span class="icon icon-sm" data-icon="arrow-down"></span> Bajar</button></div>
          <p class="hint">De diez en diez, para poder intercalar un módulo nuevo sin renumerar. De este orden depende el desbloqueo secuencial.</p>
        </div>
        <div><label>Cadena de desbloqueo</label>
@@ -2116,92 +2247,84 @@ function detMod(d,m){
          <p class="hint">Tachado: no aplica a ${S.perfilVista}. Punteado: todavía no publicado, y la cadena también lo saltea, así una agencia no queda trabada esperando un módulo que no existe para ella o que no salió aún.</p>
        </div>
        <div><label for="mt">Plan al que aplica</label>
-         <select id="mt"${dis('editar')}><option ${m.tag==='P+B'?'selected':''}>P+B — todos los planes</option><option ${m.tag==='B'?'selected':''}>B — solo Business</option><option ${m.tag==='B-nicho'?'selected':''}>B-nicho — Business, caso puntual</option></select></div>
+         <select id="mt"><option ${m.tag==='P+B'?'selected':''}>P+B — todos los planes</option><option ${m.tag==='B'?'selected':''}>B — solo Business</option><option ${m.tag==='B-nicho'?'selected':''}>B-nicho — Business, caso puntual</option></select></div>
        <div><label>¿Qué plan de agencia incluye este módulo?</label>
          <div class="radioset" style="flex-direction:column;align-items:stretch">
-           ${PERFILES.map(p=>`<label class="radiopill ${m.perfiles.includes(p)?'on':''}" style="justify-content:flex-start"><input type="checkbox" ${m.perfiles.includes(p)?'checked':''}${dis('editar')}> ${p}</label>`).join('')}
+           ${PERFILES.map(p=>`<label class="radiopill ${m.perfiles.includes(p)?'on':''}" style="justify-content:flex-start"><input type="checkbox" ${m.perfiles.includes(p)?'checked':''}> ${p}</label>`).join('')}
          </div></div>
        <div><label>Secciones</label>
-         <div class="row"><button class="btn btn-sm" data-add="sec|${m.id}"${dis('editar')}>+ Agregar sección</button>
+         <div class="row"><button class="btn btn-sm" data-add="sec|${m.id}">+ Agregar sección</button>
            <span class="hint" style="margin:0">${m.secciones.length?m.secciones.map(s=>esc(s.name)).join(' · '):'ninguna todavía'}</span></div></div>
        <div><label>Baja</label>
-         <div class="row"><button class="btn btn-d btn-sm" data-arch="mod"${dis('archivar')}>Archivar módulo</button></div>
-         <p class="hint">No hay borrado físico. Archivar lo saca del árbol y de la Academia, conserva el ID y el historial, y no se puede reactivar sin revisar sus videos.${can('archivar')?'':' '+esc(porque('archivar'))}</p>
+         <div class="row"><button class="btn btn-d btn-sm" data-arch="mod">Archivar módulo</button></div>
+         <p class="hint">No hay borrado físico. Archivar lo saca del árbol y de la Academia, conserva el ID y el historial, y no se puede reactivar sin revisar sus videos.</p>
        </div>
      </div>
      <div class="note v3"><b>Ajuste v3 ·</b> La cadena de desbloqueo ahora distingue tres situaciones: aplica y está publicado, aplica pero <b>todavía no salió</b> (punteado), y no aplica al perfil (tachado). Los dos últimos se saltean. Era la regla que no estaba definida en ningún documento.</div>`;
   }
 
-  if(S.tab==='banco'){
-    const cob=cobertura(m), cero=cob.filter(c=>c.n===0).length;
-    if(m.subtemas.length===0){
-      b.innerHTML=`<div class="banner stop"><span class="icon" data-icon="alert-circle"></span><div><b>Este módulo no tiene temas definidos.</b> Sin temas no se puede validar el banco ni publicar el módulo: el sorteo de 10 sobre 50 podría dejar afuera un concepto central.</div></div>
-        <div class="row"><button class="btn btn-p" data-go2="subtemas|${m.id}">Definir temas</button></div>
-        <div class="note new"><b>Atajo recomendado ·</b> Al abrir el catálogo, el sistema propone los temas derivados de los títulos de los videos del módulo. La persona ajusta en vez de escribir desde cero.</div>`;
-    } else if(nP===0){
-      b.innerHTML=`<div class="emptynote"><b>El banco está vacío.</b><br>Hay dos caminos: cargar preguntas de a una, o pegar la planilla. En los dos casos <b>el tema es obligatorio</b>, porque es lo que garantiza que el examen cubra todos los conceptos del módulo.
-        <div class="row" style="margin-top:16px"><button class="btn btn-p" data-go2="pregunta|${m.id}|new"${dis('editar')}>Agregar pregunta</button><button class="btn" data-go2="imp-preg|${m.id}"${dis('editar')}>Pegar desde planilla</button><button class="btn" data-go2="subtemas|${m.id}">Administrar temas</button></div></div>`;
-    } else {
-      b.innerHTML=`
-       ${cero?`<div class="banner stop"><span class="icon" data-icon="alert-circle"></span><div><b>Publicación bloqueada:</b> ${cero} tema${cero>1?'s':''} sin ninguna pregunta.</div></div>`:''}
-       <div style="font-family:var(--mono);font-size:22px">${nP}<span style="color:var(--muted);font-size:14px"> / ${m.params.objetivo}</span>
-         <span class="tag" style="margin-left:8px">mínimo para publicar: ${m.params.minimo}</span></div>
-       <div class="bar ${nP===0?'zero':(nP<m.params.objetivo?'low':'')}"><i style="width:${Math.min(100,nP/m.params.objetivo*100)}%"></i></div>
-       <ul class="sublist">${cob.map(c=>`<li><div class="lineup"><span>${esc(c.st.name)}</span>
-         <span class="n">${c.n} preguntas ${c.n===0?'<span class="bad">· sin cubrir</span>':''}</span></div>
-         <div class="bar ${c.n===0?'zero':(c.n<6?'low':'')}"><i style="width:${Math.min(100,c.n/8*100)}%"></i></div></li>`).join('')}</ul>
-       <div class="sep"></div>
-       <div class="row"><button class="btn btn-p btn-sm" data-go2="banco|${m.id}">Abrir el banco completo</button>
-         <button class="btn btn-sm" data-go2="pregunta|${m.id}|new"${dis('editar')}>Agregar pregunta</button>
-         <button class="btn btn-sm" data-go2="imp-preg|${m.id}"${dis('editar')}>Pegar desde planilla</button>
-         <button class="btn btn-sm" data-go2="subtemas|${m.id}">Temas</button></div>`;
-    }
-  }
-
+  /* Una sola pestaña "Evaluación" en la ficha del módulo, y es un resumen con una
+     puerta. Antes eran dos —"Banco" y "Evaluación y Meet"—, así que lo mismo vivía
+     en dos lugares y la Meet colgaba de uno de ellos; encontrar la evaluación de un
+     módulo dependía de saber en cuál de las dos mirar. */
   if(S.tab==='eval'){
+    const cob=cobertura(m), cero=cob.filter(c=>c.n===0).length;
     const p=m.params;
     b.innerHTML=`
-     <h3>Parámetros de la evaluación</h3>
-     <p class="hint" style="margin:0 0 8px">Visibles siempre, para que nadie tenga que preguntar de dónde sale el 80 %. Los marcados como regla del MVP no se editan, para que ningún módulo termine con un umbral distinto sin decisión formal.</p>
-     <div class="fieldgrid">
-       <div><label>Preguntas por intento</label><div class="ro"><span class="mono">${p.porIntento}</span><span class="lock">regla del MVP</span></div></div>
-       <div><label>Tamaño objetivo del banco</label><div class="row"><input type="number" value="${p.objetivo}" style="max-width:100px"${dis('params')}><span class="hint" style="margin:0">${can('params')?'editable':esc(porque('params'))}</span></div></div>
-       <div><label>Mínimo duro para publicar</label><div class="row"><input type="number" value="${p.minimo}" style="max-width:100px"${dis('params')}><span class="hint" style="margin:0">${can('params')?'editable':'solo rol Publicación'}</span></div></div>
-       <div><label>Umbral de aprobación</label><div class="ro"><span class="mono">${p.umbral}</span> (8 de 10)<span class="lock">regla del MVP</span></div></div>
-       <div><label>Reintentos permitidos</label><div class="ro">${p.reintentos}<span class="lock">regla del MVP</span></div></div>
-       <div><label>Forzar cobertura por tema en el sorteo</label>
-         <div class="ro"><span class="tag warn">a definir</span> Decisión 2<span class="lock">recomendación: sí</span></div>
-         <p class="hint">Si el módulo tiene 10 temas o menos, garantizar al menos una pregunta de cada uno y el resto al azar.</p></div>
-       <div><label>Mostrar respuestas correctas al finalizar</label>
-         <div class="ro"><span class="tag warn">a definir</span> Decisión 1<span class="lock">recomendación: no</span></div>
-         <p class="hint">Las dos variantes están construidas en la pantalla de resultado: se pueden comparar antes de decidir.</p></div>
-       <div><label>La aprobación caduca si se regraba un video del módulo</label>
-         <div class="ro"><span class="tag warn">a definir</span> Decisión 6<span class="lock">lo decide quien declara el impacto</span></div></div>
-       <div><label>Al aprobar, habilita</label><div class="ro">El módulo siguiente que aplique al perfil${modSiguiente(m)?': '+modSiguiente(m):''}<span class="lock">solo lectura</span></div></div>
-     </div>
+     ${cero&&nP?`<div class="banner stop"><span class="icon" data-icon="alert-circle"></span><div><b>Publicación bloqueada:</b> ${cero} tema${cero>1?'s':''} sin ninguna pregunta activa.</div></div>`:''}
+     ${nP===0?`<div class="emptynote"><b>El banco está vacío.</b><br>Hay dos caminos: cargar preguntas de a una, o pegar la planilla. En los dos casos <b>el tema es obligatorio</b>, porque es lo que garantiza que el examen cubra todos los conceptos del módulo.</div>`:`
+       <div style="font-family:var(--mono);font-size:22px">${nP}<span style="color:var(--muted);font-size:14px"> / ${p.objetivo}</span>
+         <span class="tag ${nP<p.minimo?'stop':'ok'}" style="margin-left:8px">mínimo para publicar: ${p.minimo}</span></div>
+       <div class="bar ${nP<p.minimo?'zero':(nP<p.objetivo?'low':'')}"><i style="width:${Math.min(100,nP/p.objetivo*100)}%"></i></div>
+       <ul class="sublist">${cob.map(c=>`<li><div class="lineup"><span>${esc(c.st.name)}</span>
+         <span class="n">${c.n} preguntas ${c.n===0?'<span class="bad">· sin cubrir</span>':''}</span></div>
+         <div class="bar ${c.n===0?'zero':(c.n<6?'low':'')}"><i style="width:${Math.min(100,c.n/8*100)}%"></i></div></li>`).join('')}</ul>`}
      <div class="sep"></div>
+     <div class="derived"><dl>
+       <dt>Preguntas por intento</dt><dd><span class="mono">${p.porIntento}</span> al azar del banco</dd>
+       <dt>Umbral de aprobación</dt><dd><span class="mono">${p.umbral}</span> (${GLOBAL.umbralAprob} de ${p.porIntento})</dd>
+       <dt>Reintentos</dt><dd>${esc(p.reintentos)}</dd>
+       <dt>Forzar cobertura por tema</dt><dd>${valParam(p.forzarCobertura)}</dd>
+       <dt>Mostrar correctas al finalizar</dt><dd>${valParam(p.mostrarCorrectas)}</dd>
+       <dt>Al aprobar, habilita</dt><dd>El módulo siguiente que aplique al perfil${modSiguiente(m)?': '+modSiguiente(m):''}</dd>
+     </dl></div>
+     <div class="row" style="margin-top:16px">
+       <button class="btn btn-p" data-go2="banco|${m.id}">Abrir la evaluación</button>
+       <button class="btn btn-sm" data-go2="pregunta|${m.id}|new">Agregar pregunta</button>
+       <button class="btn btn-sm" data-go2="imp-preg|${m.id}">Pegar desde planilla</button>
+       <span class="hint" style="margin:0">El banco, la cobertura, los parámetros y la previsualización están en una sola pantalla.</span></div>`;
+  }
+
+  if(S.tab==='meet'){
+    b.innerHTML=`
      <h3>Meet de soporte</h3>
+     <p class="hint" style="margin:0 0 8px">La Meet se habilita al aprobar la evaluación del módulo, así que vive al lado —no adentro—: es otro objeto, con su propia agenda por agencia.</p>
      <div class="fieldgrid">
        <div><label>Meet habilitada para este módulo</label>
-         <div class="radioset"><label class="radiopill ${m.meet.habilitada?'on':''}"><input type="radio" name="meetHab" ${m.meet.habilitada?'checked':''}${dis('editar')}> Sí</label><label class="radiopill ${m.meet.habilitada?'':'on'}"><input type="radio" name="meetHab" ${m.meet.habilitada?'':'checked'}${dis('editar')}> No</label></div></div>
+         <div class="radioset"><label class="radiopill ${m.meet.habilitada?'on':''}"><input type="radio" name="meetHab" ${m.meet.habilitada?'checked':''}> Sí</label><label class="radiopill ${m.meet.habilitada?'':'on'}"><input type="radio" name="meetHab" ${m.meet.habilitada?'':'checked'}> No</label></div></div>
        <div><label>Condición de habilitación</label><div class="ro">${esc(m.meet.condicion)}<span class="lock">regla del MVP</span></div></div>
-       <div><label>Duración</label><div class="row"><input type="number" value="${m.meet.duracion}" style="max-width:90px"${dis('editar')}><span class="hint" style="margin:0">minutos</span></div></div>
+       <div><label>Duración</label><div class="row"><input type="number" value="${m.meet.duracion}" style="max-width:90px"><span class="hint" style="margin:0">minutos</span></div></div>
        <div><label>Enlace de la Meet</label><div class="ro">Se genera por turno al agendar<span class="lock">no se carga acá</span></div>
          <p class="hint">El enlace es propio del turno, no del módulo: vive en la agenda de cada agencia. Cargarlo acá sería una segunda fuente de verdad para el mismo dato.</p></div>
        <div><label>Responsable visible</label><div class="ro">${esc(m.meet.responsable)}</div></div>
      </div>
      <div class="sep"></div>
-     <div class="row"><button class="btn btn-p btn-sm" data-go2="preview|${m.id}">Previsualizar la evaluación</button>
-       <span class="hint" style="margin:0">Sortea 10 preguntas con estas reglas, te deja responder y muestra el resultado como lo vería la agencia.</span></div>`;
+     <div class="row"><button class="btn btn-sm" data-go="meet">Ver las colas de dudas y los turnos</button></div>`;
   }
 
   if(S.tab==='publicar'){
     b.innerHTML=`
+     ${/* Publicado y publicable son dos preguntas distintas. Antes se evaluaba
+           primero el bloqueo, así que un módulo YA publicado que dejó de cumplir
+           un requisito decía "todavía no se puede publicar", que es falso y además
+           tapaba el aviso que importa: está afuera, en manos de las agencias, y
+           hoy no cumple. */''}
      ${chk.bloqueado
-       ?`<div class="banner stop"><span class="icon" data-icon="alert-circle"></span><div><b>Todavía no se puede publicar.</b> Hay ${chk.duros.filter(x=>!x.ok).length} requisito${chk.duros.filter(x=>!x.ok).length>1?'s':''} sin cumplir.</div></div>`
+       ?(vis
+         ?`<div class="banner stop"><span class="icon" data-icon="alert-circle"></span><div><b>Publicado, pero hoy no cumple ${chk.duros.filter(x=>!x.ok).length} requisito${chk.duros.filter(x=>!x.ok).length>1?'s':''}.</b> Las agencias lo siguen viendo. Se corrige o se despublica; no se resuelve solo.</div></div>`
+         :`<div class="banner stop"><span class="icon" data-icon="alert-circle"></span><div><b>Todavía no se puede publicar.</b> Hay ${chk.duros.filter(x=>!x.ok).length} requisito${chk.duros.filter(x=>!x.ok).length>1?'s':''} sin cumplir.</div></div>`)
        :(vis?`<div class="banner ok"><span class="icon" data-icon="check-circle"></span><div><b>Módulo publicado.</b> Publicado por M. Luna el 12/08/2026 a las 16:40.</div></div>`
             :`<div class="banner ok"><span class="icon" data-icon="check-circle"></span><div><b>Listo para publicar.</b> Todos los requisitos duros están cumplidos.</div></div>`)}
-     ${can('publicar')?'':'<div class="banner plan"><span class="icon" data-icon="info"></span><div><b>Podés revisar el checklist, no publicar.</b> '+esc(porque('publicar'))+' El checklist se muestra completo igual: sirve para saber qué falta y a quién pedírselo.</div></div>'}
      <h3>Requisitos que bloquean</h3>
      <ul class="checklist">${chk.duros.map(x=>`<li><span class="mk ${x.ok?'ok':'bad'}">${x.ok?ico('check-circle'):ico('x')}</span><span>${esc(x.t)}<br><span class="hint" style="margin:0">${esc(x.d)}</span></span></li>`).join('')}</ul>
      <div class="sep"></div>
@@ -2209,8 +2332,8 @@ function detMod(d,m){
      <ul class="checklist">${chk.blandos.map(x=>`<li><span class="mk ${x.ok?'ok':'miss'}">${x.ok?ico('check-circle'):ico('circle')}</span><span>${esc(x.t)}<br><span class="hint" style="margin:0">${esc(x.d)}</span></span></li>`).join('')}</ul>
      <div class="sep"></div>
      <div class="row">
-       ${vis?`<button class="btn btn-d" data-pub="off"${dis('publicar')}>Despublicar módulo</button>`
-            :`<button class="btn btn-p" data-pub="on" ${(chk.bloqueado||!can('publicar'))?'disabled':''}>Publicar para las agencias</button>`}
+       ${vis?`<button class="btn btn-d" data-pub="off">Despublicar módulo</button>`
+            :`<button class="btn btn-p" data-pub="on" ${chk.bloqueado?'disabled':''}>Publicar para las agencias</button>`}
        <span class="hint" style="margin:0">${vis?'Despublicar es una acción propia: no hay que tocar el estado de producción de los videos para lograrlo.':'Al publicar se registra quién y cuándo.'}</span>
      </div>
      <div class="note v3"><b>Ajuste v3 ·</b> Se sumó un requisito duro que faltaba —"tiene al menos un video cargado"— porque un módulo vacío pasaba el checklist anterior. Y el botón de publicar respeta el rol: con rol Contenido queda bloqueado con el motivo escrito, en lugar de desaparecer.</div>`;
@@ -2232,11 +2355,11 @@ function detSec(d,m,sec){
   const b=el('div','dbody');b.setAttribute('role','tabpanel');b.setAttribute('tabindex','0');
   b.innerHTML=`
    <div class="fieldgrid">
-     <div><label for="sn">Nombre de la sección</label><input type="text" id="sn" value="${esc(sec.name)}"${dis('editar')}>
+     <div><label for="sn">Nombre de la sección</label><input type="text" id="sn" value="${esc(sec.name)}">
        <p class="hint">Es un agrupamiento visual dentro del módulo. Ayuda a que una lista de 7 videos se lea como dos ideas.</p></div>
      <div><label>Módulo al que pertenece</label><div class="ro"><span class="mono">${m.id}</span> · ${esc(m.name)}<span class="lock">definido por su lugar en el árbol</span></div></div>
-     <div><label>Orden dentro del módulo</label><div class="row"><button class="btn btn-sm" data-sord="up"${dis('editar')}><span class="icon icon-sm" data-icon="arrow-up"></span> Subir</button><button class="btn btn-sm" data-sord="down"${dis('editar')}><span class="icon icon-sm" data-icon="arrow-down"></span> Bajar</button><span class="hint" style="margin:0">posición ${S.sel.secIdx+1} de ${m.secciones.length}</span></div></div>
-     <div><label>Baja</label><div class="row"><button class="btn btn-d btn-sm" data-arch="sec"${dis('archivar')}>Archivar sección</button></div>
+     <div><label>Orden dentro del módulo</label><div class="row"><button class="btn btn-sm" data-sord="up"><span class="icon icon-sm" data-icon="arrow-up"></span> Subir</button><button class="btn btn-sm" data-sord="down"><span class="icon icon-sm" data-icon="arrow-down"></span> Bajar</button><span class="hint" style="margin:0">posición ${S.sel.secIdx+1} de ${m.secciones.length}</span></div></div>
+     <div><label>Baja</label><div class="row"><button class="btn btn-d btn-sm" data-arch="sec">Archivar sección</button></div>
        <p class="hint">Los videos de la sección <b>no quedan huérfanos</b>: se archivan con ella y conservan su ID. Al reactivarla vuelven en el mismo orden.</p></div>
    </div>
    <div class="note v3"><b>Ajuste v3 ·</b> El reordenamiento de secciones ahora funciona de verdad: los botones de subir y bajar mueven la sección en el árbol. Los videos van con ella y su ID no cambia.</div>`;
@@ -2257,7 +2380,7 @@ function detVid(d,m,sec){
     <h2>${esc(v.t)}</h2>
     <div class="dmeta"><span class="tag">${esc(v.tag||m.tag)}</span><span class="tag">Prioridad ${v.p}</span>
       <span class="tag">Cohorte ${esc(v.c)}</span>${v.dur?`<span class="tag">${v.dur}</span>`:(v.durEst?`<span class="tag warn">${v.durEst} estimada</span>`:'')}
-      ${emb==='ok'?'<span class="tag ok">embebido <span class="icon icon-sm" data-icon="check"></span></span>':''}${emb==='falla'?'<span class="tag stop">embebido <span class="icon icon-sm" data-icon="x"></span></span>':''}${emb==='sin verificar'?'<span class="tag warn">embebido sin verificar</span>':''}</div>`;
+      ${emb==='ok'?'<span class="tag ok">embebido <span class="icon icon-sm" data-icon="check"></span></span>':''}${emb==='falla'?'<span class="tag stop">embebido <span class="icon icon-sm" data-icon="x"></span></span>':''}</div>`;
   d.appendChild(h);
   if(!['ficha','prod','traza'].includes(S.tab)) S.tab='ficha';
   d.appendChild(tabsBar([['ficha','Ficha'],['prod','Producción'],['traza','Trazabilidad']]));
@@ -2267,42 +2390,40 @@ function detVid(d,m,sec){
     const falta=[];
     if(!link) falta.push(['Link del video','miss']);
     if(emb==='falla') falta.push(['Embebido rechazado por YouTube: la agencia vería "video no disponible"','bad']);
-    if(emb==='sin verificar') falta.push(['Verificar el embebido','miss']);
     if(!v.dur&&!v.durEst) falta.push(['Duración','miss']);
     if(v.c==='—') falta.push(['Cohorte de grabación','miss']);
     b.innerHTML=`
      ${emb==='falla'?`<div class="banner stop"><span class="icon" data-icon="alert-circle"></span><div><b>El embebido falla.</b> YouTube no permite mostrar este video dentro de la Academia. Revisá la configuración de privacidad y el dominio autorizado. Mientras siga así, el módulo no se puede publicar.</div></div>`:''}
      <div class="fieldgrid">
        <div><label>ID permanente</label><div class="ro"><span class="mono">${id}</span><span class="lock">no cambia nunca, ni si lo regrabás</span></div></div>
-       <div><label for="vt">¿Qué enseña?</label><input type="text" id="vt" value="${esc(v.t)}"${dis('editar')}></div>
+       <div><label for="vt">¿Qué enseña?</label><input type="text" id="vt" value="${esc(v.t)}"></div>
        <div><label>Dónde está en la Academia</label><div class="ro">${esc(m.name)} › ${esc(sec.name)}<span class="lock">se cambia con subir y bajar, abajo</span></div></div>
        <div><label>Orden dentro de la sección</label>
-         <div class="row"><button class="btn btn-sm" data-vord="up"${dis('editar')}><span class="icon icon-sm" data-icon="arrow-up"></span> Subir</button><button class="btn btn-sm" data-vord="down"${dis('editar')}><span class="icon icon-sm" data-icon="arrow-down"></span> Bajar</button>
+         <div class="row"><button class="btn btn-sm" data-vord="up"><span class="icon icon-sm" data-icon="arrow-up"></span> Subir</button><button class="btn btn-sm" data-vord="down"><span class="icon icon-sm" data-icon="arrow-down"></span> Bajar</button>
            <span class="hint" style="margin:0">posición ${pos+1} de ${sec.videos.length}</span></div>
          <p class="hint">El orden es un campo aparte del ID. Mover un video no le cambia el número de secuencia: por eso ${id} puede quedar antes de ${m.id}.020 sin romper nada.</p></div>
        <div><label for="vl">Link del video</label>
-         <div class="row"><input type="url" id="vl" value="${link?'https://youtube.com/watch?v=demo'+v.seq:''}" placeholder="Todavía no hay video grabado"${dis('editar')}>
-           <button class="btn btn-sm"${dis('editar')}>Verificar</button></div>
+         <div class="row"><input type="url" id="vl" value="${link?'https://youtube.com/watch?v=demo'+v.seq:''}" placeholder="Todavía no hay video grabado">
+           <button class="btn btn-sm">Verificar</button></div>
          <p class="hint">${link?(emb==='ok'?'Embebido verificado. Duración leída del video: '+v.dur:(emb==='falla'?'Verificación fallida el 30/08/2026.':'Sin verificar todavía.')):'Se completa cuando el video exista.'}</p></div>
-       ${!link?`<div><label for="vde">Duración estimada</label><div class="row"><input type="text" id="vde" value="${esc(v.durEst||'')}" placeholder="4:00" style="max-width:120px"${dis('editar')}><span class="tag warn">estimada</span></div>
+       ${!link?`<div><label for="vde">Duración estimada</label><div class="row"><input type="text" id="vde" value="${esc(v.durEst||'')}" placeholder="4:00" style="max-width:120px"><span class="tag warn">estimada</span></div>
          <p class="hint">Se reemplaza sola por la duración real cuando se cargue el link.</p></div>`:''}
        <div><label>Plan de este video</label>
          <div class="radioset">
-           <label class="radiopill ${!v.tag?'on':''}"><input type="radio" name="vplan" ${!v.tag?'checked':''}${dis('editar')}> Hereda del módulo (${esc(m.tag)})</label>
-           <label class="radiopill ${v.tag?'on':''}"><input type="radio" name="vplan" ${v.tag?'checked':''}${dis('editar')}> Plan propio</label>
+           <label class="radiopill ${!v.tag?'on':''}"><input type="radio" name="vplan" ${!v.tag?'checked':''}> Hereda del módulo (${esc(m.tag)})</label>
+           <label class="radiopill ${v.tag?'on':''}"><input type="radio" name="vplan" ${v.tag?'checked':''}> Plan propio</label>
          </div>
          ${v.tag?`<div class="row" style="margin-top:8px"><span class="tag plan">${esc(v.tag)}</span><span class="hint" style="margin:0">este video aplica a un plan distinto del módulo, como el Dashboard de KPIs</span></div>`:''}
          <p class="hint">Alineado al prototipo: un video puede tener plan propio dentro de un módulo compartido. Si no aplica al plan de la agencia, se lista con su aviso y no cuenta para el avance.</p></div>
        <div><label>Estado de producción</label>
          <div class="row"><span class="chip ${stCls(prod)}">${prod}</span>
-           ${sig(prod)?`<button class="btn btn-sm btn-p"${dis('editar')}>${sig(prod)}</button>`:''}
-           <button class="btn-q btn-sm">Ver los 7 estados</button></div>
+           </div>
          <p class="hint">Dónde está en el proceso de producción. No define si la agencia lo ve.</p></div>
        <div><label>Visible para las agencias</label>
          <div class="row"><span class="chip nodot ${vis?'vis-si':'vis-no'}">${vis?'sí':'no'}</span>
-           ${vis?'<button class="btn btn-d btn-sm" data-vid-pub="off"'+dis('publicar')+'>Despublicar este video</button>':'<button class="btn btn-sm" data-vid-pub="on" '+((link&&emb==='ok'&&modVisible(m)&&can('publicar'))?'':'disabled')+'>Publicar este video</button>'}</div>
+           ${vis?'<button class="btn btn-d btn-sm" data-vid-pub="off">Despublicar este video</button>':'<button class="btn btn-sm" data-vid-pub="on" '+((link&&emb==='ok'&&modVisible(m))?'':'disabled')+'>Publicar este video</button>'}</div>
          <p class="hint">${modVisible(m)?'Independiente del estado de producción. Un video puede estar grabado y editado sin exponerse todavía.':'El módulo no está publicado, así que ningún video suyo se ve, sin importar su visibilidad individual.'}</p></div>
-       <div><label>Baja</label><div class="row"><button class="btn btn-d btn-sm" data-arch="vid"${dis('archivar')}>Archivar video</button></div>
+       <div><label>Baja</label><div class="row"><button class="btn btn-d btn-sm" data-arch="vid">Archivar video</button></div>
          <p class="hint">Conserva el ID y el historial. El ID no se reutiliza nunca.</p></div>
      </div>
      ${falta.length?`<div class="sep"></div><h3>Falta completar</h3><ul class="checklist">${falta.map(f=>`<li><span class="mk ${f[1]}">${f[1]==='bad'?ico('x'):ico('circle')}</span>${esc(f[0])}</li>`).join('')}</ul>`
@@ -2313,14 +2434,14 @@ function detVid(d,m,sec){
   if(S.tab==='prod'){
     b.innerHTML=`
      <div class="fieldgrid">
-       <div><label for="pc">Cohorte de grabación</label><select id="pc"${dis('editar')}><option>${esc(v.c)}</option><option>Sin asignar</option></select>
+       <div><label for="pc">Cohorte de grabación</label><select id="pc"><option>${esc(v.c)}</option><option>Sin asignar</option></select>
          <p class="hint">Un cohorte agrupa videos que comparten el mismo escenario de datos: se prepara una vez y se graban varios de corrido.</p></div>
-       <div><label for="pp">Prioridad de grabado</label><select id="pp"${dis('editar')}><option>${v.p}</option></select>
+       <div><label for="pp">Prioridad de grabado</label><select id="pp"><option>${v.p}</option></select>
          <p class="hint">P1 es lo que más se repite en los onboardings. No cambia el orden en que la agencia lo ve.</p></div>
        <div><label>Guion</label><div class="row"><button class="btn btn-sm">${prod==='backlog'?'Escribir guion':'Ver guion'}</button>
          <span class="hint" style="margin:0">plantilla: intro a cámara · cuerpo en pantalla · cierre</span></div></div>
        <div><label>Escenario que hay que dejar listo antes de grabar</label>
-         <textarea rows="3" placeholder="Ej: cliente demo ya creado, file abierto con un pasajero"${dis('editar')}>${prod==='backlog'?'':'Viene del video anterior del cohorte.'}</textarea></div>
+         <textarea rows="3" placeholder="Ej: cliente demo ya creado, file abierto con un pasajero">${prod==='backlog'?'':'Viene del video anterior del cohorte.'}</textarea></div>
      </div>`;
   }
 
@@ -2348,23 +2469,151 @@ function detVid(d,m,sec){
   }
   d.appendChild(b);return d;
 }
-function sig(e){return {'backlog':'Marcar como guionado','guionado':'Marcar como grabado','grabado':'Marcar como editado','editado':'Marcar producción terminada','a regrabar':'Cargar nueva versión'}[e]||null;}
 
 /* ============================================================
    BANCO COMPLETO
    ============================================================ */
-function viewBanco(){
+/* ============================================================
+   CONSOLA DE EVALUACIÓN DEL MÓDULO
+   ============================================================ */
+/* Una sola pantalla para la evaluación de un módulo. Antes lo mismo estaba repartido
+   en cinco lugares —dos pestañas de la ficha y tres pantallas propias—, cada uno con
+   su propio "volver" a un padre distinto y ninguno en la navegación principal. Acá
+   el módulo se elige en el encabezado, así que cargar preguntas en otro módulo dejó
+   de exigir salir al árbol de estructura y volver a entrar. */
+const EV_TABS=[['banco','Banco'],['cobertura','Cobertura'],['config','Configuración'],['previa','Previsualizar']];
+
+/* Los parámetros que todavía son decisión abierta se muestran como VALOR y no como
+   cartel fijo: "a definir" es un estado del dato. */
+function valParam(v){
+  return v==='si'?'<span class="tag ok">sí</span>'
+    :(v==='no'?'<span class="tag">no</span>':'<span class="tag warn">a definir</span>');
+}
+
+/* El encabezado responde de un vistazo las cinco preguntas por las que alguien
+   entra acá: de qué módulo, cuánto banco hay, si llega al mínimo, si están todos
+   los temas cubiertos y si el módulo se puede publicar. */
+function evHead(m){
+  const p=m.params, nAct=bancoActivas(m).length;
+  const cob=cobertura(m), cubiertos=cob.filter(c=>c.n>0).length;
+  const chk=checklistPub(m), vis=modVisible(m);
+  const mods=modsVis().slice().sort((a,b)=>a.orden-b.orden);
+  const falta=Math.max(0,p.minimo-nAct);
+  const h=el('div');
+  h.innerHTML=`
+   <h1>Evaluación del módulo</h1>
+   <div class="row" style="margin:0 0 16px">
+     <select id="evMod" style="max-width:420px" aria-label="Módulo cuya evaluación se está viendo">
+       ${mods.map(x=>`<option value="${x.id}" ${x.id===m.id?'selected':''}>${x.id} · ${esc(x.name)}</option>`).join('')}</select>
+     <span class="chip nodot ${vis?'vis-si':'vis-no'}">${vis?'visible para las agencias':'en preparación'}</span>
+     <span style="margin-left:auto"></span>
+     <button class="btn btn-sm" data-go2="mod|${m.id}">Ver la ficha del módulo</button>
+   </div>
+   <div class="dmeta">
+     <span class="tag ${nAct<p.minimo?'stop':(nAct<p.objetivo?'warn':'ok')}">${nAct}/${p.objetivo} activas</span>
+     <span class="tag ${falta?'stop':'ok'}">mínimo ${p.minimo}${falta?' · faltan '+falta:' · cumplido'}</span>
+     <span class="tag ${cubiertos<cob.length?'stop':'ok'}">${cubiertos}/${cob.length} temas cubiertos</span>
+     <span class="tag">${p.porIntento} por intento</span>
+     <span class="tag">umbral ${esc(p.umbral)}</span>
+     <span class="tag ${chk.bloqueado?'stop':'ok'}">${chk.bloqueado?(vis?'publicado y hoy no cumple':'no publicable todavía'):'publicable'}</span>
+   </div>`;
+  return h;
+}
+
+function viewEvaluacion(){
   const m=findMod(S.bModId);
   const w=el('div','wrap');
-  const act=activas(m);
-  const nAct=act.filter(q=>q.estado==='activa').length;
-  const cob=cobertura(m), cero=cob.filter(c=>c.n===0).length;
+  w.appendChild(evHead(m));
+  if(!EV_TABS.some(t=>t[0]===S.evTab)) S.evTab='banco';
+  const tb=tabsBar(EV_TABS,'evtab',S.evTab);tb.classList.add('flush');
+  w.appendChild(tb);
+  const body=el('div');
+  body.setAttribute('role','tabpanel');body.setAttribute('tabindex','0');
+  body.style.paddingTop='16px';
+  body.appendChild(({banco:panelBanco,cobertura:panelCobertura,config:panelConfig,previa:panelPrevia}[S.evTab])(m));
+  w.appendChild(body);
+  return w;
+}
 
-  w.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
-      <div><h1>Banco de preguntas · ${m.id}</h1><p class="lede" style="margin-bottom:8px">${esc(m.name)} · el examen toma ${m.params.porIntento} al azar de este banco.</p></div>
-      <button class="btn btn-sm" data-go2="mod|${m.id}"><span class="icon icon-sm" data-icon="arrow-left"></span> Volver al módulo</button></div>`;
+/* Configuración de ESTE módulo. Los globales son la semilla con la que nace un
+   módulo, no un segundo lugar donde editarlos: por eso acá se edita y en
+   "Parámetros globales" solo se lee. */
+function panelConfig(m){
+  const p=m.params, w=el('div');
+  const tri=(name,val)=>['si','no','a definir'].map(v=>
+    `<label class="radiopill ${val===v?'on':''}"><input type="radio" name="${name}" value="${v}" ${val===v?'checked':''}> ${v==='si'?'sí':v}</label>`).join('');
+  w.appendChild(el('p','lede','Los parámetros son de <b>este</b> módulo. Los marcados como regla del MVP no se editan, para que ningún módulo termine con un umbral distinto sin decisión formal.'));
+
+  const card=el('div','card');card.style.padding='16px';
+  card.innerHTML=`
+   <div class="fieldgrid">
+     <div><label>Preguntas por intento</label><div class="ro"><span class="mono">${p.porIntento}</span><span class="lock">regla del MVP</span></div></div>
+     <div><label for="pObj">Tamaño objetivo del banco</label>
+       <div class="row"><input type="number" id="pObj" value="${p.objetivo}" style="max-width:100px"></div>
+       <p class="hint">La meta a la que se apunta. No bloquea la publicación: eso lo hace el mínimo.</p></div>
+     <div><label for="pMin">Mínimo duro para publicar</label>
+       <div class="row"><input type="number" id="pMin" value="${p.minimo}" style="max-width:100px"></div>
+       <p class="hint">No puede bajar de ${3*p.porIntento}, que es 3× el intento: con reintentos ilimitados, un banco chico se memoriza. Tampoco puede superar al objetivo.</p></div>
+     <div><label>Umbral de aprobación</label><div class="ro"><span class="mono">${esc(p.umbral)}</span> (${GLOBAL.umbralAprob} de ${p.porIntento})<span class="lock">regla del MVP</span></div></div>
+     <div><label>Reintentos permitidos</label><div class="ro">${esc(p.reintentos)}<span class="lock">regla del MVP</span></div></div>
+     <div><label>Forzar cobertura por tema en el sorteo</label>
+       <div class="radioset">${tri('pForzar',p.forzarCobertura)}</div>
+       <p class="hint">Decisión 2, recomendación: sí. Con este módulo alcanza: tiene ${m.subtemas.length} tema${m.subtemas.length===1?'':'s'} y el intento son ${p.porIntento} preguntas, así que ${m.subtemas.length<=p.porIntento?'se puede garantizar una de cada tema':'NO se puede garantizar una de cada tema'}. Se ve funcionando en la pestaña Previsualizar.</p></div>
+     <div><label>Mostrar respuestas correctas al finalizar</label>
+       <div class="radioset">${tri('pCorr',p.mostrarCorrectas)}</div>
+       <p class="hint">Decisión 1, recomendación: no. Define con qué variante abre la pantalla de resultado; las dos siguen estando para comparar.</p></div>
+     <div><label>La aprobación caduca si se regraba un video del módulo</label>
+       <div class="radioset">${tri('pCaduca',p.caducaAlRegrabar)}</div>
+       <p class="hint">Decisión 6. Lo decide quien declara el impacto del regrabado.</p></div>
+     <div><label>Al aprobar, habilita</label><div class="ro">El módulo siguiente que aplique al perfil${modSiguiente(m)?': '+modSiguiente(m):''}<span class="lock">se deriva del orden</span></div></div>
+   </div>
+   <div class="sep"></div>
+   <div class="row">
+     <button class="btn btn-p" data-pmsave="save">Guardar parámetros</button>
+     <button class="btn" data-pmsave="reset">Volver a los valores por defecto</button>
+     <span class="hint" style="margin:0">Por defecto: objetivo ${GLOBAL.bancoObjetivo}, mínimo ${GLOBAL.bancoMinimo} y las tres decisiones sin definir.</span>
+   </div>`;
+  w.appendChild(card);
+  w.appendChild(el('div','note v3','<b>Ajuste ·</b> El objetivo y el mínimo se editaban en dos pantallas —acá y en Parámetros globales— sin precedencia definida, y el global no propagaba a los módulos ya creados porque se copiaba una sola vez al iniciar. Ahora el módulo es el único dueño de sus parámetros y el global es la semilla.'));
+  return w;
+}
+
+/* Las filas que el filtro deja ver. Vive afuera de la vista porque las acciones en
+   lote la necesitan igual: una selección tiene que aplicarse sobre lo que la
+   persona está viendo, no sobre lo que quedó marcado antes de filtrar. */
+function filasBanco(m){
+  return bancoVigente(m).filter(q=>{
+    if(S.bFiltro&&!q.e.toLowerCase().includes(S.bFiltro.toLowerCase())) return false;
+    if(S.bSub==='__none'&&q.st) return false;
+    if(S.bSub&&S.bSub!=='__none'&&q.st!==S.bSub) return false;
+    if(S.bEstado&&q.estado!==S.bEstado) return false;
+    if(S.bCorregir&&!problemas(q).length) return false;
+    return true;
+  });
+}
+/* Los IDs seleccionados que además están visibles. */
+function selVisible(m){return filasBanco(m).filter(q=>S.bChecked.has(q.id)).map(q=>q.id);}
+
+function panelBanco(m){
+  const w=el('div');
+  const act=bancoVigente(m);
+  const nAct=bancoActivas(m).length;
+  const cob=cobertura(m), cero=cob.filter(c=>c.n===0).length;
+  const futuro=bancoFuturo(m);
+
+  /* El vacío se resuelve primero: antes esta pantalla mostraba el bloqueo de
+     cobertura, la barra en 0 y los filtros de una tabla que no existía, y recién
+     al final decía que el banco estaba vacío. Cuatro mensajes para decir uno. */
+  if(!act.length){
+    w.appendChild(el('div','emptynote','<b>El banco está vacío.</b><br>Dos caminos: cargar de a una o pegar la planilla. El tema es obligatorio en los dos, porque es lo que garantiza que el sorteo de '+m.params.porIntento+' cubra todos los conceptos del módulo.'
+      +'<div class="row" style="margin-top:16px"><button class="btn btn-p" data-go2="pregunta|'+m.id+'|new">Agregar la primera pregunta</button>'
+      +'<button class="btn" data-go2="imp-preg|'+m.id+'">Pegar desde planilla</button></div>'));
+    if(futuro) w.appendChild(el('div','banner plan','<span class="icon" data-icon="info"></span><div>Hay <b>'+futuro+'</b> pregunta'+(futuro>1?'s':'')+' cargada'+(futuro>1?'s':'')+' a mano en un momento posterior. El banco muestra lo que existe con la '+ESCENAS[S.escena].label+'.</div>'));
+    return w;
+  }
 
   if(cero) w.appendChild(el('div','banner stop',`<span class="icon" data-icon="alert-circle"></span><div><b>Publicación bloqueada:</b> ${cero} tema${cero>1?'s':''} sin ninguna pregunta activa (${cob.filter(c=>c.n===0).map(c=>esc(c.st.name)).join(', ')}).</div>`));
+  if(futuro) w.appendChild(el('div','banner plan',`<span class="icon" data-icon="info"></span><div>Hay <b>${futuro}</b> pregunta${futuro>1?'s':''} cargada${futuro>1?'s':''} a mano en un momento posterior, así que no se ven acá. El banco siempre muestra lo que existe con la ${ESCENAS[S.escena].label}.</div>`));
 
   const head=el('div','card');head.style.padding='16px';head.style.marginBottom='16px';
   head.innerHTML=`<div class="row" style="gap:24px;align-items:flex-end">
@@ -2378,147 +2627,199 @@ function viewBanco(){
   const bar=el('div','row');bar.style.marginBottom='8px';
   bar.innerHTML=`
     <input type="text" id="bFiltro" placeholder="Buscar en el enunciado" value="${esc(S.bFiltro)}" style="max-width:220px" aria-label="Buscar">
-    <select id="bSub" style="max-width:190px"><option value="">Todos los temas</option>
+    <select id="bSub" style="max-width:190px" aria-label="Filtrar por tema"><option value="">Todos los temas</option>
       ${m.subtemas.map(s=>`<option value="${s.id}" ${S.bSub===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}
       <option value="__none" ${S.bSub==='__none'?'selected':''}>Sin tema</option></select>
-    <select id="bEstado" style="max-width:150px"><option value="">Todos los estados</option>
+    <select id="bEstado" style="max-width:180px" aria-label="Filtrar por estado"><option value="">Todos los estados</option>
       ${['activa','borrador','inactiva'].map(e=>`<option ${S.bEstado===e?'selected':''}>${e}</option>`).join('')}</select>
     <label class="row" style="font-size:14px;color:var(--muted);gap:8px;margin:0"><input type="checkbox" id="bCorregir" ${S.bCorregir?'checked':''} style="accent-color:var(--accent)"> Solo las que tienen algo para corregir</label>
     <span style="margin-left:auto"></span>
-    <button class="btn btn-p btn-sm" data-go2="pregunta|${m.id}|new"${dis('editar')}>Agregar pregunta</button>
-    <button class="btn btn-sm" data-go2="imp-preg|${m.id}"${dis('editar')}>Pegar desde planilla</button>
-    <button class="btn btn-sm" data-go2="subtemas|${m.id}">Administrar temas</button>`;
+    <button class="btn btn-p btn-sm" data-go2="pregunta|${m.id}|new">Agregar pregunta</button>
+    <button class="btn btn-sm" data-go2="imp-preg|${m.id}">Pegar desde planilla</button>
+    <button class="btn btn-sm" data-evtab="cobertura">Ver cobertura por tema</button>`;
   w.appendChild(bar);
 
-  const rows=act.filter(q=>{
-    if(S.bFiltro&&!q.e.toLowerCase().includes(S.bFiltro.toLowerCase())) return false;
-    if(S.bSub==='__none'&&q.st) return false;
-    if(S.bSub&&S.bSub!=='__none'&&q.st!==S.bSub) return false;
-    if(S.bEstado&&q.estado!==S.bEstado) return false;
-    if(S.bCorregir&&!problema(q)) return false;
-    return true;
-  });
-
-  if(!act.length){
-    w.appendChild(el('div','emptynote','<b>El banco está vacío.</b><br>Dos caminos: cargar de a una o pegar la planilla. El tema es obligatorio en los dos, porque es lo que garantiza que el sorteo de 10 cubra todos los conceptos del módulo.'));
-    return w;
-  }
+  const rows=filasBanco(m);
+  const todas=rows.length>0&&rows.every(q=>S.bChecked.has(q.id));
 
   const tw=el('div','tablewrap');
   const tb=el('table');
-  tb.innerHTML=`<thead><tr><th style="width:26px"></th><th>Enunciado</th><th style="width:150px">Tema</th>
+  tb.innerHTML=`<thead><tr>
+    <th style="width:26px"><input type="checkbox" data-ballcheck="1" ${todas?'checked':''} style="accent-color:var(--accent)" aria-label="Seleccionar las ${rows.length} preguntas visibles"></th>
+    <th>Enunciado</th><th style="width:150px">Tema</th>
     <th style="width:80px">Opciones</th><th style="width:90px">Estado</th><th style="width:120px">Video de repaso</th><th style="width:130px">Última edición</th></tr></thead>`;
   const body=el('tbody');
   rows.forEach(q=>{
-    const pr=problema(q);
+    const pr=problemas(q);
     const stn=q.st?m.subtemas.find(s=>s.id===q.st):null;
     const nOk=q.ops.filter(o=>o.ok).length;
-    const tr=el('tr');tr.dataset.bad=String(!!pr);
+    const tr=el('tr');tr.dataset.bad=String(!!pr.length);
     tr.innerHTML=`
-      <td><input type="checkbox" data-bcheck="${q.id}" ${S.bChecked.has(q.id)?'checked':''} style="accent-color:var(--accent)" aria-label="Seleccionar"></td>
+      <td><input type="checkbox" data-bcheck="${q.id}" ${S.bChecked.has(q.id)?'checked':''} style="accent-color:var(--accent)" aria-label="Seleccionar ${q.id}"></td>
       <td><button class="label" style="text-align:left;background:none;border:0;padding:0;color:var(--ink);cursor:pointer" data-go2="pregunta|${m.id}|${q.id}" title="${esc(q.e)}">${esc(q.e.length>82?q.e.slice(0,82)+'…':q.e)}</button>
-        ${pr?`<span class="rowerr">${esc(pr)}</span>`:''}
-        ${q.acierto<15?`<span class="rowwarn">Solo ${q.acierto} % de acierto: revisá si el problema está en la pregunta.</span>`:''}</td>
+        ${pr.map(x=>`<span class="rowerr">${esc(x)}</span>`).join('')}
+        ${q.acierto!=null&&q.acierto<15?`<span class="rowwarn">Solo ${q.acierto} % de acierto: revisá si el problema está en la pregunta.</span>`:''}
+        ${q.manual?'<span class="rowwarn">Cargada a mano en esta sesión.</span>':''}</td>
       <td>${stn?`<span class="tag ok">${esc(stn.name)}</span>`:'<span class="tag stop">sin tema</span>'}</td>
       <td>${q.ops.length}${nOk!==1?` <span class="tag stop">${nOk} correctas</span>`:''}</td>
       <td><span class="chip ${q.estado==='activa'?'st-publicado':(q.estado==='borrador'?'st-guionado':'st-backlog')}">${q.estado}</span></td>
       <td class="cellmono">${esc(q.repaso||'—')}</td>
-      <td>${esc(q.fecha)}<br><span class="hint" style="margin:0">${esc(q.por)}</span></td>`;
+      <td>${fmtFecha(q.fecha)}<br><span class="hint" style="margin:0">${esc(q.por)} · v${q.ver}</span></td>`;
     body.appendChild(tr);
   });
   tb.appendChild(body);tw.appendChild(tb);w.appendChild(tw);
 
   const sum=el('div','summary');
   sum.innerHTML=`<span>${rows.length} de ${act.length} preguntas</span>
-    <span class="miss">${act.filter(problema).length} con algo para corregir</span>
-    <span style="margin-left:auto" class="row"><button class="btn btn-sm" data-go2="preview|${m.id}">Previsualizar un intento</button></span>`;
+    <span class="miss">${act.filter(q=>problemas(q).length).length} con algo para corregir</span>
+    <span style="margin-left:auto" class="row"><button class="btn btn-sm" data-evtab="previa">Previsualizar un intento</button></span>`;
   w.appendChild(sum);
 
   if(S.bChecked.size){
-    const b=el('div','bulk');b.style.position='sticky';b.style.borderRadius='var(--r)';
-    b.innerHTML=`<span class="count">${S.bChecked.size} preguntas</span>
-      <button class="btn btn-sm" data-bbulk="activar"${dis('editar')}>Activar</button>
-      <button class="btn btn-sm" data-bbulk="desactivar"${dis('editar')}>Desactivar</button>
-      <button class="btn btn-sm" data-bbulk="subtema"${dis('editar')}>Asignar tema…</button>
+    /* El lote se aplica sobre la intersección con lo visible, y lo dice: antes una
+       selección de 12 sobrevivía al cambio de filtro y se aplicaba sobre filas que
+       ya no estaban en pantalla. */
+    const vis=selVisible(m).length, ocultas=S.bChecked.size-vis;
+    const b=el('div','bulk');b.style.borderRadius='var(--r)';
+    b.innerHTML=`<span class="count">${vis} pregunta${vis===1?'':'s'} seleccionada${vis===1?'':'s'}</span>
+      ${ocultas?`<span class="tag warn">${ocultas} más quedaron fuera del filtro y no se tocan</span>`:''}
+      <button class="btn btn-sm" data-bbulk="activar">Activar</button>
+      <button class="btn btn-sm" data-bbulk="desactivar">Desactivar</button>
+      <select id="bBulkTema" style="max-width:200px" aria-label="Asignar tema a las seleccionadas">
+        <option value="">Asignar tema…</option>
+        ${m.subtemas.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select>
       <button class="btn btn-sm" data-bbulk="exportar">Exportar a planilla</button>
       <button class="btn btn-sm x" data-bbulk="clear">Deseleccionar</button>`;
     w.appendChild(b);
   }
   return w;
 }
-function problema(q){
+/* Todo lo que hay que corregir en una pregunta, no solo lo primero que aparece.
+   Y una pregunta en borrador sin tema NO bloquea la publicación —no cuenta para la
+   cobertura hasta que se active—, así que el aviso se dice distinto según el
+   estado: antes el filtro "algo para corregir" heredaba ese falso positivo. */
+function problemas(q){
   const n=q.ops.filter(o=>o.ok).length;
-  if(!q.st) return 'Sin tema: no cuenta para la cobertura y bloquea la publicación.';
-  if(n===0) return 'Ninguna opción marcada como correcta.';
-  if(n>1) return 'Más de una opción marcada como correcta.';
-  if(q.ops.length<2) return 'Menos de dos opciones.';
-  return null;
+  const out=[];
+  if(!q.st) out.push(q.estado==='activa'
+    ?'Sin tema: no cuenta para la cobertura y bloquea la publicación.'
+    :'Sin tema: hay que elegirlo antes de activarla.');
+  if(q.ops.length<2) out.push('Menos de dos opciones.');
+  if(n===0) out.push('Ninguna opción marcada como correcta.');
+  if(n>1) out.push('Más de una opción marcada como correcta.');
+  return out;
 }
 
 /* ============================================================
    ALTA / EDICIÓN DE PREGUNTA
    ============================================================ */
+/* Cuatro opciones es lo recomendado por el propio formulario, así que una pregunta
+   nueva ya nace con esas cuatro filas. */
+function draftDe(q){
+  return q
+    ? {e:q.e,ops:q.ops.map(o=>({t:o.t,ok:!!o.ok})),st:q.st||'',repaso:q.repaso||'',
+       explicacion:q.explicacion||'',estado:q.estado}
+    : {e:'',ops:[{t:'',ok:true},{t:'',ok:false},{t:'',ok:false},{t:'',ok:false}],
+       st:'',repaso:'',explicacion:'',estado:'borrador'};
+}
+/* Lee el formulario del DOM a un objeto. Lo usan igual el guardado y las acciones
+   que reconstruyen la pantalla —agregar o quitar una opción—, que si no borrarían
+   lo que la persona venía tipeando. Mismo criterio que el alta de módulo. */
+function leerFormQ(){
+  const txt=Array.from(document.querySelectorAll('.optxt')).map(i=>i.value);
+  const ok=document.querySelector('.optok:checked');
+  const iOk=ok?+ok.value:0;
+  const est=document.querySelector('input[name="qest"]:checked');
+  return {
+    e:($('#qe')&&$('#qe').value.trim())||'',
+    ops:txt.map((t,i)=>({t:t.trim(),ok:i===iOk})),
+    st:($('#qst')&&$('#qst').value)||'',
+    repaso:($('#qrep')&&$('#qrep').value)||'',
+    explicacion:($('#qexp')&&$('#qexp').value.trim())||'',
+    estado:est?est.value:'borrador'
+  };
+}
+/* Lo que impide guardar, en el orden en que conviene corregirlo. Devuelve null
+   cuando está bien. El aviso de enunciado repetido NO bloquea, como dice el hint. */
+function validarQ(m,d,id){
+  if(!d.e) return 'Falta el enunciado.';
+  if(!d.st) return 'Falta el tema: es obligatorio, porque es lo que garantiza que el sorteo cubra todos los conceptos del módulo.';
+  const conTexto=d.ops.filter(o=>o.t);
+  if(conTexto.length<2) return 'Hacen falta al menos dos opciones con texto.';
+  if(conTexto.length!==d.ops.length) return 'Hay opciones vacías: completalas o quitalas.';
+  if(d.ops.filter(o=>o.ok).length!==1) return 'Tiene que haber exactamente una opción marcada como correcta.';
+  return null;
+}
 function viewPregunta(){
   const m=findMod(S.bModId);
   const nueva=S.qEdit==='new'||!S.qEdit;
-  const q=nueva?null:m.pool.find(x=>x.id===S.qEdit);
+  const q=nueva?null:qDe(m,S.qEdit);
   const w=el('div','wrap');
-  const ops=q?q.ops:[{t:'',ok:true},{t:'',ok:false},{t:'',ok:false},{t:'',ok:false}];
+  /* El borrador en curso vive en S.qDraft y no en el DOM: agregar o quitar una
+     opción reconstruye la pantalla, y sin esto se perdería lo tipeado. Va con la
+     clave de qué se está editando, así un borrador viejo no se cuela en otra
+     pregunta y no hace falta limpiarlo en cada salida. */
+  const dkey=m.id+'|'+(nueva?'new':S.qEdit);
+  if(!S.qDraft||S.qDraft.key!==dkey) S.qDraft={key:dkey,...draftDe(q)};
+  const d=S.qDraft;
+  const ops=d.ops;
   const vids=vidsDe(m).filter(x=>!x.v.archivado);
+  const off=b=>b?' disabled':'';
+  const respondida=q&&q.acierto!=null;
 
   w.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
     <div><h1>${nueva?'Nueva pregunta':'Editar pregunta'}</h1>
       <p class="lede" style="margin-bottom:16px">Banco de ${m.id} · ${esc(m.name)}</p></div>
     <button class="btn btn-sm" data-go2="banco|${m.id}"><span class="icon icon-sm" data-icon="arrow-left"></span> Volver al banco</button></div>`;
 
-  if(!can('editar')){
-    w.appendChild(el('div','banner stop','<span class="icon" data-icon="alert-circle"></span><div><b>Solo lectura.</b> '+esc(porque('editar'))+'</div>'));
-  }
-  if(!nueva&&q&&q.acierto<15) w.appendChild(el('div','banner warn',`<span class="icon" data-icon="alert-triangle"></span><div><b>Solo ${q.acierto} % de acierto</b> sobre ${12+q.acierto} respuestas. Cuando casi todos fallan, el problema suele estar en el enunciado o en los distractores, no en las agencias.</div>`));
-  if(!nueva) w.appendChild(el('div','banner plan',`<span class="icon" data-icon="info"></span><div>Editar una pregunta ya respondida <b>crea la versión ${q?q.ver+1:2}</b>. Los intentos anteriores siguen apuntando a la versión con la que se respondieron, así las notas históricas quedan auditables.</div>`));
+  if(respondida&&q.acierto<15) w.appendChild(el('div','banner warn',`<span class="icon" data-icon="alert-triangle"></span><div><b>Solo ${q.acierto} % de acierto</b> sobre ${12+q.acierto} respuestas. Cuando casi todos fallan, el problema suele estar en el enunciado o en los distractores, no en las agencias.</div>`));
+  /* El versionado solo aplica a lo que ya se respondió: subir la versión de una
+     pregunta que nunca entró en un intento infla el historial sin auditar nada. */
+  if(respondida) w.appendChild(el('div','banner plan',`<span class="icon" data-icon="info"></span><div>Esta pregunta ya se respondió, así que guardarla <b>crea la versión ${q.ver+1}</b>. Los intentos anteriores siguen apuntando a la versión con la que se respondieron, así las notas históricas quedan auditables.</div>`));
 
   const card=el('div','card');card.style.padding='16px';
   card.innerHTML=`
    <div class="fieldgrid">
-     <div><label for="qe">Enunciado</label><textarea id="qe" rows="3" placeholder="Ej: Un recibo detallado sirve para…"${dis('editar')}>${esc(q?q.e:'')}</textarea>
+     <div><label for="qe">Enunciado</label><textarea id="qe" rows="3" placeholder="Ej: Un recibo detallado sirve para…"${off()}>${esc(d.e)}</textarea>
        <p class="hint">Si coincide con otra pregunta del mismo módulo, avisamos antes de guardar. No bloquea.</p></div>
-     <div><label for="qtipo">Tipo</label><select id="qtipo"${dis('editar')}><option>Opción única</option></select>
+     <div><label for="qtipo">Tipo</label><select id="qtipo"${off()}><option>Opción única</option></select>
        <p class="hint">El MVP admite solo opción única. Verdadero/falso es un caso particular con dos opciones, así que no necesita desarrollo aparte (decisión 4).</p></div>
      <div><label>Opciones y respuesta correcta</label>
        ${ops.map((o,i)=>`<div class="opteditor">
-         <label class="radiopill ${o.ok?'on':''}" style="padding:11px 16px"><input type="radio" name="correcta" ${o.ok?'checked':''}${dis('editar')} aria-label="Marcar como correcta"> correcta</label>
-         <input type="text" value="${esc(o.t)}" placeholder="Opción ${String.fromCharCode(65+i)}"${dis('editar')} aria-label="Texto de la opción ${String.fromCharCode(65+i)}">
-         <button class="rowact" title="Quitar opción"><span class="icon icon-sm" data-icon="x"></span></button></div>`).join('')}
-       <button class="addbtn" style="margin-top:4px"${dis('editar')}>+ agregar opción</button>
+         <label class="radiopill ${o.ok?'on':''}" style="padding:11px 16px"><input type="radio" name="correcta" class="optok" value="${i}" data-qopt="correcta|${i}" ${o.ok?'checked':''}${off()} aria-label="Marcar la opción ${String.fromCharCode(65+i)} como correcta"> correcta</label>
+         <input type="text" class="optxt" value="${esc(o.t)}" placeholder="Opción ${String.fromCharCode(65+i)}"${off()} aria-label="Texto de la opción ${String.fromCharCode(65+i)}">
+         <button class="rowact" data-qopt="del|${i}" title="Quitar la opción ${String.fromCharCode(65+i)}"${off(ops.length<=2)}><span class="icon icon-sm" data-icon="x"></span></button></div>`).join('')}
+       <button class="addbtn" data-qopt="add" style="margin-top:4px"${off(ops.length>=5)}>+ agregar opción</button>
        <p class="hint">De 2 a 5 opciones, recomendado 4. Exactamente una correcta.</p></div>
      <div><label for="qst">Tema (sección del módulo)</label>
-       <div class="row"><select id="qst" style="max-width:300px"${dis('editar')}>
+       <div class="row"><select id="qst" style="max-width:300px"${off()}>
          <option value="">Elegí la sección…</option>
-         ${m.subtemas.map(s=>`<option value="${s.id}" ${q&&q.st===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select></div>
+         ${m.subtemas.map(s=>`<option value="${s.id}" ${d.st===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select></div>
        <p class="hint">Obligatorio. El tema es una <b>sección</b> del módulo: es lo que garantiza que el sorteo cubra todos los conceptos y es la misma taxonomía de las dudas de la Meet. Se agrega una sección nueva desde el árbol de estructura.</p></div>
-     <div><label for="qrep">Video de repaso</label><select id="qrep" style="max-width:340px"${dis('editar')}>
+     <div><label for="qrep">Video de repaso</label><select id="qrep" style="max-width:340px"${off()}>
        <option value="">Sin video asociado</option>
-       ${vids.map(x=>`<option value="${m.id}.${x.v.seq}" ${q&&q.repaso===m.id+'.'+x.v.seq?'selected':''}>${m.id}.${x.v.seq} · ${esc(x.v.t.slice(0,44))}</option>`).join('')}</select>
-       <p class="hint">Recomendado: es lo que la pantalla de resultado le muestra a la agencia cuando falla este concepto, en lugar de darle la respuesta.</p></div>
-     <div><label for="qexp">Explicación</label><textarea id="qexp" rows="2" placeholder="Por qué la correcta es la correcta"${dis('editar')}></textarea>
+       ${vids.map(x=>`<option value="${m.id}.${x.v.seq}" ${d.repaso===m.id+'.'+x.v.seq?'selected':''}>${m.id}.${x.v.seq} · ${esc(x.v.t.slice(0,44))}</option>`).join('')}</select>
+       <p class="hint">Recomendado: es lo que la pantalla de resultado le muestra a la agencia cuando falla este concepto, en lugar de darle la respuesta. Conviene que sea un video del tema elegido.</p></div>
+     <div><label for="qexp">Explicación</label><textarea id="qexp" rows="2" placeholder="Por qué la correcta es la correcta"${off()}>${esc(d.explicacion)}</textarea>
        <p class="hint">Su uso depende de la decisión 1: si no se muestran las respuestas correctas al finalizar, esta explicación queda para uso interno.</p></div>
      <div><label>Estado</label>
-       <div class="radioset">${['borrador','activa','inactiva'].map(e=>`<label class="radiopill ${(q?q.estado:'borrador')===e?'on':''}"><input type="radio" name="qest" ${(q?q.estado:'borrador')===e?'checked':''}${dis('editar')}> ${e}</label>`).join('')}</div>
+       <div class="radioset">${['borrador','activa','inactiva'].map(e=>`<label class="radiopill ${d.estado===e?'on':''}"><input type="radio" name="qest" value="${e}" ${d.estado===e?'checked':''}${off()}> ${e}</label>`).join('')}</div>
        <p class="hint">Por defecto borrador: no entra en el sorteo ni cuenta para la cobertura hasta activarla.</p></div>
    </div>
    <div class="sep"></div>
    <div class="derived"><dl>
-     <dt>ID de pregunta</dt><dd><span class="idbadge">${q?q.id:m.id+'-Q'+String(m.pool.length+1).padStart(3,'0')}</span></dd>
+     <dt>ID de pregunta</dt><dd><span class="idbadge">${q?q.id:nextQId(m)}</span>${q?'':' <span class="hint" style="display:inline">se reserva al guardar</span>'}</dd>
      <dt>Módulo · superficie</dt><dd>${m.id} · ${m.sup}</dd>
      <dt>Versión</dt><dd>v${q?q.ver:1}</dd>
-     <dt>Creada por</dt><dd>${q?esc(q.por)+' el '+esc(q.fecha):'M. Luna · hoy'}</dd>
-     <dt>Veces respondida</dt><dd>${q?(12+q.acierto)+' · '+q.acierto+' % de acierto':'todavía sin intentos'}</dd>
+     <dt>${q?'Última edición':'Creada por'}</dt><dd>${q?esc(q.por)+' el '+fmtFecha(q.fecha):'M. Luna · '+fmtFecha(hoyISO())}</dd>
+     <dt>Veces respondida</dt><dd>${respondida?(12+q.acierto)+' · '+q.acierto+' % de acierto':'todavía sin intentos'}</dd>
+     <dt>Existe desde</dt><dd>${esc(ESCENAS[q?q.desde:S.escena].label)}<span class="lock">el momento en el que se cargó</span></dd>
    </dl></div>
    <div class="row" style="margin-top:16px">
-     <button class="btn btn-p" data-qsave="1"${dis('editar')}>Guardar</button>
-     <button class="btn" data-qsave="more"${dis('editar')}>Guardar y crear otra</button>
+     <button class="btn btn-p" data-qsave="1"${off()}>Guardar</button>
+     <button class="btn" data-qsave="more"${off()}>Guardar y crear otra</button>
      <button class="btn" data-go2="preview|${m.id}">Previsualizar como agencia</button>
-     ${nueva?'':'<button class="btn"'+dis('editar')+'>Duplicar</button>'}
+     ${nueva?'':'<button class="btn" data-qdup="1"'+off()+'>Duplicar</button>'}
      <button class="btn-q" data-go2="banco|${m.id}">Cancelar</button>
    </div>
    <p class="hint">"Guardar y crear otra" mantiene el tema elegido, que es como se carga un banco en la práctica: de corrido, por concepto.</p>`;
@@ -2529,24 +2830,21 @@ function viewPregunta(){
 /* ============================================================
    CATÁLOGO DE SUB-TEMAS
    ============================================================ */
-function viewSubtemas(){
-  const m=findMod(S.bModId);
-  const w=el('div','wrap');
+function panelCobertura(m){
+  const w=el('div');
   const cob=cobertura(m);
-  w.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
-    <div><h1>Temas del banco · ${m.id}</h1><p class="lede" style="margin-bottom:16px">Alineado al prototipo aprobado: <b>el tema del banco es la sección del módulo</b>. No hay un catálogo aparte que mantener. Cada pregunta pertenece a una sección, y el sorteo de ${m.params.porIntento} debe cubrirlas todas.</p></div>
-    <button class="btn btn-sm" data-go2="mod|${m.id}"><span class="icon icon-sm" data-icon="arrow-left"></span> Volver al módulo</button></div>`;
+  w.appendChild(el('p','lede','Alineado al prototipo aprobado: <b>el tema del banco es la sección del módulo</b>. No hay un catálogo aparte que mantener. Cada pregunta pertenece a una sección, y el sorteo de '+m.params.porIntento+' debe cubrirlas todas.'));
 
   w.appendChild(el('div','banner plan','<span class="icon" data-icon="info"></span><div>Los temas se administran como <b>secciones</b>, en el árbol de estructura. Acá se ve la cobertura del banco por sección, en solo lectura. Para renombrar, reordenar o archivar un tema, se edita la sección.</div>'));
 
   if(!m.secciones.length){
-    w.appendChild(el('div','emptynote','<b>Este módulo no tiene secciones.</b><br>Agregá una sección desde el árbol: es, a la vez, el agrupamiento visual de los videos y el tema del banco.<div class="row" style="margin-top:16px"><button class="btn btn-p" data-add="sec|'+m.id+'"'+dis('editar')+'>Agregar una sección</button></div>'));
+    w.appendChild(el('div','emptynote','<b>Este módulo no tiene secciones.</b><br>Agregá una sección desde el árbol: es, a la vez, el agrupamiento visual de los videos y el tema del banco.<div class="row" style="margin-top:16px"><button class="btn btn-p" data-add="sec|'+m.id+'">Agregar una sección</button></div>'));
     return w;
   }
 
   const tw=el('div','tablewrap');
   const tb=el('table');
-  tb.innerHTML=`<thead><tr><th>Tema (= sección)</th><th style="width:110px">Videos</th><th style="width:120px">Preguntas</th><th style="width:90px">Orden</th></tr></thead>`;
+  tb.innerHTML=`<thead><tr><th>Tema (= sección)</th><th style="width:110px">Videos</th><th style="width:120px">Preguntas</th><th style="width:90px">Orden</th><th style="width:150px"></th></tr></thead>`;
   const body=el('tbody');
   cob.forEach((c,i)=>{
     const sec=m.secciones[i];
@@ -2555,14 +2853,17 @@ function viewSubtemas(){
     tr.innerHTML=`<td>${esc(c.st.name)}</td>
       <td class="cellmono">${nv}</td>
       <td class="cellmono">${c.n}${c.n===0?' <span class="tag stop">sin cubrir</span>':(c.n<6?' <span class="tag warn">baja</span>':'')}</td>
-      <td class="cellmono">${c.st.orden}</td>`;
+      <td class="cellmono">${c.st.orden}</td>
+      ${/* El atajo va donde se ve el hueco: cargar la que falta sin tener que ir al
+            banco, filtrar por el tema y volver a elegirlo en el formulario. */''}
+      <td>${c.n<6?`<button class="btn btn-sm" data-qnew="${c.st.id}">${c.n===0?'Cargar la primera':'Cargar otra'}</button>`:''}</td>`;
     body.appendChild(tr);
   });
   tb.appendChild(body);tw.appendChild(tb);w.appendChild(tw);
 
   const r=el('div','row');r.style.marginTop='16px';
-  r.innerHTML=`<button class="btn btn-p btn-sm" data-go2="banco|${m.id}">Ir al banco</button>
-    <button class="btn btn-sm" data-add="sec|${m.id}"${dis('editar')}>+ Agregar sección/tema</button>
+  r.innerHTML=`<button class="btn btn-p btn-sm" data-evtab="banco">Ir al banco</button>
+    <button class="btn btn-sm" data-add="sec|${m.id}">+ Agregar sección/tema</button>
     <span class="hint" style="margin-left:auto">Un tema con preguntas no se puede vaciar sin reasignarlas: se resuelve moviendo las preguntas de sección.</span>`;
   w.appendChild(r);
   w.appendChild(el('div','note v3','<b>Ajuste de alineación ·</b> El ABM de sub-temas independiente se eliminó. En el prototipo aprobado el tema es siempre una sección del módulo, y esa misma taxonomía es la de las dudas de la Meet. Menos entidades, y una fuente de desincronización menos.'));
@@ -2572,42 +2873,64 @@ function viewSubtemas(){
 /* ============================================================
    PREVISUALIZAR LA EVALUACIÓN
    ============================================================ */
+/* Una pregunta entra en el sorteo si está activa, tiene tema y tiene exactamente
+   una correcta: lo demás el examen no lo puede corregir.
+
+   `forzarCobertura` es la decisión 2 y acá se aplica de verdad, no como cartel:
+   cuando está en "sí" se reserva una pregunta de cada tema y el resto se completa
+   al azar. Solo se puede garantizar si el módulo no tiene más temas que preguntas
+   por intento; si los tiene, el sorteo cae al azar puro y la previa lo avisa. */
 function sortear(m){
-  const pool=activas(m).filter(q=>q.estado==='activa'&&q.st&&q.ops.filter(o=>o.ok).length===1);
-  const out=[];
-  const copia=pool.slice();
-  for(let i=0;i<m.params.porIntento&&copia.length;i++){
-    const k=Math.floor(Math.random()*copia.length);
-    out.push(copia.splice(k,1)[0]);
+  const pool=bancoActivas(m).filter(q=>q.st&&q.ops.filter(o=>o.ok).length===1);
+  const n=m.params.porIntento;
+  const copia=pool.slice(), out=[];
+  const saca=arr=>arr.splice(Math.floor(Math.random()*arr.length),1)[0];
+  if(m.params.forzarCobertura==='si'&&m.subtemas.length<=n){
+    m.subtemas.forEach(st=>{
+      if(out.length>=n) return;
+      const delTema=copia.filter(q=>q.st===st.id);
+      if(!delTema.length) return;
+      const q=delTema[Math.floor(Math.random()*delTema.length)];
+      copia.splice(copia.indexOf(q),1);out.push(q);
+    });
   }
+  while(out.length<n&&copia.length) out.push(saca(copia));
+  /* Se mezcla al final: si no, las reservadas por cobertura salen siempre primero y
+     en el mismo orden que los temas. */
+  for(let i=out.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[out[i],out[j]]=[out[j],out[i]];}
   return out;
 }
-function viewPreview(){
-  const m=findMod(S.bModId);
-  const w=el('div','wrap');
+function panelPrevia(m){
+  const w=el('div');
   if(!S.muestra||S.muestra.mod!==m.id){S.muestra={mod:m.id,qs:sortear(m)};S.respuestas={};}
   const qs=S.muestra.qs;
   const usados=[...new Set(qs.map(q=>q.st))];
   const faltan=m.subtemas.filter(s=>!usados.includes(s.id));
 
-  w.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
-    <div><h1>Previsualizar la evaluación · ${m.id}</h1>
-      <p class="lede" style="margin-bottom:16px">Un intento de muestra con las reglas configuradas: ${m.params.porIntento} preguntas al azar sobre ${activas(m).filter(q=>q.estado==='activa').length}. Podés responder; <b>no queda registrado</b>.</p></div>
-    <button class="btn btn-sm" data-go2="mod|${m.id}"><span class="icon icon-sm" data-icon="arrow-left"></span> Volver al módulo</button></div>`;
+  w.appendChild(el('p','lede','Un intento de muestra con las reglas configuradas: '+m.params.porIntento+' preguntas al azar sobre '+bancoActivas(m).length+'. Podés responder; <b>no queda registrado</b>.'));
 
   if(!qs.length){
-    w.appendChild(el('div','emptynote','<b>No hay preguntas activas y válidas para sortear.</b><br>Cargá el banco y revisá que cada pregunta tenga tema y exactamente una opción correcta.'));
+    w.appendChild(el('div','emptynote','<b>No hay preguntas activas y válidas para sortear.</b><br>Cargá el banco y revisá que cada pregunta tenga tema y exactamente una opción correcta.'
+      +'<div class="row" style="margin-top:16px"><button class="btn btn-p" data-evtab="banco">Ir al banco</button></div>'));
     return w;
   }
 
+  const p=m.params;
+  const forzando=p.forzarCobertura==='si';
+  const garantizable=m.subtemas.length<=p.porIntento;
   const ctl=el('div','row');ctl.style.marginBottom='16px';
   ctl.innerHTML=`<button class="btn btn-p btn-sm" data-resort="1">Volver a sortear</button>
-    <span class="tag">umbral ${m.params.umbral}</span><span class="tag">reintentos ${m.params.reintentos.toLowerCase()}</span>
-    <span class="tag warn">forzar cobertura: a definir</span>`;
+    <span class="tag">umbral ${esc(p.umbral)}</span><span class="tag">reintentos ${p.reintentos.toLowerCase()}</span>
+    <span class="tag ${forzando?(garantizable?'ok':'warn'):(p.forzarCobertura==='no'?'':'warn')}">forzar cobertura: ${p.forzarCobertura==='si'?'sí':esc(p.forzarCobertura)}</span>
+    <button class="btn btn-sm" data-evtab="config">Cambiar las reglas</button>`;
   w.appendChild(ctl);
 
-  if(faltan.length) w.appendChild(el('div','banner warn',`<span class="icon" data-icon="alert-triangle"></span><div><b>Este sorteo dejó afuera ${faltan.length} tema${faltan.length>1?'s':''}:</b> ${faltan.map(s=>esc(s.name)).join(', ')}. Es exactamente el riesgo que resuelve la decisión 2. Probá "Volver a sortear" varias veces para ver cuánto varía.</div>`));
-  else w.appendChild(el('div','banner ok','<span class="icon" data-icon="check-circle"></span><div>Este sorteo cubrió todos los temas del módulo. Sin forzar cobertura, no está garantizado en el próximo.</div>'));
+  if(faltan.length) w.appendChild(el('div','banner warn',`<span class="icon" data-icon="alert-triangle"></span><div><b>Este sorteo dejó afuera ${faltan.length} tema${faltan.length>1?'s':''}:</b> ${faltan.map(s=>esc(s.name)).join(', ')}. ${forzando&&!garantizable
+    ?'Forzar cobertura está en sí, pero el módulo tiene '+m.subtemas.length+' temas y el intento son '+p.porIntento+' preguntas: no se puede garantizar uno de cada uno.'
+    :'Es exactamente el riesgo que resuelve la decisión 2: probá "Volver a sortear" varias veces para ver cuánto varía, y después ponela en sí.'}</div>`));
+  else w.appendChild(el('div','banner ok',`<span class="icon" data-icon="check-circle"></span><div>Este sorteo cubrió todos los temas del módulo. ${forzando&&garantizable
+    ?'Con forzar cobertura en sí está garantizado en todos los intentos.'
+    :'Sin forzar cobertura, no está garantizado en el próximo.'}</div>`));
 
   qs.forEach((q,i)=>{
     const st=m.subtemas.find(s=>s.id===q.st);
@@ -2632,7 +2955,8 @@ function viewPreview(){
 function viewResultado(){
   const m=findMod(S.bModId);
   const w=el('div','wrap');
-  if(!S.muestra||S.muestra.mod!==m.id){S.screen='preview';return viewPreview();}
+  /* Sin sorteo en curso no hay resultado que mostrar: se vuelve a la previa. */
+  if(!S.muestra||S.muestra.mod!==m.id){S.screen='evaluacion';S.evTab='previa';return viewEvaluacion();}
   const qs=S.muestra.qs;
   const total=qs.length;
   let ok=0, sinResp=0;
@@ -2679,7 +3003,7 @@ function viewResultado(){
   if(aprobado){
     w.appendChild(el('div','banner ok',`<span class="icon" data-icon="check-circle"></span><div><b>Módulo aprobado.</b> Se habilita ${sig?'el módulo siguiente que te corresponda ('+sig+')':'el final de la secuencia'} y queda disponible la Meet de ${m.meet.duracion} minutos para dudas puntuales de este módulo.</div>`));
   } else {
-    w.appendChild(el('div','banner warn',`<span class="icon" data-icon="alert-triangle"></span><div><b>No alcanzó el 80 %.</b> Se puede volver a intentar sin límite: el próximo intento sortea 10 preguntas nuevas sobre las mismas ${activas(m).filter(q=>q.estado==='activa').length} del banco. El módulo siguiente sigue trabado hasta aprobar.</div>`));
+    w.appendChild(el('div','banner warn',`<span class="icon" data-icon="alert-triangle"></span><div><b>No alcanzó el 80 %.</b> Se puede volver a intentar sin límite: el próximo intento sortea 10 preguntas nuevas sobre las mismas ${bancoActivas(m).length} del banco. El módulo siguiente sigue trabado hasta aprobar.</div>`));
   }
 
   /* variante recomendada: por tema + video de repaso */
@@ -2696,14 +3020,19 @@ function viewResultado(){
     :'<div class="banner ok" style="margin:0"><span class="icon" data-icon="check-circle"></span><div>Todos los temas del intento salieron correctos.</div></div>'}`;
   w.appendChild(box);
 
-  /* comparación de variantes */
+  /* Comparación de variantes. Con qué variante ABRE lo decide el parámetro del
+     módulo (decisión 1); el comparador sigue estando para poder mirar la otra sin
+     tocar la configuración. */
+  const ver=S.verCorrectas===null?m.params.mostrarCorrectas==='si':S.verCorrectas;
   const cmp=el('div','row');cmp.style.marginBottom='8px';
-  cmp.innerHTML=`<button class="btn btn-sm ${S.verCorrectas?'':'btn-on'}" data-vercorr="0">Variante A · sin mostrar correctas</button>
-    <button class="btn btn-sm ${S.verCorrectas?'btn-on':''}" data-vercorr="1">Variante B · mostrando correctas</button>
-    <span class="hint" style="margin:0">Las dos están construidas para poder comparar antes de cerrar la decisión 1.</span>`;
+  cmp.innerHTML=`<button class="btn btn-sm ${ver?'':'btn-on'}" data-vercorr="0">Variante A · sin mostrar correctas</button>
+    <button class="btn btn-sm ${ver?'btn-on':''}" data-vercorr="1">Variante B · mostrando correctas</button>
+    <span class="hint" style="margin:0">${m.params.mostrarCorrectas==='a definir'
+      ?'Decisión 1 sin definir: abre con la variante recomendada. Se elige por módulo en Configuración.'
+      :'Este módulo está configurado en <b>'+(m.params.mostrarCorrectas==='si'?'sí':'no')+'</b>. Podés mirar la otra variante igual.'}</span>`;
   w.appendChild(cmp);
 
-  if(S.verCorrectas){
+  if(ver){
     w.appendChild(el('div','banner plan','<span class="icon" data-icon="info"></span><div><b>Variante B.</b> Con reintentos ilimitados, mostrar la correcta convierte el examen en un ejercicio de memoria: la agencia puede fallar, leer las respuestas y aprobar en el intento siguiente sin haber visto un video. Sirve si el objetivo es enseñar en el examen; no sirve si el examen tiene que validar aprendizaje.</div>'));
     detalle.forEach(d=>{
       const c=el('div','qcard');
@@ -2742,7 +3071,7 @@ function viewAgencia(){
   const w=el('div','wrap');
   const p=S.perfilVista;
   w.innerHTML=`<h1>Ver como agencia</h1>
-    <p class="lede">Así ve la Academia una agencia de plan ${esc(p)} en la escena ${S.escena}. Sirve para revisar antes de publicar, no después.</p>`;
+    <p class="lede">Así ve la Academia una agencia de plan ${esc(p)} con la ${esc(ESCENAS[S.escena].label)}. Sirve para revisar antes de publicar, no después.</p>`;
   const sel=el('div','row');sel.style.marginBottom='16px';
   sel.innerHTML=`<span class="hint" style="margin:0">Plan de la agencia:</span>
     ${PERFILES.map(x=>`<button class="btn btn-sm ${p===x?'btn-on':''}" data-perfil="${x}">${x}</button>`).join('')}`;
@@ -2831,17 +3160,67 @@ const FILAS_V=[
  ['BAK-M80.050','Informe de rentabilidad por vendedor','','P3','C18','Falta el plan al que aplica (P+B, B o B-nicho).'],
  ['BAK-M20.070','Unificar clientes duplicados','P+B','P2','C06',null]
 ];
+/* El pegado de preguntas. Las filas ya no traen el error escrito: se calcula contra
+   el módulo DESTINO, que es el de la consola. Antes cada fila decía "BAK-M40" y su
+   error hardcodeados mientras el encabezado anunciaba otro destino: dos fuentes de
+   verdad para el mismo dato, en la misma pantalla.
+
+   La columna de tema acepta el ID de la sección o su nombre. El ID es la forma
+   buena —es permanente—; el nombre se resuelve igual, pero avisa, porque renombrar
+   la sección rompe el pegado en silencio. */
 const FILAS_P=[
- ['BAK-M40','Modos de recibo','¿Qué recibo agrupa varios files de un mismo cliente?','Detallado','Indicado','Automático','Ninguno','A',null],
- ['BAK-M40','Devolución','¿Cómo se registra una devolución al pasajero?','Como egreso','Como recibo negativo','Como nota de crédito','No se registra','A',null],
- ['BAK-M40','Cheques','¿Cómo se registra un cheque de tercero?','Como TR3','Como TC3','Como efectivo','No aplica','B','El tema "Cheques" no existe en BAK-M40.'],
- ['BAK-M40','Moneda','¿Qué moneda fija la cuenta corriente del cliente?','La de registro','La de documento','La del recibo','La del voucher','A',null],
- ['BAK-M40','Valores','¿Qué valor corresponde a una transferencia?','Efectivo','Transferencia','Tarjeta','Tercero','E','La letra E no coincide con ninguna opción cargada.'],
- ['BAK-M40','Cuenta corriente','¿Los saldos se llevan por moneda?','Sí, por moneda de registro','No, siempre en ARS','Solo para jurídicas','Depende del file','','Sin letra de correcta.'],
- ['BAK-M40','Modos de recibo','¿Qué recibo agrupa varios files de un mismo cliente?','Detallado','Indicado','Automático','Ninguno','A','Enunciado repetido dentro de este mismo pegado.'],
- ['BAK-M99','Varios','¿Pregunta de un módulo inexistente?','A','B','C','D','A','El módulo BAK-M99 no existe.'],
- ['BAK-M40','Valores','¿Qué significa TR3 en un recibo?','Transferencia de tercero','Tarjeta de tercero','Transferencia en tres pagos','Tres recibos','A',null]
+ {mod:'BAK-M40',tema:'BAK-M40.S1',e:'¿Qué recibo agrupa varios files de un mismo cliente?',ops:['Detallado','Indicado','Automático','Ninguno'],correcta:'A',estado:'activa'},
+ {mod:'BAK-M40',tema:'Cuenta corriente y devoluciones',e:'¿Cómo se registra una devolución al pasajero?',ops:['Como egreso','Como recibo negativo','Como nota de crédito','No se registra'],correcta:'A',estado:'activa'},
+ {mod:'BAK-M40',tema:'Cheques',e:'¿Cómo se registra un cheque de tercero?',ops:['Como TR3','Como TC3','Como efectivo','No aplica'],correcta:'B',estado:'activa'},
+ {mod:'BAK-M40',tema:'BAK-M40.S2',e:'¿Qué moneda fija la cuenta corriente del cliente?',ops:['La de registro','La de documento','La del recibo','La del voucher'],correcta:'A',estado:'activa'},
+ {mod:'BAK-M40',tema:'BAK-M40.S1',e:'¿Qué valor corresponde a una transferencia?',ops:['Efectivo','Transferencia','Tarjeta','Tercero'],correcta:'E',estado:'activa'},
+ {mod:'BAK-M40',tema:'BAK-M40.S3',e:'¿Los saldos se llevan por moneda?',ops:['Sí, por moneda de registro','No, siempre en ARS','Solo para jurídicas','Depende del file'],correcta:'',estado:'activa'},
+ {mod:'BAK-M40',tema:'BAK-M40.S1',e:'¿Qué recibo agrupa varios files de un mismo cliente?',ops:['Detallado','Indicado','Automático','Ninguno'],correcta:'A',estado:'activa'},
+ {mod:'BAK-M99',tema:'Varios',e:'¿Pregunta de un módulo que no existe?',ops:['A','B','C','D'],correcta:'A',estado:'activa'},
+ {mod:'BAK-M40',tema:'BAK-M40.S1',e:'¿Qué significa TR3 en un recibo?',ops:['Transferencia de tercero','Tarjeta de tercero','Transferencia en tres pagos','Tres recibos'],correcta:'A',estado:'borrador'}
 ];
+
+/* El tema se busca por ID y, si no, por nombre. Devuelve cómo se resolvió, porque
+   resolver por nombre es una advertencia y no un acierto. */
+function resolverTema(m,txt){
+  const t=String(txt||'').trim();
+  const porId=m.subtemas.find(s=>s.id.toLowerCase()===t.toLowerCase());
+  if(porId) return {st:porId,porNombre:false};
+  const porNom=m.subtemas.find(s=>s.name.toLowerCase()===t.toLowerCase());
+  return porNom?{st:porNom,porNombre:true}:null;
+}
+
+/* Valida el pegado contra el módulo destino y devuelve las filas resueltas. El
+   error viaja en la fila resuelta, no en el dato de origen: cambiar el destino
+   revalida todo. */
+function resolverFilasP(m){
+  const vistos={};
+  return FILAS_P.map(f=>{
+    const r={...f};
+    const t=resolverTema(m,f.tema);
+    r.st=t?t.st.id:null;
+    r.temaNombre=t?t.st.name:String(f.tema||'');
+    const letra=String(f.correcta||'').trim().toUpperCase();
+    const iOk=letra?letra.charCodeAt(0)-65:-1;
+    r.ops=f.ops.map((x,k)=>({t:x,ok:k===iOk}));
+    const clave=f.e.toLowerCase();
+    const repetidaAca=!!vistos[clave]; vistos[clave]=true;
+    const yaEnBanco=(m.pool||[]).some(q=>q.e.toLowerCase()===clave);
+
+    if(f.mod&&f.mod!==m.id) r.err='Esta fila es de '+f.mod+' y el destino es '+m.id+'.';
+    else if(!t) r.err='El tema "'+esc(String(f.tema||''))+'" no existe en '+m.id+'.';
+    else if(!letra) r.err='Sin letra de correcta.';
+    else if(iOk<0||iOk>=f.ops.length) r.err='La letra '+letra+' no coincide con ninguna opción cargada.';
+    else if(repetidaAca) r.err='Enunciado repetido dentro de este mismo pegado.';
+    else if(yaEnBanco) r.err='Aviso: el enunciado ya está en el banco de '+m.id+'. Entra igual.';
+    else if(t.porNombre) r.err='Aviso: el tema se resolvió por nombre. Si se renombra la sección, este pegado deja de entrar; conviene pegar el ID.';
+    else r.err=null;
+    return r;
+  });
+}
+/* Los avisos entran igual; los errores, no. Mismo criterio que ya usaba la vista. */
+const esAviso=e=>!!e&&(e.indexOf('Aviso')>=0||e.indexOf('se omite')>=0);
+const errDe=(modo,f)=>modo==='preguntas'?f.err:f[5];
 
 function viewImportar(){
   const w=el('div','wrap');
@@ -2850,17 +3229,14 @@ function viewImportar(){
   w.innerHTML=`<h1>Cargar desde planilla</h1>
     <p class="lede">Copiá las filas del tablero maestro y pegalas acá. Antes de guardar nada, te muestro fila por fila qué entró bien y qué hay que corregir.</p>`;
 
-  if(!can('editar')){
-    w.appendChild(el('div','banner stop','<span class="icon" data-icon="alert-circle"></span><div><b>Sin permiso para importar.</b> '+esc(porque('editar'))+'</div>'));
-    return w;
-  }
 
   const sel=el('div','row');sel.style.marginBottom='16px';
   sel.innerHTML=`<span class="hint" style="margin:0">Qué vas a cargar:</span>
     <button class="btn btn-sm ${modo==='estructura'?'btn-on':''}" data-impmodo="estructura">Estructura (módulos y secciones)</button>
     <button class="btn btn-sm ${modo==='videos'?'btn-on':''}" data-impmodo="videos">Videos</button>
     <button class="btn btn-sm ${modo==='preguntas'?'btn-on':''}" data-impmodo="preguntas">Preguntas del banco</button>
-    ${modo==='preguntas'?`<span class="tag" style="margin-left:8px">destino: ${m.id}</span>`:''}`;
+    ${modo==='preguntas'?`<span class="tag ok" style="margin-left:8px">destino: ${m.id}</span>
+      <button class="btn btn-sm" data-go2="banco|${m.id}">Cambiar de módulo</button>`:''}`;
   w.appendChild(sel);
 
   const steps=el('div','steps');
@@ -2871,11 +3247,11 @@ function viewImportar(){
   const ph={
    estructura:'FRT-M00\tFundamentos del frontend\tConcepto y acceso\tP+B\t10',
    videos:'BAK-M30.060\tEstados del voucher y cotización\tP+B\tP3\tC12',
-   preguntas:'BAK-M40\tModos de recibo\t¿Qué recibo agrupa varios files?\tDetallado\tIndicado\tAutomático\tNinguno\tA\tactiva'}[modo];
+   preguntas:'BAK-M40\tBAK-M40.S1\t¿Qué recibo agrupa varios files?\tDetallado\tIndicado\tAutomático\tNinguno\tA\tactiva'}[modo];
   const cols={
    estructura:'ID del módulo (opcional, lo generamos si falta) · nombre del módulo · nombre de la sección · plan · orden',
    videos:'ID (opcional) · qué enseña · plan · prioridad · cohorte',
-   preguntas:'módulo · tema · enunciado · opción A · B · C · D · letra de la correcta · estado'}[modo];
+   preguntas:'módulo · tema (ID de la sección, o su nombre) · enunciado · opción A · B · C · D · letra de la correcta · estado (activa o borrador)'}[modo];
 
   if(S.impPaso===1){
     const c=el('div','card');c.style.padding='16px';
@@ -2890,29 +3266,39 @@ function viewImportar(){
     return w;
   }
 
-  const filas=modo==='preguntas'?FILAS_P:(modo==='videos'?FILAS_V:FILAS_E);
-  const errIdx=modo==='preguntas'?8:5;
+  /* En modo preguntas las filas se resuelven contra el destino en cada render, así
+     que cambiar de módulo revalida el pegado entero. */
+  const filas=modo==='preguntas'?resolverFilasP(m):(modo==='videos'?FILAS_V:FILAS_E);
   const vivas=filas.filter((f,i)=>!S.omit.has(i));
-  const ok=vivas.filter(f=>!f[errIdx]).length, bad=vivas.filter(f=>f[errIdx]).length;
+  const entran=f=>{const e=errDe(modo,f);return !e||esAviso(e);};
+  const ok=vivas.filter(entran).length, bad=vivas.length-ok;
 
   const tw=el('div','tablewrap');const tb=el('table');
   tb.innerHTML=modo==='preguntas'
-    ?`<thead><tr><th style="width:26px"></th><th style="width:80px">Módulo</th><th style="width:130px">Tema</th><th>Enunciado</th><th style="width:60px">Correcta</th></tr></thead>`
+    ?`<thead><tr><th style="width:26px"></th><th style="width:90px">Módulo</th><th style="width:170px">Tema</th><th>Enunciado</th><th style="width:70px">Correcta</th><th style="width:80px">Estado</th></tr></thead>`
     :(modo==='videos'
       ?`<thead><tr><th style="width:26px"></th><th style="width:110px">ID</th><th>Qué enseña</th><th style="width:60px">Plan</th><th style="width:50px">Pri.</th><th style="width:70px">Cohorte</th></tr></thead>`
       :`<thead><tr><th style="width:26px"></th><th style="width:90px">Módulo</th><th style="width:26%">Nombre del módulo</th><th>Sección</th><th style="width:60px">Plan</th><th style="width:60px">Orden</th></tr></thead>`);
   const body=el('tbody');
   filas.forEach((f,i)=>{
     if(S.omit.has(i)) return;
-    const e=f[errIdx];
-    const aviso=!!e&&(e.indexOf('Aviso')>=0||e.indexOf('se omite')>=0);
+    const e=errDe(modo,f);
+    const aviso=esAviso(e);
     const tr=el('tr');
     if(e&&!aviso) tr.dataset.bad='true'; else if(aviso) tr.dataset.warn='true';
     let botones='';
-    if(e){
+    if(aviso){
+      /* Un aviso entra igual, así que la única salida que tiene sentido es no
+         traerla: ofrecerle "corregir el tema" a una fila que resolvió bien
+         confundía más de lo que ayudaba. */
+      botones='<button class="btn btn-sm" data-skip="'+i+'">Omitir fila</button>';
+    }else if(e){
       if(e.indexOf('no existe')>=0&&modo==='videos') botones+=`<button class="btn btn-sm" data-fixmod="${esc(f[0].split('.')[0])}">Crear el módulo ${esc(f[0].split('.')[0])}</button>`;
-      if(e.indexOf('tema')>=0) botones+='<button class="btn btn-sm" data-fix="'+i+'">Crear el tema</button><button class="btn btn-sm" data-fix="'+i+'">Elegir uno existente</button>';
+      /* La fila de otro módulo ya no es un callejón: se puede traer al destino. */
+      if(e.indexOf('el destino es')>=0) botones+=`<button class="btn btn-sm" data-fix="dest|${i}">Traer la fila a ${m.id}</button>`;
+      else if(e.indexOf('tema')>=0) botones+='<button class="btn btn-sm" data-fix="'+i+'">Crear el tema</button><button class="btn btn-sm" data-fix="'+i+'">Elegir uno existente</button>';
       if(e.indexOf('repetido')>=0) botones+='<button class="btn btn-sm" data-fix="'+i+'">Quedarme con una</button>';
+      if(e.indexOf('letra')>=0||e.indexOf('Sin letra')>=0) botones+='<button class="btn btn-sm" data-fix="'+i+'">Elegir la correcta</button>';
       if(e.indexOf('Plan distinto')>=0) botones+='<button class="btn btn-sm" data-fix="'+i+'">Usar P+B</button><button class="btn btn-sm" data-fix="'+i+'">Usar B</button>';
       if(e.indexOf('confirmación')>=0) botones+='<button class="btn btn-sm" data-fix="'+i+'">Pedir confirmación a Producto</button>';
       if(!botones) botones='<button class="btn btn-sm" data-fix="'+i+'">Corregir</button>';
@@ -2921,7 +3307,11 @@ function viewImportar(){
     const fix=e?`<span class="${aviso?'rowwarn':'rowerr'}">${esc(e)}</span><span class="rowfix">${botones}</span>`:'';
     const mk=e?(aviso?'<span class="miss"><span class="icon icon-sm" data-icon="circle"></span></span>':'<span class="bad"><span class="icon icon-sm" data-icon="x"></span></span>'):'<span class="ok"><span class="icon icon-sm" data-icon="check"></span></span>';
     tr.innerHTML=modo==='preguntas'
-      ?`<td>${mk}</td><td class="cellmono">${esc(f[0])}</td><td>${esc(f[1])}</td><td>${esc(f[2])}${fix}</td><td class="cellmono">${esc(f[7])||'<span class="bad">—</span>'}</td>`
+      ?`<td>${mk}</td><td class="cellmono">${esc(f.mod)}</td>
+        <td>${f.st?`<span class="tag ok">${esc(f.temaNombre)}</span>`:`<span class="tag stop">${esc(f.temaNombre)||'sin tema'}</span>`}</td>
+        <td>${esc(f.e)}${fix}</td>
+        <td class="cellmono">${esc(f.correcta)||'<span class="bad">—</span>'}</td>
+        <td><span class="chip ${f.estado==='activa'?'st-publicado':'st-guionado'}">${esc(f.estado)}</span></td>`
       :(modo==='videos'
         ?`<td>${mk}</td><td class="cellmono">${esc(f[0])}</td><td>${esc(f[1])}${fix}</td><td>${esc(f[2])||'<span class="bad">—</span>'}</td><td>${esc(f[3])}</td><td>${esc(f[4])}</td>`
         :`<td>${mk}</td><td class="cellmono">${esc(f[0])}</td><td>${esc(f[1])}</td><td>${esc(f[2])||'<span class="miss">sin sección</span>'}${fix}</td><td>${esc(f[3])}</td><td class="cellmono">${esc(f[4])}</td>`);
@@ -2938,16 +3328,23 @@ function viewImportar(){
   }
   if(modo==='preguntas'){
     const cob=cobertura(m);
+    /* La proyección cruza por ID de sección, no por nombre: antes comparaba el
+       nombre de la columna con el de la sección, así que un renombre —o un pegado
+       de otro módulo— daba +0 en todo y la caja mentía. Y solo suma las que van a
+       entrar ACTIVAS, porque las que entran en borrador no cuentan para cobertura. */
     const nuevas={};
-    vivas.filter(f=>!f[8]).forEach(f=>{nuevas[f[1]]=(nuevas[f[1]]||0)+1;});
+    vivas.filter(f=>entran(f)&&f.st&&f.estado==='activa').forEach(f=>{nuevas[f.st]=(nuevas[f.st]||0)+1;});
+    const enBorrador=vivas.filter(f=>entran(f)&&f.estado!=='activa').length;
     const box=el('div','card');box.style.padding='16px';box.style.margin='16px 0';
     box.innerHTML=`<h3>Cómo queda la cobertura después de importar</h3>
       <div class="row" style="gap:8px;margin-top:8px">${cob.map(c=>{
-        const add=nuevas[c.st.name]||0, tot=c.n+add;
+        const add=nuevas[c.st.id]||0, tot=c.n+add;
         return `<span class="tag ${tot===0?'stop':(tot<6?'warn':'ok')}">${esc(c.st.name)} ${c.n}${add?' +'+add:''}</span>`;}).join('')}</div>
-      <p class="hint">${cob.some(c=>(c.n+(nuevas[c.st.name]||0))===0)
+      <p class="hint">${cob.some(c=>(c.n+(nuevas[c.st.id]||0))===0)
         ?'Después de este pegado siguen quedando temas en cero: el módulo va a seguir bloqueado para publicar.'
-        :'Con este pegado se destraba el bloqueo de publicación por cobertura.'}</p>`;
+        :'Con este pegado ningún tema queda en cero.'}${enBorrador
+        ?' '+enBorrador+' fila'+(enBorrador===1?'':'s')+' entra'+(enBorrador===1?'':'n')+' en borrador y todavía no cuenta'+(enBorrador===1?'':'n')+' para la cobertura.'
+        :''}</p>`;
     w.appendChild(box);
   }
 
@@ -2990,7 +3387,6 @@ function viewMeet(){
   w.innerHTML=`<h1>Meet y colas de dudas</h1>
     <p class="lede">El modelo aprobado: <b>una Meet por módulo por agencia</b>, no por usuario. Cada agencia acumula una cola de dudas por módulo; un coordinador agenda una única Meet con Soporte, cuya agenda es esa cola. Es lo que hace que la Academia no vuelva a saturar Soporte.</p>`;
 
-  if(!can('editar')&&!can('ver')){}
   const sel=el('div','row');sel.style.marginBottom='8px';
   sel.innerHTML=`<span class="hint" style="margin:0">Agencia:</span>
     ${AGENCIAS.map(a=>`<button class="btn btn-sm ${agId===a.id?'btn-on':''}" data-meetag="${a.id}">${esc(a.nombre)}</button>`).join('')}
@@ -3004,9 +3400,9 @@ function viewMeet(){
     <p class="hint" style="margin:0 0 8px">Un parámetro del backoffice, no del módulo: define qué turnos ofrece el agendador. Es un dato nuevo que el MVP no tenía.</p>
     <div class="fieldgrid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
       <div><label>Duración por Meet</label><div class="ro">${FRANJA.duracionMin} min<span class="lock">regla del MVP</span></div></div>
-      <div><label>Días</label><div class="row"><input type="text" value="${esc(FRANJA.dias)}" style="max-width:200px"${dis('params')}></div></div>
-      <div><label>Horas</label><div class="row"><input type="text" value="${esc(FRANJA.horas)}" style="max-width:260px"${dis('params')}></div></div>
-      <div><label>Semanas de anticipación</label><div class="row"><input type="number" value="${FRANJA.semanas}" style="max-width:90px"${dis('params')}></div></div>
+      <div><label>Días</label><div class="row"><input type="text" value="${esc(FRANJA.dias)}" style="max-width:200px"></div></div>
+      <div><label>Horas</label><div class="row"><input type="text" value="${esc(FRANJA.horas)}" style="max-width:260px"></div></div>
+      <div><label>Semanas de anticipación</label><div class="row"><input type="number" value="${FRANJA.semanas}" style="max-width:90px"></div></div>
       <div><label>Zona horaria</label><div class="ro">${esc(FRANJA.zona)}<span class="lock">rotulada en pantalla</span></div></div>
     </div>`;
   w.appendChild(fr);
@@ -3034,8 +3430,8 @@ function viewMeet(){
         <span class="tag">${dd.length} duda${dd.length!==1?'s':''}</span>
         ${turno?`<span class="tag ok">turno ${esc(turno.cuando)} · ${esc(turno.enlace)}</span>`:''}
         <span style="margin-left:auto"></span>
-        ${est==='abierto'?`<button class="btn btn-sm btn-p" data-meetagendar="${modId}"${dis('editar')}>Agendar Meet</button>`:''}
-        ${est==='agendado'?`<button class="btn btn-sm" data-meetagendar="${modId}"${dis('editar')}>Ver turno</button>`:''}
+        ${est==='abierto'?`<button class="btn btn-sm btn-p" data-meetagendar="${modId}">Agendar Meet</button>`:''}
+        ${est==='agendado'?`<button class="btn btn-sm" data-meetagendar="${modId}">Ver turno</button>`:''}
       </div>
       <div style="padding:8px 24px 16px">${dd.map(d=>`
         <div style="padding:16px 0;border-bottom:1px solid var(--line-soft)">
@@ -3061,8 +3457,8 @@ function viewCertificado(){
   cfg.innerHTML=`<h3>Fuente del documento del titular</h3>
     <p class="hint" style="margin:0 0 8px">El nombre sale del SSO. El documento no lo tiene el modelo: hay que decidir de dónde viene (CE-1) y si se persiste (CE-2).</p>
     <div class="radioset">
-      <label class="radiopill on"><input type="radio" name="certfuente" checked${dis('params')}> Llega del SSO / backoffice de SIGMMA</label>
-      <label class="radiopill"><input type="radio" name="certfuente"${dis('params')}> Lo carga la agencia y se valida</label>
+      <label class="radiopill on"><input type="radio" name="certfuente" checked> Llega del SSO / backoffice de SIGMMA</label>
+      <label class="radiopill"><input type="radio" name="certfuente"> Lo carga la agencia y se valida</label>
     </div>
     <p class="hint">Recomendación del prototipo: que llegue precargado. Pedirlo en cada descarga es retrabajo y una oportunidad más de tipearlo mal.</p>`;
   w.appendChild(cfg);
@@ -3075,8 +3471,8 @@ function viewCertificado(){
   tw.appendChild(tb);w.appendChild(tw);
 
   const r=el('div','row');r.style.margin='8px 0 24px';
-  r.innerHTML=`<button class="btn btn-sm btn-p"${dis('params')}>+ Agregar tipo</button>
-    <button class="btn btn-sm"${dis('params')}>Ver plantilla del certificado</button>
+  r.innerHTML=`<button class="btn btn-sm btn-p">+ Agregar tipo</button>
+    <button class="btn btn-sm">Ver plantilla del certificado</button>
     <span class="hint" style="margin:0">Valida solo el formato, nunca coincidencia: no hay contra qué cotejar.</span>`;
   w.appendChild(r);
 
@@ -3195,14 +3591,16 @@ function viewParams(){
      <div><label>Umbral para marcar un video como "visto"</label><div class="ro"><span class="mono">${GLOBAL.umbralVisto} %</span> de la duración<span class="lock">regla del MVP</span></div></div>
      <div><label>Cómo se mide ese ${GLOBAL.umbralVisto} %</label>
        <div class="radioset">
-         <label class="radiopill ${GLOBAL.metodoVisto==='posición'?'on':''}"><input type="radio" name="mv" ${GLOBAL.metodoVisto==='posición'?'checked':''}${dis('params')}> Posición máxima alcanzada</label>
-         <label class="radiopill ${GLOBAL.metodoVisto!=='posición'?'on':''}"><input type="radio" name="mv" ${GLOBAL.metodoVisto!=='posición'?'checked':''}${dis('params')}> Segundos efectivamente reproducidos (anti-scrub)</label>
+         <label class="radiopill ${GLOBAL.metodoVisto==='posición'?'on':''}"><input type="radio" name="mv" ${GLOBAL.metodoVisto==='posición'?'checked':''}> Posición máxima alcanzada</label>
+         <label class="radiopill ${GLOBAL.metodoVisto!=='posición'?'on':''}"><input type="radio" name="mv" ${GLOBAL.metodoVisto!=='posición'?'checked':''}> Segundos efectivamente reproducidos (anti-scrub)</label>
        </div>
        <p class="hint miss">Decisión abierta P04.3. El prototipo usa posición y avisa que <b>no es el criterio de producción</b>: arrastrar la barra al final marca el video como visto. La API de YouTube alcanza para el criterio estricto — es decisión de producto, no límite técnico.</p></div>
      <div><label>Preguntas por intento</label><div class="ro"><span class="mono">${GLOBAL.preguntasIntento}</span><span class="lock">regla del MVP</span></div></div>
      <div><label>Umbral de aprobación</label><div class="ro"><span class="mono">${GLOBAL.umbralAprob} / 10</span> (80 %)<span class="lock">regla del MVP</span></div></div>
-     <div><label>Tamaño mínimo del banco para publicar</label><div class="row"><input type="number" value="${GLOBAL.bancoMinimo}" style="max-width:100px"${dis('params')}><span class="hint" style="margin:0">alineado a ${GLOBAL.bancoMinimo/GLOBAL.preguntasIntento}× el intento; objetivo ${GLOBAL.bancoObjetivo}</span></div></div>
-     <div><label>Canal único de soporte</label><div class="row"><input type="text" value="${esc(GLOBAL.soporte)}" style="max-width:320px"${dis('params')}></div>
+     <div><label>Tamaño del banco con el que nace un módulo</label>
+       <div class="ro">mínimo <span class="mono">${GLOBAL.bancoMinimo}</span> · objetivo <span class="mono">${GLOBAL.bancoObjetivo}</span><span class="lock">semilla, no valor vigente</span></div>
+       <p class="hint">Alineado a ${GLOBAL.bancoMinimo/GLOBAL.preguntasIntento}× el intento. Es el valor con el que nace un módulo nuevo: <b>el valor vigente lo define cada módulo</b>, en la pestaña Configuración de su evaluación. Editarlo acá no propagaba a lo ya creado, así que dejó de ser editable.</p></div>
+     <div><label>Canal único de soporte</label><div class="row"><input type="text" value="${esc(GLOBAL.soporte)}" style="max-width:320px"></div>
        <p class="hint">Un solo canal en toda la Academia, como en el prototipo.</p></div>
      <div><label>Zona horaria de atención</label><div class="ro">${esc(GLOBAL.zona)}<span class="lock">rotulada en pantalla, sin conversión de husos</span></div></div>
      <div><label>Rehacer una evaluación ya aprobada</label>
@@ -3210,7 +3608,34 @@ function viewParams(){
        <p class="hint">Se cruza con la decisión 6 (¿la aprobación caduca al regrabar un video?): las dos definen si una aprobación es permanente o revisable, y conviene escribirlas juntas.</p></div>
    </div>`;
   w.appendChild(card);
-  w.appendChild(el('div','note v3','<b>Pantalla nueva de alineación ·</b> Reúne los parámetros que el prototipo consume: umbral de visto y su método de medición, preguntas por intento, umbral de aprobación, canal de soporte y zona horaria. Que estén acá evita que cada uno viva como una constante suelta en el código.'));
+
+  /* Trazabilidad: qué módulos se apartaron de la semilla y en qué. Con los
+     parámetros repartidos en dos pantallas, este dato no existía en ninguna. */
+  const semilla=p=>p.objetivo===GLOBAL.bancoObjetivo&&p.minimo===GLOBAL.bancoMinimo
+    &&p.forzarCobertura==='a definir'&&p.mostrarCorrectas==='a definir'&&p.caducaAlRegrabar==='a definir';
+  const propios=DATA.filter(m=>!semilla(m.params));
+  const tr2=el('div','card');tr2.style.padding='16px';tr2.style.marginTop='16px';
+  tr2.innerHTML=`<h3>Módulos con parámetros propios</h3>
+    <p class="hint" style="margin:4px 0 8px">Cada módulo es dueño de sus parámetros. Acá se ve, de una sola mirada, cuáles se apartaron del valor por defecto: es lo que evita que un umbral distinto se cuele sin decisión formal.</p>`;
+  if(!propios.length){
+    tr2.appendChild(el('div','emptynote','<b>Ninguno se apartó todavía.</b><br>Los '+DATA.length+' módulos corren con objetivo '+GLOBAL.bancoObjetivo+', mínimo '+GLOBAL.bancoMinimo+' y las tres decisiones sin definir.'));
+  }else{
+    const tw=el('div','tablewrap'),tb=el('table');
+    tb.innerHTML=`<thead><tr><th style="width:110px">Módulo</th><th>Nombre</th><th style="width:90px">Objetivo</th><th style="width:90px">Mínimo</th><th style="width:130px">Forzar cobertura</th><th style="width:130px">Mostrar correctas</th><th style="width:120px">Caduca al regrabar</th></tr></thead>`;
+    const bd=el('tbody');
+    propios.forEach(m=>{
+      const p=m.params, tr=el('tr');
+      tr.innerHTML=`<td class="cellmono">${m.id}</td><td>${esc(m.name)}</td>
+        <td class="cellmono">${p.objetivo}${p.objetivo!==GLOBAL.bancoObjetivo?' <span class="tag warn">propio</span>':''}</td>
+        <td class="cellmono">${p.minimo}${p.minimo!==GLOBAL.bancoMinimo?' <span class="tag warn">propio</span>':''}</td>
+        <td>${valParam(p.forzarCobertura)}</td><td>${valParam(p.mostrarCorrectas)}</td><td>${valParam(p.caducaAlRegrabar)}</td>`;
+      bd.appendChild(tr);
+    });
+    tb.appendChild(bd);tw.appendChild(tb);tr2.appendChild(tw);
+  }
+  w.appendChild(tr2);
+
+  w.appendChild(el('div','note v3','<b>Ajuste ·</b> Esta pantalla reúne lo que es global de verdad —umbral de visto y su método, preguntas por intento, umbral de aprobación, canal de soporte y zona horaria— y dejó de editar el mínimo del banco, que ahora vive en cada módulo. Antes el mismo número se editaba en dos lugares sin precedencia definida.'));
   return w;
 }
 
@@ -3219,7 +3644,7 @@ function viewParams(){
    EVENTOS
    ============================================================ */
 document.addEventListener('click',ev=>{
-  const t=ev.target.closest('[data-go],[data-go2],[data-jump],[data-door],[data-esc],[data-rol],[data-sup],[data-toggle],[data-sel],[data-add],[data-ins],[data-quick],[data-secsave],[data-amsave],[data-tab],[data-bulk],[data-bbulk],[data-imp],[data-impmodo],[data-fix],[data-fixmod],[data-skip],[data-info],[data-perfil],[data-arch],[data-pub],[data-vid-pub],[data-qsave],[data-resort],[data-verres],[data-vercorr],[data-vord],[data-sord],[data-mord],[data-meetag],[data-panelag],[data-meetagendar],#collapseAll');
+  const t=ev.target.closest('[data-go],[data-go2],[data-jump],[data-door],[data-esc],[data-sup],[data-toggle],[data-sel],[data-add],[data-ins],[data-quick],[data-modo],[data-secsave],[data-amsave],[data-tab],[data-evtab],[data-pmsave],[data-qnew],[data-bulk],[data-bbulk],[data-imp],[data-impmodo],[data-fix],[data-fixmod],[data-skip],[data-info],[data-perfil],[data-arch],[data-pub],[data-vid-pub],[data-qsave],[data-qopt],[data-qdup],[data-ballcheck],[data-resort],[data-verres],[data-vercorr],[data-vord],[data-sord],[data-mord],[data-meetag],[data-panelag],[data-meetagendar],#collapseAll');
   if(!t||t.disabled) return;
 
   if(t.dataset.go){S.screen=t.dataset.go;S.impPaso=1;render();return;}
@@ -3232,13 +3657,15 @@ document.addEventListener('click',ev=>{
     if(p[0]==='banco'){S.screen='banco';S.bModId=p[1];S.bChecked.clear();render();return;}
     if(p[0]==='pregunta'){S.screen='pregunta';S.bModId=p[1];S.qEdit=p[2];render();return;}
     if(p[0]==='subtemas'){S.screen='subtemas';S.bModId=p[1];render();return;}
-    if(p[0]==='preview'){S.screen='preview';S.bModId=p[1];S.muestra=null;S.respuestas={};render();return;}
+    if(p[0]==='preview'){S.screen='preview';S.bModId=p[1];S.muestra=null;S.respuestas={};S.verCorrectas=null;render();return;}
     if(p[0]==='imp-preg'){S.screen='importar';S.impModo='preguntas';S.bModId=p[1];S.impPaso=1;S.omit.clear();render();return;}
   }
 
   if(t.dataset.jump){
     const p=t.dataset.jump.split('|');
-    if(p[0]==='banco'){S.screen='banco';S.bModId=p[1];render();return;}
+    /* Mismo efecto que data-go2: entrar al banco desde un pendiente no puede
+       arrastrar una selección hecha en otro módulo. */
+    if(p[0]==='banco'){S.screen='banco';S.bModId=p[1];S.bChecked.clear();render();return;}
     if(p[0]==='subtemas'){S.screen='subtemas';S.bModId=p[1];render();return;}
     if(p[0]==='sec'){S.screen='constructor';S.open[p[1]]=true;S.qsec={modId:p[1]};S.sel={kind:'mod',modId:p[1]};render();return;}
     if(p[0]==='vid'){S.screen='constructor';S.open[p[1]]=true;S.sel={kind:'vid',modId:p[1],secIdx:+p[2],vidSeq:p[3]};S.tab='ficha';render();return;}
@@ -3248,27 +3675,31 @@ document.addEventListener('click',ev=>{
   if(t.dataset.door){
     const d=t.dataset.door;
     if(d==='tengo'){
-      if(!can('editar')){toast(porque('editar'));return;}
       S.screen='constructor';const m=findMod('BAK-M40');S.superficie='BAK';S.open[m.id]=true;
       S.quick={modId:m.id,secIdx:0,modo:'tengo'};S.sel=null;render();
       toast('Elegí dónde va el video y pegá el link. Al guardar se verifica el embebido.');return;
     }
     if(d==='preguntas'){
-      if(!can('editar')){toast(porque('editar'));return;}
-      S.screen='banco';S.bModId='BAK-M40';render();toast('Banco de BAK-M40. El tema es obligatorio en cada pregunta.');return;
+      /* Antes esta puerta iba siempre a BAK-M40, hardcodeado: si querías cargar
+         preguntas de otro módulo, la única acción directa del hub no servía. Ahora
+         abre el módulo con el banco más atrasado, y el selector de la consola deja
+         cambiarlo sin volver. */
+      const cand=modsVis().filter(x=>!x.enPrep&&x.subtemas.length)
+        .sort((a,b)=>(bancoActivas(a).length-a.params.minimo)-(bancoActivas(b).length-b.params.minimo));
+      S.bModId=(cand[0]||findMod('BAK-M40')||modsVis()[0]).id;
+      S.screen='banco';S.bChecked.clear();render();
+      toast('Banco de '+S.bModId+', el más atrasado contra su mínimo. Podés cambiar de módulo arriba. El tema es obligatorio en cada pregunta.');
+      return;
     }
     if(d==='estructura'){
-      if(!can('editar')){toast(porque('editar'));return;}
       S.screen='altamod';render();return;
     }
     if(d==='publicar'){
-      if(!can('publicar')){toast(porque('publicar'));return;}
       S.screen='constructor';S.superficie='BAK';S.bModId='BAK-M30';S.open['BAK-M30']=true;S.sel={kind:'mod',modId:'BAK-M30'};S.tab='publicar';render();return;
     }
   }
 
-  if(t.dataset.esc){S.escena=t.dataset.esc;S.checked.clear();S.bChecked.clear();S.quick=null;S.qsec=null;S.muestra=null;S.respuestas={};if(S.escena==='E1')S.sel=null;render();return;}
-  if(t.dataset.rol){S.rol=t.dataset.rol;S.quick=null;S.qsec=null;render();toast('Actuando como '+ROLES[S.rol].n+'. '+ROLES[S.rol].d);return;}
+  if(t.dataset.esc){S.escena=t.dataset.esc;S.checked.clear();S.bChecked.clear();S.quick=null;S.qsec=null;S.muestra=null;S.respuestas={};if(!modsVis().length)S.sel=null;render();return;}
   if(t.dataset.sup){S.superficie=t.dataset.sup;S.sel=null;S.quick=null;S.qsec=null;render();return;}
   if(t.dataset.perfil){S.perfilVista=t.dataset.perfil;render();return;}
   if(t.dataset.meetag){S.meetAg=t.dataset.meetag;render();return;}
@@ -3325,6 +3756,11 @@ document.addEventListener('click',ev=>{
     S.screen='constructor';S.open[m.id]=true;S.bModId=m.id;S.sel={kind:'mod',modId:m.id};S.tab='ficha';render();return;
   }
 
+  /* El estado del video que se está dando de alta. El radio estaba dibujado con su
+     `value` y nadie lo leía: `modo` valía siempre 'tengo', así que el formulario no
+     ofrecía nunca la rama de duración estimada y el estado `backlog` era inalcanzable. */
+  if(t.dataset.modo&&S.quick){S.quick={...S.quick,modo:t.dataset.modo};render();return;}
+
   /* alta de video */
   if(t.dataset.quick){
     const a=t.dataset.quick;
@@ -3348,6 +3784,48 @@ document.addEventListener('click',ev=>{
   }
 
   if(t.dataset.tab){S.tab=t.dataset.tab;render();return;}
+  if(t.dataset.evtab){S.screen='evaluacion';S.evTab=t.dataset.evtab;render();return;}
+
+  /* Cargar una pregunta de un tema puntual, desde donde se ve el hueco. */
+  if(t.dataset.qnew){
+    const m=findMod(S.bModId);
+    S.screen='pregunta';S.qEdit='new';
+    S.qDraft={key:m.id+'|new',...draftDe(null),st:t.dataset.qnew};
+    render();
+    const nom=(m.subtemas.find(s=>s.id===t.dataset.qnew)||{}).name||'';
+    toast('Pregunta nueva con el tema "'+nom+'" ya elegido.');
+    return;
+  }
+
+  /* Parámetros de la evaluación, que son del módulo. Las validaciones protegen las
+     reglas ya ratificadas: el mínimo no puede bajar de 3× el intento ni superar al
+     objetivo. */
+  if(t.dataset.pmsave){
+    const m=findMod(S.bModId), p=m.params;
+    if(t.dataset.pmsave==='reset'){
+      p.objetivo=GLOBAL.bancoObjetivo;p.minimo=GLOBAL.bancoMinimo;
+      p.forzarCobertura='a definir';p.mostrarCorrectas='a definir';p.caducaAlRegrabar='a definir';
+      render();toast('Parámetros de '+m.id+' vueltos a los valores por defecto: objetivo '+GLOBAL.bancoObjetivo+', mínimo '+GLOBAL.bancoMinimo+'.');
+      return;
+    }
+    const obj=parseInt(($('#pObj')&&$('#pObj').value)||p.objetivo,10);
+    const min=parseInt(($('#pMin')&&$('#pMin').value)||p.minimo,10);
+    const piso=3*p.porIntento;
+    if(!(obj>0)||!(min>0)){toast('El objetivo y el mínimo tienen que ser números mayores que cero.');return;}
+    if(min<piso){toast('El mínimo no puede bajar de '+piso+': es 3× las '+p.porIntento+' preguntas del intento, y con reintentos ilimitados un banco más chico se memoriza.');return;}
+    if(min>obj){toast('El mínimo no puede superar al objetivo: quedaría un módulo que nunca se puede publicar.');return;}
+    const leer=n=>{const x=document.querySelector('input[name="'+n+'"]:checked');return x?x.value:'a definir';};
+    p.objetivo=obj;p.minimo=min;
+    p.forzarCobertura=leer('pForzar');p.mostrarCorrectas=leer('pCorr');p.caducaAlRegrabar=leer('pCaduca');
+    /* Cambiar las reglas invalida el sorteo que estaba en pantalla. */
+    S.muestra=null;S.respuestas={};
+    const nAct=bancoActivas(m).length;
+    render();
+    toast('Parámetros de '+m.id+' guardados. '+(nAct<min
+      ?'Con '+nAct+' activas queda por debajo del mínimo de '+min+': el módulo no se puede publicar.'
+      :'Con '+nAct+' activas cumple el mínimo de '+min+'.'));
+    return;
+  }
 
   /* reordenamientos reales */
   if(t.dataset.vord){
@@ -3385,14 +3863,35 @@ document.addEventListener('click',ev=>{
     toast(msg);S.checked.clear();render();return;
   }
 
+  if(t.dataset.ballcheck){
+    const m=findMod(S.bModId);
+    const vis=filasBanco(m).map(q=>q.id);
+    const todas=vis.length>0&&vis.every(id=>S.bChecked.has(id));
+    vis.forEach(id=>todas?S.bChecked.delete(id):S.bChecked.add(id));
+    render();return;
+  }
   if(t.dataset.bbulk){
-    const a=t.dataset.bbulk,n=S.bChecked.size;
+    const m=findMod(S.bModId);
+    const a=t.dataset.bbulk;
     if(a==='clear'){S.bChecked.clear();render();return;}
-    toast({activar:n+' preguntas activadas: ya entran en el sorteo.',
-      desactivar:n+' preguntas desactivadas. No se borran: dejan de entrar en el sorteo.',
-      subtema:'Asignar tema a '+n+' preguntas de una vez. Es la salida rápida cuando el import entró sin etiqueta.',
-      exportar:'Exportando '+n+' preguntas a planilla.'}[a]);
-    S.bChecked.clear();render();return;
+    const ids=selVisible(m);
+    if(!ids.length){toast('No hay ninguna pregunta seleccionada entre las que se están viendo.');return;}
+    if(a==='exportar'){toast('Exportando '+ids.length+' preguntas a planilla, con ID, tema, opciones, estado y versión.');return;}
+    const plural=n=>n===1?'':'s';
+    if(a==='activar'){
+      const n=qEstado(m,ids,'activa');
+      const malas=ids.map(id=>qDe(m,id)).filter(q=>problemas(q).length).length;
+      const cero=subtemasEnCero(m);
+      S.bChecked.clear();render();
+      toast(n+' pregunta'+plural(n)+' activada'+plural(n)+': ya entra'+(n===1?'':'n')+' en el sorteo y cuenta'+(n===1?'':'n')+' para la cobertura.'
+        +(malas?' Ojo: '+malas+' tiene'+(malas===1?'':'n')+' algo para corregir, así que el sorteo la'+plural(malas)+' descarta.':'')
+        +(cero?' Todavía quedan '+cero+' tema'+plural(cero)+' sin cubrir.':''));
+      return;
+    }
+    const n=qEstado(m,ids,'inactiva');
+    S.bChecked.clear();render();
+    toast(n+' pregunta'+plural(n)+' desactivada'+plural(n)+'. No se borran —el ID no se reusa—: dejan de entrar en el sorteo.');
+    return;
   }
 
   if(t.dataset.impmodo){S.impModo=t.dataset.impmodo;S.impPaso=1;S.omit.clear();render();return;}
@@ -3403,7 +3902,20 @@ document.addEventListener('click',ev=>{
     if(a==='csv'){toast('También acepta CSV, con mapeo de columnas.');return;}
     if(a==='ok'){
       const p=S.impModo;S.impPaso=1;S.omit.clear();
-      if(p==='preguntas'){S.screen='banco';toast('Preguntas importadas en estado borrador. Revisá y activalas para que entren en el sorteo.');}
+      if(p==='preguntas'){
+        /* Importa de verdad: recién así la proyección de cobertura de la pantalla
+           anterior es verificable contra el banco. */
+        const mod=findMod(S.bModId);
+        const listas=resolverFilasP(mod).filter((f,i)=>!S.omit.has(i)&&(!f.err||esAviso(f.err)));
+        const antes=bancoActivas(mod).length, cero=subtemasEnCero(mod);
+        const n=qImportar(mod,listas);
+        const act=listas.filter(f=>f.estado==='activa').length;
+        S.screen='banco';S.bChecked.clear();render();
+        toast(n+' pregunta'+(n===1?'':'s')+' importada'+(n===1?'':'s')+' en '+mod.id+': '+act+' activa'+(act===1?'':'s')+' y '+(n-act)+' en borrador. '
+          +'Activas: '+antes+' → '+bancoActivas(mod).length+'. '
+          +(cero&&!subtemasEnCero(mod)?'Se destrabó el bloqueo por cobertura.':(subtemasEnCero(mod)?'Todavía quedan '+subtemasEnCero(mod)+' temas sin cubrir.':'')));
+        return;
+      }
       else if(p==='videos'){S.screen='constructor';toast('Videos importados. Quedaron en backlog, con su ID reservado.');}
       else{
         /* crea de verdad la estructura FRT del pegado */
@@ -3419,7 +3931,18 @@ document.addEventListener('click',ev=>{
       }
       render();return;}
   }
-  if(t.dataset.fix){toast('Se resuelve la fila sin descartar el resto del pegado.');return;}
+  if(t.dataset.fix){
+    const p=String(t.dataset.fix).split('|');
+    /* Traer la fila al destino sí se resuelve de verdad: cambia el módulo de la
+       fila y el pegado se revalida contra los temas del destino. */
+    if(p[0]==='dest'&&FILAS_P[+p[1]]){
+      const m=findMod(S.bModId);
+      FILAS_P[+p[1]].mod=m.id;
+      render();toast('Fila traída a '+m.id+'. Se revalidó contra sus temas: si el tema no existe acá, ahora lo dice.');
+      return;
+    }
+    toast('Se resuelve la fila sin descartar el resto del pegado.');return;
+  }
   if(t.dataset.fixmod){
     const idm=t.dataset.fixmod;
     if(findMod(idm)){toast('El módulo '+idm+' ya existe.');return;}
@@ -3447,14 +3970,61 @@ document.addEventListener('click',ev=>{
     toast(t.dataset.vidPub==='on'?'Video publicado dentro del módulo.':'Video despublicado. Su estado de producción sigue siendo el que era: no se perdió la historia.');
     return;
   }
-  if(t.dataset.qsave){
-    toast(t.dataset.qsave==='more'
-      ?'Pregunta guardada. El formulario vuelve vacío con el mismo tema, que es como se carga un banco de corrido.'
-      :'Pregunta guardada en borrador. Activala para que entre en el sorteo y cuente para la cobertura.');
-    if(t.dataset.qsave!=='more'){S.screen='banco';render();}
+  /* Opciones de la pregunta: agregar, quitar y elegir la correcta. Antes estos tres
+     controles no tenían data-*, así que no entraban por la delegación y el editor
+     era decorativo: cuatro opciones fijas y sin poder mover la correcta. */
+  if(t.dataset.qopt){
+    const [a,i]=t.dataset.qopt.split('|');
+    const d={...S.qDraft,...leerFormQ()};
+    if(a==='add'&&d.ops.length<5) d.ops.push({t:'',ok:false});
+    if(a==='del'&&d.ops.length>2){
+      const era=d.ops[+i].ok;
+      d.ops.splice(+i,1);
+      /* Si se borró la correcta, la primera pasa a serlo: dejar cero correctas
+         sería guardar una pregunta que el sorteo descarta sin decir por qué. */
+      if(era) d.ops[0].ok=true;
+    }
+    if(a==='correcta') d.ops=d.ops.map((o,k)=>({...o,ok:k===+i}));
+    S.qDraft=d;render();
+    if(a==='del'&&d.ops.length===2) toast('Quedaron dos opciones, el mínimo. Para bajar más habría que replantear la pregunta.');
     return;
   }
-  if(t.dataset.resort){S.muestra=null;S.respuestas={};S.screen='preview';render();toast('Nuevo sorteo con las mismas reglas. Mirá si cambió la cobertura por tema.');return;}
+  if(t.dataset.qdup){
+    const m=findMod(S.bModId);
+    const d={...S.qDraft,...leerFormQ()};
+    const mal=validarQ(m,d);
+    if(mal){toast('No se puede duplicar todavía: '+mal);return;}
+    const nq=qGuardar(m,{e:d.e+' (copia)',ops:d.ops,st:d.st,repaso:d.repaso,
+      explicacion:d.explicacion,estado:'borrador'});
+    S.qEdit=nq.id;S.qDraft=null;render();
+    toast('Copia guardada como '+nq.id+' en borrador. El ID es nuevo y permanente: no se reusa el de la original.');
+    return;
+  }
+  if(t.dataset.qsave){
+    const m=findMod(S.bModId);
+    const d={...S.qDraft,...leerFormQ()};
+    const mal=validarQ(m,d);
+    if(mal){toast(mal);return;}
+    const id=S.qEdit==='new'?null:S.qEdit;
+    const verAntes=id?(qDe(m,id)||{}).ver:0;
+    const repetida=(m.pool||[]).some(x=>x.id!==id&&x.e.toLowerCase()===d.e.toLowerCase());
+    const q=qGuardar(m,{e:d.e,ops:d.ops,st:d.st,repaso:d.repaso,
+      explicacion:d.explicacion,estado:d.estado},id);
+    const dondeEntra=q.estado==='activa'
+      ?'Entra en el sorteo y ya cuenta para la cobertura del tema.'
+      :'Queda en '+q.estado+': no entra en el sorteo ni cuenta para la cobertura hasta activarla.';
+    const aviso=repetida?' Ojo: hay otra pregunta con el mismo enunciado en este módulo.':'';
+    if(t.dataset.qsave==='more'){
+      /* Se conserva el tema: un banco se carga de corrido, por concepto. */
+      S.qEdit='new';S.qDraft={key:m.id+'|new',...draftDe(null),st:d.st};
+      render();toast(q.id+' guardada. '+dondeEntra+' El formulario vuelve vacío con el mismo tema.'+aviso);
+      return;
+    }
+    S.qDraft=null;S.screen='banco';render();
+    toast(q.id+(q.ver>verAntes&&verAntes?' guardada como v'+q.ver+', porque ya se había respondido. ':' guardada. ')+dondeEntra+aviso);
+    return;
+  }
+  if(t.dataset.resort){S.muestra=null;S.respuestas={};S.verCorrectas=null;S.screen='preview';render();toast('Nuevo sorteo con las mismas reglas. Mirá si cambió la cobertura por tema.');return;}
   if(t.dataset.verres){S.screen='resultado';render();return;}
   if(t.dataset.vercorr!==undefined){S.verCorrectas=t.dataset.vercorr==='1';render();return;}
 
@@ -3471,9 +4041,25 @@ document.addEventListener('change',ev=>{
   if(t.id==='notesChk'){document.body.classList.toggle('notes-off',!t.checked);return;}
   if(t.id==='soloPend'){S.soloPend=t.checked;render();return;}
   if(t.id==='verArch'){S.verArch=t.checked;render();return;}
+  /* Cambiar de módulo sin salir de la consola. Se limpia todo lo que era del módulo
+     anterior: filtros, selección y el sorteo de muestra. */
+  if(t.id==='evMod'){
+    S.bModId=t.value;S.bChecked.clear();S.bFiltro='';S.bSub='';S.bEstado='';S.bCorregir=false;
+    S.muestra=null;S.respuestas={};S.qDraft=null;
+    render();return;
+  }
   if(t.id==='bSub'){S.bSub=t.value;render();return;}
   if(t.id==='bEstado'){S.bEstado=t.value;render();return;}
   if(t.id==='bCorregir'){S.bCorregir=t.checked;render();return;}
+  if(t.id==='bBulkTema'&&t.value){
+    const m=findMod(S.bModId);
+    const ids=selVisible(m);
+    const n=qTema(m,ids,t.value);
+    const nom=(m.subtemas.find(s=>s.id===t.value)||{}).name||'';
+    S.bChecked.clear();render();
+    toast(n+' pregunta'+(n===1?'':'s')+' movida'+(n===1?'':'s')+' al tema "'+nom+'". Es la salida rápida cuando un pegado entró sin tema.');
+    return;
+  }
   if(t.dataset&&t.dataset.pv!==undefined){S.respuestas[+t.dataset.pv]=+t.value;return;}
   if(t.dataset&&t.dataset.check!==undefined){t.checked?S.checked.add(t.dataset.check):S.checked.delete(t.dataset.check);render();return;}
   if(t.dataset&&t.dataset.bcheck!==undefined){t.checked?S.bChecked.add(t.dataset.bcheck):S.bChecked.delete(t.dataset.bcheck);render();return;}
@@ -3510,13 +4096,12 @@ document.addEventListener('keydown',ev=>{
   else if(ev.key==='ArrowLeft'&&kind==='mod'&&S.open[mid]){ev.preventDefault();S.open[mid]=false;render();refocus(a.dataset.sel);}
 });
 
+/* El foco y el caret los devuelve render(); acá solo se guarda el filtro. */
 document.addEventListener('input',ev=>{
   const id=ev.target.id;
   if(id==='filtro'||id==='bFiltro'){
-    const pos=ev.target.selectionStart;
     if(id==='filtro') S.filtro=ev.target.value; else S.bFiltro=ev.target.value;
     render();
-    const f=$('#'+id);if(f){f.focus();f.setSelectionRange(pos,pos);}
   }
 });
 

@@ -52,7 +52,7 @@ Lo que comparten y no se puede tocar de un solo lado:
 | Meet | 30 min · martes y jueves · 15:00 a 16:30 · ventana de 3 semanas · ART (UTC-3) |
 | Tipos de documento | `DNI` · `PASAPORTE` · `CI` · `LC-LE` |
 
-### Las tres reglas que sostienen todo lo demás
+### Las cuatro reglas que sostienen todo lo demás
 
 1. **El ID es permanente.** El del módulo, el de la sección y el del video. No se reasigna ni se
    renumera nunca — sobrevive al regrabado. Por eso el **orden** es un campo aparte del ID.
@@ -61,6 +61,10 @@ Lo que comparten y no se puede tocar de un solo lado:
    ningún denominador.
 3. **El tema del banco es una sección del propio módulo.** No hay catálogo de temas aparte. Es lo que
    permite medir cobertura por sección y etiquetar las dudas de la Meet con valores que la agencia ve.
+   Una pregunta sale de un video, y de ese video hereda las dos cosas: su tema y su video de repaso.
+4. **Los parámetros de la evaluación son del módulo.** Los globales son la semilla con la que nace un
+   módulo nuevo, no un segundo lugar donde editarlos. Lo que sí es global y no se edita son las reglas
+   del MVP: 10 preguntas por intento, umbral 80,00 %, reintentos ilimitados, mínimo = 3× el intento.
 
 ---
 
@@ -76,6 +80,8 @@ La regla: **si se puede derivar, se deriva.**
 | **Estado del cupo de Meet** | la cola de dudas + la fecha del turno |
 | Promedio de avance de la agencia | aprobaciones del plantel / (personas × total del recorrido) |
 | Cobertura del banco por tema | `pregunta.st` contra las secciones del módulo |
+| **Qué preguntas existen en cada escena** | `pregunta.desde` contra la escena actual |
+| Si un módulo se puede publicar | el checklist, contra el banco y los videos del momento |
 
 El estado del cupo es el caso de manual: guardado se desincroniza en cuanto alguien retira una duda.
 Sus cuatro valores son `sin-lugares` → `abierto` → `agendado` → `consumido`, con **el mismo
@@ -100,18 +106,29 @@ con los botones del encabezado:
 | `E1` · Día cero | Nada cargado. Se puede crear el primer módulo o pegar la estructura |
 | `E2` · IDs reservados | Los 55 videos existen como IDs en backlog, sin bancos |
 | `E3` · Guionando y grabando | Los de Prioridad 1 entre guionados y grabados |
-| `E4` · Ruta esencial publicada | Los 12 videos de P1 listos, tres módulos visibles |
-| `E5` · En régimen *(default)* | Todo publicado: aparece la cola de «a regrabar» |
+| `E4` · Ruta esencial publicada | BAK-M00, M10 y M20 completos y visibles; uno con el embebido roto |
+| `E5` · En régimen *(default)* | Todo publicado con el banco completo: aparece la cola de «a regrabar» |
+
+El banco también depende de la escena, y cada pregunta declara **desde cuándo existe** (`desde`):
+`E1` y `E2` sin banco, `E3` el primer banco a medio cargar —el único caso donde se ve la regla de
+cobertura bloqueando de verdad—, `E4` la ruta esencial completa, `E5` todos los módulos en su
+objetivo. Una pregunta cargada a mano nace en la escena en la que se cargó, igual que un video.
 
 ### Las pantallas
 
 | Grupo | Pantalla |
 |---|---|
 | Inicio | Qué querés hacer · **Reglas y decisiones** |
-| Contenido | Estructura de la Academia (árbol, ficha, banco) · Cargar desde planilla |
+| Contenido | Estructura de la Academia (árbol y ficha) · **Evaluaciones y bancos** · Cargar desde planilla |
 | Soporte | Meet y colas de dudas · Certificados |
 | Seguimiento | Avance por agencia · Panel general |
 | Revisión | **Ver como agencia** · Roles y permisos · Parámetros globales |
+
+**Evaluaciones y bancos** es la consola de la evaluación de un módulo: banco de preguntas,
+cobertura por tema, parámetros y previsualización del intento, con el módulo elegido en el
+encabezado. Reemplaza a las tres pantallas sueltas que había antes (banco, temas y previsualizar) y a
+las dos pestañas de la ficha; la ficha del módulo conserva una sola pestaña **Evaluación**, que es un
+resumen con la puerta.
 
 «Ver como agencia» es la que más rinde para revisar antes de publicar: muestra el recorrido tal como
 lo ve una agencia de cada plan, con los módulos fuera de plan bajo candado y sin ordinal.
@@ -152,7 +169,10 @@ Deuda compartida con el repo de la agencia, no divergencias entre los dos:
 - Cómo se mide el 80 % de visto: posición del cursor vs. segundos acumulados anti-scrub (`P04.3`).
 - De dónde sale el documento del titular del certificado (`CE-1`) y si se persiste.
 - Longitudes válidas por tipo de documento (`CE-3`): las de acá son conservadoras, sin confirmar.
-- Si la aprobación caduca al regrabar un video del módulo.
+- Si la aprobación caduca al regrabar un video del módulo (decisión 6). **Ya es configurable por
+  módulo**, junto con forzar cobertura en el sorteo (decisión 2) y mostrar las respuestas correctas al
+  finalizar (decisión 1): las tres arrancan en «a definir» y se pueden probar en la consola antes de
+  cerrarlas con negocio.
 - Despublicar un módulo que una agencia está cursando: ¿pierde acceso, aprobación, ordinal?
 - Si la Meet debe exigir aprobar (`P08.6`): el que necesita ayuda es el que desaprueba.
 - Quién designa al coordinador y qué pasa si se va de la agencia.
