@@ -198,10 +198,6 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
   margin-left:auto;font-size:12px;color:var(--rail-ink-soft);
   border:1px solid var(--rail-line);border-radius:var(--r-sm);padding:0 4px;
 }
-.railfoot{
-  margin-top:auto;padding:24px 24px 0;border-top:1px solid rgba(255,255,255,.1);
-  font-size:14px;color:var(--rail-ink-soft);font-family:var(--serif-alt);
-}
 
 .main{display:flex;flex-direction:column;min-width:0}
 
@@ -600,6 +596,10 @@ button.tag:hover{border-color:var(--ink-soft);color:var(--ink)}
 .legend{
   padding:0 24px 8px 48px;font-family:var(--serif-alt);font-size:14px;color:var(--warning);
 }
+/* La leyenda del árbol nació ámbar porque avisaba de un módulo sin publicar. La de
+   planes no avisa: informa, y pintada de ámbar se leía como advertencia. Variante
+   cerrada del mismo componente, no color libre por instancia (§6.7). */
+.legend.plan{color:var(--indigo-light)}
 .addrow{padding:8px 24px 16px 80px}
 .addrow.sec{padding-left:48px}
 .addrow.mod{padding-left:16px;padding-bottom:24px}
@@ -793,9 +793,6 @@ tr[data-warn="true"]:hover td{background:color-mix(in srgb,var(--warning-border)
   transition:border-color var(--t-hover) var(--ease),background var(--t-hover) var(--ease);
 }
 .optrow:hover{border-color:var(--g500)}
-.optrow.correct{border-color:var(--success);background:var(--success-bg)}
-.optrow.wrong{border-color:var(--error);background:var(--error-bg)}
-.optrow .mkop{margin-left:auto;font-size:14px;font-weight:700}
 .opteditor{display:flex;gap:8px;align-items:center;margin-bottom:8px}
 .opteditor input[type=text]{flex:1}
 .opteditor .mk{flex:none;width:auto}
@@ -881,6 +878,11 @@ tr[data-warn="true"]:hover td{background:color-mix(in srgb,var(--warning-border)
    14 · NOTAS DE DISEÑO
    Andamiaje del prototipo, no producto. Se leen como anotación al margen
    para que nadie las confunda con interfaz.
+
+   Hoy no se dibuja ninguna: las notas están diferidas detrás del flag `notas` y
+   aplicarMVP las remueve del DOM. Estas reglas son lo que el flag revive, así que
+   se dejan escritas. Antes había además un `display:none` gobernado por un check
+   del rail; se fue con el check, porque ocultar no es lo mismo que no estar.
    ========================================================================= */
 
 .note{
@@ -893,7 +895,6 @@ tr[data-warn="true"]:hover td{background:color-mix(in srgb,var(--warning-border)
 .note.new b{color:var(--indigo)}
 .note.v3{border-left-color:var(--primary)}
 .note.v3 b{color:var(--primary-deep)}
-body.notes-off .note{display:none}
 
 /* ============================================================================
    15 · MOVIMIENTO  —  un solo momento orquestado (§4.4)
@@ -959,8 +960,7 @@ body.notes-off .note{display:none}
   <nav class="rail" aria-label="Navegación principal">
     <div class="brand"><strong>Academia SIGMMA</strong><span>Backoffice de contenido</span></div>
     <div class="railgroup"><h4>Empezar</h4>
-      <button class="railitem" data-go="hub">Qué querés hacer</button>
-      <button class="railitem" data-go="cambios">Reglas y decisiones</button></div>
+      <button class="railitem" data-go="hub">Qué querés hacer</button></div>
     <div class="railgroup"><h4>Contenido</h4>
       <button class="railitem" data-go="constructor">Estructura de la Academia</button>
       <button class="railitem" data-go="evaluacion">Evaluaciones y bancos</button>
@@ -974,12 +974,6 @@ body.notes-off .note{display:none}
     <div class="railgroup"><h4>Control</h4>
       <button class="railitem" data-go="agencia">Ver como agencia</button>
       <button class="railitem" data-go="params">Parámetros globales</button></div>
-    <div class="railfoot">
-      Wireframe v4 · alineado al prototipo agencia<br>
-      <label style="display:flex;gap:8px;align-items:center;margin-top:16px;color:var(--rail-ink-soft);font-weight:400">
-        <input type="checkbox" id="notesChk" checked style="accent-color:var(--sky-light)"> Ver notas de diseño
-      </label>
-    </div>
   </nav>
 
   <div class="main">
@@ -1054,12 +1048,18 @@ const ico=(n,cls)=>'<span class="icon'+(cls?' '+cls:'')+'" data-icon="'+n+'"></s
    Prender el flag devuelve la pantalla, la entrada del rail, los botones y los
    textos que ofrecen el camino de la planilla.
 
+   `notas` apaga las notas de diseño: los carteles que cuentan qué cambió en cada
+   versión del prototipo. Sirvieron para acordar el modelo con negocio y el acuerdo
+   quedó escrito en el README; en pantalla eran dato de proceso para alguien que
+   entra a administrar contenido. Se difieren en vez de borrarse porque el texto
+   explica decisiones que todavía se citan: prender el flag las devuelve todas.
+
    Se declara ACÁ, arriba de GLOBAL, porque el bloque que evalúa `cotejo.js`
    arranca en la declaración de GLOBAL: adentro, MVP sería una referencia más que
    el script tendría que definir por su cuenta. Ojo con nombrar los marcadores de
    corte en texto plano —el script los busca con indexOf y se queda con el primero
    que encuentra, comentario incluido. */
-const MVP={importador:false};
+const MVP={importador:false,notas:false};
 
 /* Un solo lugar apaga lo diferido, tanto en el markup estático del shell como en
    lo que generan las vistas. Se remueve en vez de ocultar: un botón `hidden`
@@ -1381,15 +1381,20 @@ function initMod(m){
      "los mismos que el módulo"— y ponerle un default lo volvería indistinguible de
      un video al que alguien le eligió esos planes a mano. */
   m.planes=m.planes&&m.planes.length?m.planes:[...PLANES];
-  /* Los parámetros de la evaluación son DEL MÓDULO. GLOBAL es la semilla —el valor
-     con el que nace un módulo nuevo—, no una segunda pantalla donde editarlos:
-     antes el objetivo y el mínimo se podían tocar en los dos lugares, sin
-     precedencia definida y sin que el global propagara a lo ya creado.
-     Las tres decisiones abiertas viven acá como valor, no como cartel: así se
-     pueden probar por módulo antes de cerrarlas. */
+  /* Los parámetros con los que corre la evaluación del módulo. GLOBAL es la
+     semilla, y NINGUNO se edita en el backoffice: son condiciones del MVP, no
+     configuración —un módulo con umbral o mínimo propio sería una decisión de
+     negocio tomada sin decisión de negocio—. Viven en el módulo y no solo en
+     GLOBAL porque cada módulo se mide contra los suyos (el checklist de
+     publicación lee `m.params.minimo`) y porque `cotejo.js` custodia que los doce
+     declaren lo mismo. Forzar cobertura en "sí" era la decisión 2: se probó acá y
+     quedó cerrada. La 1 —no mostrar las correctas al finalizar— también se cerró,
+     pero NO tiene campo: es comportamiento fijo de la pantalla de resultado. Lo
+     tuvo mientras hubo un comparador que lo leía; sin ese lector habría quedado
+     dato que no hace nada, el caso de `caducaAlRegrabar`. */
   m.params=m.params||{porIntento:GLOBAL.preguntasIntento,objetivo:GLOBAL.bancoObjetivo,
     minimo:GLOBAL.bancoMinimo,umbral:'80,00 %',reintentos:'Ilimitados',
-    forzarCobertura:'a definir',mostrarCorrectas:'a definir',caducaAlRegrabar:'a definir'};
+    forzarCobertura:'si'};
   /* La Meet NO lleva link por módulo: el enlace es del turno (TURNOS[].enlace).
      Un link acá sería una segunda fuente de verdad para el mismo dato. */
   m.meet=m.meet||{habilitada:true,condicion:'Aprobar con 80 % o más',duracion:30,
@@ -1407,6 +1412,16 @@ DATA.forEach(initMod);
    DATOS DEL LADO AGENCIA (alineados al prototipo aprobado)
    El backoffice tiene que producir y administrar todo esto.
    ============================================================ */
+/* Doce agencias y no dos: el selector de agencia se busca, no se recorre con la
+   vista, y con dos filas el buscador queda decorativo y no se puede demostrar en
+   la demo para que sirve. Todas son ficticias (el mapa de contenido no lo es).
+   Tres reglas del dato que hay que mantener al agregar una:
+     - `plantel` no vacio: el avance promedio divide por `plantel.length`.
+     - `coordinadorId` es un id DE SU PROPIO plantel (lo lee nombrePlantel).
+     - `cert:true` implica fila en CERTIFICADOS: si no, la pantalla de
+       certificados dice "emitido" para alguien que no figura en el registro.
+   El plantel en 0 y el recorrido cerrado estan a proposito: son los dos extremos
+   que ordenan las sugerencias del selector. */
 const AGENCIAS=[
  {id:'viajes-del-sur',nombre:'Viajes del Sur',plan:'Professional',coordinadorId:2,
   plantel:[
@@ -1422,7 +1437,75 @@ const AGENCIAS=[
    {id:102,nombre:'Ramiro Cabrera',aprobados:11,ultimoAcceso:'31/07/2026',cert:true},
    {id:103,nombre:'Julieta Ponce',aprobados:7,ultimoAcceso:'29/07/2026',cert:false},
    {id:104,nombre:'Tomás Ferreyra',aprobados:3,ultimoAcceso:'28/07/2026',cert:false},
-   {id:105,nombre:'Ana Lucero',aprobados:0,ultimoAcceso:'—',cert:false}]}
+   {id:105,nombre:'Ana Lucero',aprobados:0,ultimoAcceso:'—',cert:false}]},
+ {id:'sol-y-nieve',nombre:'Sol y Nieve Turismo',plan:'Professional',coordinadorId:202,
+  plantel:[
+   {id:201,nombre:'Vanesa Alcaraz',aprobados:1,ultimoAcceso:'Hoy 11:05',cert:false},
+   {id:202,nombre:'Gonzalo Peralta',aprobados:4,ultimoAcceso:'02/09/2026',cert:false,coord:true},
+   {id:203,nombre:'Mariela Quintana',aprobados:1,ultimoAcceso:'26/08/2026',cert:false},
+   {id:204,nombre:'Ezequiel Barrios',aprobados:0,ultimoAcceso:'—',cert:false}]},
+ {id:'turismo-patagonico',nombre:'Turismo Patagónico',plan:'Business',coordinadorId:301,
+  plantel:[
+   {id:301,nombre:'Gabriela Ocampo',aprobados:11,ultimoAcceso:'21/08/2026',cert:true,coord:true},
+   {id:302,nombre:'Hernán Villalba',aprobados:8,ultimoAcceso:'Hoy 08:55',cert:false},
+   {id:303,nombre:'Rocio Ledesma',aprobados:6,ultimoAcceso:'01/09/2026',cert:false},
+   {id:304,nombre:'Ignacio Arrieta',aprobados:6,ultimoAcceso:'28/08/2026',cert:false},
+   {id:305,nombre:'Silvina Rearte',aprobados:4,ultimoAcceso:'18/08/2026',cert:false},
+   {id:306,nombre:'Braian Gutiérrez',aprobados:2,ultimoAcceso:'11/08/2026',cert:false}]},
+ {id:'caminos-del-litoral',nombre:'Caminos del Litoral',plan:'Professional',coordinadorId:401,
+  plantel:[
+   {id:401,nombre:'Alejandra Benitez',aprobados:9,ultimoAcceso:'03/09/2026',cert:false,coord:true},
+   {id:402,nombre:'Fabián Ojeda',aprobados:5,ultimoAcceso:'25/08/2026',cert:false},
+   {id:403,nombre:'Yamila Coronel',aprobados:3,ultimoAcceso:'20/08/2026',cert:false}]},
+ {id:'puna-viajes',nombre:'Puna Viajes',plan:'Business',coordinadorId:503,
+  plantel:[
+   {id:501,nombre:'Marcos Ale',aprobados:2,ultimoAcceso:'14/08/2026',cert:false},
+   {id:502,nombre:'Daniela Chocobar',aprobados:1,ultimoAcceso:'07/08/2026',cert:false},
+   {id:503,nombre:'Leandro Zerpa',aprobados:3,ultimoAcceso:'Hoy 12:40',cert:false,coord:true},
+   {id:504,nombre:'Noelia Cardozo',aprobados:0,ultimoAcceso:'—',cert:false},
+   {id:505,nombre:'Emiliano Tolaba',aprobados:1,ultimoAcceso:'30/07/2026',cert:false}]},
+ {id:'atlantico-tours',nombre:'Atlántico Tours',plan:'Professional',coordinadorId:604,
+  plantel:[
+   {id:601,nombre:'Cecilia Maidana',aprobados:9,ultimoAcceso:'02/09/2026',cert:false},
+   {id:602,nombre:'Pablo Iriarte',aprobados:7,ultimoAcceso:'29/08/2026',cert:false},
+   {id:603,nombre:'Luján Bustos',aprobados:6,ultimoAcceso:'27/08/2026',cert:false},
+   {id:604,nombre:'Sebastián Gaitán',aprobados:6,ultimoAcceso:'Hoy 09:18',cert:false,coord:true},
+   {id:605,nombre:'Antonella Prieto',aprobados:5,ultimoAcceso:'24/08/2026',cert:false},
+   {id:606,nombre:'Ruben Escalante',aprobados:4,ultimoAcceso:'19/08/2026',cert:false},
+   {id:607,nombre:'Milagros Ayala',aprobados:2,ultimoAcceso:'12/08/2026',cert:false},
+   {id:608,nombre:'Federico Lamas',aprobados:0,ultimoAcceso:'—',cert:false}]},
+ {id:'sierras-y-lagos',nombre:'Sierras y Lagos',plan:'Business',coordinadorId:701,
+  plantel:[
+   {id:701,nombre:'Vera Sandoval',aprobados:7,ultimoAcceso:'Hoy 10:47',cert:false,coord:true},
+   {id:702,nombre:'Joaquín Reynoso',aprobados:5,ultimoAcceso:'31/08/2026',cert:false},
+   {id:703,nombre:'Camila Bogado',aprobados:4,ultimoAcceso:'23/08/2026',cert:false},
+   {id:704,nombre:'Ariel Montaño',aprobados:2,ultimoAcceso:'15/08/2026',cert:false}]},
+ {id:'norte-grande-viajes',nombre:'Norte Grande Viajes',plan:'Professional',coordinadorId:801,
+  plantel:[
+   {id:801,nombre:'Roxana Guanuco',aprobados:0,ultimoAcceso:'—',cert:false,coord:true},
+   {id:802,nombre:'Matias Salvá',aprobados:0,ultimoAcceso:'—',cert:false},
+   {id:803,nombre:'Elisa Chavarría',aprobados:0,ultimoAcceso:'—',cert:false},
+   {id:804,nombre:'Cristian Nieva',aprobados:0,ultimoAcceso:'—',cert:false},
+   {id:805,nombre:'Lorena Farfán',aprobados:0,ultimoAcceso:'—',cert:false}]},
+ {id:'costa-esmeralda-travel',nombre:'Costa Esmeralda Travel',plan:'Business',coordinadorId:902,
+  plantel:[
+   {id:901,nombre:'Ivana Baigorria',aprobados:5,ultimoAcceso:'01/09/2026',cert:false},
+   {id:902,nombre:'Adrián Bermudez',aprobados:9,ultimoAcceso:'Hoy 13:02',cert:false,coord:true},
+   {id:903,nombre:'Karen Otta',aprobados:3,ultimoAcceso:'22/08/2026',cert:false}]},
+ {id:'cuyo-corporativo',nombre:'Cuyo Corporativo',plan:'Business',coordinadorId:1001,
+  plantel:[
+   {id:1001,nombre:'Estéfano Riera',aprobados:11,ultimoAcceso:'18/08/2026',cert:true,coord:true},
+   {id:1002,nombre:'Malena Pizarro',aprobados:11,ultimoAcceso:'20/08/2026',cert:false},
+   {id:1003,nombre:'Juan Cruz Aguirre',aprobados:11,ultimoAcceso:'16/08/2026',cert:true},
+   {id:1004,nombre:'Belén Zalazar',aprobados:11,ultimoAcceso:'26/08/2026',cert:false},
+   {id:1005,nombre:'Damian Funes',aprobados:11,ultimoAcceso:'29/08/2026',cert:false},
+   {id:1006,nombre:'Agostina Vitale',aprobados:11,ultimoAcceso:'Hoy 09:03',cert:false}]},
+ {id:'delta-y-rios',nombre:'Delta y Ríos',plan:'Professional',coordinadorId:1102,
+  plantel:[
+   {id:1101,nombre:'Nadia Mansilla',aprobados:3,ultimoAcceso:'28/08/2026',cert:false},
+   {id:1102,nombre:'Hugo Correa',aprobados:6,ultimoAcceso:'Hoy 14:11',cert:false,coord:true},
+   {id:1103,nombre:'Priscila Cabral',aprobados:2,ultimoAcceso:'13/08/2026',cert:false},
+   {id:1104,nombre:'Ariadna Sequeira',aprobados:1,ultimoAcceso:'05/08/2026',cert:false}]}
 ];
 const recorridoDe=ag=>DATA.filter(m=>m.sup==='BAK'&&m.planes.includes(ag.plan)&&!m.enPrep);
 /* Los módulos del mapa que ya existen de verdad: los reservados no cuentan. */
@@ -1481,9 +1564,17 @@ const USO_MUESTRA={
  'BAK-M40':[52,17],'BAK-M50':[44,14],'BAK-M60':[38,11],'BAK-M70':[30,9],
  'BAK-M80':[26,8],'BAK-M90':[18,7],'BAK-M95':[12,5]
 };
+/* Un certificado por cada `cert:true` del plantel, y ninguno de mas: la columna
+   "Certificado" del plantel y este registro son la misma emision leida de dos
+   lados. Los que completaron el recorrido y NO tienen fila salen como
+   "disponible", que es justamente el estado que esta pantalla existe para
+   mostrar. */
 const CERTIFICADOS=[
  {agencia:'viajes-del-sur',persona:'Martín Ruiz',doc:'DNI 30111222',emitido:'28/07/2026',plan:'Professional'},
- {agencia:'andes-receptivo',persona:'Ramiro Cabrera',doc:'DNI 28999111',emitido:'25/07/2026',plan:'Business'}
+ {agencia:'andes-receptivo',persona:'Ramiro Cabrera',doc:'DNI 28999111',emitido:'25/07/2026',plan:'Business'},
+ {agencia:'turismo-patagonico',persona:'Gabriela Ocampo',doc:'DNI 31442008',emitido:'21/08/2026',plan:'Business'},
+ {agencia:'cuyo-corporativo',persona:'Estéfano Riera',doc:'DNI 27650413',emitido:'18/08/2026',plan:'Business'},
+ {agencia:'cuyo-corporativo',persona:'Juan Cruz Aguirre',doc:'Pasaporte AAC884120',emitido:'16/08/2026',plan:'Business'}
 ];
 /* Catálogo de tipos de documento: es un PARÁMETRO GLOBAL del backoffice, no una
    constante de cada superficie. Las claves y los patrones son los del prototipo
@@ -1541,9 +1632,37 @@ function planesPropios(m,v){ return !!(v&&v.planes); }
    al lado de los planes, y eran dos campos contiguos para el mismo dato. */
 function etiquetaPlanes(m){
   const p=m.planes||[];
+  /* Sin planes la sigla decía "B" y contradecía al texto de al lado, que avisa que
+     un módulo sin plan no se puede publicar. Solo lo alcanza el preview del alta
+     —ningún módulo del mapa tiene planes vacíos—, pero ahí es donde más se mira. */
+  if(!p.length) return '—';
   if(p.length>1) return 'P+B';
   if(p[0]==='Professional') return 'P';
   return m.nicho?'B-nicho':'B';
+}
+/* Tres lecturas del mismo dato y ninguna guardada. La SIGLA es la referencia corta
+   —el mapa aprobado y el README hablan en P+B / B-nicho—, la ETIQUETA LEGIBLE es lo
+   que lee quien administra contenido, y la AYUDA explica el caso. Viven pegadas a
+   propósito: el criterio de qué es "caso puntual" tiene que poder cambiar en un solo
+   lugar, y la legible se deriva de la sigla para que no puedan contradecirse.
+   Para P+B, P y B la legible ES `planes.join(' + ')`: por eso la tabla del panel
+   general puede imprimir una sola cosa donde antes imprimía el dato dos veces. */
+function etiquetaPlanesLarga(m){
+  const p=m.planes||[];
+  if(!p.length) return 'sin plan asignado';
+  return p.join(' + ')+(etiquetaPlanes(m)==='B-nicho'?' · caso puntual':'');
+}
+/* La frase única de la que salen todos los tooltips y ayudas. Lo que NO dice es
+   deliberado: el caso puntual no cambia el recorrido, ni la evaluación, ni el
+   certificado, porque hoy no lo hace —el README lo tiene como pendiente abierto—. */
+function ayudaPlanes(m){
+  if(!(m.planes||[]).length) return 'Sin plan asignado: el módulo no se puede publicar hasta que tenga al menos uno.';
+  switch(etiquetaPlanes(m)){
+    case 'P+B': return 'Lo tienen los dos planes: entra al recorrido de 9 módulos y al de 11. Sigla: P+B.';
+    case 'P': return 'Solo Professional. Una agencia Business lo ve con candado, sin número, y no le cuenta para el avance. Sigla: P.';
+    case 'B-nicho': return 'Solo Business, y además caso puntual: no es un plan aparte, es Business que además cubre una operación que no toda agencia tiene. Le da a la agencia el motivo por el que el módulo no está en su recorrido, y nada más: no cambia el recorrido, ni la evaluación, ni el certificado. Sigla: B-nicho.';
+    default: return 'Solo Business. Una agencia Professional lo ve con candado, sin número, y no le cuenta para el avance. Sigla: B.';
+  }
 }
 function videoAplicable(m,v,plan){
   return planesDe(m,v).indexOf(plan)!==-1;
@@ -1686,13 +1805,27 @@ const S={screen:'hub',escena:'COMPLETA',superficie:'BAK',open:{'BAK-M30':true},s
   quick:null,qsec:null,checked:new Set(),filtro:'',soloPend:false,verArch:false,
   impPaso:1,impModo:'videos',omit:new Set(),
   bModId:'BAK-M30',evTab:'banco',bFiltro:'',bSub:'',bEstado:'',bCorregir:false,bChecked:new Set(),
-  qEdit:null,qDraft:null,planVista:'Professional',muestra:null,respuestas:{},verCorrectas:null,
-  amPlanes:[...PLANES],amNicho:false,vplanAbierto:null,meetAg:null,panelAg:null};
+  qEdit:null,qDraft:null,planVista:'Professional',muestra:null,respuestas:{},
+  amPlanes:[...PLANES],amNicho:false,vplanAbierto:null,meetAg:null,panelAg:null,
+  /* Un solo buscador de agencia para las dos pantallas que la eligen (Avance y
+     Meet), a proposito: es la misma busqueda, y el texto escrito sobrevive al
+     salto de una a la otra. Si alguna vez tienen que filtrar distinto, son dos
+     campos, no un flag. */
+  agFiltro:''};
 
 const $=s=>document.querySelector(s);
 const el=(t,c,h)=>{const n=document.createElement(t);if(c)n.className=c;if(h!==undefined)n.innerHTML=h;return n;};
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
-function toast(m){const t=$('#toast');t.textContent=m;t.classList.remove('hide');clearTimeout(toast._i);toast._i=setTimeout(()=>t.classList.add('hide'),4600);}
+/* Nota de diseño: nace marcada con el flag para que aplicarMVP la remueva. El
+   atributo vive en un solo lugar en vez de en veinte `setAttribute` colgados, y
+   `el` no acepta atributos. Las cuatro notas que están escritas dentro de un
+   template string llevan el `data-mvp` en el literal, que es lo que un ternario
+   adentro de un template no resuelve. */
+const nota=(v,h)=>{const n=el('div','note'+(v?' '+v:''),h);n.dataset.mvp='notas';return n;};
+/* Los 4600 ms son la confirmación de una acción ("BAK-M30-Q012 guardada"). Un texto
+   que explica un concepto no se lee en ese tiempo, así que la duración es opcional:
+   el default no cambia y quien explica pide más aire. */
+function toast(m,ms){const t=$('#toast');t.textContent=m;t.classList.remove('hide');clearTimeout(toast._i);toast._i=setTimeout(()=>t.classList.add('hide'),ms||4600);}
 const stCls=s=>'st-'+String(s).replace(/\s+/g,'').replace('aregrabar','regrabar');
 const findMod=id=>DATA.find(m=>m.id===id);
 /* El orden de un video dentro de su sección es un campo APARTE del ID: un video
@@ -1762,7 +1895,6 @@ function crumbs(){
   const b=S.bModId, tab=(EV_TABS.find(t=>t[0]===S.evTab)||['','Banco'])[1];
   return {
    hub:[['Qué querés hacer']],
-   cambios:[['Reglas y decisiones']],
    constructor:[['Contenido'],['Estructura']],
    altamod:[['Contenido'],['Estructura','constructor'],['Nuevo módulo']],
    importar:[['Contenido'],['Cargar desde planilla']],
@@ -1793,7 +1925,7 @@ function render(){
   const h=$('#screens');
   const foco=recordarFoco(h);
   h.innerHTML='';
-  const map={hub:viewHub,cambios:viewCambios,constructor:viewConstructor,altamod:viewAltaMod,importar:viewImportar,
+  const map={hub:viewHub,constructor:viewConstructor,altamod:viewAltaMod,importar:viewImportar,
     evaluacion:viewEvaluacion,pregunta:viewPregunta,resultado:viewResultado,
     agencia:viewAgencia,meet:viewMeet,certificado:viewCertificado,
     panelAgencia:viewPanelAgencia,panelMacro:viewPanelMacro,params:viewParams};
@@ -1874,7 +2006,7 @@ function viewHub(){
         ?'Hay dos caminos y los dos funcionan desde acá: crear el primer módulo a mano, o pegar la estructura completa (módulos y secciones) desde la planilla maestra.'
         :'El arranque es a mano: se crea el primer módulo con su primera sección, y de ahí en adelante ya acepta videos y preguntas.')
       +'<div class="row" style="margin-top:16px"><button class="btn btn-p" data-go2="altamod">Crear el primer módulo</button><button class="btn" data-go2="imp-estr" data-mvp="importador">Pegar la estructura</button></div>'));
-    w.appendChild(el('div','note v3','<b>Ajuste v3 ·</b> El día cero era una pantalla sin salida: el botón era decorativo. Ahora el alta de módulo existe como pantalla propia, crea el módulo con su primera sección y deja la Academia lista para recibir videos.'));
+    w.appendChild(nota('v3','<b>Ajuste v3 ·</b> El día cero era una pantalla sin salida: el botón era decorativo. Ahora el alta de módulo existe como pantalla propia, crea el módulo con su primera sección y deja la Academia lista para recibir videos.'));
     return w;
   }
 
@@ -1931,81 +2063,7 @@ function viewHub(){
   if(!items.length) ul.appendChild(el('li','','<span class="grow">Nada pendiente en este momento.</span>'));
   card.appendChild(ul);
   w.appendChild(card);
-  w.appendChild(el('div','note v3','<b>Ajuste v4 ·</b> Todos los usuarios del backoffice entran con las mismas atribuciones (rol Publicación): ya no hay selector de rol, ni acciones que se atenúen según quién esté mirando. Las cuatro puertas están siempre disponibles.'));
-  return w;
-}
-
-/* ============================================================
-   REGLAS Y DECISIONES (MVP v2 ratificado)
-   ============================================================ */
-function viewCambios(){
-  const w=el('div','wrap');
-  w.innerHTML=`<h1>Reglas y decisiones</h1>
-    <p class="lede">El backoffice está ahora <b>alineado al prototipo aprobado del lado agencia</b>. Esta pantalla es el anexo del MVP v2: qué se alineó, qué decisiones cerró el prototipo, y qué queda abierto. Sirve para que desarrollo estime sobre un solo documento.</p>`;
-
-  const alin=[
-   ['Planes','Corporate / Business / Standard (MVP §2).','<b>Professional / Business</b>, y son de la agencia. Un solo campo <b>planes</b> por módulo y por video, con el nombre y la forma del prototipo aprobado.','El prototipo usa dos planes; el README lo marca como "a corregir".'],
-   ['Tema del banco','Catálogo de sub-temas con su propio ABM.','El tema <b>es la sección</b> del módulo. Se eliminó el ABM de sub-temas.','Alinea con el prototipo y con las dudas de la Meet, y borra una fuente de desincronización.'],
-   ['Temas y secciones','El tema seguía siendo un <b>campo guardado</b> (<span class="cellmono">subtemas</span>), que se calculaba una sola vez al iniciar.','Se <b>deriva de las secciones en cada lectura</b>. El campo no existe.','Una sección creada desde el backoffice existía como sección y no como tema: los desplegables de la consola quedaban vacíos y no se podía guardar ninguna pregunta, porque el tema es obligatorio. Es la misma clase de error que el estado del cupo y que los parámetros globales —un dato derivado, guardado—, y era el que quedaba.'],
-   ['Módulos fuera de plan','"Ver como agencia" los ocultaba.','Se <b>muestran con candado de plan</b>, sin ordinal, sin contar para el avance.','Además de pedagógico, es una superficie comercial. Decisión del prototipo.'],
-   ['Publicación y ordinales','La cadena salteaba los no publicados.','<b>Publicación en orden</b> obligatoria (requisito duro nuevo). El ordinal del recorrido va 1..N sin huecos.','Sostiene la invariante que el prototipo ya verifica.'],
-   ['Planes por video','El plan del video se heredaba del módulo, sin poder restringirlo.','Un video puede incluir <b>menos planes que su módulo</b>, como el Dashboard de KPIs (Business en un módulo que incluye a los dos). <b>Filtra de verdad</b>: a una agencia Professional se le lista con candado y no cuenta para su avance.','Sin él, ese contenido aprobado no se puede cargar. Y declarado pero sin filtrar, el candado no existía.'],
-   ['Un solo campo de planes','Dos campos contiguos: <b>tag</b> editorial (P+B/B/B-nicho) al lado de los planes de agencia, y el primero prellenaba al segundo.','Queda <b>un campo</b>, <span class="cellmono">planes</span>, más un check <b>caso puntual (nicho)</b>. La etiqueta corta P+B/B/B-nicho <b>se deriva</b> y ya no se edita.','Eran dos escrituras del mismo dato, una arriba de la otra, y las dos se llamaban "plan": no había forma de saber cuál se estaba editando. El modelo aprobado usa un solo campo.'],
-   ['Campos de contenido','El ABM no pedía resumen ni descripción.','Se agregaron <b>resumen</b> (card) y <b>descripción</b> (syllabus) al módulo.','El prototipo los muestra; sin ellos la card y el syllabus quedan sin texto.'],
-   ['Meet','Un link fijo en la ficha del módulo.','<b>Cupo por agencia</b>, cola de dudas, coordinador, franja de atención y <b>enlace por turno</b>. La ficha del módulo ya <b>no tiene campo de link</b>.','Es el modelo de negocio: una Meet por módulo por agencia, no por usuario. Dos lugares para el mismo enlace eran dos fuentes de verdad.'],
-   ['Estado del cupo','Se guardaba en el turno y se llamaba <span class="cellmono">sin-cola</span>.','<b>Se deriva</b> de la cola y de la fecha del turno, con el vocabulario del prototipo: <span class="cellmono">sin-lugares · abierto · agendado · consumido</span>.','Un estado guardado se desincroniza en cuanto alguien retira una duda. Y un mismo estado no puede llamarse distinto en cada superficie.'],
-   ['Secciones','20 secciones con nombres propios del backoffice.','Las <b>31 del prototipo aprobado</b>, con <b>ID permanente</b> (<span class="cellmono">BAK-M40.S3</span>) que no se reasigna al reordenar.','La sección es el tema del banco y el de las dudas: con dos taxonomías, ninguna pregunta resolvía contra el syllabus que ve la agencia.'],
-   ['Orden del video','Era la posición en la estructura, sin campo propio.','Campo <b>orden</b> dentro de la sección, independiente del ID y opcional: sin él manda la estructura.','El orden de dictado y el de reserva de IDs no son lo mismo. El ID es permanente y no se renumera para mover un video.'],
-   ['Tipos de documento','Claves propias del backoffice (<span class="cellmono">PAS</span>, <span class="cellmono">LCLE</span>), sin patrón.','Las claves del prototipo (<span class="cellmono">PASAPORTE</span>, <span class="cellmono">LC-LE</span>) más <b>patrón, ejemplo y mensajes</b>.','Un certificado emitido con una clave no se validaba con la otra. El catálogo es un parámetro global, no una constante de cada superficie.'],
-   ['Certificado','No estaba en el MVP.','Plantilla, tipos de documento, fuente del documento y registro de emisiones.','El prototipo lo emite; el backoffice tiene que administrarlo.'],
-   ['Panel + tracking','Estaba como "fase 2".','Avance por agencia y panel general, con la regla de agregación del prototipo.','El logueo de eventos entra en el MVP aunque las pantallas se pulan después: es lo irrecuperable.'],
-   ['Banco','Mínimo 20.','Mínimo <b>30</b> (3× el intento), objetivo 50.','Con reintentos ilimitados, un banco chico se memoriza.'],
-   ['Dónde vive la evaluación','Repartida en cinco lugares: dos pestañas de la ficha del módulo y tres pantallas propias, ninguna en la navegación principal.','Una <b>consola única</b> por módulo —Banco, Cobertura, Configuración, Previsualizar— con selector de módulo, entrada propia en el rail y una sola pestaña "Evaluación" en la ficha.','Cargar preguntas de un módulo que no fuera el de la puerta del hub costaba cinco clicks y saber que el banco vivía dentro del árbol de estructura. Y adentro del banco no se podía cambiar de módulo.'],
-   ['Parámetros de la evaluación','El objetivo y el mínimo se editaban en dos pantallas —la ficha del módulo y Parámetros globales— sin precedencia definida.','<b>Son del módulo</b>. El global es la semilla con la que nace un módulo nuevo y pasó a solo lectura, con una tabla de qué módulos se apartaron.','El global se copiaba una sola vez al iniciar, así que editarlo no propagaba a lo ya creado: el mismo número en dos lugares, y ninguno mandaba.'],
-   ['Decisiones 1, 2 y 6','Carteles fijos que decían "a definir" en la ficha.','<b>Valores configurables por módulo</b> que se aplican de verdad: forzar cobertura cambia el sorteo, y mostrar correctas define con qué variante abre el resultado.','Una decisión abierta se cierra probándola. Como cartel no se podía comparar; como parámetro, negocio la ve funcionando antes de firmar.'],
-   ['Vigencia del banco','El banco de cada momento era un corte del pool contra una tabla de totales.','Cada pregunta declara <b>desde qué momento existe</b>, y el pool apunta al objetivo del módulo.','La tabla declaraba 50 preguntas para módulos cuyo pool máximo eran 18: el checklist pedía un mínimo inalcanzable, y una pregunta cargada a mano no movía ningún contador.'],
-   ['Publicado y publicable','El checklist se evaluaba antes que la visibilidad, así que un módulo publicado que dejaba de cumplir decía "todavía no se puede publicar".','Tres estados separados, incluido <b>"publicado, pero hoy no cumple"</b>, y el hub los cuenta por separado.','Es información de control: el módulo está afuera, en manos de las agencias, y hoy no cumple. Decirle "todavía no se publicó" era falso y tapaba el aviso.'],
-   ['Video de repaso','La pregunta tomaba el tema de su sección y el video de un video cualquiera del módulo.','Cada pregunta <b>sale de un video</b> y hereda de él las dos cosas: su tema y su video de repaso.','Una pregunta de "Los números del voucher" podía mandar a repasar un video de otra sección: el resultado derivaba a un video que no explicaba el concepto fallado.'],
-   ['Carga de contenido','Carga masiva desde planilla, en tres modos: estructura, videos y preguntas.','<b>Carga manual</b> de punta a punta: módulo, sección, video y pregunta, de a uno. La carga masiva queda <b>diferida post-MVP</b>.','El importador estaba diseñado pero no implementado: el pegado no se leía y la vista previa corría contra filas de ejemplo. Entregar el MVP con la carga que sí funciona es más honesto que entregar una pantalla que promete lo que no hace.']
-  ];
-  const t1=el('div','tablewrap');const tb1=el('table');
-  tb1.innerHTML='<thead><tr><th style="width:130px">Tema</th><th style="width:24%">Antes (MVP v1)</th><th style="width:30%">Ahora (alineado)</th><th>Por qué</th></tr></thead><tbody>'+
-    alin.map(r=>`<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td><td>${r[2]}</td><td>${esc(r[3])}</td></tr>`).join('')+'</tbody>';
-  t1.appendChild(tb1);
-  w.appendChild(el('h2','','Alineado al prototipo — pasa al MVP v2'));
-  w.appendChild(t1);
-
-  const cerr=[
-   ['Mostrar las respuestas correctas','No se muestran (P07.6). Solo el tema fallado y el video de repaso. Es la variante A de la pantalla de resultado.'],
-   ['Orden independiente del ID','Confirmado y en uso: tres secciones muestran los videos fuera del orden de ID a propósito.'],
-   ['Estado "Próximamente"','No existe: un módulo se publica solo con su syllabus completo. Valida el requisito "al menos un video".'],
-   ['Tipo de pregunta','Opción única con 4 opciones. Verdadero/falso no necesita desarrollo aparte.'],
-   ['Qué número ve la agencia','La posición en el recorrido (1..N), nunca el ID.'],
-   ['Rehacer evaluación aprobada','Gana la última nota aprobada; desaprobar no revoca (P05.4).']
-  ];
-  const t2=el('div','tablewrap');const tb2=el('table');
-  tb2.innerHTML='<thead><tr><th style="width:34%">Lo que el prototipo ya cierra</th><th>Cómo</th></tr></thead><tbody>'+
-    cerr.map(r=>`<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td></tr>`).join('')+'</tbody>';
-  t2.appendChild(tb2);
-  w.appendChild(el('h2','','Decisiones que el prototipo cierra'));
-  w.appendChild(t2);
-
-  const ab=[
-   ['Superficies FRT y CRM en el recorrido','¿Un recorrido por superficie con su propio certificado, o una sola secuencia intercalada? No está en ningún documento y condiciona el modelo.','Producto'],
-   ['Cómo se mide el 80 % de visto','Posición del cursor vs. segundos acumulados anti-scrub (P04.3). Es decisión de producto, no límite técnico.','Producto'],
-   ['Despublicar algo en curso','Si una agencia lo estaba cursando: ¿pierde acceso? ¿pierde la aprobación? ¿se le corre el ordinal?','Producto'],
-   ['La Meet exige aprobar','El que necesita ayuda es el que desaprueba (P08.6). El propio prototipo lo marca como la objeción más fuerte.','Producto + Capacitación'],
-   ['Designación del coordinador','Quién lo nombra y qué pasa si se va de la agencia. Hoy llega de solo lectura desde el backend.','Producto'],
-   ['Carga masiva desde planilla','Diferida post-MVP: para la entrega la carga es manual. El contrato de columnas está definido para los tres modos y las reglas de aviso vs. error están cerradas. Falta el parser y una definición de negocio: la planilla de videos no declara a qué sección va cada video.','Producto + Capacitación']
-  ];
-  const t3=el('div','tablewrap');const tb3=el('table');
-  tb3.innerHTML='<thead><tr><th style="width:32%">Sigue abierto</th><th>Qué está en juego</th><th style="width:130px">Quién decide</th></tr></thead><tbody>'+
-    ab.map(r=>`<tr data-warn="true"><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('')+'</tbody>';
-  t3.appendChild(tb3);
-  w.appendChild(el('h2','','Sigue abierto — necesita decisión formal'));
-  w.appendChild(t3);
-
-  w.appendChild(el('div','note v3','<b>Alineación completa ·</b> El prototipo del lado agencia está aprobado, así que manda: donde el backoffice difería, se ajustó el backoffice. En esta pasada se alinearon además las <b>31 secciones</b> del syllabus con ID permanente, el <b>catálogo de tipos de documento</b>, el <b>estado derivado</b> del cupo de Meet y el <b>plan a nivel video</b>, que estaba declarado pero no filtraba. Quedan dos bloques afuera del MVP: qué pasa con las superficies FRT y CRM dentro del recorrido de una agencia, y la <b>carga masiva desde planilla</b>, diferida a propósito —el diseño está hecho, falta el parser— para entregar con la carga manual, que es la que funciona de punta a punta.'));
+  w.appendChild(nota('v3','<b>Ajuste v4 ·</b> Todos los usuarios del backoffice entran con las mismas atribuciones (rol Publicación): ya no hay selector de rol, ni acciones que se atenúen según quién esté mirando. Las cuatro puertas están siempre disponibles.'));
   return w;
 }
 /* ============================================================
@@ -2056,7 +2114,12 @@ function treeCol(){
       <button class="label" role="treeitem" aria-level="1" aria-expanded="${open}" data-sel="mod|${mod.id}">${esc(mod.name)}</button>
       <span class="idbadge">${mod.id}</span>
       <span class="tag">orden ${mod.orden}</span>
-      <span class="tag">${etiquetaPlanes(mod)}</span>
+      ${/* Acá va la SIGLA y no la etiqueta legible: la fila ya lleva cinco atributos
+            y `Business · caso puntual` la partiría en dos líneas —`.node` envuelve—,
+            en la pantalla más densa del backoffice. La variante `plan` es la que hace
+            que deje de parecer un código de sistema al lado de "orden 110", y el
+            título dice en palabras lo que la sigla abrevia. */''}
+      <span class="tag plan" title="${esc(etiquetaPlanesLarga(mod)+' — '+ayudaPlanes(mod))}">${etiquetaPlanes(mod)}</span>
       <span class="chip nodot ${vis?'vis-si':'vis-no'}">${vis?'visible':'en preparación'}</span>
       ${/* Lo que bloquea es el MÍNIMO, no el objetivo: antes este tag se ponía
             verde solo al llegar a 50 —un estado que ningún módulo alcanzaba— y
@@ -2069,6 +2132,10 @@ function treeCol(){
 
     if(mod.nuevo) tree.appendChild(el('div','legend','Módulo recién creado en esta sesión. Acepta secciones, videos y preguntas; se publica cuando cumpla el checklist.'));
     else if(mod.enPrep) tree.appendChild(el('div','legend','Módulo nuevo, todavía no publicado. Acepta videos y preguntas; no se muestra a las agencias hasta completar el checklist de publicación.'));
+    /* La misma mecánica que las dos leyendas de arriba, y por el mismo motivo: la
+       explicación aparece pegada al nodo que la necesita en vez de costarle alto a
+       los otros diez. `B-nicho` era la etiqueta que nadie sabía leer. */
+    if(etiquetaPlanes(mod)==='B-nicho') tree.appendChild(el('div','legend plan','<b>Caso puntual (nicho).</b> No es un plan aparte: es Business que además cubre una operación que no toda agencia tiene. Sirve para darle a la agencia el motivo por el que el módulo no está en su recorrido. No cambia el recorrido, ni la evaluación, ni el certificado.'));
 
     if(!mod.secciones.length){
       const e=el('div','addrow sec');
@@ -2116,8 +2183,15 @@ function treeCol(){
   am.innerHTML=`<button class="addbtn" data-add="mod">+ agregar módulo ${S.superficie}</button>`;
   tree.appendChild(am);
 
-  tree.appendChild(el('div','note v3','<b>Ajuste v3 ·</b> "+ agregar módulo" y "+ agregar sección" ya no son avisos: abren el alta real. El módulo se crea en estado <b>en preparación</b> y aparece en el árbol al instante; la sección se crea en línea, sin salir del árbol.'));
-  tree.appendChild(el('div','note new','<b>De la v2 ·</b> Cada módulo muestra <b>orden</b> y <b>visibilidad</b> por separado. Cada video muestra <b>estado de producción</b> y <b>visibilidad</b> como dos chips distintos, más el semáforo de embebido, y "insertar <span class="icon icon-sm" data-icon="arrow-down"></span>" para usar la numeración de diez en diez.'));
+  /* El glosario de las cuatro etiquetas, y no de tres: `P` también se puede derivar
+     y no estaba explicada en ningún texto del prototipo. Va como `.hint` y no como
+     nota de diseño porque es producto: las notas las remueve `aplicarMVP`. */
+  const gloss=el('p','hint','<b>Etiquetas de plan:</b> <b>P+B</b> los dos planes · <b>P</b> solo Professional · <b>B</b> solo Business · <b>B-nicho</b> solo Business y además <b>caso puntual</b>, una operación que no toda agencia tiene. Se derivan de los planes tildados en la ficha del módulo: no son un campo.');
+  gloss.style.padding='0 24px 8px 16px';
+  tree.appendChild(gloss);
+
+  tree.appendChild(nota('v3','<b>Ajuste v3 ·</b> "+ agregar módulo" y "+ agregar sección" ya no son avisos: abren el alta real. El módulo se crea en estado <b>en preparación</b> y aparece en el árbol al instante; la sección se crea en línea, sin salir del árbol.'));
+  tree.appendChild(nota('new','<b>De la v2 ·</b> Cada módulo muestra <b>orden</b> y <b>visibilidad</b> por separado. Cada video muestra <b>estado de producción</b> y <b>visibilidad</b> como dos chips distintos, más el semáforo de embebido, y "insertar <span class="icon icon-sm" data-icon="arrow-down"></span>" para usar la numeración de diez en diez.'));
   col.appendChild(tree);
 
   if(S.checked.size){
@@ -2212,6 +2286,9 @@ function viewAltaMod(){
   /* Nace incluido en todos los planes: es el default del módulo, y el caso
      frecuente. Restringirlo es la excepción, y se marca destildando. */
   const planes=S.amPlanes;
+  /* El módulo que todavía no existe, para poder derivarle la etiqueta y la ayuda con
+     las mismas funciones que usa uno guardado: son lecturas, no dependen del alta. */
+  const prev={planes,nicho:S.amNicho};
   const supName={BAK:'SIGMMA Backend · operación de la agencia',FRT:'SIGMMA Frontend · herramienta B2B2C',CRM:'Deal Closer · gobernanza externa'}[sup];
 
   w.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
@@ -2229,13 +2306,19 @@ function viewAltaMod(){
        <p class="hint">Cada superficie tiene su propio espacio de numeración. De acá sale el prefijo del ID.</p></div>
      <div><label for="anNombre">Nombre del módulo</label><input type="text" id="anNombre" placeholder="Ej: Tráfico y asignación de butaca" autocomplete="off">
        <p class="hint">Como lo va a leer la agencia en el listado. Sin el prefijo del ID: eso lo agrega el sistema.</p></div>
-     <div><label>Planes que incluyen este módulo</label>
-       <div class="radioset" style="flex-direction:column;align-items:stretch">
+     <div><label>Planes que incluyen este módulo <button class="info" data-info="nicho" aria-label="Qué es un caso puntual">i</button></label>
+       <div class="radioset" role="group" aria-label="Planes que incluyen este módulo" style="flex-direction:column;align-items:stretch">
          ${PLANES.map(p=>`<label class="radiopill ${planes.includes(p)?'on':''}" style="justify-content:flex-start"><input type="checkbox" class="apPlan" value="${p}" ${planes.includes(p)?'checked':''}> ${p}</label>`).join('')}
-         <label class="radiopill ${S.amNicho?'on':''}" style="justify-content:flex-start"><input type="checkbox" id="anNicho" ${S.amNicho?'checked':''}> Caso puntual (nicho)</label>
+         <label class="radiopill ${S.amNicho?'on':''}" style="justify-content:flex-start"><input type="checkbox" id="anNicho" ${S.amNicho?'checked':''}> Caso puntual (nicho): solo le sirve a algunas agencias</label>
        </div>
-       <span class="tag" style="margin-top:8px">${etiquetaPlanes({planes,nicho:S.amNicho})}</span>
-       <p class="hint">Viene prellenado con los dos planes, que es el caso normal. Sin ningún plan el módulo no se puede publicar, y las agencias que no lo tengan asignado lo saltean en la cadena de desbloqueo. La etiqueta corta de arriba se deriva sola: no es un campo aparte.</p></div>
+       ${/* La etiqueta legible acá y la sigla al lado: es la pantalla donde se DECIDE
+             el plan, hay una columna entera de ancho, y abreviar algo que todavía no
+             existe es el peor lugar posible para una sigla. */''}
+       <span class="tag plan" style="margin-top:8px">${esc(etiquetaPlanesLarga(prev))}</span>
+       <span class="hint mono" style="display:inline;margin-left:8px">${etiquetaPlanes(prev)}</span>
+       <p class="hint">${esc(ayudaPlanes(prev))}</p>
+       ${S.amNicho&&planes.length>1?'<p class="hint">Con los dos planes tildados, el «caso puntual» no aparece en ninguna etiqueta: el matiz solo existe cuando el módulo es <b>solo Business</b>.</p>':''}
+       <p class="hint">Viene prellenado con los dos planes, que es el caso normal. Sin ningún plan el módulo no se puede publicar, y las agencias que no lo tengan asignado lo saltean en la cadena de desbloqueo. La etiqueta se deriva de lo tildado, no es un campo: <b>P+B</b> los dos planes · <b>P</b> solo Professional · <b>B</b> solo Business · <b>B-nicho</b> solo Business y caso puntual.</p></div>
      <div><label for="anOrden">Orden en la secuencia</label>
        <div class="row"><input type="number" id="anOrden" value="${ord}" style="max-width:110px">
          <span class="hint" style="margin:0">de diez en diez, para poder intercalar sin renumerar</span></div>
@@ -2257,7 +2340,7 @@ function viewAltaMod(){
      <button class="btn-q" data-go="constructor">Cancelar</button>
    </div>`;
   w.appendChild(card);
-  w.appendChild(el('div','note v3','<b>Pantalla nueva v3 ·</b> Era el hueco que dejaba la Academia sin arranque posible. Los campos son los del MVP §3.1 (ID, nombre, estado, planes, orden) más la primera sección, que evita el paso muerto de crear un módulo que todavía no acepta videos. El ID y el estado inicial son derivados y se muestran antes de guardar, igual que en el alta de video.'));
+  w.appendChild(nota('v3','<b>Pantalla nueva v3 ·</b> Era el hueco que dejaba la Academia sin arranque posible. Los campos son los del MVP §3.1 (ID, nombre, estado, planes, orden) más la primera sección, que evita el paso muerto de crear un módulo que todavía no acepta videos. El ID y el estado inicial son derivados y se muestran antes de guardar, igual que en el alta de video.'));
   return w;
 }
 
@@ -2291,7 +2374,12 @@ function detMod(d,m){
   const chk=checklistPub(m);
   const vis=modVisible(m);
   const h=el('div','dhead');
-  h.innerHTML=`<div class="idline"><span class="idbadge">${m.id}</span><span class="tag">${etiquetaPlanes(m)}</span>
+  h.innerHTML=`<div class="idline"><span class="idbadge">${m.id}</span>
+      ${/* Acá sí la etiqueta legible: la `.idline` envuelve, la columna de detalle es
+            fija y es el encabezado que se lee justamente cuando alguien abrió el
+            módulo para entender qué es. La sigla queda al lado, en chico. */''}
+      <span class="tag plan" title="${esc(ayudaPlanes(m))}">${esc(etiquetaPlanesLarga(m))}</span>
+      <span class="hint mono" style="display:inline">${etiquetaPlanes(m)}</span>
       <span class="chip nodot ${vis?'vis-si':'vis-no'}">${vis?'visible para las agencias':'en preparación'}</span>
       ${chk.bloqueado&&!vis?'<span class="tag stop">no publicable todavía</span>':''}</div>
     <h2>${esc(m.name)}</h2>
@@ -2321,13 +2409,19 @@ function detMod(d,m){
            `${i?'<span class="lnk"><span class="icon icon-sm" data-icon="arrow-right"></span></span>':''}<span class="mod ${c.aplica?(c.m.id===m.id?'here':(c.pub?'':'nopub')):'skip'}" title="${esc(c.m.name)}${c.aplica?(c.pub?'':' · sin publicar, la cadena lo saltea'):' · no aplica a '+S.planVista}">${c.m.id.replace(c.m.sup+'-','')}</span>`).join('')}</div>
          <p class="hint">Tachado: no aplica a ${S.planVista}. Punteado: todavía no publicado, y la cadena también lo saltea, así una agencia no queda trabada esperando un módulo que no existe para ella o que no salió aún.</p>
        </div>
-       <div><label>Planes que incluyen este módulo</label>
-         <div class="radioset" style="flex-direction:column;align-items:stretch">
+       <div><label>Planes que incluyen este módulo <button class="info" data-info="nicho" aria-label="Qué es un caso puntual">i</button></label>
+         <div class="radioset" role="group" aria-label="Planes que incluyen este módulo" style="flex-direction:column;align-items:stretch">
            ${PLANES.map(p=>`<label class="radiopill ${m.planes.includes(p)?'on':''}" style="justify-content:flex-start"><input type="checkbox" ${m.planes.includes(p)?'checked':''}> ${p}</label>`).join('')}
-           <label class="radiopill ${m.nicho?'on':''}" style="justify-content:flex-start"><input type="checkbox" ${m.nicho?'checked':''}> Caso puntual (nicho)</label>
+           <label class="radiopill ${m.nicho?'on':''}" style="justify-content:flex-start"><input type="checkbox" data-nicho="${m.id}" ${m.nicho?'checked':''}> Caso puntual (nicho): solo le sirve a algunas agencias</label>
          </div>
-         <span class="tag" style="margin-top:8px">${etiquetaPlanes(m)}</span>
-         <p class="hint">Es el único campo de planes del módulo: la etiqueta corta se deriva de lo tildado. Antes eran dos campos, uno arriba del otro, y uno prellenaba al otro.</p></div>
+         <span class="tag plan" style="margin-top:8px">${esc(etiquetaPlanesLarga(m))}</span>
+         <span class="hint mono" style="display:inline;margin-left:8px">${etiquetaPlanes(m)}</span>
+         ${/* El hint contaba la historia del modelo de datos —"antes eran dos campos"—,
+               que es copy de proceso: vive en el README, y la pantalla que la dibujaba
+               ya no existe. Acá va lo que la persona necesita para decidir. */''}
+         <p class="hint">${esc(ayudaPlanes(m))}</p>
+         ${m.nicho&&m.planes.length>1?'<p class="hint">Con los dos planes tildados, el «caso puntual» no aparece en ninguna etiqueta: el matiz solo existe cuando el módulo es <b>solo Business</b>.</p>':''}
+         <p class="hint">Es el único campo de planes del módulo y la etiqueta se deriva de lo tildado: <b>P+B</b> los dos planes · <b>P</b> solo Professional · <b>B</b> solo Business · <b>B-nicho</b> solo Business y caso puntual. Un módulo fuera del plan de una agencia se le muestra con candado, sin número, y no le cuenta para el avance.</p></div>
        <div><label>Secciones</label>
          <div class="row"><button class="btn btn-sm" data-add="sec|${m.id}">+ Agregar sección</button>
            <span class="hint" style="margin:0">${m.secciones.length?m.secciones.map(s=>esc(s.name)).join(' · '):'ninguna todavía'}</span></div></div>
@@ -2336,7 +2430,7 @@ function detMod(d,m){
          <p class="hint">No hay borrado físico. Archivar lo saca del árbol y de la Academia, conserva el ID y el historial, y no se puede reactivar sin revisar sus videos.</p>
        </div>
      </div>
-     <div class="note v3"><b>Ajuste v3 ·</b> La cadena de desbloqueo ahora distingue tres situaciones: aplica y está publicado, aplica pero <b>todavía no salió</b> (punteado), y no aplica al plan (tachado). Los dos últimos se saltean. Era la regla que no estaba definida en ningún documento.</div>`;
+     <div class="note v3" data-mvp="notas"><b>Ajuste v3 ·</b> La cadena de desbloqueo ahora distingue tres situaciones: aplica y está publicado, aplica pero <b>todavía no salió</b> (punteado), y no aplica al plan (tachado). Los dos últimos se saltean. Era la regla que no estaba definida en ningún documento.</div>`;
   }
 
   /* Una sola pestaña "Evaluación" en la ficha del módulo, y es un resumen con una
@@ -2362,15 +2456,15 @@ function detMod(d,m){
        <dt>Preguntas por intento</dt><dd><span class="mono">${p.porIntento}</span> al azar del banco</dd>
        <dt>Umbral de aprobación</dt><dd><span class="mono">${p.umbral}</span> (${GLOBAL.umbralAprob} de ${p.porIntento})</dd>
        <dt>Reintentos</dt><dd>${esc(p.reintentos)}</dd>
-       <dt>Forzar cobertura por tema</dt><dd>${valParam(p.forzarCobertura)}</dd>
-       <dt>Mostrar correctas al finalizar</dt><dd>${valParam(p.mostrarCorrectas)}</dd>
+       <dt>Forzar cobertura por tema</dt><dd>sí · regla del MVP</dd>
+       <dt>Mostrar correctas al finalizar</dt><dd>no · regla del MVP</dd>
        <dt>Al aprobar, habilita</dt><dd>El módulo siguiente que aplique al plan${modSiguiente(m)?': '+modSiguiente(m):''}</dd>
      </dl></div>
      <div class="row" style="margin-top:16px">
        <button class="btn btn-p" data-go2="banco|${m.id}">Abrir la evaluación</button>
        <button class="btn btn-sm" data-go2="pregunta|${m.id}|new">Agregar pregunta</button>
        <button class="btn btn-sm" data-go2="imp-preg|${m.id}" data-mvp="importador">Pegar desde planilla</button>
-       <span class="hint" style="margin:0">El banco, la cobertura, los parámetros y la previsualización están en una sola pantalla.</span></div>`;
+       <span class="hint" style="margin:0">El banco, la cobertura y la previsualización están en una sola pantalla.</span></div>`;
   }
 
   if(S.tab==='meet'){
@@ -2414,7 +2508,7 @@ function detMod(d,m){
             :`<button class="btn btn-p" data-pub="on" ${chk.bloqueado?'disabled':''}>Publicar para las agencias</button>`}
        <span class="hint" style="margin:0">${vis?'Despublicar es una acción propia: no hay que tocar el estado de producción de los videos para lograrlo.':'Al publicar se registra quién y cuándo.'}</span>
      </div>
-     <div class="note v3"><b>Ajuste v3 ·</b> Se sumó un requisito duro que faltaba —"tiene al menos un video cargado"— porque un módulo vacío pasaba el checklist anterior. Y el botón de publicar respeta el rol: con rol Contenido queda bloqueado con el motivo escrito, en lugar de desaparecer.</div>`;
+     <div class="note v3" data-mvp="notas"><b>Ajuste v3 ·</b> Se sumó un requisito duro que faltaba —"tiene al menos un video cargado"— porque un módulo vacío pasaba el checklist anterior. Y el botón de publicar respeta el rol: con rol Contenido queda bloqueado con el motivo escrito, en lugar de desaparecer.</div>`;
   }
   d.appendChild(b);return d;
 }
@@ -2440,7 +2534,7 @@ function detSec(d,m,sec){
      <div><label>Baja</label><div class="row"><button class="btn btn-d btn-sm" data-arch="sec">Archivar sección</button></div>
        <p class="hint">Los videos de la sección <b>no quedan huérfanos</b>: se archivan con ella y conservan su ID. Al reactivarla vuelven en el mismo orden.</p></div>
    </div>
-   <div class="note v3"><b>Ajuste v3 ·</b> El reordenamiento de secciones ahora funciona de verdad: los botones de subir y bajar mueven la sección en el árbol. Los videos van con ella y su ID no cambia.</div>`;
+   <div class="note v3" data-mvp="notas"><b>Ajuste v3 ·</b> El reordenamiento de secciones ahora funciona de verdad: los botones de subir y bajar mueven la sección en el árbol. Los videos van con ella y su ID no cambia.</div>`;
   d.appendChild(b);return d;
 }
 
@@ -2510,7 +2604,7 @@ function detVid(d,m,sec){
      </div>
      ${falta.length?`<div class="sep"></div><h3>Falta completar</h3><ul class="checklist">${falta.map(f=>`<li><span class="mk ${f[1]}">${f[1]==='bad'?ico('x'):ico('circle')}</span>${esc(f[0])}</li>`).join('')}</ul>`
        :'<div class="sep"></div><ul class="checklist"><li><span class="mk ok"><span class="icon icon-sm" data-icon="check-circle"></span></span>Ficha completa y embebido verificado</li></ul>'}
-     <div class="note v3"><b>Ajuste v3 ·</b> Apareció el campo <b>orden dentro de la sección</b>, independiente del ID, que era el faltante del MVP §3.3: antes un video no se podía reordenar nunca sin archivarlo y recrearlo. El campo es <b>opcional</b>: solo existe cuando alguien movió el video, y sin él manda la estructura. Mover un video no le toca el ID a nadie.</div>`;
+     <div class="note v3" data-mvp="notas"><b>Ajuste v3 ·</b> Apareció el campo <b>orden dentro de la sección</b>, independiente del ID, que era el faltante del MVP §3.3: antes un video no se podía reordenar nunca sin archivarlo y recrearlo. El campo es <b>opcional</b>: solo existe cuando alguien movió el video, y sin él manda la estructura. Mover un video no le toca el ID a nadie.</div>`;
   }
 
   if(S.tab==='traza'){
@@ -2548,14 +2642,7 @@ function detVid(d,m,sec){
    su propio "volver" a un padre distinto y ninguno en la navegación principal. Acá
    el módulo se elige en el encabezado, así que cargar preguntas en otro módulo dejó
    de exigir salir al árbol de estructura y volver a entrar. */
-const EV_TABS=[['banco','Banco'],['cobertura','Cobertura'],['config','Configuración'],['previa','Previsualizar']];
-
-/* Los parámetros que todavía son decisión abierta se muestran como VALOR y no como
-   cartel fijo: "a definir" es un estado del dato. */
-function valParam(v){
-  return v==='si'?'<span class="tag ok">sí</span>'
-    :(v==='no'?'<span class="tag">no</span>':'<span class="tag warn">a definir</span>');
-}
+const EV_TABS=[['banco','Banco'],['cobertura','Cobertura'],['previa','Previsualizar']];
 
 /* El encabezado responde de un vistazo las cinco preguntas por las que alguien
    entra acá: de qué módulo, cuánto banco hay, si llega al mínimo, si están todos
@@ -2597,51 +2684,8 @@ function viewEvaluacion(){
   const body=el('div');
   body.setAttribute('role','tabpanel');body.setAttribute('tabindex','0');
   body.style.paddingTop='16px';
-  body.appendChild(({banco:panelBanco,cobertura:panelCobertura,config:panelConfig,previa:panelPrevia}[S.evTab])(m));
+  body.appendChild(({banco:panelBanco,cobertura:panelCobertura,previa:panelPrevia}[S.evTab])(m));
   w.appendChild(body);
-  return w;
-}
-
-/* Configuración de ESTE módulo. Los globales son la semilla con la que nace un
-   módulo, no un segundo lugar donde editarlos: por eso acá se edita y en
-   "Parámetros globales" solo se lee. */
-function panelConfig(m){
-  const p=m.params, w=el('div');
-  const tri=(name,val)=>['si','no','a definir'].map(v=>
-    `<label class="radiopill ${val===v?'on':''}"><input type="radio" name="${name}" value="${v}" ${val===v?'checked':''}> ${v==='si'?'sí':v}</label>`).join('');
-  w.appendChild(el('p','lede','Los parámetros son de <b>este</b> módulo. Los marcados como regla del MVP no se editan, para que ningún módulo termine con un umbral distinto sin decisión formal.'));
-
-  const card=el('div','card');card.style.padding='16px';
-  card.innerHTML=`
-   <div class="fieldgrid">
-     <div><label>Preguntas por intento</label><div class="ro"><span class="mono">${p.porIntento}</span><span class="lock">regla del MVP</span></div></div>
-     <div><label for="pObj">Tamaño objetivo del banco</label>
-       <div class="row"><input type="number" id="pObj" value="${p.objetivo}" style="max-width:100px"></div>
-       <p class="hint">La meta a la que se apunta. No bloquea la publicación: eso lo hace el mínimo.</p></div>
-     <div><label for="pMin">Mínimo duro para publicar</label>
-       <div class="row"><input type="number" id="pMin" value="${p.minimo}" style="max-width:100px"></div>
-       <p class="hint">No puede bajar de ${3*p.porIntento}, que es 3× el intento: con reintentos ilimitados, un banco chico se memoriza. Tampoco puede superar al objetivo.</p></div>
-     <div><label>Umbral de aprobación</label><div class="ro"><span class="mono">${esc(p.umbral)}</span> (${GLOBAL.umbralAprob} de ${p.porIntento})<span class="lock">regla del MVP</span></div></div>
-     <div><label>Reintentos permitidos</label><div class="ro">${esc(p.reintentos)}<span class="lock">regla del MVP</span></div></div>
-     <div><label>Forzar cobertura por tema en el sorteo</label>
-       <div class="radioset">${tri('pForzar',p.forzarCobertura)}</div>
-       <p class="hint">Decisión 2, recomendación: sí. Con este módulo alcanza: tiene ${subtemasDe(m).length} tema${subtemasDe(m).length===1?'':'s'} y el intento son ${p.porIntento} preguntas, así que ${subtemasDe(m).length<=p.porIntento?'se puede garantizar una de cada tema':'NO se puede garantizar una de cada tema'}. Se ve funcionando en la pestaña Previsualizar.</p></div>
-     <div><label>Mostrar respuestas correctas al finalizar</label>
-       <div class="radioset">${tri('pCorr',p.mostrarCorrectas)}</div>
-       <p class="hint">Decisión 1, recomendación: no. Define con qué variante abre la pantalla de resultado; las dos siguen estando para comparar.</p></div>
-     <div><label>La aprobación caduca si se regraba un video del módulo</label>
-       <div class="radioset">${tri('pCaduca',p.caducaAlRegrabar)}</div>
-       <p class="hint">Decisión 6. Lo decide quien declara el impacto del regrabado.</p></div>
-     <div><label>Al aprobar, habilita</label><div class="ro">El módulo siguiente que aplique al plan${modSiguiente(m)?': '+modSiguiente(m):''}<span class="lock">se deriva del orden</span></div></div>
-   </div>
-   <div class="sep"></div>
-   <div class="row">
-     <button class="btn btn-p" data-pmsave="save">Guardar parámetros</button>
-     <button class="btn" data-pmsave="reset">Volver a los valores por defecto</button>
-     <span class="hint" style="margin:0">Por defecto: objetivo ${GLOBAL.bancoObjetivo}, mínimo ${GLOBAL.bancoMinimo} y las tres decisiones sin definir.</span>
-   </div>`;
-  w.appendChild(card);
-  w.appendChild(el('div','note v3','<b>Ajuste ·</b> El objetivo y el mínimo se editaban en dos pantallas —acá y en Parámetros globales— sin precedencia definida, y el global no propagaba a los módulos ya creados porque se copiaba una sola vez al iniciar. Ahora el módulo es el único dueño de sus parámetros y el global es la semilla.'));
   return w;
 }
 
@@ -2853,8 +2897,6 @@ function viewPregunta(){
    <div class="fieldgrid">
      <div><label for="qe">Enunciado</label><textarea id="qe" rows="3" placeholder="Ej: Un recibo detallado sirve para…"${off()}>${esc(d.e)}</textarea>
        <p class="hint">Si coincide con otra pregunta del mismo módulo, avisamos antes de guardar. No bloquea.</p></div>
-     <div><label for="qtipo">Tipo</label><select id="qtipo"${off()}><option>Opción única</option></select>
-       <p class="hint">El MVP admite solo opción única. Verdadero/falso es un caso particular con dos opciones, así que no necesita desarrollo aparte (decisión 4).</p></div>
      <div><label>Opciones y respuesta correcta</label>
        ${ops.map((o,i)=>`<div class="opteditor">
          <label class="radiopill ${o.ok?'on':''}" style="padding:11px 16px"><input type="radio" name="correcta" class="optok" value="${i}" data-qopt="correcta|${i}" ${o.ok?'checked':''}${off()} aria-label="Marcar la opción ${String.fromCharCode(65+i)} como correcta"> correcta</label>
@@ -2872,7 +2914,7 @@ function viewPregunta(){
        ${vids.map(x=>`<option value="${m.id}.${x.v.seq}" ${d.repaso===m.id+'.'+x.v.seq?'selected':''}>${m.id}.${x.v.seq} · ${esc(x.v.t.slice(0,44))}</option>`).join('')}</select>
        <p class="hint">Recomendado: es lo que la pantalla de resultado le muestra a la agencia cuando falla este concepto, en lugar de darle la respuesta. Conviene que sea un video del tema elegido.</p></div>
      <div><label for="qexp">Explicación</label><textarea id="qexp" rows="2" placeholder="Por qué la correcta es la correcta"${off()}>${esc(d.explicacion)}</textarea>
-       <p class="hint">Su uso depende de la decisión 1: si no se muestran las respuestas correctas al finalizar, esta explicación queda para uso interno.</p></div>
+       <p class="hint">La evaluación no muestra las respuestas correctas al finalizar, así que esta explicación queda para uso interno: sirve para revisar la pregunta, no para el examen.</p></div>
      <div><label>Estado</label>
        <div class="radioset">${['borrador','activa','inactiva'].map(e=>`<label class="radiopill ${d.estado===e?'on':''}"><input type="radio" name="qest" value="${e}" ${d.estado===e?'checked':''}${off()}> ${e}</label>`).join('')}</div>
        <p class="hint">Por defecto borrador: no entra en el sorteo ni cuenta para la cobertura hasta activarla.</p></div>
@@ -2944,7 +2986,7 @@ function panelCobertura(m){
     <button class="btn btn-sm" data-add="sec|${m.id}">+ Agregar sección/tema</button>
     <span class="hint" style="margin-left:auto">Un tema con preguntas no se puede vaciar sin reasignarlas: se resuelve moviendo las preguntas de sección.</span>`;
   w.appendChild(r);
-  w.appendChild(el('div','note v3','<b>Ajuste de alineación ·</b> El ABM de sub-temas independiente se eliminó. En el prototipo aprobado el tema es siempre una sección del módulo, y esa misma taxonomía es la de las dudas de la Meet. Menos entidades, y una fuente de desincronización menos.'));
+  w.appendChild(nota('v3','<b>Ajuste de alineación ·</b> El ABM de sub-temas independiente se eliminó. En el prototipo aprobado el tema es siempre una sección del módulo, y esa misma taxonomía es la de las dudas de la Meet. Menos entidades, y una fuente de desincronización menos.'));
   return w;
 }
 
@@ -2954,10 +2996,11 @@ function panelCobertura(m){
 /* Una pregunta entra en el sorteo si está activa, tiene tema y tiene exactamente
    una correcta: lo demás el examen no lo puede corregir.
 
-   `forzarCobertura` es la decisión 2 y acá se aplica de verdad, no como cartel:
-   cuando está en "sí" se reserva una pregunta de cada tema y el resto se completa
-   al azar. Solo se puede garantizar si el módulo no tiene más temas que preguntas
-   por intento; si los tiene, el sorteo cae al azar puro y la previa lo avisa. */
+   El sorteo fuerza cobertura por tema —la decisión 2, ya cerrada en "sí"—: reserva
+   una pregunta de cada tema y completa el resto al azar. Solo se puede garantizar
+   si el módulo no tiene más temas que preguntas por intento; si los tiene, el
+   sorteo cae al azar puro y la previa lo avisa. El valor se lee de `m.params` y no
+   está escrito acá porque es la regla del módulo, no de esta función. */
 function sortear(m){
   const pool=bancoActivas(m).filter(q=>q.st&&q.ops.filter(o=>o.ok).length===1);
   const n=m.params.porIntento;
@@ -2986,7 +3029,7 @@ function panelPrevia(m){
   const usados=[...new Set(qs.map(q=>q.st))];
   const faltan=subtemasDe(m).filter(s=>!usados.includes(s.id));
 
-  w.appendChild(el('p','lede','Un intento de muestra con las reglas configuradas: '+m.params.porIntento+' preguntas al azar sobre '+bancoActivas(m).length+'. Podés responder; <b>no queda registrado</b>.'));
+  w.appendChild(el('p','lede','Un intento de muestra con las reglas del MVP: '+m.params.porIntento+' preguntas al azar sobre '+bancoActivas(m).length+'. Podés responder; <b>no queda registrado</b>.'));
 
   if(!qs.length){
     w.appendChild(el('div','emptynote','<b>No hay preguntas activas y válidas para sortear.</b><br>Cargá el banco y revisá que cada pregunta tenga tema y exactamente una opción correcta.'
@@ -2995,21 +3038,23 @@ function panelPrevia(m){
   }
 
   const p=m.params;
-  const forzando=p.forzarCobertura==='si';
+  /* La cobertura forzada solo se puede garantizar si el módulo no tiene más temas
+     que preguntas por intento. Hoy ninguno se acerca, pero las secciones se agregan
+     desde el backoffice: el día que un módulo pase de las 10, el sorteo cae al azar
+     puro y esto es lo único que lo avisa. */
   const garantizable=subtemasDe(m).length<=p.porIntento;
   const ctl=el('div','row');ctl.style.marginBottom='16px';
   ctl.innerHTML=`<button class="btn btn-p btn-sm" data-resort="1">Volver a sortear</button>
     <span class="tag">umbral ${esc(p.umbral)}</span><span class="tag">reintentos ${p.reintentos.toLowerCase()}</span>
-    <span class="tag ${forzando?(garantizable?'ok':'warn'):(p.forzarCobertura==='no'?'':'warn')}">forzar cobertura: ${p.forzarCobertura==='si'?'sí':esc(p.forzarCobertura)}</span>
-    <button class="btn btn-sm" data-evtab="config">Cambiar las reglas</button>`;
+    <span class="tag ${garantizable?'ok':'warn'}">cobertura por tema forzada${garantizable?'':' · no garantizable'}</span>`;
   w.appendChild(ctl);
 
-  if(faltan.length) w.appendChild(el('div','banner warn',`<span class="icon" data-icon="alert-triangle"></span><div><b>Este sorteo dejó afuera ${faltan.length} tema${faltan.length>1?'s':''}:</b> ${faltan.map(s=>esc(s.name)).join(', ')}. ${forzando&&!garantizable
-    ?'Forzar cobertura está en sí, pero el módulo tiene '+subtemasDe(m).length+' temas y el intento son '+p.porIntento+' preguntas: no se puede garantizar uno de cada uno.'
-    :'Es exactamente el riesgo que resuelve la decisión 2: probá "Volver a sortear" varias veces para ver cuánto varía, y después ponela en sí.'}</div>`));
-  else w.appendChild(el('div','banner ok',`<span class="icon" data-icon="check-circle"></span><div>Este sorteo cubrió todos los temas del módulo. ${forzando&&garantizable
-    ?'Con forzar cobertura en sí está garantizado en todos los intentos.'
-    :'Sin forzar cobertura, no está garantizado en el próximo.'}</div>`));
+  if(faltan.length) w.appendChild(el('div','banner warn',`<span class="icon" data-icon="alert-triangle"></span><div><b>Este sorteo dejó afuera ${faltan.length} tema${faltan.length>1?'s':''}:</b> ${faltan.map(s=>esc(s.name)).join(', ')}. ${!garantizable
+    ?'El módulo tiene '+subtemasDe(m).length+' temas y el intento son '+p.porIntento+' preguntas: no alcanzan para una de cada tema, así que el sorteo no puede garantizar la cobertura.'
+    :'La cobertura está forzada, así que si un tema quedó afuera es porque no tiene ninguna pregunta activa y válida: revisalo en Cobertura.'}</div>`));
+  else w.appendChild(el('div','banner ok',`<span class="icon" data-icon="check-circle"></span><div>Este sorteo cubrió todos los temas del módulo. ${garantizable
+    ?'Con la cobertura forzada está garantizado en todos los intentos.'
+    :'No está garantizado en el próximo: el módulo tiene más temas que preguntas por intento.'}</div>`));
 
   qs.forEach((q,i)=>{
     const st=subtemasDe(m).find(s=>s.id===q.st);
@@ -3085,11 +3130,11 @@ function viewResultado(){
     w.appendChild(el('div','banner warn',`<span class="icon" data-icon="alert-triangle"></span><div><b>No alcanzó el 80 %.</b> Se puede volver a intentar sin límite: el próximo intento sortea 10 preguntas nuevas sobre las mismas ${bancoActivas(m).length} del banco. El módulo siguiente sigue trabado hasta aprobar.</div>`));
   }
 
-  /* variante recomendada: por tema + video de repaso */
+  /* lo que sí ve la agencia: por tema + video de repaso */
   const box=el('div','card');box.style.padding='16px';box.style.marginBottom='16px';
   const fallados=Object.keys(porSub).filter(k=>porSub[k].ok<porSub[k].tot);
   box.innerHTML=`<h3>Qué conceptos conviene repasar</h3>
-    <p class="hint" style="margin:0 0 8px">Variante recomendada de la decisión 1: no se muestran las respuestas correctas, se muestra <b>dónde</b> falló y <b>qué video</b> lo explica.</p>
+    <p class="hint" style="margin:0 0 8px">Regla del MVP: no se muestran las respuestas correctas, se muestra <b>dónde</b> falló y <b>qué video</b> lo explica.</p>
     ${fallados.length?`<ul class="sublist">${fallados.map(k=>{
       const s=porSub[k];
       return `<li><div class="lineup"><span>${esc(k)}</span><span class="n">${s.ok} de ${s.tot} correctas</span></div>
@@ -3099,37 +3144,11 @@ function viewResultado(){
     :'<div class="banner ok" style="margin:0"><span class="icon" data-icon="check-circle"></span><div>Todos los temas del intento salieron correctos.</div></div>'}`;
   w.appendChild(box);
 
-  /* Comparación de variantes. Con qué variante ABRE lo decide el parámetro del
-     módulo (decisión 1); el comparador sigue estando para poder mirar la otra sin
-     tocar la configuración. */
-  const ver=S.verCorrectas===null?m.params.mostrarCorrectas==='si':S.verCorrectas;
-  const cmp=el('div','row');cmp.style.marginBottom='8px';
-  cmp.innerHTML=`<button class="btn btn-sm ${ver?'':'btn-on'}" data-vercorr="0">Variante A · sin mostrar correctas</button>
-    <button class="btn btn-sm ${ver?'btn-on':''}" data-vercorr="1">Variante B · mostrando correctas</button>
-    <span class="hint" style="margin:0">${m.params.mostrarCorrectas==='a definir'
-      ?'Decisión 1 sin definir: abre con la variante recomendada. Se elige por módulo en Configuración.'
-      :'Este módulo está configurado en <b>'+(m.params.mostrarCorrectas==='si'?'sí':'no')+'</b>. Podés mirar la otra variante igual.'}</span>`;
-  w.appendChild(cmp);
-
-  if(ver){
-    w.appendChild(el('div','banner plan','<span class="icon" data-icon="info"></span><div><b>Variante B.</b> Con reintentos ilimitados, mostrar la correcta convierte el examen en un ejercicio de memoria: la agencia puede fallar, leer las respuestas y aprobar en el intento siguiente sin haber visto un video. Sirve si el objetivo es enseñar en el examen; no sirve si el examen tiene que validar aprendizaje.</div>'));
-    detalle.forEach(d=>{
-      const c=el('div','qcard');
-      const st=subtemasDe(m).find(s=>s.id===d.q.st);
-      c.innerHTML=`<div class="qn">Pregunta ${d.i+1} · ${esc(st?st.name:'sin tema')} · ${d.bien?'<span class="ok">correcta</span>':'<span class="bad">incorrecta</span>'}</div>
-        <div class="qe">${esc(d.q.e)}</div>
-        ${d.q.ops.map((o,k)=>{
-          const esElegida=d.r===k, esOk=o.ok;
-          const cls=esOk?'correct':(esElegida?'wrong':'');
-          const mk=esOk?'<span class="mkop ok">correcta</span>':(esElegida?'<span class="mkop bad">tu respuesta</span>':'');
-          return `<div class="optrow ${cls}"><span>${esc(o.t)}</span>${mk}</div>`;
-        }).join('')}
-        ${d.q.repaso?`<div class="hint">Video de repaso: <span class="mono">${esc(d.q.repaso)}</span></div>`:''}`;
-      w.appendChild(c);
-    });
-  } else {
-    w.appendChild(el('div','banner plan','<span class="icon" data-icon="info"></span><div><b>Variante A, la recomendada.</b> La agencia se lleva el detalle de arriba: qué temas falló y qué video mirar. No ve qué opción era la correcta, así que el reintento exige volver al contenido y no a la memoria.</div>'));
-  }
+  /* No se muestran las correctas: es la decisión 1, y quedó cerrada. Acá vivía un
+     comparador con la variante que sí las mostraba, para poder decidir mirando la
+     pantalla en vez de discutiendo; firmada la decisión, era interfaz para algo ya
+     resuelto —el mismo caso que la pestaña «Configuración»— y se eliminó. */
+  w.appendChild(el('div','banner plan','<span class="icon" data-icon="info"></span><div><b>No se muestran las respuestas correctas.</b> La agencia se lleva el detalle de arriba: qué temas falló y qué video mirar. No ve qué opción era la correcta, así que el reintento exige volver al contenido y no a la memoria.</div>'));
 
   const acc=el('div','row');acc.style.marginTop='16px';
   acc.innerHTML=`<button class="btn btn-p" data-resort="1">Volver a intentar</button>
@@ -3139,7 +3158,7 @@ function viewResultado(){
   w.appendChild(acc);
 
   w.appendChild(el('div','banner plan','<span class="icon" data-icon="info"></span><div><b>Qué registra el intento real</b> (esta muestra no registra nada): agencia y usuario, módulo, número de intento, fecha y hora, las 10 preguntas sorteadas con su versión, la respuesta elegida en cada una, la nota y el resultado. Sin la versión de cada pregunta, una nota vieja se vuelve imposible de auditar cuando el banco se edita.</div>'));
-  w.appendChild(el('div','note v3','<b>Pantalla nueva v3 ·</b> Era el hueco que dejaba huérfano al campo "video de repaso": existía en el alta de pregunta y no había ninguna pantalla que lo consumiera. Además cierra el circuito de la evaluación —desbloqueo del módulo siguiente y habilitación de la Meet— y deja comparar las dos variantes de la decisión 1 con datos en pantalla en vez de en una discusión.'));
+  w.appendChild(nota('v3','<b>Pantalla nueva v3 ·</b> Era el hueco que dejaba huérfano al campo "video de repaso": existía en el alta de pregunta y no había ninguna pantalla que lo consumiera. Además cierra el circuito de la evaluación —desbloqueo del módulo siguiente y habilitación de la Meet— y fue donde se cerró la decisión 1: la pantalla trajo un comparador con la variante que mostraba las correctas, negocio las vio funcionando con datos y firmó no mostrarlas. Cerrada la decisión, el comparador se retiró.'));
   return w;
 }
 
@@ -3226,7 +3245,7 @@ function viewAgencia(){
     });
   }
   w.appendChild(frame);
-  w.appendChild(el('div','note v3','<b>Alineado al prototipo aprobado ·</b> Los módulos <b>fuera de plan se muestran con candado</b> (no se ocultan): además de pedagógico, es una superficie comercial. No tienen ordinal ni cuentan para el avance. El número que ve la agencia es la <b>posición en el recorrido</b>, nunca el ID, y va de 1 a N sin huecos porque la publicación es en orden.'));
+  w.appendChild(nota('v3','<b>Alineado al prototipo aprobado ·</b> Los módulos <b>fuera de plan se muestran con candado</b> (no se ocultan): además de pedagógico, es una superficie comercial. No tienen ordinal ni cuentan para el avance. El número que ve la agencia es la <b>posición en el recorrido</b>, nunca el ID, y va de 1 a N sin huecos porque la publicación es en orden.'));
   return w;
 }
 
@@ -3349,8 +3368,10 @@ function viewImportar(){
    videos:'BAK-M30.060\tEstados del voucher y cotización\tP+B',
    preguntas:'BAK-M40\tBAK-M40.S1\t¿Qué recibo agrupa varios files?\tDetallado\tIndicado\tAutomático\tNinguno\tA\tactiva'}[modo];
   const cols={
-   estructura:'ID del módulo (opcional, lo generamos si falta) · nombre del módulo · nombre de la sección · planes · orden',
-   videos:'ID (opcional) · qué enseña · planes',
+   /* La sigla estaba en los dos ejemplos de pegado y no se definía en ningún lado:
+      quien copia la planilla tiene que saber qué escribir en esa columna. */
+   estructura:'ID del módulo (opcional, lo generamos si falta) · nombre del módulo · nombre de la sección · planes (P+B los dos, P solo Professional, B solo Business, B-nicho solo Business y caso puntual) · orden',
+   videos:'ID (opcional) · qué enseña · planes (P+B los dos, P solo Professional, B solo Business)',
    preguntas:'módulo · tema (ID de la sección, o su nombre) · enunciado · opción A · B · C · D · letra de la correcta · estado (activa o borrador)'}[modo];
 
   if(S.impPaso===1){
@@ -3362,7 +3383,7 @@ function viewImportar(){
       <div class="row" style="margin-top:16px"><button class="btn btn-p" data-imp="rev">Revisar las filas</button>
         <button class="btn" data-imp="csv">Subir un archivo CSV</button></div>`;
     w.appendChild(c);
-    if(modo==='estructura') w.appendChild(el('div','note v3','<b>Modo nuevo v3 ·</b> El importador solo aceptaba videos contra módulos que ya existían, así que en una Academia vacía no servía para arrancar. Este modo crea la estructura: módulos, sus secciones y su orden, con la misma vista previa fila por fila.'));
+    if(modo==='estructura') w.appendChild(nota('v3','<b>Modo nuevo v3 ·</b> El importador solo aceptaba videos contra módulos que ya existían, así que en una Academia vacía no servía para arrancar. Este modo crea la estructura: módulos, sus secciones y su orden, con la misma vista previa fila por fila.'));
     return w;
   }
 
@@ -3454,8 +3475,8 @@ function viewImportar(){
     <span style="margin-left:auto" class="row"><button class="btn" data-imp="back">Volver a pegar</button>
     <button class="btn btn-p" data-imp="ok" ${ok?'':'disabled'}>Importar ${ok} filas de ${nombre}</button></span>`;
   w.appendChild(sum);
-  w.appendChild(el('div','note','<b>Nota de diseño ·</b> Vista previa obligatoria y nunca un import a ciegas. Cada error se explica en la fila que lo causó y ofrece las salidas específicas de ese error, en lugar de rechazar el lote entero por una celda.'));
-  if(modo==='videos') w.appendChild(el('div','note v3','<b>Ajuste v3 ·</b> La fila de BAK-M31 antes solo se podía omitir. Ahora ofrece <b>crear el módulo que falta</b> sin abandonar el pegado: es el caso real de una planilla que va más adelantada que la Academia.'));
+  w.appendChild(nota('','<b>Nota de diseño ·</b> Vista previa obligatoria y nunca un import a ciegas. Cada error se explica en la fila que lo causó y ofrece las salidas específicas de ese error, en lugar de rechazar el lote entero por una celda.'));
+  if(modo==='videos') w.appendChild(nota('v3','<b>Ajuste v3 ·</b> La fila de BAK-M31 antes solo se podía omitir. Ahora ofrece <b>crear el módulo que falta</b> sin abandonar el pegado: es el caso real de una planilla que va más adelantada que la Academia.'));
   return w;
 }
 
@@ -3464,6 +3485,89 @@ function viewImportar(){
    ============================================================ */
 function agBy(id){return AGENCIAS.find(a=>a.id===id);}
 function nombrePlantel(ag,uid){const e=ag.plantel.find(x=>x.id===uid);return e?e.nombre:'—';}
+
+/* ---------- EL SELECTOR DE AGENCIA (Avance por agencia + Meet) ----------
+   Con doce agencias, un botón por agencia deja de ser un selector y pasa a ser
+   una pared: elegir una agencia se vuelve una búsqueda visual. Así que el camino
+   principal es el buscador y los botones quedan como atajo secundario.
+   Vive acá, junto al dato de agencia, y no dentro de una vista, porque lo usan
+   las dos pantallas que eligen agencia: dos copias del mismo selector se
+   desincronizan solas. `attr` es 'panelag' o 'meetag', así que el componente no
+   sabe en qué pantalla está y los handlers de click siguen como estaban. */
+
+/* Avance promedio sobre el recorrido DEL PLAN, nunca sobre los del mapa
+   (invariante 2). Estaba inline en viewPanelAgencia y se extrajo porque el orden
+   de las sugerencias mide exactamente lo mismo que el KPI de la pantalla:
+   calcularlo en dos lugares es garantizar que en algún momento se separen. */
+function avancePromedio(ag){
+  const total=recorridoDe(ag).length;
+  if(!total||!ag.plantel.length) return 0;
+  return ag.plantel.reduce((a,e)=>a+Math.min(e.aprobados,total),0)/ag.plantel.length/total*100;
+}
+/* `ultimoAcceso` es texto de pantalla y viene en tres formas: 'Hoy HH:MM',
+   'DD/MM/YYYY' y '—' (nunca entró). parseCuando no sirve acá: exige la fecha
+   CON hora. El que nunca entró da 0, así que ordena último. */
+function tsAcceso(txt){
+  const t=String(txt||'').trim();
+  const h=/^Hoy (\d{2}):(\d{2})$/.exec(t);
+  if(h){const d=new Date();d.setHours(+h[1],+h[2],0,0);return d.getTime();}
+  const f=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(t);
+  return f?new Date(+f[3],+f[2]-1,+f[1]).getTime():0;
+}
+const ultimoAccesoAg=ag=>ag.plantel.reduce((a,e)=>Math.max(a,tsAcceso(e.ultimoAcceso)),0);
+/* Las sugerencias se DERIVAN, no se sortean (invariante 6). Un Math.random() por
+   render haría temblar los botones mientras se escribe, porque render() se vuelve
+   a correr en cada tecla. El criterio es el que Capacitación efectivamente
+   persigue —quién está más atrasado—, el rótulo lo nombra en pantalla, y el
+   desempate es la actividad reciente: entre dos agencias igual de atrasadas,
+   primero la que está entrando. */
+const agenciasSugeridas=n=>AGENCIAS.slice().sort((a,b)=>
+  avancePromedio(a)-avancePromedio(b)||ultimoAccesoAg(b)-ultimoAccesoAg(a)).slice(0,n);
+/* Sin mayúsculas y sin acentos: buscar "patagonico" tiene que encontrar
+   "Patagónico". normalize() alcanza y no necesita nada externo (file://). */
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+
+const AG_SUGERIDAS=6, AG_RESULTADOS=8;
+function selectorAgencia(agId,attr){
+  const ag=agBy(agId);
+  const q=norm(S.agFiltro.trim());
+  const hits=q?AGENCIAS.filter(a=>norm(a.nombre).includes(q)||norm(a.plan).includes(q)):null;
+
+  const box=el('div');box.style.margin='0 0 16px';
+  const busca=el('div','row');
+  busca.innerHTML=`<input type="text" id="agFiltro" placeholder="Buscar agencia por nombre o plan" value="${esc(S.agFiltro)}" style="width:280px" aria-label="Buscar agencia" autocomplete="off">
+    ${S.agFiltro?'<button class="btn btn-sm" data-agclear="1">Limpiar</button>':''}
+    <span class="tag" style="margin-left:8px">${esc(ag.nombre)}</span>
+    <span class="tag">plan ${esc(ag.plan)}</span>`;
+  box.appendChild(busca);
+
+  /* Sin resultados no se dibuja ninguna fila de botones: cuál es la agencia
+     activa ya lo dice el chip de arriba, y un botón solitario debajo de "0 de 12
+     coinciden" se lee como si fuera un resultado. */
+  if(hits&&!hits.length){
+    box.appendChild(el('div','emptynote','<b>Ninguna agencia coincide con «'+esc(S.agFiltro)+'».</b><br>Probá con parte del nombre, o con el plan (Professional / Business).'));
+    return box;
+  }
+
+  const tope=hits?AG_RESULTADOS:AG_SUGERIDAS;
+  let lista=(hits||agenciasSugeridas(AG_SUGERIDAS)).slice(0,tope);
+  /* La agencia elegida se dibuja SIEMPRE, aunque no matchee el filtro ni entre
+     en las sugeridas: si el botón activo desaparece, la pantalla parece
+     desincronizada de sus propios números. Y cuando se agrega, el rótulo lo
+     dice: si no, cuenta "6 coinciden" y se ven siete botones. */
+  const suelta=!lista.some(a=>a.id===agId);
+  if(suelta) lista=[ag].concat(lista.slice(0,tope-1));
+
+  const rot=(hits
+    ?`${hits.length} de ${AGENCIAS.length} agencias coinciden`+(hits.length>AG_RESULTADOS?` · se listan las primeras ${AG_RESULTADOS}`:'')
+    :'Sugeridas · menor avance del recorrido y actividad reciente')
+    +(suelta?' · la primera es la que estás viendo':'');
+  const fila=el('div','row');fila.style.marginTop='8px';
+  fila.innerHTML=`<span class="hint" style="margin:0;width:100%">${rot}</span>`+
+    lista.map(a=>`<button class="btn btn-sm ${agId===a.id?'btn-on':''}" data-${attr}="${a.id}">${esc(a.nombre)}</button>`).join('');
+  box.appendChild(fila);
+  return box;
+}
 /* El estado del cupo NO se guarda: se deriva de la cola y del turno. Un estado
    almacenado se desincroniza en cuanto alguien retira una duda.
 
@@ -3487,12 +3591,10 @@ function viewMeet(){
   w.innerHTML=`<h1>Meet y colas de dudas</h1>
     <p class="lede">El modelo aprobado: <b>una Meet por módulo por agencia</b>, no por usuario. Cada agencia acumula una cola de dudas por módulo; un coordinador agenda una única Meet con Soporte, cuya agenda es esa cola. Es lo que hace que la Academia no vuelva a saturar Soporte.</p>`;
 
-  const sel=el('div','row');sel.style.marginBottom='8px';
-  sel.innerHTML=`<span class="hint" style="margin:0">Agencia:</span>
-    ${AGENCIAS.map(a=>`<button class="btn btn-sm ${agId===a.id?'btn-on':''}" data-meetag="${a.id}">${esc(a.nombre)}</button>`).join('')}
-    <span class="tag" style="margin-left:8px">plan ${esc(ag.plan)}</span>
-    <span class="tag">coordinador: ${esc(nombrePlantel(ag,ag.coordinadorId))}</span>`;
-  w.appendChild(sel);
+  w.appendChild(selectorAgencia(agId,'meetag'));
+  /* El coordinador es dato de esta pantalla y no del selector compartido: es
+     quien agenda la Meet. Va debajo para no meterlo dentro del componente. */
+  w.appendChild(el('p','hint','Coordinador que agenda: <b>'+esc(nombrePlantel(ag,ag.coordinadorId))+'</b>'));
 
   /* Franja de atención de Soporte: parámetro del backoffice */
   const fr=el('div','card');fr.style.padding='16px';fr.style.margin='16px 0';
@@ -3541,7 +3643,7 @@ function viewMeet(){
   });
 
   w.appendChild(el('div','banner warn','<span class="icon" data-icon="alert-triangle"></span><div><b>Definiciones pendientes de la Meet.</b> Quién designa al coordinador y qué pasa si se va de la agencia (hoy llega de solo lectura desde el backend). Quién ve el texto de las dudas ajenas (el prototipo: el coordinador todas, el resto solo las propias). Y si la cola vence (decidido que no).</div>'));
-  w.appendChild(el('div','note v3','<b>Pantalla nueva de alineación ·</b> El backoffice modelaba la Meet como un link fijo en la ficha del módulo. El modelo aprobado es cupo por agencia con cola de dudas, coordinador y agenda de turnos, y <b>el enlace es por turno</b>. Ya no hay campo de link en la ficha del módulo, y el <b>estado del cupo se deriva</b> de la cola y de la fecha del turno: guardado se desincronizaba en cuanto alguien retiraba una duda.'));
+  w.appendChild(nota('v3','<b>Pantalla nueva de alineación ·</b> El backoffice modelaba la Meet como un link fijo en la ficha del módulo. El modelo aprobado es cupo por agencia con cola de dudas, coordinador y agenda de turnos, y <b>el enlace es por turno</b>. Ya no hay campo de link en la ficha del módulo, y el <b>estado del cupo se deriva</b> de la cola y de la fecha del turno: guardado se desincronizaba en cuanto alguien retiraba una duda.'));
   return w;
 }
 
@@ -3583,7 +3685,7 @@ function viewCertificado(){
   tw2.appendChild(tb2);w.appendChild(tw2);
 
   w.appendChild(el('div','banner plan','<span class="icon" data-icon="info"></span><div><b>Qué imprime el certificado</b> (CE-4): nombre del titular, documento, agencia, plan, módulos del recorrido aprobados y fecha. El PDF lo emite el backend; el prototipo confirma los datos y ahí termina. No hay que prometer un archivo que la maqueta no genera.</div>'));
-  w.appendChild(el('div','note v3','<b>Pantalla nueva de alineación ·</b> El certificado no estaba en el MVP del backoffice y el prototipo lo emite. Sin plantilla, tipos de documento y registro de emisiones administrados acá, el lado agencia no tiene de dónde tomar los datos.'));
+  w.appendChild(nota('v3','<b>Pantalla nueva de alineación ·</b> El certificado no estaba en el MVP del backoffice y el prototipo lo emite. Sin plantilla, tipos de documento y registro de emisiones administrados acá, el lado agencia no tiene de dónde tomar los datos.'));
   return w;
 }
 
@@ -3599,13 +3701,9 @@ function viewPanelAgencia(){
   w.innerHTML=`<h1>Avance por agencia</h1>
     <p class="lede">El agregado por agencia, con la regla de agregación nombrada: promedio de módulos aprobados por persona <b>sobre los del recorrido del plan</b> (${total} con ${esc(ag.plan)}), nunca sobre los ${mapaBAK().length} del mapa.</p>`;
 
-  const sel=el('div','row');sel.style.marginBottom='16px';
-  sel.innerHTML=`<span class="hint" style="margin:0">Agencia:</span>
-    ${AGENCIAS.map(a=>`<button class="btn btn-sm ${agId===a.id?'btn-on':''}" data-panelag="${a.id}">${esc(a.nombre)}</button>`).join('')}
-    <span class="tag" style="margin-left:8px">plan ${esc(ag.plan)}</span>`;
-  w.appendChild(sel);
+  w.appendChild(selectorAgencia(agId,'panelag'));
 
-  const prom=(ag.plantel.reduce((a,e)=>a+Math.min(e.aprobados,total),0)/ag.plantel.length/total*100);
+  const prom=avancePromedio(ag);
   const conAct=ag.plantel.filter(e=>e.aprobados>0).length;
   const completos=ag.plantel.filter(e=>e.aprobados>=total).length;
   const mini=el('div','mini');mini.style.gridTemplateColumns='repeat(4,1fr)';
@@ -3630,7 +3728,7 @@ function viewPanelAgencia(){
   tw.appendChild(tb);w.appendChild(tw);
 
   w.appendChild(el('div','banner plan','<span class="icon" data-icon="info"></span><div><b>Los eventos que alimentan esto tienen que loguearse desde el día uno:</b> por usuario y módulo — intentos con fecha-hora (con segundos, que desempatan el ranking), la versión de cada pregunta sorteada, la respuesta, la nota y el resultado; por usuario y video — aperturas, progreso y visto ≥80 %. Si el MVP sale sin el logueo, este panel se construye sobre datos que no existen.</div>'));
-  w.appendChild(el('div','note v3','<b>Pantalla nueva ·</b> Era "fase 2", pero el prototipo ya define exactamente qué datos consume y con qué regla de agregación, así que dejó de ser libre.'));
+  w.appendChild(nota('v3','<b>Pantalla nueva ·</b> Era "fase 2", pero el prototipo ya define exactamente qué datos consume y con qué regla de agregación, así que dejó de ser libre.'));
   return w;
 }
 
@@ -3658,14 +3756,29 @@ function viewPanelMacro(){
   /* % de agencias que completaron cada módulo (muestra derivada del plantel) */
   const bak=mapaBAK();
   w.appendChild(el('h2','','Completitud y reprobación por módulo'));
+  /* Es la única pantalla donde las etiquetas de los 11 módulos se leen de corrido y se
+     comparan entre sí, así que la tabla de equivalencias va acá y no en el árbol. Va
+     como `.banner plan` —informativo, no advertencia— y no como nota de diseño: el
+     glosario es producto, y las notas las remueve `aplicarMVP`. */
+  w.appendChild(el('div','banner plan','<span class="icon" data-icon="info"></span><div><b>Las etiquetas de la columna «Planes».</b> <b>P+B</b> · los dos planes: entra al recorrido de 9 módulos y al de 11. <b>P</b> · solo Professional. <b>B</b> · solo Business: una agencia Professional lo ve con candado, sin número, y no le cuenta para el avance. <b>B-nicho</b> · solo Business y además <b>caso puntual</b>: no es un plan aparte, es Business que además cubre una operación que no toda agencia tiene (hoy, receptivo operador). Las cuatro <b>se derivan</b> de los planes tildados en la ficha del módulo: no son un campo.</div>'));
   const tw=el('div','tablewrap');const tb=el('table');
-  tb.innerHTML=`<thead><tr><th>Módulo</th><th style="width:120px">Planes</th><th style="width:150px">% completado</th><th style="width:150px">Tasa de reprobación</th><th style="width:130px">Señal</th></tr></thead><tbody>`+
+  /* 160 y no 120: la etiqueta legible es más larga que la sigla, y con 120 la columna
+     partía «B-nicho» al medio. La sigla va nowrap por el mismo motivo. */
+  tb.innerHTML=`<thead><tr><th>Módulo</th><th style="width:160px">Planes</th><th style="width:150px">% completado</th><th style="width:150px">Tasa de reprobación</th><th style="width:130px">Señal</th></tr></thead><tbody>`+
     bak.map(m=>{
       const compl=USO_MUESTRA[m.id]?USO_MUESTRA[m.id][0]:20;
       const repro=USO_MUESTRA[m.id]?USO_MUESTRA[m.id][1]:10;
       const alerta=repro>=20;
       return `<tr data-warn="${alerta}"><td><span class="idbadge">${m.id}</span> ${esc(m.name)}</td>
-        <td>${esc(m.planes.join(" + "))} <span class="tag">${etiquetaPlanes(m)}</span></td>
+        ${/* La celda imprimía `planes.join(' + ')` y encima el chip derivado del mismo
+              dato: para diez de los once módulos era la misma palabra dos veces, y la
+              segunda en clave. Ahora imprime la etiqueta legible una sola vez —que
+              para esos diez ES el join— más la sigla, que es lo único que el chip
+              agregaba. Sin chip, además, la columna no se ensancha: `.tag` es nowrap
+              y la tabla no es de ancho fijo, así que un chip largo se comía las
+              barras de porcentaje. */''}
+        <td title="${esc(ayudaPlanes(m))}">${esc(etiquetaPlanesLarga(m))}
+          <span class="hint mono" style="display:inline;white-space:nowrap">${etiquetaPlanes(m)}</span></td>
         <td><div class="row" style="gap:8px"><span class="cellmono">${compl}%</span><div class="bar" style="flex:1;max-width:100px"><i style="width:${compl}%"></i></div></div></td>
         <td><div class="row" style="gap:8px"><span class="cellmono">${repro}%</span><div class="bar ${alerta?'zero':'low'}" style="flex:1;max-width:100px"><i style="width:${Math.min(100,repro*3)}%"></i></div></div></td>
         <td>${alerta?'<span class="tag stop">revisar contenido</span>':'<span class="tag ok">ok</span>'}</td></tr>`;
@@ -3673,7 +3786,7 @@ function viewPanelMacro(){
   tw.appendChild(tb);w.appendChild(tw);
 
   w.appendChild(el('div','banner warn','<span class="icon" data-icon="alert-triangle"></span><div><b>BAK-M20 (Entidades) reprueba '+USO_MUESTRA['BAK-M20'][1]+' %.</b> Es la señal que el panel existe para dar: no es que las agencias sean flojas, es que "Cliente vs. Pasajero" confunde. Se cruza con el % de acierto por pregunta del banco para encontrar el video a mejorar.</div>'));
-  w.appendChild(el('div','note v3','<b>Pantalla nueva ·</b> MVP §6. El ranking de videos más/menos vistos y el volumen de Meets por agencia salen del mismo logueo de eventos que alimenta el avance por agencia.'));
+  w.appendChild(nota('v3','<b>Pantalla nueva ·</b> MVP §6. El ranking de videos más/menos vistos y el volumen de Meets por agencia salen del mismo logueo de eventos que alimenta el avance por agencia.'));
   return w;
 }
 
@@ -3683,59 +3796,35 @@ function viewPanelMacro(){
 function viewParams(){
   const w=el('div','wrap');
   w.innerHTML=`<h1>Parámetros globales</h1>
-    <p class="lede">Los valores que el lado agencia lee y que hasta ahora vivían dispersos o solo en el documento. Acá quedan explícitos y, donde el MVP lo permite, editables.</p>`;
+    <p class="lede">Los valores que el lado agencia lee en toda la Academia. Los que llevan candado <b>no se editan en ningún lado</b>: son condiciones cerradas del MVP, y moverlas es una decisión de negocio, no una tarea de administración.</p>`;
 
   const card=el('div','card');card.style.padding='16px';
   card.innerHTML=`
    <div class="fieldgrid">
      <div><label>Umbral para marcar un video como "visto"</label><div class="ro"><span class="mono">${GLOBAL.umbralVisto} %</span> de la duración<span class="lock">regla del MVP</span></div></div>
      <div><label>Cómo se mide ese ${GLOBAL.umbralVisto} %</label>
-       <div class="radioset">
-         <label class="radiopill ${GLOBAL.metodoVisto==='posición'?'on':''}"><input type="radio" name="mv" ${GLOBAL.metodoVisto==='posición'?'checked':''}> Posición máxima alcanzada</label>
-         <label class="radiopill ${GLOBAL.metodoVisto!=='posición'?'on':''}"><input type="radio" name="mv" ${GLOBAL.metodoVisto!=='posición'?'checked':''}> Segundos efectivamente reproducidos (anti-scrub)</label>
-       </div>
-       <p class="hint miss">Decisión abierta P04.3. El prototipo usa posición y avisa que <b>no es el criterio de producción</b>: arrastrar la barra al final marca el video como visto. La API de YouTube alcanza para el criterio estricto — es decisión de producto, no límite técnico.</p></div>
+       <div class="ro">${GLOBAL.metodoVisto==='posición'?'Posición máxima alcanzada':'Segundos efectivamente reproducidos (anti-scrub)'}<span class="lock">no configurable en el MVP</span></div>
+       <p class="hint">${GLOBAL.metodoVisto==='posición'?'Arrastrar la barra hasta el final marca el video como visto.':'No cuenta el arrastre de la barra: solo los segundos que se reprodujeron.'}</p></div>
      <div><label>Preguntas por intento</label><div class="ro"><span class="mono">${GLOBAL.preguntasIntento}</span><span class="lock">regla del MVP</span></div></div>
      <div><label>Umbral de aprobación</label><div class="ro"><span class="mono">${GLOBAL.umbralAprob} / 10</span> (80 %)<span class="lock">regla del MVP</span></div></div>
-     <div><label>Tamaño del banco con el que nace un módulo</label>
-       <div class="ro">mínimo <span class="mono">${GLOBAL.bancoMinimo}</span> · objetivo <span class="mono">${GLOBAL.bancoObjetivo}</span><span class="lock">semilla, no valor vigente</span></div>
-       <p class="hint">Alineado a ${GLOBAL.bancoMinimo/GLOBAL.preguntasIntento}× el intento. Es el valor con el que nace un módulo nuevo: <b>el valor vigente lo define cada módulo</b>, en la pestaña Configuración de su evaluación. Editarlo acá no propagaba a lo ya creado, así que dejó de ser editable.</p></div>
+     <div><label>Tamaño del banco</label>
+       <div class="ro">mínimo <span class="mono">${GLOBAL.bancoMinimo}</span> · objetivo <span class="mono">${GLOBAL.bancoObjetivo}</span><span class="lock">regla del MVP</span></div>
+       <p class="hint">El mínimo es ${GLOBAL.bancoMinimo/GLOBAL.preguntasIntento}× el intento: con reintentos ilimitados, un banco más chico se memoriza. El mínimo bloquea la publicación, el objetivo es la meta y no la bloquea. Los ${DATA.length} módulos corren con estos valores.</p></div>
+     <div><label>Forzar cobertura por tema en el sorteo</label>
+       <div class="ro">sí<span class="lock">regla del MVP</span></div>
+       <p class="hint">Cada intento reserva una pregunta de cada tema del módulo y completa el resto al azar. Se ve funcionando en la pestaña Previsualizar de la evaluación.</p></div>
+     <div><label>Mostrar las respuestas correctas al finalizar</label>
+       <div class="ro">no<span class="lock">regla del MVP</span></div>
+       <p class="hint">Con reintentos ilimitados, mostrar la correcta convierte el examen en un ejercicio de memoria. El resultado muestra en qué tema falló y qué video repasar.</p></div>
      <div><label>Canal único de soporte</label><div class="row"><input type="text" value="${esc(GLOBAL.soporte)}" style="max-width:320px"></div>
-       <p class="hint">Un solo canal en toda la Academia, como en el prototipo.</p></div>
+       <p class="hint">Un solo canal en toda la Academia.</p></div>
      <div><label>Zona horaria de atención</label><div class="ro">${esc(GLOBAL.zona)}<span class="lock">rotulada en pantalla, sin conversión de husos</span></div></div>
      <div><label>Rehacer una evaluación ya aprobada</label>
-       <div class="ro">Gana la última nota aprobada; desaprobar después no revoca la aprobación<span class="lock">decisión del prototipo (P05.4)</span></div>
-       <p class="hint">Se cruza con la decisión 6 (¿la aprobación caduca al regrabar un video?): las dos definen si una aprobación es permanente o revisable, y conviene escribirlas juntas.</p></div>
+       <div class="ro">Gana la última nota aprobada; desaprobar después no revoca la aprobación<span class="lock">regla del MVP</span></div></div>
    </div>`;
   w.appendChild(card);
 
-  /* Trazabilidad: qué módulos se apartaron de la semilla y en qué. Con los
-     parámetros repartidos en dos pantallas, este dato no existía en ninguna. */
-  const semilla=p=>p.objetivo===GLOBAL.bancoObjetivo&&p.minimo===GLOBAL.bancoMinimo
-    &&p.forzarCobertura==='a definir'&&p.mostrarCorrectas==='a definir'&&p.caducaAlRegrabar==='a definir';
-  const propios=DATA.filter(m=>!semilla(m.params));
-  const tr2=el('div','card');tr2.style.padding='16px';tr2.style.marginTop='16px';
-  tr2.innerHTML=`<h3>Módulos con parámetros propios</h3>
-    <p class="hint" style="margin:4px 0 8px">Cada módulo es dueño de sus parámetros. Acá se ve, de una sola mirada, cuáles se apartaron del valor por defecto: es lo que evita que un umbral distinto se cuele sin decisión formal.</p>`;
-  if(!propios.length){
-    tr2.appendChild(el('div','emptynote','<b>Ninguno se apartó todavía.</b><br>Los '+DATA.length+' módulos corren con objetivo '+GLOBAL.bancoObjetivo+', mínimo '+GLOBAL.bancoMinimo+' y las tres decisiones sin definir.'));
-  }else{
-    const tw=el('div','tablewrap'),tb=el('table');
-    tb.innerHTML=`<thead><tr><th style="width:110px">Módulo</th><th>Nombre</th><th style="width:90px">Objetivo</th><th style="width:90px">Mínimo</th><th style="width:130px">Forzar cobertura</th><th style="width:130px">Mostrar correctas</th><th style="width:120px">Caduca al regrabar</th></tr></thead>`;
-    const bd=el('tbody');
-    propios.forEach(m=>{
-      const p=m.params, tr=el('tr');
-      tr.innerHTML=`<td class="cellmono">${m.id}</td><td>${esc(m.name)}</td>
-        <td class="cellmono">${p.objetivo}${p.objetivo!==GLOBAL.bancoObjetivo?' <span class="tag warn">propio</span>':''}</td>
-        <td class="cellmono">${p.minimo}${p.minimo!==GLOBAL.bancoMinimo?' <span class="tag warn">propio</span>':''}</td>
-        <td>${valParam(p.forzarCobertura)}</td><td>${valParam(p.mostrarCorrectas)}</td><td>${valParam(p.caducaAlRegrabar)}</td>`;
-      bd.appendChild(tr);
-    });
-    tb.appendChild(bd);tw.appendChild(tb);tr2.appendChild(tw);
-  }
-  w.appendChild(tr2);
-
-  w.appendChild(el('div','note v3','<b>Ajuste ·</b> Esta pantalla reúne lo que es global de verdad —umbral de visto y su método, preguntas por intento, umbral de aprobación, canal de soporte y zona horaria— y dejó de editar el mínimo del banco, que ahora vive en cada módulo. Antes el mismo número se editaba en dos lugares sin precedencia definida.'));
+  w.appendChild(nota('v3','<b>Ajuste ·</b> Esta pantalla es el único lugar donde se leen las reglas de la evaluación. El objetivo y el mínimo del banco se editaron primero acá y en la ficha del módulo sin precedencia definida, después solo en la pestaña Configuración de cada módulo, con una tabla de quién se había apartado. No se apartó ninguno en ningún momento: son condiciones cerradas del MVP, así que la pestaña y la tabla se eliminaron y acá quedan con candado.'));
   return w;
 }
 
@@ -3744,7 +3833,7 @@ function viewParams(){
    EVENTOS
    ============================================================ */
 document.addEventListener('click',ev=>{
-  const t=ev.target.closest('[data-go],[data-go2],[data-jump],[data-door],[data-esc],[data-sup],[data-toggle],[data-sel],[data-add],[data-ins],[data-quick],[data-modo],[data-secsave],[data-amsave],[data-tab],[data-evtab],[data-pmsave],[data-qnew],[data-bulk],[data-bbulk],[data-imp],[data-impmodo],[data-fix],[data-fixmod],[data-skip],[data-info],[data-plan],[data-arch],[data-pub],[data-vid-pub],[data-qsave],[data-qopt],[data-qdup],[data-ballcheck],[data-resort],[data-verres],[data-vercorr],[data-vord],[data-sord],[data-mord],[data-meetag],[data-panelag],[data-meetagendar],#collapseAll');
+  const t=ev.target.closest('[data-go],[data-go2],[data-jump],[data-door],[data-esc],[data-sup],[data-toggle],[data-sel],[data-add],[data-ins],[data-quick],[data-modo],[data-secsave],[data-amsave],[data-tab],[data-evtab],[data-qnew],[data-bulk],[data-bbulk],[data-imp],[data-impmodo],[data-fix],[data-fixmod],[data-skip],[data-info],[data-plan],[data-arch],[data-pub],[data-vid-pub],[data-qsave],[data-qopt],[data-qdup],[data-ballcheck],[data-resort],[data-verres],[data-vord],[data-sord],[data-mord],[data-meetag],[data-panelag],[data-agclear],[data-meetagendar],#collapseAll');
   if(!t||t.disabled) return;
 
   if(t.dataset.go){S.screen=t.dataset.go;S.impPaso=1;render();return;}
@@ -3757,7 +3846,7 @@ document.addEventListener('click',ev=>{
     if(p[0]==='banco'){S.screen='banco';S.bModId=p[1];S.bChecked.clear();render();return;}
     if(p[0]==='pregunta'){S.screen='pregunta';S.bModId=p[1];S.qEdit=p[2];render();return;}
     if(p[0]==='subtemas'){S.screen='subtemas';S.bModId=p[1];render();return;}
-    if(p[0]==='preview'){S.screen='preview';S.bModId=p[1];S.muestra=null;S.respuestas={};S.verCorrectas=null;render();return;}
+    if(p[0]==='preview'){S.screen='preview';S.bModId=p[1];S.muestra=null;S.respuestas={};render();return;}
     if(p[0]==='imp-preg'){S.screen='importar';S.impModo='preguntas';S.bModId=p[1];S.impPaso=1;S.omit.clear();render();return;}
   }
 
@@ -3804,6 +3893,7 @@ document.addEventListener('click',ev=>{
   if(t.dataset.plan){S.planVista=t.dataset.plan;render();return;}
   if(t.dataset.meetag){S.meetAg=t.dataset.meetag;render();return;}
   if(t.dataset.panelag){S.panelAg=t.dataset.panelag;render();return;}
+  if(t.dataset.agclear){S.agFiltro='';render();return;}
   if(t.dataset.meetagendar){const est=cupoEstado(S.meetAg||AGENCIAS[0].id,t.dataset.meetagendar);
     toast(est==='agendado'?'Turno ya agendado. El enlace de esta Meet es propio del turno, no del módulo.':'Agendando la Meet del equipo con la cola como agenda. Se toma un turno de la franja y se genera el enlace.');return;}
   if(t.dataset.toggle){S.open[t.dataset.toggle]=!S.open[t.dataset.toggle];render();return;}
@@ -3894,36 +3984,6 @@ document.addEventListener('click',ev=>{
     render();
     const nom=(subtemasDe(m).find(s=>s.id===t.dataset.qnew)||{}).name||'';
     toast('Pregunta nueva con el tema "'+nom+'" ya elegido.');
-    return;
-  }
-
-  /* Parámetros de la evaluación, que son del módulo. Las validaciones protegen las
-     reglas ya ratificadas: el mínimo no puede bajar de 3× el intento ni superar al
-     objetivo. */
-  if(t.dataset.pmsave){
-    const m=findMod(S.bModId), p=m.params;
-    if(t.dataset.pmsave==='reset'){
-      p.objetivo=GLOBAL.bancoObjetivo;p.minimo=GLOBAL.bancoMinimo;
-      p.forzarCobertura='a definir';p.mostrarCorrectas='a definir';p.caducaAlRegrabar='a definir';
-      render();toast('Parámetros de '+m.id+' vueltos a los valores por defecto: objetivo '+GLOBAL.bancoObjetivo+', mínimo '+GLOBAL.bancoMinimo+'.');
-      return;
-    }
-    const obj=parseInt(($('#pObj')&&$('#pObj').value)||p.objetivo,10);
-    const min=parseInt(($('#pMin')&&$('#pMin').value)||p.minimo,10);
-    const piso=3*p.porIntento;
-    if(!(obj>0)||!(min>0)){toast('El objetivo y el mínimo tienen que ser números mayores que cero.');return;}
-    if(min<piso){toast('El mínimo no puede bajar de '+piso+': es 3× las '+p.porIntento+' preguntas del intento, y con reintentos ilimitados un banco más chico se memoriza.');return;}
-    if(min>obj){toast('El mínimo no puede superar al objetivo: quedaría un módulo que nunca se puede publicar.');return;}
-    const leer=n=>{const x=document.querySelector('input[name="'+n+'"]:checked');return x?x.value:'a definir';};
-    p.objetivo=obj;p.minimo=min;
-    p.forzarCobertura=leer('pForzar');p.mostrarCorrectas=leer('pCorr');p.caducaAlRegrabar=leer('pCaduca');
-    /* Cambiar las reglas invalida el sorteo que estaba en pantalla. */
-    S.muestra=null;S.respuestas={};
-    const nAct=bancoActivas(m).length;
-    render();
-    toast('Parámetros de '+m.id+' guardados. '+(nAct<min
-      ?'Con '+nAct+' activas queda por debajo del mínimo de '+min+': el módulo no se puede publicar.'
-      :'Con '+nAct+' activas cumple el mínimo de '+min+'.'));
     return;
   }
 
@@ -4123,9 +4183,8 @@ document.addEventListener('click',ev=>{
     toast(q.id+(q.ver>verAntes&&verAntes?' guardada como v'+q.ver+', porque ya se había respondido. ':' guardada. ')+dondeEntra+aviso);
     return;
   }
-  if(t.dataset.resort){S.muestra=null;S.respuestas={};S.verCorrectas=null;S.screen='preview';render();toast('Nuevo sorteo con las mismas reglas. Mirá si cambió la cobertura por tema.');return;}
+  if(t.dataset.resort){S.muestra=null;S.respuestas={};S.screen='preview';render();toast('Nuevo sorteo con las mismas reglas. Mirá si cambió la cobertura por tema.');return;}
   if(t.dataset.verres){S.screen='resultado';render();return;}
-  if(t.dataset.vercorr!==undefined){S.verCorrectas=t.dataset.vercorr==='1';render();return;}
 
   if(t.dataset.info==='id'){
     toast('El ID se arma solo: BAK (superficie) + M30 (módulo) + 050 (de diez en diez, para poder intercalar). Es permanente: no cambia ni si regrabás el video.');return;
@@ -4133,11 +4192,15 @@ document.addEventListener('click',ev=>{
   if(t.dataset.info==='idmod'){
     toast('El ID del módulo es superficie + número, de diez en diez: BAK-M40, FRT-M00. Para intercalar entre dos módulos se usa un número intermedio, como BAK-M35. Es permanente.');return;
   }
+  /* La explicación completa del concepto, que es lo que el chip "B-nicho" nunca dijo.
+     Alcanzable por teclado, que es lo que un `title` no resuelve. */
+  if(t.dataset.info==='nicho'){
+    toast('Caso puntual (nicho): no es un plan aparte, es Business que además cubre una operación que no toda agencia tiene —hoy, receptivo operador—. Por eso los planes siguen siendo dos y el matiz es un tilde. Lo único que hace es nombrar el módulo distinto («Business · caso puntual», sigla B-nicho) y darle a la agencia el motivo por el que no está en su recorrido. No cambia el recorrido, ni la evaluación, ni el certificado.',12000);return;
+  }
 });
 
 document.addEventListener('change',ev=>{
   const t=ev.target;
-  if(t.id==='notesChk'){document.body.classList.toggle('notes-off',!t.checked);return;}
   if(t.id==='soloPend'){S.soloPend=t.checked;render();return;}
   if(t.id==='verArch'){S.verArch=t.checked;render();return;}
   /* Cambiar de módulo sin salir de la consola. Se limpia todo lo que era del módulo
@@ -4175,6 +4238,28 @@ document.addEventListener('change',ev=>{
     if($('#anNombre'))$('#anNombre').value=n;
     if($('#anSec'))$('#anSec').value=s;
     if($('#anOrden')&&o)$('#anOrden').value=o;
+    return;
+  }
+  /* El "caso puntual" en la FICHA. El check estaba dibujado y nadie lo leía: el tilde
+     se movía, el dato no, y el render siguiente lo revertía sin avisar —el mismo error
+     que tenía el nombre de la sección—. Y ahora que la pantalla explica para qué sirve
+     tildarlo, un control que no escribe es peor que la sigla sin explicar.
+     Se guarda al instante porque el panel de detalle no tiene botón de guardar, y se
+     devuelve lo tipeado en nombre y orden: esos dos campos todavía no los lee ningún
+     handler, así que el render los limpiaría a la vista. */
+  if(t.dataset&&t.dataset.nicho){
+    const m=findMod(t.dataset.nicho); if(!m) return;
+    m.nicho=t.checked;
+    const nom=$('#mn')?$('#mn').value:null, ord=$('#mo')?$('#mo').value:null;
+    render();
+    if(nom!==null&&$('#mn'))$('#mn').value=nom;
+    if(ord!==null&&$('#mo'))$('#mo').value=ord;
+    const etiq='La etiqueta '+(m.nicho?'pasa a':'vuelve a')+' «'+etiquetaPlanesLarga(m)+'» (sigla '+etiquetaPlanes(m)+').';
+    let msg;
+    if(!m.nicho) msg=m.id+' ya no es caso puntual. '+etiq;
+    else if(m.planes.length>1) msg=m.id+' queda marcado como caso puntual, pero con los dos planes tildados el matiz no aparece en ninguna etiqueta: solo existe cuando el módulo es solo Business.';
+    else msg=m.id+' queda marcado como caso puntual. '+etiq+' No cambia el recorrido, ni la evaluación, ni el certificado.';
+    toast(msg,8000);
     return;
   }
   /* El nombre de la SECCIÓN. El campo estaba dibujado y nadie lo leía: aceptaba lo
@@ -4245,12 +4330,13 @@ document.addEventListener('keydown',ev=>{
 });
 
 /* El foco y el caret los devuelve render(); acá solo se guarda el filtro. */
+/* Un Map y no un objeto literal, por el mismo motivo que ALIAS_EV: un literal
+   indexado por algo que sale del DOM responde 'constructor' y cualquier otra
+   clave heredada. Acá los tres ids son nuestros, pero el descuido se copia. */
+const CAMPOS_FILTRO=new Map([['filtro','filtro'],['bFiltro','bFiltro'],['agFiltro','agFiltro']]);
 document.addEventListener('input',ev=>{
-  const id=ev.target.id;
-  if(id==='filtro'||id==='bFiltro'){
-    if(id==='filtro') S.filtro=ev.target.value; else S.bFiltro=ev.target.value;
-    render();
-  }
+  const k=CAMPOS_FILTRO.get(ev.target.id);
+  if(k){ S[k]=ev.target.value; render(); }
 });
 
 render();

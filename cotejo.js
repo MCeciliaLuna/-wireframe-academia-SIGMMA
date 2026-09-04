@@ -232,13 +232,24 @@ DATA.forEach(m => {
 chequeo(temaAjeno.length === 0, 'el tema de cada pregunta es una sección de su propio módulo' + (temaAjeno.length ? '; fallan: ' + lista(temaAjeno) : ''));
 chequeo(repasoAjeno.length === 0, 'el video de repaso de cada pregunta es de su mismo tema' + (repasoAjeno.length ? '; fallan: ' + lista(repasoAjeno) : ''));
 
-/* Las reglas ratificadas: mínimo = 3× el intento, y el objetivo nunca por debajo
-   del mínimo (si no, el módulo no se podría publicar nunca). */
+/* Las reglas ratificadas: mínimo = 3× el intento, el objetivo nunca por debajo del
+   mínimo (si no, el módulo no se podría publicar nunca), y la cobertura forzada en
+   el sorteo igual en todos los módulos. Esto último lo custodiaba el candado de la
+   pestaña Configuración, que se eliminó porque no había nada que configurar: acá
+   está el reemplazo. Se custodia por VALOR porque tiene comportamiento: lo lee el
+   sorteo. Las otras dos decisiones cerradas se custodian por AUSENCIA, con el
+   mismo criterio —un campo que nadie lee es dato que no hace nada—:
+   `caducaAlRegrabar` (la 6) nunca tuvo comportamiento, y `mostrarCorrectas` (la 1)
+   perdió su único lector cuando se eliminó el comparador de variantes de la
+   pantalla de resultado. Si alguna vuelve, tiene que volver con comportamiento. */
 const malParams = [];
 DATA.forEach(m => {
   const p = m.params;
   if (p.minimo < 3 * p.porIntento) malParams.push(m.id + ': mínimo ' + p.minimo + ' < 3×' + p.porIntento);
   if (p.objetivo < p.minimo) malParams.push(m.id + ': objetivo ' + p.objetivo + ' < mínimo ' + p.minimo);
+  if (p.forzarCobertura !== 'si') malParams.push(m.id + ': forzarCobertura ' + p.forzarCobertura + ' ≠ si');
+  if ('mostrarCorrectas' in p) malParams.push(m.id + ': declara mostrarCorrectas, que se eliminó');
+  if ('caducaAlRegrabar' in p) malParams.push(m.id + ': declara caducaAlRegrabar, que se eliminó');
 });
 chequeo(malParams.length === 0, 'los parámetros de cada módulo respetan las reglas del MVP' + (malParams.length ? '; fallan: ' + lista(malParams, 4) : ''));
 
