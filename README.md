@@ -1,5 +1,23 @@
 # Academia SIGMMA — backoffice de gestión (prototipo de alta fidelidad)
 
+> **⚠ Este documento es anterior a las decisiones de negocio del 07/09/2026 en adelante** (aviso del
+> 05/11/2026). El prototipo sigue siendo la referencia visual y funcional aprobada, pero **ante una
+> diferencia manda `planes/DECISIONES.md`** de la carpeta `ACADEMIA-SIGMMA`, y el producto construido en
+> `academia-agencias/` y `academia-gestioninterna/`. Lo que cambió desde que se escribió:
+>
+> - **Los planes son tres:** Professional · Business · Corporate (decisión 3), no dos.
+> - **La Meet está diferida** y fuera de la v1 (decisiones 4, 17 y 28): el soporte va por WhatsApp.
+> - **El documento del titular sale del ERP** y no se pide en pantalla; el número completo se guarda y el
+>   backoffice ve los últimos 4 dígitos (decisiones del 08/09 y 62).
+> - **Un banco necesita 30 preguntas para publicar** (decisión 12), de 4 opciones (decisión 13).
+> - **El 80 % por posición del cursor es el criterio de producción** (decisión 1).
+> - **Regrabar no caduca la aprobación** (decisiones 10 y 11).
+> - **El importador y la planilla de videos existen** (decisiones 29, 41, 42 y 49), y **las agencias
+>   vienen del backoffice/ERP de SIGMMA** (decisión 5).
+>
+> **Ojo con la numeración:** cuando este documento dice «decisión 1, 2 o 6», usa una numeración propia
+> del prototipo, que **no** es la de `planes/DECISIONES.md`.
+
 Maquetación del **backoffice interno** de la Academia de Autocapacitación SIGMMA: donde el staff carga
 el contenido, administra los bancos de preguntas, publica módulos y sigue el avance de las agencias.
 La otra cara —la que usan las agencias— vive en el repo hermano
